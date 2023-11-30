@@ -1,0 +1,26 @@
+.container {
+  display: contents;
+}
+
+.button {
+  padding: 5px 10px;
+  gap: 10px;
+  border-bottom: solid 1px currentColor;
+  border-radius: var(--rounded) var(--rounded) 0 0;
+  color: var(--gray);
+  transition: color var(--fast);
+}
+
+.button:hover {
+  border-width: 1px;
+  color: var(--deep);
+}
+
+.button[data-selected] {
+  border-width: 3px;
+  color: var(--accent);
+}
+
+.content {
+  width: 100%;
+}

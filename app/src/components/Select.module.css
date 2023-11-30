@@ -1,0 +1,74 @@
+.root,
+.control {
+  display: contents;
+}
+
+.button {
+  padding: 5px;
+  gap: 10px;
+  border-bottom: solid 2px currentColor;
+  border-radius: var(--rounded) var(--rounded) 0 0;
+  color: var(--accent);
+  text-align: left;
+  transition: color var(--fast);
+}
+
+.button:hover {
+  color: var(--deep);
+}
+
+.button > span {
+  flex-grow: 1;
+}
+
+.popup {
+  z-index: 999 !important;
+  border-radius: var(--rounded);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.option {
+  display: grid;
+  grid-template-columns: 30px 2fr 1fr 30px;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--fast);
+}
+
+.option:hover,
+.option[data-highlighted] {
+  background: var(--accent-light);
+}
+
+.check {
+  justify-self: center;
+  height: 15px;
+  color: var(--accent);
+}
+
+.check[hidden] {
+  opacity: 0;
+}
+
+.text {
+  padding-right: 10px;
+}
+
+.info {
+  justify-self: flex-end;
+}
+
+.icon {
+  justify-self: center;
+}

@@ -1,0 +1,17 @@
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min-content;
+  gap: 20px;
+  color: var(--deep);
+  text-align: center;
+}
+
+.tile svg {
+  height: 30px;
+}
+
+.primary {
+  font-size: 1.1rem;
+}

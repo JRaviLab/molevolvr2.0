@@ -1,0 +1,16 @@
+.section {
+  padding: 60px max(40px, (100% - var(--content)) / 2);
+  background: var(--white);
+}
+
+.section:nth-child(even) {
+  background: #fafafa;
+}
+
+.fill {
+  background: var(--deep-light) !important;
+}
+
+.full {
+  padding: 40px;
+}

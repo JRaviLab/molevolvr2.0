@@ -1,0 +1,21 @@
+.footer {
+  padding: 40px 20px;
+  background: var(--deep);
+  box-shadow: var(--shadow);
+  color: var(--white);
+  text-align: center;
+}
+
+.footer a {
+  color: currentColor;
+  transition: opacity var(--fast);
+}
+
+.footer a:hover {
+  opacity: 0.5;
+}
+
+.icons > a {
+  display: flex;
+  padding: 5px;
+}

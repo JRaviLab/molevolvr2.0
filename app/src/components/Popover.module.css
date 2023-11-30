@@ -1,0 +1,46 @@
+.popup {
+  z-index: 999 !important;
+}
+
+.content {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  max-width: 400px;
+  padding: 20px;
+  gap: 20px;
+  background: var(--white);
+  color: var(--black);
+}
+
+.content > * {
+  margin: 0;
+}
+
+.label {
+  padding-right: 40px;
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  color: var(--accent);
+  transition: color var(--fast);
+}
+
+.close:hover {
+  color: var(--deep);
+}
+
+.arrow {
+  --arrow-size: 10px;
+  --arrow-background: var(--white);
+}
+
+.arrow div {
+  box-shadow: var(--shadow);
+  clip-path: polygon(-50% -50%, 150% -50%, -50% 150%);
+}

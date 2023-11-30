@@ -1,0 +1,26 @@
+[
+  {
+    "id": "a1b2c3",
+    "name": "Fake Analysis A",
+    "type": "fasta",
+    "info": "Lorem ipsum",
+    "started": "2023-11-29T23:19:34.390Z",
+    "status": { "type": "analyzing", "info": "Step 5 of 7" }
+  },
+  {
+    "id": "d4e5f6",
+    "name": "Fake Analysis B",
+    "type": "blast",
+    "info": "Dolor amet",
+    "started": "2022-11-28T23:19:34.390Z",
+    "status": { "type": "complete", "info": "Took 3:14:15" }
+  },
+  {
+    "id": "g7h8i9",
+    "name": "Fake Analysis C",
+    "type": "interproscan",
+    "info": "Alqua",
+    "started": "2023-10-29T23:19:34.390Z",
+    "status": { "type": "error", "info": "Server error" }
+  }
+]

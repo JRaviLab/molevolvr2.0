@@ -1,0 +1,17 @@
+{
+  "recommendations": [
+    "steoates.autoimport",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "pflannery.vscode-versionlens",
+    "yoavbls.pretty-ts-errors",
+    "streetsidesoftware.code-spell-checker"
+    // "eamodio.gitlens",
+    // "bennycode.sort-everything",
+    // "ms-vscode.live-server",
+    // "christian-kohler.path-intellisense",
+    // "Tyriar.sort-lines",
+    // "nmsmith89.incrementor",
+    // "janisdd.vscode-edit-csv",
+  ]
+}

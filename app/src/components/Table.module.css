@@ -1,0 +1,53 @@
+.scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: min(max-content, var(--content));
+}
+
+.th {
+  display: flex;
+  gap: 5px;
+}
+
+.th-label {
+  padding-right: 5px;
+}
+
+.header-button {
+  color: var(--light-gray);
+  transition: color var(--fast);
+}
+
+.header-button:hover {
+  color: var(--deep);
+}
+
+.header-button[data-active] {
+  color: var(--accent);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.page-text {
+  padding: 0 5px;
+}
+
+.page-button {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--rounded);
+  color: var(--accent);
+  transition: color var(--accent);
+}
+
+.page-button:hover {
+  color: var(--deep);
+}

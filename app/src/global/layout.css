@@ -1,0 +1,116 @@
+/** half content-width column */
+
+.narrow {
+  width: 100%;
+  max-width: calc(var(--content) / 2) !important;
+}
+
+/** full width */
+
+.full {
+  width: 100%;
+}
+
+/** basic, commonly-needed, centered horizontal or vertical flex */
+/** if any customization needed, use local class from scratch */
+
+.flex-row,
+.flex-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+}
+
+.flex-row {
+  flex-wrap: wrap;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+/** basic auto-filled grid with max number of columns */
+/** if customization needed, use local class from scratch */
+
+.grid {
+  --cols: 2;
+  --cell: min(100%, calc(var(--content) / var(--cols) - 100px));
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--cell), 1fr));
+  max-width: 100%;
+  gap: 40px;
+}
+
+/** adjust max number of grid columns */
+
+.cols-3 {
+  --cols: 3;
+}
+
+.cols-4 {
+  --cols: 4;
+}
+
+/** set spacing of flex or grid */
+
+.gap-xs {
+  gap: 5px 10px;
+}
+
+.gap-sm {
+  gap: 10px 20px;
+}
+
+.gap-md {
+  gap: 20px 40px;
+}
+
+.gap-lg {
+  gap: 40px 60px;
+}
+
+/** let flex/grid gap handle spacing of children */
+
+:is(.flex-row, .flex-col, .grid) > * {
+  margin: 0;
+}
+
+/** simple two-col auto-sized table of key/value pairs */
+
+.mini-table {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 5px 20px;
+  text-align: left;
+}
+
+.mini-table > :nth-child(odd) {
+  color: var(--gray);
+}
+
+.mini-table > :nth-child(even) {
+  font-weight: var(--medium);
+}
+
+/** automatically applied to all icons (react-icons and imported custom icons) */
+
+.icon {
+  flex-shrink: 0;
+  width: unset;
+  height: 1em;
+  overflow: visible;
+}
+
+/** blank box for dev or loading placeholder */
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 1;
+  width: 100%;
+  border-radius: var(--rounded);
+  background: var(--light-gray);
+}

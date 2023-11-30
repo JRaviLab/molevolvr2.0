@@ -1,0 +1,38 @@
+.container {
+  position: relative;
+  color: var(--accent);
+  transition: color var(--fast);
+}
+
+.container:hover {
+  color: var(--deep);
+}
+
+.input {
+  width: 100%;
+  padding-right: 20px;
+  border: none;
+  border-bottom: solid 2px currentColor;
+  border-radius: var(--rounded) var(--rounded) 0 0;
+  background: none;
+  color: currentColor;
+  text-align: center;
+}
+
+.inc,
+.dec {
+  position: absolute;
+  right: 0;
+  width: 20px;
+  height: calc(50% - 1px);
+  color: currentColor;
+  transition: color var(--fast);
+}
+
+.inc {
+  top: 0;
+}
+
+.dec {
+  top: calc(50% - 1px);
+}

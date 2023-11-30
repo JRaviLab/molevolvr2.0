@@ -1,0 +1,27 @@
+.button {
+  display: grid;
+  grid-template-columns: 1fr max-content 1em 1fr;
+  width: 100%;
+  gap: 10px;
+  border-radius: var(--rounded);
+  color: var(--accent);
+  transition: color var(--fast);
+}
+
+.button::before,
+.button::after {
+  height: 2px;
+  margin: 0 10px;
+  background: var(--light-gray);
+  content: "";
+  transition: background var(--fast);
+}
+
+.button:hover {
+  color: var(--deep);
+}
+
+.button:hover::before,
+.button:hover::after {
+  background: var(--deep);
+}

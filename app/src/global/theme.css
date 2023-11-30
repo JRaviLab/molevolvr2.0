@@ -1,0 +1,40 @@
+:root {
+  /* accent */
+  --accent: #2a9294;
+  --accent-light: #eefbfc;
+
+  /** deep */
+  --deep: #5c4863;
+  --deep-mid: #9a7da5;
+  --deep-light: #f7ede2;
+
+  /** grays */
+  --black: #000000;
+  --dark-gray: #404040;
+  --gray: #707070;
+  --light-gray: #e8e8e8;
+
+  --white: #ffffff;
+
+  /** util colors */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #f43f5e;
+
+  /* font weights */
+  --regular: 300;
+  --medium: 400;
+  --bold: 500;
+
+  /* effects */
+  --rounded: 5px;
+  --fast: 0.15s ease;
+  --slow: 0.35s ease;
+  --shadow: 0 0 2px #00000020, 2px 2px 5px #00000020;
+  --focus: 0 0 5px var(--accent);
+  --spacing: 2;
+  --compact: 1.5;
+
+  /** sizes */
+  --content: 1000px;
+}

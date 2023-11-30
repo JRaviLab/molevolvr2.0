@@ -1,0 +1,72 @@
+/** alignment */
+
+.left {
+  text-align: left;
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+/** weight */
+
+.bold {
+  font-weight: var(--bold);
+}
+
+/** color */
+
+.primary {
+  color: var(--dark-gray);
+  font-weight: var(--medium);
+}
+
+.secondary {
+  color: var(--gray);
+}
+
+/** single line truncate to width */
+
+.truncate:not(:focus) {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/** multi-line truncate */
+
+:is(.truncate-2, .truncate-3, .truncate-4, .truncate-5):not(:focus) {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lines);
+  display: -webkit-box;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.truncate-2 {
+  --lines: 2;
+}
+.truncate-3 {
+  --lines: 3;
+}
+.truncate-4 {
+  --lines: 4;
+}
+.truncate-5 {
+  --lines: 5;
+}
+
+/** indicate plain text has tooltip */
+
+.text-tooltip {
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-decoration-color: var(--gray);
+  text-underline-offset: 0.2em;
+  cursor: help;
+}
