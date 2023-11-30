@@ -7,8 +7,8 @@ import { useEffect } from "react";
 import { IconContext } from "react-icons";
 import {
   createBrowserRouter,
-  Navigate,
   Outlet,
+  redirect,
   RouterProvider,
   useLocation,
   useMatches,
@@ -112,7 +112,15 @@ const routes = [
       {
         /** not found */
         path: "*",
-        element: <Navigate to="/" replace />,
+        loader: async () => {
+          /** handle 404 redirect */
+          const url = window.sessionStorage.redirect as string;
+          if (url) {
+            console.info("Redirecting to:", url);
+            window.sessionStorage.removeItem("redirect");
+            return redirect(url);
+          } else return redirect("/");
+        },
       },
     ],
   },

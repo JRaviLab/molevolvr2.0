@@ -11,13 +11,10 @@
   background: var(--deep);
   box-shadow: var(--shadow);
   color: var(--white);
-  transition:
-    margin var(--slow),
-    padding var(--slow);
+  transition: padding var(--slow);
 }
 
 .header[data-scrolled] {
-  margin-bottom: 16px;
   padding: 8px 12px;
 }
 
