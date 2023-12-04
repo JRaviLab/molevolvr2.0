@@ -1,7 +1,7 @@
-import type { ComponentProps } from "react";
 import { useId, useState } from "react";
 import { normalizeProps, useMachine } from "@zag-js/react";
 import * as slider from "@zag-js/slider";
+import { useForm } from "@/components/Form";
 import type { LabelProps } from "@/components/Label";
 import Label, { forwardLabelProps } from "@/components/Label";
 import { renderText } from "@/util/dom";
@@ -15,6 +15,8 @@ type Base = {
   max?: number;
   /** inc/dec interval */
   step?: number;
+  /** field name */
+  name?: string;
 };
 
 type Single = {
@@ -35,12 +37,7 @@ type Multi = {
   onChange?: (value: number[]) => void;
 };
 
-type Input = Omit<
-  ComponentProps<"input">,
-  "min" | "max" | "step" | "value" | "onChange"
->;
-
-type Props = Base & LabelProps & (Single | Multi) & Input;
+type Props = Base & LabelProps & (Single | Multi);
 
 /**
  * single or multi-value number slider. use for numeric values that need quick
@@ -53,6 +50,7 @@ const Slider = ({
   multi,
   value,
   onChange,
+  name,
   ...props
 }: Props) => {
   /** focused index */
@@ -68,8 +66,9 @@ const Slider = ({
     slider.machine({
       /** unique id for component instance */
       id: useId(),
-      /** FormData name */
-      name: props.name,
+      /** link field to form */
+      name,
+      form: useForm(),
       minStepsBetweenThumbs: _step,
       /** slider props */
       min: _min,
@@ -118,16 +117,7 @@ const Slider = ({
               className={classes.thumb}
               aria-label={renderText(props.label || "") + " " + index}
             >
-              <input
-                {...api.getHiddenInputProps({ index })}
-                name={
-                  props.name
-                    ? multi
-                      ? props.name + "-" + index
-                      : props.name
-                    : undefined
-                }
-              />
+              <input {...api.getHiddenInputProps({ index })} name={name} />
             </div>
           ))}
         </div>

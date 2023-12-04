@@ -27,7 +27,7 @@ type Props = {
   width?: CSSProperties["width"];
   /** input/control to be associated with label */
   children: ReactElement;
-} & Omit<ComponentProps<"label">, "children">;
+} & Pick<ComponentProps<"label">, "htmlFor">;
 
 const labelProps = ["label", "layout", "tooltip", "required", "width"] as const;
 

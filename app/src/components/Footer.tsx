@@ -3,7 +3,7 @@ import classNames from "classnames";
 import Link from "@/components/Link";
 import classes from "./Footer.module.css";
 
-/** at bottom of every page */
+/** at bottom of every page. singleton. */
 const Footer = () => {
   return (
     <footer className={classNames(classes.footer, "flex-col", "gap-sm")}>

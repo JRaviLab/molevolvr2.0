@@ -15,7 +15,6 @@ import Overview from "@/pages/analysis/Overview";
 import { examples } from "@/pages/Home";
 
 const AnalysisContext = createContext<_Analysis>(examples[0]!);
-/** avoid prop-drilling */
 export const useAnalysis = () => useContext(AnalysisContext);
 
 const Analysis = () => {

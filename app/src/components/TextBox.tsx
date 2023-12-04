@@ -1,6 +1,7 @@
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { useId, useRef, useState } from "react";
 import { FaXmark } from "react-icons/fa6";
+import { useForm } from "@/components/Form";
 import type { LabelProps } from "@/components/Label";
 import Label, { forwardLabelProps } from "@/components/Label";
 import classes from "./TextBox.module.css";
@@ -12,26 +13,24 @@ type Base = {
   value?: string;
   /** on text state change */
   onChange?: (value: string) => void;
+  /** field name */
+  name?: string;
 };
 
 type Single = {
   /** single line */
   multi?: false;
-};
+} & Pick<ComponentProps<"input">, "placeholder" | "type" | "autoComplete">;
 
 type Multi = {
   /** multi-line */
   multi: true;
-};
+} & Pick<ComponentProps<"textarea">, "placeholder" | "autoComplete">;
 
-type Input = Omit<ComponentProps<"input">, "value" | "onChange">;
-
-type Textarea = Omit<ComponentProps<"textarea">, "value" | "onChange">;
-
-type Props = Base & LabelProps & ((Single & Input) | (Multi & Textarea));
+type Props = Base & LabelProps & (Single | Multi);
 
 /** single or multi-line text input box */
-const TextBox = ({ multi, icon, value, onChange, ...props }: Props) => {
+const TextBox = ({ multi, icon, value, onChange, name, ...props }: Props) => {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
 
   /** track whether input is blank */
@@ -60,6 +59,9 @@ const TextBox = ({ multi, icon, value, onChange, ...props }: Props) => {
     );
   else if (icon) sideElement = <div className={classes.side}>{icon}</div>;
 
+  /** link to form parent */
+  const form = useForm();
+
   /** input field */
   const input = multi ? (
     <textarea
@@ -71,7 +73,9 @@ const TextBox = ({ multi, icon, value, onChange, ...props }: Props) => {
         onChange?.(event.target.value);
         setBlank(!event.target.value);
       }}
-      {...(props as Textarea)}
+      name={name}
+      form={form}
+      {...props}
     />
   ) : (
     <input
@@ -84,7 +88,9 @@ const TextBox = ({ multi, icon, value, onChange, ...props }: Props) => {
         onChange?.(event.target.value);
         setBlank(!event.target.value);
       }}
-      {...(props as Input)}
+      name={name}
+      form={form}
+      {...props}
     />
   );
 

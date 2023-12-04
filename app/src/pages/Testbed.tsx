@@ -291,8 +291,8 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
             options={
               [
                 { id: "a", text: "Lorem" },
-                { id: "2", text: "Ipsum", info: "123" },
-                { id: "3", text: "Dolor", info: "123", icon: <FaHorse /> },
+                { id: "b", text: "Ipsum", info: "123" },
+                { id: "c", text: "Dolor", info: "123", icon: <FaHorse /> },
               ] as const
             }
             onChange={logChange}
@@ -396,7 +396,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
           Ago
         </Heading>
         <div className="flex-row gap-sm">
-          <Ago date="" />
+          <Ago date={new Date()} />
           <Ago date="Nov 12 2023" />
           <Ago date="Jun 1 2020" />
         </div>
@@ -633,7 +633,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
         </div>
       </Section>
 
-      {/* form (usually not needed) */}
+      {/* form */}
       <Section>
         <Heading level={2} icon={<FaClipboardList />}>
           Form
@@ -659,11 +659,23 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
               <Radios
                 label="Order"
                 options={[
-                  { id: "A", primary: "One" },
-                  { id: "B", primary: "Two" },
-                  { id: "C", primary: "Three" },
+                  { id: "one", primary: "One" },
+                  { id: "two", primary: "Two" },
+                  { id: "three", primary: "Three" },
                 ]}
                 name="order"
+              />
+              <Select
+                label="Select"
+                multi={true}
+                options={
+                  [
+                    { id: "a", text: "Lorem" },
+                    { id: "b", text: "Ipsum", info: "123" },
+                    { id: "c", text: "Dolor", info: "123", icon: <FaHorse /> },
+                  ] as const
+                }
+                name="select"
               />
             </div>
             <CheckBox label="I consent" name="consent" />

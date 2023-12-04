@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
-import { useEvent } from "react-use";
+import { useClickAway, useEvent } from "react-use";
 import classNames from "classnames";
 import Tooltip from "@/components/Tooltip";
 import { firstInView } from "@/util/dom";
@@ -19,7 +19,8 @@ const getHeadings = () => [
  * turned on/off at route level. singleton.
  */
 const TableOfContents = () => {
-  const ref = useRef<HTMLDivElement>(null);
+  const root = useRef<HTMLElement>(null);
+  const list = useRef<HTMLDivElement>(null);
 
   /** open/closed state */
   const [open, setOpen] = useState(window.innerWidth > 1500);
@@ -32,6 +33,11 @@ const TableOfContents = () => {
   /** active heading (first in view) */
   const [active, setActive] = useState("");
 
+  /** click off to close on small screens */
+  useClickAway(root, () => {
+    if (window.innerWidth < 1500) setOpen(false);
+  });
+
   /** on window scroll */
   useEvent("scroll", () => {
     /** get active heading */
@@ -40,7 +46,7 @@ const TableOfContents = () => {
 
   /** scroll toc list active item into view */
   useEffect(() => {
-    ref.current
+    list.current
       ?.querySelector("[data-active]")
       ?.scrollIntoView({ block: "center" });
   });
@@ -73,7 +79,7 @@ const TableOfContents = () => {
     return <></>;
 
   return (
-    <aside className={classes.table} aria-label="Table of contents">
+    <aside ref={root} className={classes.table} aria-label="Table of contents">
       <div className={classes.heading}>
         {/* top text */}
         {open && (
@@ -96,7 +102,7 @@ const TableOfContents = () => {
 
       {/* links */}
       {open && (
-        <div ref={ref} className={classes.list}>
+        <div ref={list} className={classes.list}>
           {headings.map((heading, index) => (
             <a
               key={index}

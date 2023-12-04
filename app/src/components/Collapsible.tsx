@@ -40,11 +40,13 @@ const Collapsible = ({ text, tooltip, className, children }: Props) => {
       </Tooltip>
 
       {/* content */}
-      {open && (
-        <div id={id} className={className}>
-          {children}
-        </div>
-      )}
+      <div
+        id={id}
+        className={className}
+        style={{ display: open ? "" : "none" }}
+      >
+        {children}
+      </div>
     </>
   );
 };

@@ -6,6 +6,7 @@ import type {
 } from "react";
 import { cloneElement, forwardRef } from "react";
 import classNames from "classnames";
+import { useForm } from "@/components/Form";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
 import classes from "./Button.module.css";
@@ -15,18 +16,28 @@ type Base = {
   icon?: ReactElement;
   /** look */
   design?: "normal" | "accent" | "critical";
+  /** class */
+  className?: string;
 };
 
 type Description =
   /** require text and/or tooltip for accessibility */
   { text: string; tooltip?: ReactNode } | { text?: string; tooltip: ReactNode };
 
-/** <a> or <RouterLink> */
-type Link = ComponentProps<typeof Link>;
-/** <button> */
-type _Button = ComponentProps<"button">;
+type _Link = Pick<ComponentProps<typeof Link>, "to">;
 
-type Props = Base & Description & (Link | _Button);
+type _Button = Pick<
+  ComponentProps<"button">,
+  | "onClick"
+  | "type"
+  | "onDrag"
+  | "onDragEnter"
+  | "onDragLeave"
+  | "onDragOver"
+  | "onDrop"
+>;
+
+type Props = Base & Description & (_Link | _Button);
 
 /**
  * looks like a button and either goes somewhere (<a>) or does something
@@ -50,6 +61,9 @@ const Button = forwardRef(
       [classes.square!]: !text && !!icon,
     });
 
+    /** link to form parent */
+    const form = useForm();
+
     /** if "to", render as link */
     if ("to" in props)
       return (
@@ -58,7 +72,7 @@ const Button = forwardRef(
           className={_class}
           tooltip={tooltip}
           noIcon={true}
-          {...(props as Link)}
+          {...props}
         >
           {children}
         </Link>
@@ -70,7 +84,8 @@ const Button = forwardRef(
             ref={ref as ForwardedRef<HTMLButtonElement>}
             className={_class}
             type="button"
-            {...(props as _Button)}
+            form={form}
+            {...props}
           >
             {children}
           </button>

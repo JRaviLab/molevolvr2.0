@@ -6,6 +6,7 @@ import { omit } from "lodash";
 import { normalizeProps, Portal, useMachine } from "@zag-js/react";
 import * as select from "@zag-js/select";
 import type { PropTypes } from "@zag-js/types";
+import { useForm } from "@/components/Form";
 import type { LabelProps } from "@/components/Label";
 import Label, { forwardLabelProps } from "@/components/Label";
 import classes from "./Select.module.css";
@@ -24,6 +25,8 @@ export type Option = {
 type Base<O extends Option> = {
   /** pass with "as const" */
   options: readonly O[];
+  /** field name */
+  name?: string;
 };
 
 type Single<O extends Option> = {
@@ -51,6 +54,7 @@ const Select = <O extends Option>({
   value,
   onChange,
   options,
+  name,
   ...props
 }: Props<O>) => {
   /** set up zag */
@@ -58,8 +62,11 @@ const Select = <O extends Option>({
     select.machine<O>({
       /** unique id for component instance */
       id: useId(),
+      /** link field to form */
+      name,
+      form: useForm(),
       /** multiple selections allowed */
-      multiple: multi,
+      multiple: !!multi,
       /** options */
       collection: select.collection({
         /** options */
@@ -116,78 +123,94 @@ const Select = <O extends Option>({
   if (options.some((option) => option.icon)) cols++;
 
   return (
-    <div {...api.rootProps} className={classes.root}>
-      {/* trigger */}
-      <div {...api.controlProps} className={classes.control}>
-        <Label
-          {...api.labelProps}
-          {...forwardLabelProps(props, api.triggerProps.id)}
-        >
-          <button {...api.triggerProps} className={classes.button}>
-            <span className="truncate" aria-hidden={true}>
-              {selectedLabel}
-            </span>
-            <FaCaretDown />
-          </button>
-        </Label>
+    <>
+      <div {...api.rootProps} className={classes.root}>
+        {/* trigger */}
+        <div {...api.controlProps} className={classes.control}>
+          <Label
+            {...api.labelProps}
+            {...forwardLabelProps(props, api.triggerProps.id)}
+          >
+            <button {...api.triggerProps} className={classes.button}>
+              <span className="truncate" aria-hidden={true}>
+                {selectedLabel}
+              </span>
+              <FaCaretDown />
+            </button>
+          </Label>
+        </div>
+
+        {/* popup */}
+        <Portal>
+          {api.isOpen && (
+            <div {...api.positionerProps} className={classes.popup}>
+              {/* select all/none */}
+              <ul {...api.contentProps} className={classes.list}>
+                {multi && (
+                  <button
+                    className={classes.option}
+                    onClick={() =>
+                      api.setValue(
+                        allSelected ? [] : options.map((option) => option.id),
+                      )
+                    }
+                  >
+                    <Check
+                      className={classes.check}
+                      style={{ opacity: allSelected ? 1 : 0 }}
+                    />
+                    <span className={classes.text}>All</span>
+                  </button>
+                )}
+
+                {/* main options */}
+                {options.map((option, index) => (
+                  <li
+                    key={index}
+                    {...api.getItemProps({ item: option })}
+                    className={classes.option}
+                    style={{
+                      ...api.contentProps.style,
+                      gridTemplateColumns: ["30px", "2fr", "1fr", "30px"]
+                        .slice(0, cols)
+                        .join(" "),
+                    }}
+                  >
+                    <Check
+                      {...api.getItemIndicatorProps({ item: option })}
+                      className={classes.check}
+                      style={{ height: multi ? "" : "8px" }}
+                    />
+                    <span className={classes.text}>{option.text}</span>
+                    {option.info && (
+                      <span className="secondary">{option.info}</span>
+                    )}
+                    {option.icon &&
+                      cloneElement(option.icon, {
+                        className: classNames(classes.icon, "secondary"),
+                      })}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </Portal>
       </div>
 
-      {/* popup */}
-      <Portal>
-        {api.isOpen && (
-          <div {...api.positionerProps} className={classes.popup}>
-            {/* select all/none */}
-            <ul {...api.contentProps} className={classes.list}>
-              {multi && (
-                <button
-                  className={classes.option}
-                  onClick={() =>
-                    api.setValue(
-                      allSelected ? [] : options.map((option) => option.id),
-                    )
-                  }
-                >
-                  <Check
-                    className={classes.check}
-                    style={{ opacity: allSelected ? 1 : 0 }}
-                  />
-                  <span className={classes.text}>All</span>
-                </button>
-              )}
-
-              {/* main options */}
-              {options.map((option) => (
-                <li
-                  key={option.id}
-                  {...api.getItemProps({ item: option })}
-                  className={classes.option}
-                  style={{
-                    ...api.contentProps.style,
-                    gridTemplateColumns: ["30px", "2fr", "1fr", "30px"]
-                      .slice(0, cols)
-                      .join(" "),
-                  }}
-                >
-                  <Check
-                    {...api.getItemIndicatorProps({ item: option })}
-                    className={classes.check}
-                    style={{ height: multi ? "" : "8px" }}
-                  />
-                  <span className={classes.text}>{option.text}</span>
-                  {option.info && (
-                    <span className="secondary">{option.info}</span>
-                  )}
-                  {option.icon &&
-                    cloneElement(option.icon, {
-                      className: classNames(classes.icon, "secondary"),
-                    })}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </Portal>
-    </div>
+      {/* for form usage */}
+      <select
+        {...api.hiddenSelectProps}
+        value={multi ? api.value : api.value[0]}
+        /** https://github.com/facebook/react/issues/27657 */
+        onChange={() => null}
+      >
+        {options.map((option, index) => (
+          <option key={index} value={option.id}>
+            {option.text}
+          </option>
+        ))}
+      </select>
+    </>
   );
 };
 

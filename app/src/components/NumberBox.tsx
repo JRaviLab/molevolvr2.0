@@ -1,8 +1,8 @@
-import type { ComponentProps } from "react";
 import { useId } from "react";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import * as numberInput from "@zag-js/number-input";
 import { normalizeProps, useMachine } from "@zag-js/react";
+import { useForm } from "@/components/Form";
 import type { LabelProps } from "@/components/Label";
 import Label, { forwardLabelProps } from "@/components/Label";
 import classes from "./NumberBox.module.css";
@@ -18,24 +18,30 @@ type Base = {
   value?: number;
   /** on number state change */
   onChange?: (value: number) => void;
+  /** field name */
+  name?: string;
 };
 
-type Input = Omit<
-  ComponentProps<"input">,
-  "min" | "max" | "step" | "value" | "onChange"
->;
-
-type Props = Base & LabelProps & Input;
+type Props = Base & LabelProps;
 
 /** number input box. use for numeric values that need precise adjustment. */
-const NumberBox = ({ min, max, step, value, onChange, ...props }: Props) => {
+const NumberBox = ({
+  min,
+  max,
+  step,
+  value,
+  onChange,
+  name,
+  ...props
+}: Props) => {
   /** set up zag */
   const [state, send] = useMachine(
     numberInput.machine({
       /** unique id for component instance */
       id: useId(),
-      /** FormData name */
-      name: props.name,
+      /** link field and form */
+      name,
+      form: useForm(),
       /** settings */
       allowMouseWheel: true,
       /** regular number box props */

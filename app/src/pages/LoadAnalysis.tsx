@@ -1,10 +1,10 @@
-import { useState } from "react";
 import { FaArrowRight, FaClockRotateLeft } from "react-icons/fa6";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "react-use";
 import type { Analysis } from "@/api/types";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";
+import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
 import Section from "@/components/Section";
@@ -19,9 +19,6 @@ const LoadAnalysis = () => {
   /** analysis history */
   const [history = [], setHistory] = useLocalStorage<Analysis[]>(storageKey);
 
-  /** analysis ids */
-  const [id, setId] = useState("");
-
   return (
     <>
       <Meta title="Load Analysis" />
@@ -31,21 +28,17 @@ const LoadAnalysis = () => {
           Load Analysis
         </Heading>
 
-        <div className="flex-col gap-md narrow">
-          <TextBox
-            placeholder="Analysis ID"
-            width={200}
-            name="id"
-            value={id}
-            onChange={setId}
-          />
-          <Button
-            design="accent"
-            text="Lookup"
-            icon={<FaArrowRight />}
-            onClick={() => navigate(`/analysis/${id}`)}
-          />
-        </div>
+        <Form onSubmit={(data) => navigate(`/analysis/${data.id}`)}>
+          <div className="flex-col gap-md narrow">
+            <TextBox placeholder="Analysis ID" width={200} name="id" />
+            <Button
+              design="accent"
+              text="Lookup"
+              icon={<FaArrowRight />}
+              type="submit"
+            />
+          </div>
+        </Form>
       </Section>
 
       <Section>

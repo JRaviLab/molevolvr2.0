@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ForwardedRef, ReactNode } from "react";
+import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { Link as RouterLink } from "react-router-dom";
@@ -12,7 +12,11 @@ type Props = {
   noIcon?: boolean;
   /** tooltip content */
   tooltip?: ReactNode;
-} & ComponentPropsWithoutRef<"a">;
+  /** class */
+  className?: string;
+  /** content */
+  children: ReactNode;
+};
 
 /** link to internal route or external url */
 const Link = forwardRef(

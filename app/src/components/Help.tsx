@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { FaRegCircleQuestion } from "react-icons/fa6";
 import classNames from "classnames";
 import Tooltip from "@/components/Tooltip";
@@ -8,7 +8,9 @@ import classes from "./Help.module.css";
 type Props = {
   /** tooltip content */
   tooltip: ReactNode;
-} & ComponentProps<"button">;
+  /** class */
+  className?: string;
+};
 
 /**
  * ? button to hover/click for help tooltip. for use in other components, not

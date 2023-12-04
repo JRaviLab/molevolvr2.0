@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactElement, ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { cloneElement, useRef } from "react";
 import { FaLink } from "react-icons/fa6";
 import classNames from "classnames";
@@ -14,9 +14,11 @@ type Props = {
   icon?: ReactElement | string;
   /** manually set anchor link instead of automatically from children text */
   anchor?: string;
+  /** class on heading */
+  className?: string;
   /** heading content */
   children: ReactNode;
-} & ComponentProps<"h1" | "h2" | "h3" | "h4">;
+};
 
 /**
  * demarcates a new section/level of content. only use one level 1 per page.
@@ -28,7 +30,6 @@ const Heading = ({
   anchor,
   className,
   children,
-  ...props
 }: Props) => {
   const ref = useRef<HTMLHeadingElement>(null);
 
@@ -47,12 +48,7 @@ const Heading = ({
     );
 
   return (
-    <Tag
-      id={id}
-      ref={ref}
-      {...props}
-      className={classNames(className, classes.heading)}
-    >
+    <Tag id={id} ref={ref} className={classNames(className, classes.heading)}>
       {iconElement}
 
       {/* content */}

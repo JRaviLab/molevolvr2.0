@@ -5,9 +5,14 @@ import Button from "@/components/Button";
 import classes from "./UploadButton.module.css";
 
 type Props = {
+  /**
+   * formats to accept.
+   * https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept
+   */
+  accept?: string;
+  /** callback with file */
   onUpload: (file: File, filename: string) => void;
-} & ComponentProps<typeof Button> &
-  Pick<ComponentProps<"input">, "accept">;
+} & ComponentProps<typeof Button>;
 
 /** file dialog or drag & drop button */
 const UploadButton = ({ onUpload, accept = "", tooltip, ...props }: Props) => {

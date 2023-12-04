@@ -13,6 +13,8 @@ import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
 import Collapsible from "@/components/Collapsible";
+import Form from "@/components/Form";
+import type { FormData } from "@/components/Form";
 import Heading from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
@@ -43,9 +45,8 @@ const NewAnalysis = () => {
   const navigate = useNavigate();
 
   /** state */
-  const [name, setName] = useState("New Analysis");
   const [type, setType] = useState<(typeof types)[number]>(types[0]);
-  const [sequence, setSequence] = useState("");
+  const [, setSequence] = useState("");
   const [email, setEmail] = useLocalStorage("molevolvr-email", "");
 
   const onUpload = () => {
@@ -56,8 +57,8 @@ const NewAnalysis = () => {
     setSequence("abcdefghijklmnopqrstuvwxyz");
   };
 
-  const onSubmit = () => {
-    console.info(name, type, sequence, email);
+  const onSubmit = (data: FormData) => {
+    console.info(data);
     toast("Analysis submitted", "success");
     navigate("/analysis/d4e5f6");
   };
@@ -66,91 +67,93 @@ const NewAnalysis = () => {
     <>
       <Meta title="New Analysis" />
 
-      <Section>
-        <Heading level={1} icon={<FaPlus />}>
-          New Analysis
-        </Heading>
+      <Form onSubmit={onSubmit}>
+        <Section>
+          <Heading level={1} icon={<FaPlus />}>
+            New Analysis
+          </Heading>
 
-        <TextBox
-          label="Name"
-          placeholder="New Analysis"
-          width={400}
-          value={name}
-          onChange={setName}
-        />
-      </Section>
-
-      <Section>
-        <Heading level={2} icon={<FaArrowRightToBracket />}>
-          Inputs
-        </Heading>
-
-        <Select
-          label="Type"
-          layout="horizontal"
-          tooltip="Lorem ipsum"
-          options={types}
-          value={type}
-          onChange={setType}
-        />
-
-        <TextBox
-          label="Sequence"
-          placeholder={sequencePlaceholders[type.id]}
-          multi={true}
-          width="100%"
-          value={sequence}
-          onChange={setSequence}
-        />
-
-        <div className="flex-row gap-sm">
-          <UploadButton
-            text="Upload"
-            icon={<FaUpload />}
-            onUpload={console.info}
-            design="accent"
-            onClick={onUpload}
+          <TextBox
+            label="Name"
+            placeholder="New Analysis"
+            width={400}
+            name="name"
           />
-          <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
-        </div>
+        </Section>
 
-        <Collapsible text="Advanced" className="flex-col gap-md">
-          <CheckBox label="Phylogeny" />
-          <CheckBox label="Homology" />
-          <CheckBox label="Domain Architecture" />
-        </Collapsible>
-      </Section>
+        <Section>
+          <Heading level={2} icon={<FaArrowRightToBracket />}>
+            Inputs
+          </Heading>
 
-      <Section>
-        <Heading level={2} icon={<FaRegPaperPlane />}>
-          Submit
-        </Heading>
+          <Select
+            label="Type"
+            layout="horizontal"
+            tooltip="Lorem ipsum"
+            options={types}
+            value={type}
+            onChange={setType}
+            name="type"
+          />
 
-        <Alert>
-          An analysis takes <strong>several hours to run</strong>!{" "}
-          <Link to="/about">Learn more</Link>.
-        </Alert>
+          <TextBox
+            label="Sequence"
+            placeholder={sequencePlaceholders[type.id]}
+            multi={true}
+            required={true}
+            width="100%"
+            name="sequence"
+          />
 
-        <TextBox
-          label={
-            <>
-              <FaRegBell /> Email me updates on this analysis
-            </>
-          }
-          width={360}
-          placeholder="my-email@xyz.com"
-          tooltip="We can email you when this analysis starts (so you can keep track of it) and when it finishes."
-          value={email}
-          onChange={setEmail}
-        />
+          <div className="flex-row gap-sm">
+            <UploadButton
+              text="Upload"
+              icon={<FaUpload />}
+              onUpload={console.info}
+              design="accent"
+              onClick={onUpload}
+            />
+            <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
+          </div>
 
-        <Button
-          text="Submit"
-          icon={<FaRegPaperPlane />}
-          design="critical"
-          onClick={onSubmit}
-        />
-      </Section>
+          <Collapsible text="Advanced" className="flex-col gap-md">
+            <CheckBox label="Phylogeny" name="phylogeny" />
+            <CheckBox label="Homology" name="homology" />
+            <CheckBox label="Domain Architecture" name="domain-architecture" />
+          </Collapsible>
+        </Section>
+
+        <Section>
+          <Heading level={2} icon={<FaRegPaperPlane />}>
+            Submit
+          </Heading>
+
+          <Alert>
+            An analysis takes <strong>several hours to run</strong>!{" "}
+            <Link to="/about">Learn more</Link>.
+          </Alert>
+
+          <TextBox
+            label={
+              <>
+                <FaRegBell /> Email me updates on this analysis
+              </>
+            }
+            width={360}
+            placeholder="my-email@xyz.com"
+            tooltip="We can email you when this analysis starts (so you can keep track of it) and when it finishes."
+            value={email}
+            onChange={setEmail}
+          />
+
+          <Button
+            text="Submit"
+            icon={<FaRegPaperPlane />}
+            design="critical"
+            type="submit"
+          />
+        </Section>
+      </Form>
     </>
   );
 };

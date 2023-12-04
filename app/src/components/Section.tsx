@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import type { ReactNode } from "react";
 import classNames from "classnames";
 import classes from "./Section.module.css";
 
@@ -7,7 +7,11 @@ type Props = {
   fill?: boolean;
   /** contents fill full available screen width */
   full?: boolean;
-} & ComponentProps<"section">;
+  /** class on section */
+  className?: string;
+  /** section content */
+  children: ReactNode;
+};
 
 /**
  * vertically stacked section. background color spans full width of screen, but

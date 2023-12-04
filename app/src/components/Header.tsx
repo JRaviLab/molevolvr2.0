@@ -8,7 +8,7 @@ import Tooltip from "@/components/Tooltip";
 import { sleep } from "@/util/misc";
 import classes from "./Header.module.css";
 
-/** at top of every page */
+/** at top of every page. singleton. */
 const Header = () => {
   /** logo is animating */
   const [animated, setAnimated] = useState<true | undefined>();

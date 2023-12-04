@@ -1,4 +1,3 @@
-import type { ComponentProps } from "react";
 import ReactTimeAgo from "react-time-ago";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
@@ -11,14 +10,22 @@ TimeAgo.addDefaultLocale(en);
 type Props = {
   /** iso date string or date object */
   date: string | Date | undefined;
-} & ComponentProps<"time">;
+  /** class on time element */
+  className?: string;
+};
 
 /** show datetime in "ago" format, e.g. "20 min ago" */
-const Ago = ({ date, ...props }: Props) => {
-  if (!date) return <span>???</span>;
+const Ago = ({ date, className }: Props) => {
+  /** parse arg as date */
+  const parsed = parseDate(date);
+  if (!parsed) return <span>???</span>;
+
+  /** full date for tooltip */
+  const full = formatDate(date);
+
   return (
-    <Tooltip content={formatDate(date)}>
-      <ReactTimeAgo date={parseDate(date)} locale="en-US" {...props} />
+    <Tooltip content={full || "???"}>
+      <ReactTimeAgo date={parsed} locale="en-US" className={className} />
     </Tooltip>
   );
 };
