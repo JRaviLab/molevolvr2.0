@@ -68,7 +68,7 @@
 .link::after {
   position: absolute;
   right: 5px;
-  bottom: 0;
+  bottom: 0.1em;
   left: 5px;
   height: 1px;
   transform: scaleX(0);

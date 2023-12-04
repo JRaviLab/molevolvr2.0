@@ -1,4 +1,5 @@
 .hero {
+  max-width: 550px;
   font-size: 1.2rem;
   text-align: center;
   text-wrap: balance;
