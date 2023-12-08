@@ -42,17 +42,15 @@ import { downloadCsv } from "@/util/download";
 import classes from "./Table.module.css";
 
 type Props<Datum extends object> = {
-  cols: {
+  cols: readonly {
     /** key of row object to access as value */
     key: keyof Datum;
     /** label for header */
     name: string;
     /** is sortable (default true) */
     sortable?: boolean;
-    /** is filterable (default true) */
-    filterable?: boolean;
-    /** type used for filtering (default string) */
-    type?: "string" | "number" | "enum";
+    /** is filterable, and how to filter (default string) */
+    filterable?: "string" | "number" | "enum";
     /** visibility (default true) */
     show?: boolean;
     /** custom render function for cell */
@@ -65,7 +63,7 @@ type Props<Datum extends object> = {
 declare module "@tanstack/table-core" {
   // eslint-disable-next-line
   interface ColumnMeta<TData extends RowData, TValue> {
-    type: NonNullable<Props<object>["cols"][number]["type"]>;
+    filterable: NonNullable<Props<object>["cols"][number]["filterable"]>;
   }
 }
 
@@ -109,7 +107,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
   /** custom filter func */
   const filterFunc = useMemo<FilterFnOption<Datum>>(
     () => (row, columnId, filterValue: unknown) => {
-      const type = cols[Number(columnId)]?.type ?? "string";
+      const type = cols[Number(columnId)]?.filterable ?? "string";
 
       /** string column */
       if (type === "string") {
@@ -157,15 +155,15 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
       /** name */
       header: col.name,
       /** sortable */
-      enableSorting: col.sortable ?? true,
+      enableSorting: col.sortable || true,
       /** individually filterable */
-      enableColumnFilter: col.filterable ?? true,
+      enableColumnFilter: !!col.filterable || false,
       /** include in table-wide search if column is visible */
       enableGlobalFilter: !!visible.find(
         (visible) => visible.id === String(index),
       ),
       /** type of column */
-      meta: { type: col.type ?? "string" },
+      meta: { filterable: col.filterable ?? "string" },
       /** func to use for filtering */
       filterFn: filterFunc,
       /** render func for cell */
@@ -429,7 +427,7 @@ const Filter = <Datum extends object>({ column }: FilterProps<Datum>) => {
   );
 
   /** type of filter */
-  const type = column.columnDef.meta?.type;
+  const type = column.columnDef.meta?.filterable;
 
   /** filter as number range */
   if (type === "number") {

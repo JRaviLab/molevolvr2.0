@@ -4,16 +4,12 @@
       animation:
         loading-draw 2s linear infinite,
         loading-spin 4s linear infinite;
-      stroke-dasharray: 251.3274;
+      stroke-dasharray: 1
     }
 
     @keyframes loading-draw {
       from {
-        stroke-dashoffset: var(--length);
-      }
-
-      to {
-        stroke-dashoffset: 0;
+        stroke-dashoffset: 2;
       }
     }
 
@@ -33,6 +29,6 @@
     fill="none"
     stroke="currentColor"
     stroke-width="20"
-    style="--length: 502.6548"
+    pathLength="1"
   />
 </svg>

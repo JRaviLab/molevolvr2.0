@@ -543,13 +543,15 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
         <Table
           cols={[
             { key: "name", name: "Name" },
-            { key: "age", name: "Age", type: "number" },
-            { key: "status", name: "Status", type: "enum" },
+            { key: "age", name: "Age", filterable: "number" },
+            { key: "status", name: "Status", filterable: "enum" },
             {
               key: "text",
               name: "Long text",
               show: false,
-              render: (cell) => <div className="truncate-5">{cell}</div>,
+              render: (cell) => (
+                <div className="truncate-5">{cell as string}</div>
+              ),
             },
           ]}
           rows={tableData}
