@@ -41,21 +41,34 @@ import TextBox from "@/components/TextBox";
 import { downloadCsv } from "@/util/download";
 import classes from "./Table.module.css";
 
+type Col<
+  Datum extends object = object,
+  Key extends keyof Datum = keyof Datum,
+> = {
+  /** key of row object to access as value */
+  key: Key;
+  /** label for header */
+  name: string;
+  /** is sortable (default true) */
+  sortable?: boolean;
+  /** is filterable, and how to filter (default string) */
+  filterable?: "string" | "number" | "enum";
+  /** visibility (default true) */
+  show?: boolean;
+  /** custom render function for cell */
+  render?: (cell: NoInfer<Datum[Key]>) => ReactNode;
+};
+
+/**
+ * https://stackoverflow.com/questions/68274805/typescript-reference-type-of-property-by-other-property-of-same-object
+ * https://github.com/vuejs/core/discussions/8851
+ */
+type _Col<Datum extends object> = {
+  [Key in keyof Datum]-?: Col<Datum, Key>;
+}[keyof Datum];
+
 type Props<Datum extends object> = {
-  cols: readonly {
-    /** key of row object to access as value */
-    key: keyof Datum;
-    /** label for header */
-    name: string;
-    /** is sortable (default true) */
-    sortable?: boolean;
-    /** is filterable, and how to filter (default string) */
-    filterable?: "string" | "number" | "enum";
-    /** visibility (default true) */
-    show?: boolean;
-    /** custom render function for cell */
-    render?: (cell: NoInfer<Datum[keyof Datum]>) => ReactNode;
-  }[];
+  cols: _Col<Datum>[];
   rows: Datum[];
 };
 
@@ -63,7 +76,7 @@ type Props<Datum extends object> = {
 declare module "@tanstack/table-core" {
   // eslint-disable-next-line
   interface ColumnMeta<TData extends RowData, TValue> {
-    filterable: NonNullable<Props<object>["cols"][number]["filterable"]>;
+    filterable: NonNullable<Col["filterable"]>;
   }
 }
 

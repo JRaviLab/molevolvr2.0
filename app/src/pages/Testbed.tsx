@@ -549,9 +549,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
               key: "text",
               name: "Long text",
               show: false,
-              render: (cell) => (
-                <div className="truncate-5">{cell as string}</div>
-              ),
+              render: (cell) => <div className="truncate-5">{cell}</div>,
             },
           ]}
           rows={tableData}
