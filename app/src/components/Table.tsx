@@ -64,7 +64,7 @@ type Col<
  * https://github.com/vuejs/core/discussions/8851
  */
 type _Col<Datum extends object> = {
-  [Key in keyof Datum]-?: Col<Datum, Key>;
+  [Key in keyof Datum]: Col<Datum, Key>;
 }[keyof Datum];
 
 type Props<Datum extends object> = {
