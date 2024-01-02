@@ -30,6 +30,12 @@
   color: var(--accent);
 }
 
+.empty {
+  padding: 20px;
+  color: var(--gray);
+  text-align: center;
+}
+
 .pagination {
   display: flex;
   align-items: center;
@@ -38,6 +44,12 @@
 
 .page-text {
   padding: 0 5px;
+  color: var(--accent);
+  transition: color var(--fast);
+}
+
+.page-text:hover {
+  color: var(--deep);
 }
 
 .page-button {

@@ -48,7 +48,7 @@
 
 .option:hover,
 .option[data-highlighted] {
-  background: var(--accent-light);
+  background: var(--pale);
 }
 
 .check {

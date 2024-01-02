@@ -17,7 +17,7 @@
 }
 
 .option:hover {
-  background: var(--accent-light);
+  background: var(--pale);
   box-shadow: none;
 }
 

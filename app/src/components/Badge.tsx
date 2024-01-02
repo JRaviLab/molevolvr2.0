@@ -15,7 +15,9 @@ type Props = {
  */
 const Badge = ({ className, children }: Props) => {
   return (
-    <span className={classNames(classes.badge, className)}>{children}</span>
+    <span className={classNames(classes.badge, className)} aria-hidden="true">
+      {children}
+    </span>
   );
 };
 

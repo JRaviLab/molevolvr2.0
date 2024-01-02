@@ -80,6 +80,7 @@ hr {
 
 a {
   color: var(--accent);
+  transition: color var(--fast);
 }
 
 a:hover {

@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
-import { cloneElement, useId } from "react";
+import { cloneElement, useEffect, useId } from "react";
 import classNames from "classnames";
 import { normalizeProps, Portal, useMachine } from "@zag-js/react";
 import * as tooltip from "@zag-js/tooltip";
@@ -38,6 +38,11 @@ const Tooltip = ({ content, children }: Props) => {
 
   /** interact with zag */
   const api = tooltip.connect(state, send, normalizeProps);
+
+  /** force reposition after every render (change to contents) */
+  useEffect(() => {
+    api.reposition();
+  });
 
   if (content)
     return (

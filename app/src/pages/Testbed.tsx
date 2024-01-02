@@ -80,7 +80,6 @@ const Testbed = () => {
         <div className="flex-row">
           {[
             "accent",
-            "accent-light",
             "deep",
             "deep-mid",
             "deep-light",
@@ -88,6 +87,7 @@ const Testbed = () => {
             "dark-gray",
             "gray",
             "light-gray",
+            "pale",
             "white",
             "success",
             "warning",
@@ -548,6 +548,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
             {
               key: "text",
               name: "Long text",
+              filterable: "string",
               show: false,
               render: (cell) => <div className="truncate-5">{cell}</div>,
             },
@@ -563,7 +564,9 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
         </Heading>
         <div className="flex-row gap-sm">
           <Tooltip content="Minimal, non-interactive help or contextual info">
-            <span className="text-tooltip">Plain content</span>
+            <span className="text-tooltip" tabIndex={0} role="button">
+              Plain content
+            </span>
           </Tooltip>
           <Tooltip
             content={
@@ -573,7 +576,9 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
               </>
             }
           >
-            <span className="text-tooltip">Rich content</span>
+            <span className="text-tooltip" tabIndex={0} role="button">
+              Rich content
+            </span>
           </Tooltip>
         </div>
       </Section>

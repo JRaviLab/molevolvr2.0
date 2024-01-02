@@ -53,7 +53,9 @@ const Layout = () => {
   }, [hash]);
 
   return (
-    <IconContext.Provider value={{ className: "icon" }}>
+    <IconContext.Provider
+      value={{ className: "icon", attr: { "aria-hidden": true } }}
+    >
       <Header />
       <main>
         {toc && <TableOfContents />}

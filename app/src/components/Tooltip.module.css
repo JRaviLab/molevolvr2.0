@@ -5,8 +5,6 @@
 .content {
   max-width: 300px;
   padding: 10px 15px;
-  background: var(--white);
-  color: var(--black);
 }
 
 .arrow {

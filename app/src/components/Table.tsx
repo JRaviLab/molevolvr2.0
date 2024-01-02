@@ -38,6 +38,7 @@ import Select from "@/components/Select";
 import type { Option } from "@/components/Select";
 import Slider from "@/components/Slider";
 import TextBox from "@/components/TextBox";
+import Tooltip from "@/components/Tooltip";
 import { downloadCsv } from "@/util/download";
 import classes from "./Table.module.css";
 
@@ -84,7 +85,7 @@ declare module "@tanstack/table-core" {
 const colToOption = <Datum extends object>(
   col: Props<Datum>["cols"][number],
   index: number,
-) => ({
+): Option => ({
   id: String(index),
   text: col.name,
 });
@@ -242,6 +243,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
           icon={<FaMagnifyingGlass />}
           value={search}
           onChange={setSearch}
+          tooltip="Search table for plain text or regex (JavaScript-flavor)"
         />
 
         {/* download */}
@@ -270,77 +272,87 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
         />
       </div>
 
-      {/* if data */}
-      {rows.length &&
-      visible.length &&
-      table.getFilteredRowModel().rows.length ? (
-        <div className={classes.scroll}>
-          {/* table */}
-          <table className={classes.table}>
-            {/* head */}
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id}>
-                      {header.isPlaceholder ? null : (
-                        <div className={classes.th}>
-                          {/* header label */}
-                          <span className={classes["th-label"]}>
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                          </span>
+      <div className={classes.scroll}>
+        {/* table */}
+        <table
+          className={classes.table}
+          /** https://tanstack.com/table/v8/docs/guide/migrating#migrate-table-markup */
+          aria-rowcount={table.getPrePaginationRowModel().rows.length}
+          aria-colcount={cols.length}
+        >
+          {/* head */}
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th key={header.id} aria-colindex={Number(header.id) + 1}>
+                    {header.isPlaceholder ? null : (
+                      <div className={classes.th}>
+                        {/* header label */}
+                        <span className={classes["th-label"]}>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                        </span>
 
-                          {/* header sort */}
-                          <button
-                            className={classes["header-button"]}
-                            data-active={
-                              header.column.getIsSorted() ? "" : undefined
-                            }
-                            onClick={header.column.getToggleSortingHandler()}
-                            aria-label={`Sort "${header.column.columnDef.header}"`}
-                          >
-                            {header.column.getIsSorted() ? (
-                              header.column.getIsSorted() === "asc" ? (
-                                <FaSortUp />
-                              ) : (
-                                <FaSortDown />
-                              )
+                        {/* header sort */}
+                        <button
+                          className={classes["header-button"]}
+                          data-active={
+                            header.column.getIsSorted() ? "" : undefined
+                          }
+                          onClick={header.column.getToggleSortingHandler()}
+                          aria-label={`Sort "${header.column.columnDef.header}"`}
+                        >
+                          {header.column.getIsSorted() ? (
+                            header.column.getIsSorted() === "asc" ? (
+                              <FaSortUp />
                             ) : (
-                              <FaSort />
-                            )}
-                          </button>
+                              <FaSortDown />
+                            )
+                          ) : (
+                            <FaSort />
+                          )}
+                        </button>
 
-                          {/* header filter */}
-                          {header.column.getCanFilter() ? (
-                            <Popover
-                              label={`Filter "${header.column.columnDef.header}"`}
-                              content={<Filter column={header.column} />}
+                        {/* header filter */}
+                        {header.column.getCanFilter() ? (
+                          <Popover
+                            label={`Filter "${header.column.columnDef.header}"`}
+                            content={<Filter column={header.column} />}
+                          >
+                            <button
+                              className={classes["header-button"]}
+                              data-active={
+                                header.column.getIsFiltered() ? "" : undefined
+                              }
                             >
-                              <button
-                                className={classes["header-button"]}
-                                data-active={
-                                  header.column.getIsFiltered() ? "" : undefined
-                                }
-                              >
-                                <FaFilter />
-                              </button>
-                            </Popover>
-                          ) : null}
-                        </div>
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
+                              <FaFilter />
+                            </button>
+                          </Popover>
+                        ) : null}
+                      </div>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
 
-            {/* body */}
-            <tbody>
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id}>
+          {/* body */}
+          <tbody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row, index) => (
+                <tr
+                  key={row.id}
+                  aria-rowindex={
+                    table.getState().pagination.pageIndex *
+                      table.getState().pagination.pageSize +
+                    index +
+                    1
+                  }
+                >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id}>
                       {flexRender(
@@ -350,14 +362,17 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
                     </td>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        /** fallback */
-        <div className="placeholder">No rows</div>
-      )}
+              ))
+            ) : (
+              <tr>
+                <td className={classes.empty} colSpan={cols.length}>
+                  No Rows
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* bottom controls */}
       <div className="flex-row gap-md">
@@ -379,20 +394,19 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
           >
             <FaAngleLeft />
           </button>
-          <span className={classes["page-text"]}>
-            Page{" "}
+          <Tooltip content="Jump to page">
             <button
+              className={classes["page-text"]}
               onClick={() => {
                 const page = parseInt(window.prompt("Jump to page") || "");
                 if (Number.isNaN(page)) return;
                 table.setPageIndex(clamp(page, 1, table.getPageCount()) - 1);
               }}
-              // aria-label="Jump to page"
             >
-              {table.getState().pagination.pageIndex + 1}
-            </button>{" "}
-            of {table.getPageCount()}
-          </span>
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount() || 1}
+            </button>
+          </Tooltip>
           <button
             className={classes["page-button"]}
             onClick={table.nextPage}
@@ -461,16 +475,19 @@ const Filter = <Datum extends object>({ column }: FilterProps<Datum>) => {
 
   /** filter as multi-select */
   if (type === "enum") {
+    const options = uniqueValues.map((value) => ({
+      id: String(value),
+      text: String(value),
+    }));
     return (
       <Select
-        options={uniqueValues.map((value) => ({
-          id: String(value),
-          text: String(value),
-        }))}
-        value={column.getFilterValue() as Option[]}
+        options={options}
+        value={(column.getFilterValue() as Option[]) ?? options}
         onChange={(value, count) =>
-          /** return as "unfiltered" if none are selected */
-          column.setFilterValue(count === "none" ? undefined : value)
+          /** return as "unfiltered" if all or none are selected */
+          column.setFilterValue(
+            count === "all" || count === "none" ? undefined : value,
+          )
         }
         multi={true}
       />
@@ -481,7 +498,7 @@ const Filter = <Datum extends object>({ column }: FilterProps<Datum>) => {
   return (
     <TextBox
       placeholder="Search"
-      value={(column.getFilterValue() as string) || ""}
+      value={(column.getFilterValue() as string) ?? ""}
       onChange={column.setFilterValue}
       icon={<FaMagnifyingGlass />}
     />

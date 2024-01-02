@@ -7,10 +7,8 @@
   position: relative;
   flex-direction: column;
   max-width: 400px;
-  padding: 20px;
   gap: 20px;
-  background: var(--white);
-  color: var(--black);
+  /* box-shadow: 0 0 0 9999px #00000040; */
 }
 
 .content > * {

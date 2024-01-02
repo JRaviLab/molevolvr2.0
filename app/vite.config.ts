@@ -14,6 +14,7 @@ export default defineConfig({
         expandProps: "start",
         svgProps: {
           className: `{props.className ? props.className + " icon" : "icon"}`,
+          "aria-hidden": "true",
         },
       },
     }),

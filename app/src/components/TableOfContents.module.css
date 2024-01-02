@@ -57,7 +57,7 @@
 }
 
 .link[data-active] {
-  background: var(--accent-light);
+  background: var(--pale);
   color: var(--accent);
   font-weight: var(--bold);
 }

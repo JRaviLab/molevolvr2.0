@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
-import { cloneElement, useId } from "react";
+import { cloneElement, useEffect, useId } from "react";
 import classNames from "classnames";
 import * as popover from "@zag-js/popover";
 import { normalizeProps, Portal, useMachine } from "@zag-js/react";
@@ -35,6 +35,11 @@ const Popover = ({ label, content, children }: Props) => {
   /** interact with zag */
   const api = popover.connect(state, send, normalizeProps);
 
+  /** force reposition after every render (change to contents) */
+  useEffect(() => {
+    api.reposition();
+  });
+
   return (
     <>
       {/* children elements that trigger opening on hover/focus */}
@@ -56,13 +61,13 @@ const Popover = ({ label, content, children }: Props) => {
               {...api.contentProps}
               className={classNames(classes.content, "card")}
             >
-              {/* <div
+              <div
                 {...api.titleProps}
                 className={classNames(classes.label, "primary", "bold")}
               >
                 {label}
               </div>
-              <button {...api.closeTriggerProps} className={classes.close}>
+              {/* <button {...api.closeTriggerProps} className={classes.close}>
                 <FaXmark />
               </button> */}
               {content}
