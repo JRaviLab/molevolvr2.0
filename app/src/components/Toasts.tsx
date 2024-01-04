@@ -35,7 +35,7 @@ const Toasts = () => {
 
   return (
     <Portal>
-      {api.toasts.length && (
+      {!!api.toasts.length && (
         <div
           {...api.getGroupProps({ placement: "bottom-end" })}
           className={classes.list}

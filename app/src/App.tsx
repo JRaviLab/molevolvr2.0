@@ -87,6 +87,15 @@ const routes = [
       {
         index: true,
         element: <Home />,
+        loader: async () => {
+          /** handle 404 redirect */
+          const url = window.sessionStorage.redirect as string;
+          if (url) {
+            console.info("Redirecting to:", url);
+            window.sessionStorage.removeItem("redirect");
+            return redirect(url);
+          } else return null;
+        },
       },
       {
         path: "new-analysis",
@@ -110,19 +119,6 @@ const routes = [
         path: "testbed",
         element: <Testbed />,
         loader: () => ({ toc: true }) satisfies Meta,
-      },
-      {
-        /** not found */
-        path: "*",
-        loader: async () => {
-          /** handle 404 redirect */
-          const url = window.sessionStorage.redirect as string;
-          if (url) {
-            console.info("Redirecting to:", url);
-            window.sessionStorage.removeItem("redirect");
-            return redirect(url);
-          } else return redirect("/");
-        },
       },
     ],
   },

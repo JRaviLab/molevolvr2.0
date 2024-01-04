@@ -67,7 +67,7 @@ Anything else 👇 is abstraction or convenience built on top of them, and must 
 - **[Bun](https://bun.sh/)**.
   A very new tool that aims to be an all-in-one replacement for Node, Yarn, Vite, and many other tools.
   Since it is so new, in this project will only use it as a runtime (replacement for Node) and package manager (replacement for Yarn).
-  If you encounter issues, install [Node](https://nodejs.org/en) (`v18` or later) and try running the above commands with `npm run` instead of `bun`.
+  If you encounter issues, install [Node](https://nodejs.org/en) (`v18` or later) and try running the above commands with `npm` instead of `bun`.
   Do not use functionality that is Bun-only (not "backwards-compatible" with Node).
 
 - **[ESLint](https://eslint.org/)**.
