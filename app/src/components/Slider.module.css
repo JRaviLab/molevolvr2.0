@@ -1,0 +1,48 @@
+.control {
+  display: flex;
+  position: relative;
+  align-items: center;
+  padding: 15px 10px;
+  border-radius: var(--rounded);
+  color: var(--accent);
+  cursor: pointer;
+  transition: color var(--fast);
+}
+
+.control:hover {
+  color: var(--deep);
+}
+
+.track {
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--gray);
+}
+
+.range {
+  height: 100%;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 999px !important;
+  background: currentColor;
+}
+
+.markers {
+  padding-bottom: 5px;
+  transform: translateY(-5px);
+  font-size: 0.9rem;
+}
+
+.marker[data-faded="full"] {
+  opacity: 0;
+}
+
+.marker[data-faded="half"] {
+  opacity: 0.25;
+}

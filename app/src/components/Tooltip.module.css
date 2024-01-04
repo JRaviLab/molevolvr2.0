@@ -1,0 +1,18 @@
+.popup {
+  z-index: 999 !important;
+}
+
+.content {
+  max-width: 300px;
+  padding: 10px 15px;
+}
+
+.arrow {
+  --arrow-size: 10px;
+  --arrow-background: var(--white);
+}
+
+.arrow div {
+  box-shadow: var(--shadow);
+  clip-path: polygon(-50% -50%, 150% -50%, -50% 150%);
+}

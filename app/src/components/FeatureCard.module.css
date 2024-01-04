@@ -1,0 +1,19 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+  gap: 10px;
+}
+
+.card > * {
+  margin: 0;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+}
+
+.title > :first-child {
+  flex-grow: 1;
+}
