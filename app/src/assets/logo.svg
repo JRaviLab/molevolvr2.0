@@ -1,0 +1,144 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="-50 -50 100 100"
+  data-id="logo"
+>
+  <style>
+    [data-id="logo"][data-animated] .logo-draw,
+    [data-id="logo"]:hover .logo-draw {
+      animation: logo-draw 4s linear infinite both;
+      animation-delay: var(--delay);
+      stroke-dasharray: 1;
+      animation-composition: accumulate;
+    }
+
+    @keyframes logo-draw {
+      0% {
+        stroke-dashoffset: calc(2px);
+      }
+      20% {
+        stroke-dashoffset: calc(2px);
+      }
+      40% {
+        stroke-dashoffset: calc(1px);
+      }
+      60% {
+        stroke-dashoffset: calc(1px);
+      }
+      80% {
+        stroke-dashoffset: 0;
+      }
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    [data-id="logo"][data-animated] .logo-grow,
+    [data-id="logo"]:hover .logo-grow {
+      animation: logo-grow 4s ease-in-out infinite both;
+      animation-composition: accumulate;
+      animation-delay: var(--delay);
+    }
+
+    @keyframes logo-grow {
+      0% {
+        transform: scale(1);
+      }
+      20% {
+        transform: scale(1);
+      }
+      40% {
+        transform: scale(0);
+      }
+      60% {
+        transform: scale(0);
+      }
+      80% {
+        transform: scale(1);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+  </style>
+
+  <defs>
+    <!-- bonds center cutout -->
+    <mask id="cutout">
+      <rect fill="white" x="-50" y="-50" width="100" height="100" />
+      <circle
+        class="logo-grow"
+        style="--delay: 1.2s"
+        fill="black"
+        cx="0"
+        cy="0"
+        r="18"
+      />
+    </mask>
+  </defs>
+
+  <!-- bonds -->
+  <g
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="5"
+    mask="url(#cutout)"
+  >
+    <path
+      class="logo-draw"
+      style="--delay: 0.3s"
+      pathLength="1"
+      d="
+        M 0 0
+        L -40 -30
+        L -40 25
+      "
+    />
+    <path
+      class="logo-draw"
+      style="--delay: 0.6s"
+      pathLength="1"
+      d="
+        M 0 0
+        L 40 -30
+        L 40 25
+      "
+    />
+    <path
+      class="logo-draw"
+      style="--delay: 0.9s"
+      pathLength="1"
+      d="
+        M 0 0
+        L 0 40
+      "
+    />
+  </g>
+
+  <!-- electrons -->
+  <g fill="currentColor">
+    <g transform="translate(-40, -30)">
+      <circle class="logo-grow" style="--delay: 0s" r="8" />
+    </g>
+    <g transform="translate(40, -30)">
+      <circle class="logo-grow" style="--delay: 0.3s" r="8" />
+    </g>
+    <g transform="translate(0, 40)">
+      <circle class="logo-grow" style="--delay: 0.6s" r="8" />
+    </g>
+  </g>
+
+  <!-- nucleus -->
+  <circle
+    class="logo-grow"
+    style="--delay: 1.5s"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="7"
+    cx="0"
+    cy="0"
+    r="8"
+  />
+</svg>

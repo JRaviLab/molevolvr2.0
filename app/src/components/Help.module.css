@@ -1,0 +1,6 @@
+.help {
+  display: inline-flex;
+  border-radius: 999px !important;
+  color: var(--gray);
+  cursor: help;
+}

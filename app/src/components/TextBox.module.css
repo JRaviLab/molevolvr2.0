@@ -1,0 +1,57 @@
+.container {
+  display: flex;
+  position: relative;
+  width: 100%;
+}
+
+.side {
+  display: flex;
+  position: absolute;
+  right: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--gray);
+}
+
+.side svg {
+  width: 50%;
+}
+
+button.side {
+  color: var(--accent);
+  transition: color var(--fast);
+}
+
+button.side:hover {
+  color: var(--deep);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 5px 10px;
+  border: solid 2px transparent;
+  border-radius: var(--rounded);
+  box-shadow: var(--shadow);
+  transition: border-color var(--fast);
+}
+
+:is(.input, .textarea):hover {
+  border-color: var(--accent);
+}
+
+.input {
+  height: 40px;
+}
+
+.input[data-side] {
+  padding-right: 40px;
+}
+
+.textarea {
+  min-width: 100%;
+  max-width: 100%;
+  min-height: 3.5lh;
+}

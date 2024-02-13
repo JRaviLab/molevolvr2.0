@@ -1,0 +1,9 @@
+.drag {
+  outline: dashed 2px var(--accent);
+  outline-offset: 2px;
+}
+
+/** prevent button children from messing with drag state */
+.drag > * {
+  pointer-events: none;
+}

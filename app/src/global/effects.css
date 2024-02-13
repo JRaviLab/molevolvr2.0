@@ -1,0 +1,39 @@
+/** card with depth */
+
+.card {
+  padding: 20px;
+  border-radius: var(--rounded);
+  background: var(--white);
+  box-shadow: var(--shadow);
+  color: var(--black);
+}
+
+/** visually hide something but keep it available to screen-readers */
+/** https://tailwindcss.com/docs/screen-readers */
+
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border-width: 0;
+  white-space: nowrap;
+}
+
+/** animations */
+
+.pulse {
+  animation: pulse 0.5s ease-in-out alternate infinite;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}

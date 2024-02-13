@@ -1,0 +1,19 @@
+.label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  gap: 10px;
+  border-radius: var(--rounded);
+  cursor: pointer;
+}
+
+.check {
+  height: 20px;
+  color: var(--accent);
+  transition: color var(--fast);
+}
+
+.label:hover .check {
+  color: var(--deep);
+}

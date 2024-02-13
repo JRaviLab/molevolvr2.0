@@ -1,0 +1,42 @@
+.heading {
+  display: flex;
+  position: relative;
+  align-items: center;
+  gap: 20px;
+}
+
+h1.heading,
+h2.heading {
+  justify-content: center;
+}
+
+h3.heading,
+h4.heading {
+  justify-content: flex-start;
+}
+
+.icon {
+  color: var(--deep-mid);
+}
+
+.anchor {
+  display: inline-flex;
+  position: relative;
+  top: -0.1em;
+  left: 10px;
+  width: 0;
+  outline: none;
+  color: var(--accent);
+  vertical-align: middle;
+  opacity: 0;
+  transition: opacity var(--fast);
+}
+
+.anchor svg {
+  height: 20px;
+}
+
+.heading:hover .anchor,
+.anchor:focus {
+  opacity: 1;
+}

@@ -1,0 +1,18 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 10px;
+  border: solid 2px transparent;
+  text-decoration: none;
+  transition: border-color var(--fast);
+}
+
+.card:hover {
+  border-color: var(--accent);
+}
+
+.button {
+  align-self: center;
+  margin-top: 10px;
+}
