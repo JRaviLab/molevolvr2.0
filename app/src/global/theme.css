@@ -20,6 +20,10 @@
   --warning: #f59e0b;
   --error: #f43f5e;
 
+  /** font families */
+  --sans: "Poppins", sans-serif;
+  --mono: "IBM Plex Mono", monospace;
+
   /* font weights */
   --regular: 300;
   --medium: 400;

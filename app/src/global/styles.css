@@ -2,7 +2,7 @@ html {
   font-weight: var(--regular);
   font-size: 13pt;
   line-height: var(--compact);
-  font-family: "Poppins", sans-serif;
+  font-family: var(--sans);
 }
 
 *,
