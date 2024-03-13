@@ -12,6 +12,8 @@
     "clean": "rm -rf node_modules bun.lockb && bun pm cache rm"
   },
   "dependencies": {
+    "@headlessui-float/react": "^0.13.2",
+    "@headlessui/react": "^1.7.18",
     "@tanstack/react-query": "^5.17.1",
     "@tanstack/react-table": "^8.11.3",
     "@zag-js/checkbox": "^0.32.0",
@@ -29,6 +31,7 @@
     "javascript-time-ago": "^2.5.9",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
+    "react-aria-components": "^1.1.1",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
     "react-router": "^6.21.1",

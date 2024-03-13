@@ -286,7 +286,6 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
           />
           <Select
             label="Multi"
-            layout="horizontal"
             multi={true}
             options={
               [
@@ -602,6 +601,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
                 <div className="flex-row gap-sm">
                   <Button text="Save" />
                   <Select
+                    label="Format"
                     options={
                       [
                         { id: "csv", text: "CSV" },
@@ -673,6 +673,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
               <Select
                 label="Select"
                 multi={true}
+                onChange={console.info}
                 options={
                   [
                     { id: "a", text: "Lorem" },

@@ -1,15 +1,12 @@
-import type { ReactElement } from "react";
-import { cloneElement, useId } from "react";
-import { FaCaretDown, FaCheck, FaCircle } from "react-icons/fa6";
-import classNames from "classnames";
-import { omit } from "lodash";
-import { normalizeProps, Portal, useMachine } from "@zag-js/react";
-import * as select from "@zag-js/select";
-import type { PropTypes } from "@zag-js/types";
+import { cloneElement, Fragment, type ReactElement } from "react";
+import { FaCaretDown, FaCheck } from "react-icons/fa6";
+import { Float } from "@headlessui-float/react";
+import { Listbox } from "@headlessui/react";
 import { useForm } from "@/components/Form";
-import type { LabelProps } from "@/components/Label";
-import Label, { forwardLabelProps } from "@/components/Label";
 import classes from "./Select.module.css";
+
+/** https://github.com/adobe/react-spectrum/issues/2140 */
+/** https://github.com/adobe/react-spectrum/issues/4863 */
 
 export type Option = {
   /** unique id */
@@ -25,7 +22,9 @@ export type Option = {
 type Base<O extends Option> = {
   /** pass with "as const" */
   options: readonly O[];
-  /** field name */
+  /** label text */
+  label: string;
+  /** field name in form submission */
   name?: string;
 };
 
@@ -46,172 +45,98 @@ type Multi<O extends Option> = {
   onChange?: (value: O[], count: number | "all" | "none") => void;
 };
 
-type Props<O extends Option> = Base<O> & LabelProps & (Single<O> | Multi<O>);
+type Props<O extends Option> = Base<O> & (Single<O> | Multi<O>);
 
 /** dropdown select box, multi or single */
-const Select = <O extends Option>({
+const Component = <O extends Option>({
   multi,
   value,
   onChange,
   options,
+  label,
   name,
-  ...props
 }: Props<O>) => {
-  /** set up zag */
-  const [state, send] = useMachine(
-    select.machine<O>({
-      /** unique id for component instance */
-      id: useId(),
-      /** link field to form */
-      name,
-      form: useForm(),
-      /** multiple selections allowed */
-      multiple: !!multi,
-      /** options */
-      collection: select.collection({
-        /** options */
-        items: options.map((option) => omit(option, "icon")),
-        /** for uniquely identifying option */
-        itemToValue: (option) => option.id,
-        /** string to use for type-ahead */
-        itemToString: (option) => option.text,
-      }),
-      /** initialize selected values (array of ids) */
-      value: value
-        ? [value].flat().map((value) => value.id)
-        : multi
-          ? []
-          : options[0]
-            ? [options[0].id]
-            : [],
-      /** when selected items change */
-      onValueChange: (details) =>
-        multi
-          ? onChange?.(
-              details.items,
-              details.items.length === 0
-                ? "none"
-                : details.items.length === options.length
-                  ? "all"
-                  : details.items.length,
-            )
-          : details.items[0] && onChange?.(details.items[0]),
-    }),
-  );
+  const form = useForm();
 
-  /** interact with zag */
-  const api = select.connect<PropTypes, O>(state, send, normalizeProps);
-
-  /** label to show in button trigger */
-  let selectedLabel = "";
-  const selected = api.selectedItems;
-  const count = [selected].flat().length;
-  if (count === 0) selectedLabel = "None";
-  else if (count === 1) selectedLabel = [selected].flat()[0]?.text || "";
-  else if (count === options.length) selectedLabel = "All";
-  else selectedLabel = count + " selected";
-
-  /** check icon */
-  const Check = multi ? FaCheck : FaCircle;
-
-  /** all selected */
-  const allSelected = api.selectedItems.length === options.length;
-
-  /** count number of filled columns in options */
-  let cols = 2;
-  if (options.some((option) => option.info)) cols++;
-  if (options.some((option) => option.icon)) cols++;
+  const selected = value ? value : multi ? [] : options[0]!;
 
   return (
-    <>
-      <div {...api.rootProps} className={classes.root}>
-        {/* trigger */}
-        <div {...api.controlProps} className={classes.control}>
-          <Label
-            {...api.labelProps}
-            {...forwardLabelProps(props, api.triggerProps.id)}
-          >
-            <button {...api.triggerProps} className={classes.button}>
-              <span className="truncate" aria-hidden={true}>
-                {selectedLabel}
-              </span>
-              <FaCaretDown />
-            </button>
-          </Label>
-        </div>
+    <Listbox
+      as="div"
+      className={classes.select}
+      multiple={multi}
+      value={value ? selected : undefined}
+      defaultValue={!value ? selected : undefined}
+      onChange={(value) => {
+        if (Array.isArray(value) && multi) onChange?.(value, value.length);
+        if (!Array.isArray(value) && !multi) onChange?.(value);
+      }}
+    >
+      {({ value }) => {
+        const flatValue = [value].flat();
+        let selectedLabel = "";
+        if (flatValue.length === 0) selectedLabel = "None";
+        else if (flatValue.length === 1) selectedLabel = flatValue[0]!.text;
+        else if (flatValue.length === options.length) selectedLabel = "All";
+        else selectedLabel = flatValue.length + " selected";
 
-        {/* popup */}
-        <Portal>
-          {api.isOpen && (
-            <div {...api.positionerProps} className={classes.popup}>
-              {/* select all/none */}
-              <ul {...api.contentProps} className={classes.list}>
-                {multi && (
-                  <button
-                    className={classes.option}
-                    onClick={() =>
-                      api.setValue(
-                        allSelected ? [] : options.map((option) => option.id),
-                      )
-                    }
-                  >
-                    <Check
-                      className={classes.check}
-                      style={{ opacity: allSelected ? 1 : 0 }}
-                    />
-                    <span className={classes.text}>All</span>
-                  </button>
-                )}
-
-                {/* main options */}
+        return (
+          <>
+            <Listbox.Label>{label}</Listbox.Label>
+            <Float>
+              <Listbox.Button className={classes.button}>
+                <span className={classes.buttonLabel}>{selectedLabel}</span>
+                <FaCaretDown />
+              </Listbox.Button>
+              <Listbox.Options className={classes.list}>
                 {options.map((option, index) => (
-                  <li
-                    key={index}
-                    {...api.getItemProps({ item: option })}
-                    className={classes.option}
-                    style={{
-                      ...api.contentProps.style,
-                      gridTemplateColumns: ["30px", "2fr", "1fr", "30px"]
-                        .slice(0, cols)
-                        .join(" "),
-                    }}
-                  >
-                    <Check
-                      {...api.getItemIndicatorProps({ item: option })}
-                      className={classes.check}
-                      style={{ height: multi ? "" : "8px" }}
-                    />
-                    <span className={classes.text}>{option.text}</span>
-                    {option.info && (
-                      <span className="secondary">{option.info}</span>
+                  <Listbox.Option key={index} value={option} as={Fragment}>
+                    {({ active, selected }) => (
+                      <li
+                        className={classes.item}
+                        data-active={active || undefined}
+                      >
+                        <FaCheck
+                          className={classes.check}
+                          style={{ opacity: selected ? 1 : 0 }}
+                        />
+                        <span className={classes.text}>{option.text}</span>
+                        {option.info && (
+                          <span className={classes.info}>{option.info}</span>
+                        )}
+                        {option.icon &&
+                          cloneElement(option.icon, {
+                            className: classes.icon,
+                          })}
+                      </li>
                     )}
-                    {option.icon &&
-                      cloneElement(option.icon, {
-                        className: classNames(classes.icon, "secondary"),
-                      })}
-                  </li>
+                  </Listbox.Option>
                 ))}
-              </ul>
-            </div>
-          )}
-        </Portal>
-      </div>
+              </Listbox.Options>
+            </Float>
 
-      {/* for form usage */}
-      <select
-        {...api.hiddenSelectProps}
-        value={multi ? api.value : api.value[0]}
-        /** https://github.com/facebook/react/issues/27657 */
-        onChange={() => null}
-      >
-        {options.map((option, index) => (
-          <option key={index} value={option.id}>
-            {option.text}
-          </option>
-        ))}
-      </select>
-    </>
+            {/* for form data */}
+            {/* https://github.com/tailwindlabs/headlessui/discussions/3031 */}
+            <select
+              style={{ display: "none" }}
+              multiple={multi}
+              form={form}
+              name={name}
+              value={
+                Array.isArray(value) ? value.map((value) => value.id) : value.id
+              }
+              /** https://github.com/facebook/react/issues/27657 */
+              onChange={() => null}
+            >
+              {options.map((option, index) => (
+                <option key={index} value={option.id} />
+              ))}
+            </select>
+          </>
+        );
+      }}
+    </Listbox>
   );
 };
 
-export default Select;
+export default Component;

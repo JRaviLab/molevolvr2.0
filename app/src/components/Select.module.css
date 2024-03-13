@@ -1,6 +1,7 @@
-.root,
-.control {
-  display: contents;
+.select {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .button {
@@ -17,37 +18,34 @@
   color: var(--deep);
 }
 
-.button > span {
+.buttonLabel {
   flex-grow: 1;
 }
 
-.popup {
+.list {
   z-index: 999 !important;
+  margin: 0;
+  padding: 0;
   border-radius: var(--rounded);
   background: var(--white);
   box-shadow: var(--shadow);
-}
-
-.list {
-  margin: 0;
-  padding: 0;
   list-style: none;
 }
 
-.option {
+.item {
   display: grid;
   grid-template-columns: 30px 2fr 1fr 30px;
   align-items: center;
   width: 100%;
   margin: 0;
   padding: 0;
+  outline: none;
   text-align: left;
   cursor: pointer;
   transition: background var(--fast);
 }
-
-.option:hover,
-.option[data-highlighted] {
+.item[data-active],
+.item:hover {
   background: var(--pale);
 }
 
@@ -57,18 +55,16 @@
   color: var(--accent);
 }
 
-.check[hidden] {
-  opacity: 0;
-}
-
 .text {
   padding-right: 10px;
 }
 
 .info {
   justify-self: flex-end;
+  color: var(--gray);
 }
 
 .icon {
   justify-self: center;
+  color: var(--gray);
 }
