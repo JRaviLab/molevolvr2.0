@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useId } from "react";
 import { createPortal } from "react-dom";
-import { checkedValue, uncheckedValue } from "@/components/CheckBox";
+import { checkboxKeySuffix } from "@/components/CheckBox";
 
 export type FormData = Record<
   string,
@@ -36,7 +36,7 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
           onSubmit={(event) => {
             /** get data from form */
             event.preventDefault();
-            const form = event.target as HTMLFormElement;
+            const form = event.currentTarget;
             const formData = new FormData(form);
 
             /**
@@ -45,7 +45,10 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
              * multi-select) get overwritten.
              */
             const data: FormData = {};
-            for (const key of formData.keys()) {
+            for (let key of formData.keys()) {
+              /** determine if checkbox from key name */
+              const isCheckbox = key.endsWith(checkboxKeySuffix);
+
               const values = formData.getAll(key).map((value) => {
                 /** if we can parse as number, do it */
                 if (
@@ -56,12 +59,15 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
                   return Number(value);
 
                 /** return actual boolean for checkboxes instead of default "on" */
-                if (value === uncheckedValue) return false;
-                if (value === checkedValue) return true;
+                if (isCheckbox) return Boolean(value);
 
                 /** return raw (string) value */
                 return String(value);
               });
+
+              /** remove checkbox marker */
+              if (isCheckbox)
+                key = key.replace(new RegExp(checkboxKeySuffix + "$"), "");
 
               /** assign single primitive or multi array */
               data[key] = values.length === 1 ? values[0]! : values;

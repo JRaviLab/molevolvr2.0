@@ -1,44 +1,14 @@
-.popup {
-  z-index: 999 !important;
-}
-
 .content {
   display: flex;
-  position: relative;
   flex-direction: column;
   max-width: 400px;
+  padding: 20px;
   gap: 20px;
-  /* box-shadow: 0 0 0 9999px #00000040; */
-}
-
-.content > * {
-  margin: 0;
-}
-
-.label {
-  padding-right: 40px;
-}
-
-.close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 40px;
-  height: 40px;
-  color: var(--accent);
-  transition: color var(--fast);
-}
-
-.close:hover {
-  color: var(--deep);
+  border-radius: var(--rounded);
+  background: var(--white);
+  box-shadow: 0 0 0 9999px #00000040;
 }
 
 .arrow {
-  --arrow-size: 10px;
-  --arrow-background: var(--white);
-}
-
-.arrow div {
-  box-shadow: var(--shadow);
-  clip-path: polygon(-50% -50%, 150% -50%, -50% 150%);
+  fill: var(--white);
 }

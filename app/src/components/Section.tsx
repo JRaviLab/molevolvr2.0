@@ -18,21 +18,14 @@ type Props = {
  * contents limited to a readable width by default. alternating background
  * colors. do not nest sections.
  */
-const Section = ({ fill, full, className, ...props }: Props) => {
-  return (
-    <section
-      className={classNames(
-        classes.section,
-        className,
-        {
-          [classes.fill!]: fill,
-          [classes.full!]: full,
-        },
-        "flex-col gap-lg",
-      )}
-      {...props}
-    />
-  );
-};
+const Section = ({ fill, full, className, ...props }: Props) => (
+  <section
+    className={classNames(classes.section, className, {
+      [classes.fill!]: fill,
+      [classes.full!]: full,
+    })}
+    {...props}
+  />
+);
 
 export default Section;

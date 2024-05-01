@@ -25,7 +25,9 @@ body {
 }
 
 main {
+  display: flex;
   flex-grow: 1;
+  flex-direction: column;
 }
 
 /** word breaking */
@@ -35,7 +37,7 @@ button,
 li,
 label,
 blockquote {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 /** headings */
@@ -45,6 +47,7 @@ h2,
 h3,
 h4 {
   width: 100%;
+  margin: 0;
   color: var(--deep);
   font-weight: var(--bold);
 }
@@ -61,7 +64,7 @@ h2 {
 
 h3 {
   font-size: 1.1rem;
-  text-align: left;
+  text-align: center;
 }
 
 h4 {
@@ -96,6 +99,8 @@ p a:visited:hover {
 }
 
 p {
+  width: 100%;
+  margin: 0;
   line-height: var(--spacing);
   text-align: justify;
 }
@@ -110,6 +115,7 @@ strong {
 ul,
 ol {
   width: 100%;
+  margin: 0;
   padding: 0 0 0 20px;
   line-height: var(--spacing);
 }
@@ -134,17 +140,19 @@ img {
 
 pre {
   max-width: 100%;
+  margin: 0;
   padding: 10px 20px;
   overflow: auto;
   border-radius: var(--rounded);
-  background: var(--dark-gray);
+  background: var(--off-black);
   color: var(--white);
 }
 
 :not(pre) > code {
-  padding: 2px 5px;
+  margin: -3px 0;
+  padding: 1px 3px;
   border-radius: var(--rounded);
-  background: var(--light-gray);
+  background: color-mix(in srgb, currentColor 10%, transparent);
 }
 
 blockquote {
@@ -166,14 +174,18 @@ th {
 
 th,
 td {
-  padding: 5px 10px;
+  padding: 5px 12.5px;
+}
+
+:is(th, td):not(:last-child) {
+  border-right: solid 1px var(--light-gray);
+}
+
+tr:nth-child(even) {
+  background: #fafafa;
 }
 
 thead tr {
-  border-bottom: solid 1px var(--gray);
-}
-
-tbody tr {
   border-bottom: solid 1px var(--light-gray);
 }
 
@@ -181,7 +193,7 @@ tbody tr {
 
 [disabled] {
   color: unset;
-  opacity: 0.5;
+  opacity: 0.25;
   pointer-events: none;
 }
 
@@ -190,9 +202,12 @@ button {
   appearance: none;
   align-items: center;
   justify-content: center;
+  margin: 0;
   padding: 0;
   border: none;
+  border-radius: var(--rounded);
   background: none;
+  color: var(--accent);
   font: inherit;
   cursor: pointer;
 }
@@ -200,7 +215,6 @@ button {
 input,
 textarea {
   appearance: none;
-  width: 100px;
   min-width: 0;
   padding: 5px;
   border: solid 1px black;
@@ -213,7 +227,7 @@ textarea {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background-color: var(--light-gray);
+  background-color: var(--off-white);
 }
 
 :not(html) ::-webkit-scrollbar-thumb {
@@ -225,7 +239,6 @@ textarea {
 
 :focus-visible,
 label:has(input:focus-visible) {
-  border-radius: var(--rounded) !important;
   outline: solid 2px currentColor;
   outline-offset: 2px;
 }

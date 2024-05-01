@@ -13,12 +13,10 @@ type Props = {
  * small circle with a few chars of text. for use in other components, not
  * directly.
  */
-const Badge = ({ className, children }: Props) => {
-  return (
-    <span className={classNames(classes.badge, className)} aria-hidden="true">
-      {children}
-    </span>
-  );
-};
+const Badge = ({ className, children }: Props) => (
+  <span className={classNames(classes.badge, className)} aria-hidden="true">
+    {children}
+  </span>
+);
 
 export default Badge;

@@ -11,6 +11,12 @@
   width: 100%;
 }
 
+/** expanded width */
+
+.expanded {
+  width: calc(100vw - 80px);
+}
+
 /** basic, commonly-needed, centered horizontal or vertical flex */
 /** if any customization needed, use local class from scratch */
 
@@ -70,24 +76,22 @@
   gap: 40px 60px;
 }
 
-/** let flex/grid gap handle spacing of children */
-
-:is(.flex-row, .flex-col, .grid) > * {
-  margin: 0;
-}
-
 /** simple two-col auto-sized table of key/value pairs */
 
 .mini-table {
   display: grid;
-  grid-template-columns: auto auto;
-  align-items: center;
+  grid-template-columns: max-content auto;
+  grid-auto-rows: min-content;
   gap: 5px 20px;
   text-align: left;
 }
 
 .mini-table > :nth-child(odd) {
-  color: var(--gray);
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 10px;
+  color: var(--dark-gray);
 }
 
 .mini-table > :nth-child(even) {
@@ -112,5 +116,5 @@
   aspect-ratio: 3 / 1;
   width: 100%;
   border-radius: var(--rounded);
-  background: var(--light-gray);
+  background: var(--gray);
 }

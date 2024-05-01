@@ -9,13 +9,15 @@ export const shortenUrl = (value: string) => {
 };
 
 /** format number to string */
-export const formatNumber = (value: number | undefined, compact = false) =>
-  value === undefined
-    ? null
-    : value.toLocaleString(undefined, {
-        notation: compact ? "compact" : undefined,
-        maximumFractionDigits: Math.abs(value) < 1 ? 2 : undefined,
-      });
+export const formatNumber = (value: number | undefined, compact = false) => {
+  if (value === undefined) return "-";
+  if (Math.abs(value) < 0.01 && value) return value.toExponential(1);
+  const options: Intl.NumberFormatOptions = {};
+  if (compact) options.notation = "compact";
+  if (Math.abs(value) > 1) options.maximumFractionDigits = 2;
+  if (Math.abs(value) < 1) options.maximumSignificantDigits = 2;
+  return value.toLocaleString(undefined, options).toLowerCase();
+};
 
 /** parse date string with fallback */
 export const parseDate = (date: string | Date | undefined) => {
@@ -39,3 +41,9 @@ export const formatDate = (date: string | Date | undefined) => {
     });
   return null;
 };
+
+/** make label (e.g. aria label) from html string */
+export const makeLabel = (string: string) =>
+  (
+    new DOMParser().parseFromString(string, "text/html").body.textContent || ""
+  ).replaceAll(/\s+/g, " ");

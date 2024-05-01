@@ -71,24 +71,13 @@ const Home = () => {
           evolution and phylogeny
         </p>
         <div className="flex-row gap-sm">
-          <Button
-            to="/new-analysis"
-            text="New Analysis"
-            icon={<FaPlus />}
-            design="accent"
-          />
+          <Button to="/new-analysis" text="New Analysis" icon={<FaPlus />} />
           <Button
             to="/load-analysis"
             text="Load Analysis"
             icon={<FaArrowRight />}
-            design="accent"
           />
-          <Button
-            to="/testbed"
-            text="Testbed"
-            icon={<FaFlaskVial />}
-            design="accent"
-          />
+          <Button to="/testbed" text="Testbed" icon={<FaFlaskVial />} />
         </div>
       </Section>
 
@@ -211,14 +200,8 @@ const Home = () => {
             to="https://biorxiv.org/link-to-paper"
             text="Read the Paper"
             icon={<FaRegNewspaper />}
-            design="accent"
           />
-          <Button
-            to="/about"
-            text="Learn More"
-            icon={<FaCircleInfo />}
-            design="accent"
-          />
+          <Button to="/about" text="Learn More" icon={<FaCircleInfo />} />
         </div>
       </Section>
 

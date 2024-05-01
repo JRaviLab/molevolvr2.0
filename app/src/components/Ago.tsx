@@ -25,12 +25,15 @@ const Ago = ({ date, className }: Props) => {
 
   return (
     <Tooltip content={full || "???"}>
-      <ReactTimeAgo
-        date={parsed}
-        locale="en-US"
-        className={className}
-        tabIndex={0}
-      />
+      {/* span needed because tooltip component needs child ref, and time-ago library does not forward it */}
+      <span>
+        <ReactTimeAgo
+          className={className}
+          date={parsed}
+          locale="en-US"
+          tabIndex={0}
+        />
+      </span>
     </Tooltip>
   );
 };

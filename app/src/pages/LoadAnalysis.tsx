@@ -30,13 +30,8 @@ const LoadAnalysis = () => {
 
         <Form onSubmit={(data) => navigate(`/analysis/${data.id}`)}>
           <div className="flex-col gap-md narrow">
-            <TextBox placeholder="Analysis ID" width={200} name="id" />
-            <Button
-              design="accent"
-              text="Lookup"
-              icon={<FaArrowRight />}
-              type="submit"
-            />
+            <TextBox placeholder="Analysis ID" name="id" />
+            <Button text="Lookup" icon={<FaArrowRight />} type="submit" />
           </div>
         </Form>
       </Section>

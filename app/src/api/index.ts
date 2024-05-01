@@ -1,4 +1,3 @@
-import { groupLog } from "@/util/debug";
 import { sleep } from "@/util/misc";
 
 /** base api url */
@@ -25,7 +24,7 @@ export const request = async <Response>(
   parse: "text" | "json" = "json",
 ): Promise<Response> => {
   /** artificial delay for testing loading spinners */
-  await sleep(3000);
+  await sleep(0);
 
   /** get string of url parameters */
   const paramsObject = new URLSearchParams();
@@ -38,7 +37,7 @@ export const request = async <Response>(
   /** make request object */
   const request = new Request(url, options);
 
-  groupLog(`📞 Request ${path}`, {
+  console.debug(`📞 Request ${path}`, {
     url,
     params,
     options,
@@ -65,7 +64,7 @@ export const request = async <Response>(
     error = `Couldn't parse response as ${parse}`;
   }
 
-  groupLog(`📣 Response ${path}`, {
+  console.debug(`📣 Response ${path}`, {
     url,
     params,
     options,

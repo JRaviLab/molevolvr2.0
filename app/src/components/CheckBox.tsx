@@ -1,8 +1,6 @@
-import type { ReactNode } from "react";
-import { useId } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { FaRegSquare, FaRegSquareCheck } from "react-icons/fa6";
-import * as checkbox from "@zag-js/checkbox";
-import { normalizeProps, useMachine } from "@zag-js/react";
+import Asterisk from "@/components/Asterisk";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import classes from "./CheckBox.module.css";
@@ -16,57 +14,58 @@ type Props = {
   value?: boolean;
   /** on checked state change */
   onChange?: (value: boolean) => void;
-  /** field name */
+  /** field name in form data */
   name?: string;
+  /** whether must be checked for form to be submitted */
+  required?: boolean;
 };
 
-/** obscure values to be able to distinguish boolean (checkbox) in FormData */
-export const checkedValue = "__checkedValue__";
-export const uncheckedValue = "__uncheckedValue__";
+/** mark field name as boolean for nicer parsing of FormData */
+export const checkboxKeySuffix = "-checkbox";
 
 /** simple checkbox with label */
-const CheckBox = ({ label, tooltip, value, onChange, name }: Props) => {
-  /** set up zag */
-  const [state, send] = useMachine(
-    checkbox.machine({
-      /** unique id for component instance */
-      id: useId(),
-      /** link field and form */
-      name,
-      form: useForm(),
-      /** value of checked for FormData */
-      value: checkedValue,
-      /** initialize state */
-      checked: value,
-      /** when state changes */
-      onCheckedChange: (details) => onChange?.(!!details.checked),
-    }),
-  );
+const CheckBox = ({
+  label,
+  tooltip,
+  value,
+  onChange,
+  name,
+  required,
+}: Props) => {
+  /** link to parent form component */
+  const form = useForm();
 
-  /** interact with zag */
-  const api = checkbox.connect(state, send, normalizeProps);
+  /** local checked state */
+  const [checked, setChecked] = useState(value ?? false);
 
-  /** check icon */
-  const Check = api.isChecked ? FaRegSquareCheck : FaRegSquare;
+  /** update local state from controlled value */
+  useEffect(() => {
+    if (typeof value === "boolean") setChecked(value);
+  }, [value]);
 
   return (
-    <label {...api.rootProps} className={classes.label}>
-      <Check {...api.controlProps} className={classes.check} />
-      <span {...api.labelProps}>{label}</span>
-      <input {...api.hiddenInputProps} name={undefined} />
-
-      {/* for FormData */}
+    <label className={classes.container}>
       <input
-        style={api.hiddenInputProps.style}
-        value={api.isChecked ? checkedValue : uncheckedValue}
-        checked
-        readOnly
-        tabIndex={-1}
-        aria-hidden="true"
-        name={api.hiddenInputProps.name}
-        form={api.hiddenInputProps.form}
+        type="checkbox"
+        className="sr-only"
+        checked={value}
+        onChange={(event) => {
+          const value = event.currentTarget.checked;
+          onChange?.(value);
+          setChecked(value);
+        }}
+        form={form}
+        name={name + checkboxKeySuffix}
+        required={required}
       />
+      {checked ? (
+        <FaRegSquareCheck className={classes.check} />
+      ) : (
+        <FaRegSquare className={classes.check} />
+      )}
+      {label}
       {tooltip && <Help tooltip={tooltip} />}
+      {required && <Asterisk />}
     </label>
   );
 };

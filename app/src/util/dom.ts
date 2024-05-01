@@ -29,21 +29,21 @@ export const scrollTo = async (selector: string) => {
   element.scrollIntoView({ behavior: "smooth" });
 };
 
-/** restart animations on element */
-export const restartAnimations = (element: Element): void => {
-  for (const animation of document.getAnimations()) {
-    if (
-      animation.effect instanceof KeyframeEffect &&
-      element.contains(animation.effect.target)
-    ) {
-      animation.cancel();
-      animation.play();
-    }
-  }
-};
-
 /** get text content of react node */
 export const renderText = (node: ReactNode) => {
+  /**
+   * can't use renderToString because doesn't have access to contexts app needs
+   * (e.g. router), throwing many errors. impractical to work around (have to
+   * provide or fake all contexts).
+   *
+   * https://react.dev/reference/react-dom/server/renderToString#removing-rendertostring-from-the-client-code
+   *
+   * alternative react suggests (createRoot, flushSync, root.render) completely
+   * impractical. has same context issue, and also can't be called during
+   * render/lifecycle (could be worked around by making it async, but then using
+   * this function in situ becomes much more of pain)
+   */
+
   /** try normally */
   let text = reactToText(node);
   if (text.trim()) return text.trim();
@@ -67,4 +67,17 @@ export const firstInView = (elements: HTMLElement[]) => {
   );
   for (const element of elements.reverse())
     if (element.getBoundingClientRect()?.top < offset + 10) return element;
+};
+
+/** shrink width to wrapped text https://stackoverflow.com/questions/14596213 */
+export const shrinkWrap = (element: HTMLElement | null) => {
+  if (!element) return;
+  const { firstChild, lastChild } = element;
+  if (!firstChild || !lastChild) return;
+  const range = document.createRange();
+  range.setStartBefore(firstChild);
+  range.setEndAfter(lastChild);
+  const { width } = range.getBoundingClientRect();
+  element.style.width = width + 1 + "px";
+  element.style.boxSizing = "content-box";
 };

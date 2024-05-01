@@ -9,7 +9,7 @@ const Actions = () => {
   const { id } = useAnalysis();
 
   const { mutate: edit } = useMutation({
-    mutationFn: async () => console.info("edit", id),
+    mutationFn: async () => console.debug("edit", id),
   });
 
   const { mutate: _delete } = useMutation({
@@ -20,7 +20,7 @@ const Actions = () => {
         )
       )
         return;
-      console.info("delete", id);
+      console.debug("delete", id);
     },
   });
 
@@ -34,7 +34,6 @@ const Actions = () => {
         <Button
           text="Duplicate and Edit"
           icon={<FaPencil />}
-          design="accent"
           onClick={() => edit()}
         />
         <Button

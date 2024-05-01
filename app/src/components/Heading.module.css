@@ -6,11 +6,11 @@
 }
 
 h1.heading,
-h2.heading {
+h2.heading,
+h3.heading {
   justify-content: center;
 }
 
-h3.heading,
 h4.heading {
   justify-content: flex-start;
 }

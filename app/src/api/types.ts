@@ -1,3 +1,10 @@
+export type AnalysisType =
+  | "fasta"
+  | "accnum"
+  | "msa"
+  | "blast"
+  | "interproscan";
+
 /** homepage meta-stats */
 export type Stats = {
   /** analyses currently running */

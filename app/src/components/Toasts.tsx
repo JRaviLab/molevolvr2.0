@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import { useId } from "react";
 import {
   FaCircleCheck,
   FaCircleExclamation,
@@ -7,111 +6,107 @@ import {
   FaTriangleExclamation,
   FaXmark,
 } from "react-icons/fa6";
-import { useEvent } from "react-use";
 import classNames from "classnames";
+import { atom, getDefaultStore, useAtom } from "jotai";
 import { uniqueId } from "lodash";
-import { normalizeProps, Portal, useActor, useMachine } from "@zag-js/react";
-import * as toast from "@zag-js/toast";
-import Loading from "@/assets/loading.svg?react";
+import { sleep } from "@/util/misc";
 import classes from "./Toasts.module.css";
+
+/** available categories of toasts and associated styles */
+const types = {
+  info: { color: "var(--deep)", icon: <FaCircleInfo />, timeout: 5 },
+  success: { color: "var(--success)", icon: <FaCircleCheck />, timeout: 3 },
+  warning: {
+    color: "var(--warning)",
+    icon: <FaCircleExclamation />,
+    timeout: 5,
+  },
+  error: {
+    color: "var(--error)",
+    icon: <FaTriangleExclamation />,
+    timeout: 20,
+  },
+};
+
+type Toast = {
+  /** id/name to de-duplicate by */
+  id: string;
+  /** determines icon and style */
+  type: keyof typeof types;
+  /** content */
+  text: string;
+  /** close timer */
+  timer: number;
+};
 
 /** list of "toasts" (notifications) in corner of screen. singleton. */
 const Toasts = () => {
-  /** set up zag */
-  const [state, send] = useMachine(
-    toast.group.machine<ToastProps>({
-      /** unique id for component instance */
-      id: useId(),
-    }),
-  );
-
-  /** interact with zag */
-  const api = toast.group.connect(state, send, normalizeProps);
-
-  /** listen for global toast window event */
-  useEvent("toast", (event: CustomEvent<ToastProps>) =>
-    api.upsert(event.detail),
-  );
+  const [getToasts] = useAtom(toasts);
 
   return (
-    <Portal>
-      {!!api.toasts.length && (
+    <div className={classes.list} role="region" aria-label="Notifications">
+      {getToasts.map((toast, index) => (
         <div
-          {...api.getGroupProps({ placement: "bottom-end" })}
-          className={classes.list}
+          key={index}
+          className={classNames(classes.toast, "card")}
+          style={{ "--color": types[toast.type].color } as CSSProperties}
         >
-          {api.toasts.map((toast, index) => (
-            <Toast key={index} actor={toast} />
-          ))}
+          {types[toast.type].icon}
+          <div role={toast.type === "error" ? "alert" : "status"}>
+            {toast.text}
+          </div>
+          <button onClick={() => removeToast(toast.id)}>
+            <FaXmark />
+          </button>
         </div>
-      )}
-    </Portal>
+      ))}
+    </div>
   );
 };
 
 export default Toasts;
 
-/** individual toast box */
-const Toast = ({ actor }: { actor: toast.Service<ToastProps> }) => {
-  /** set up zag */
-  const [state, send] = useActor(actor);
+/** global toasts */
+const toasts = atom<Toast[]>([]);
 
-  /** interact with zag */
-  const api = toast.connect(state, send, normalizeProps);
-
-  const { _type = "info", text } = state.context || {};
-
-  return (
-    <div
-      {...api.rootProps}
-      className={classNames(classes.toast, "card")}
-      style={{ "--color": types[_type].color } as CSSProperties}
-    >
-      {/* type icon */}
-      {types[_type].icon}
-      {/* content */}
-      <div {...api.titleProps}>{text}</div>
-      {/* x */}
-      <button onClick={api.dismiss}>
-        <FaXmark />
-      </button>
-    </div>
-  );
+/** add toast to end */
+const addToast = (toast: Toast) => {
+  removeToast(toast.id);
+  const newToasts = getDefaultStore().get(toasts).concat([toast]);
+  getDefaultStore().set(toasts, newToasts);
 };
 
-/** available categories of toasts and associated styles */
-const types = {
-  info: { color: "var(--deep)", icon: <FaCircleInfo /> },
-  loading: { color: "var(--deep)", icon: <Loading /> },
-  success: { color: "var(--success)", icon: <FaCircleCheck /> },
-  warning: { color: "var(--warning)", icon: <FaCircleExclamation /> },
-  error: { color: "var(--error)", icon: <FaTriangleExclamation /> },
+/** remove toast by id */
+const removeToast = (id: Toast["id"]) => {
+  const newToasts = getDefaultStore()
+    .get(toasts)
+    .filter((toast) => {
+      const existing = toast.id === id;
+      if (existing) window.clearTimeout(toast.timer);
+      return !existing;
+    });
+  getDefaultStore().set(toasts, newToasts);
 };
 
-type ToastProps = {
-  /** id/name to de-duplicate by */
-  id: string;
-  /** determines icon and style */
-  _type: keyof typeof types;
-  /** content */
-  text: string;
-} & toast.ToastOptions;
+/** add toast to global queue */
+const toast = async (
+  text: Toast["text"],
+  type: Toast["type"] = "info",
+  id?: Toast["id"],
+) => {
+  /** make sure to set state outside of render */
+  await sleep();
 
-/** emit global toast event for toast component to listen for */
-const makeToast = (
-  text: ToastProps["text"],
-  type?: ToastProps["_type"],
-  id?: ToastProps["id"],
-) =>
-  window.dispatchEvent(
-    new CustomEvent("toast", {
-      detail: {
-        id: id || uniqueId(),
-        _type: type || "info",
-        type: "custom",
-        text,
-      } satisfies ToastProps,
-    }),
-  );
+  /** timeout before close, in ms */
+  const timeout = types[type].timeout * 1000 + (text.length - 30) * 100;
 
-export { makeToast as toast };
+  const newToast = {
+    id: id ?? uniqueId(),
+    type: type ?? "info",
+    text,
+    timer: window.setTimeout(() => removeToast(newToast.id), timeout),
+  };
+  addToast(newToast);
+};
+
+export { toast };

@@ -6,13 +6,13 @@
   --deep: #5c4863;
   --deep-mid: #9a7da5;
   --deep-light: #f7ede2;
-
   /** grays */
   --black: #000000;
-  --dark-gray: #404040;
-  --gray: #707070;
-  --light-gray: #e8e8e8;
-  --pale: #f0f0f0;
+  --off-black: #303030;
+  --dark-gray: #606060;
+  --gray: #b0b0b0;
+  --light-gray: #e0e0e0;
+  --off-white: #f0f0f0;
   --white: #ffffff;
 
   /** util colors */

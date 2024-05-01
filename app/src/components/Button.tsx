@@ -4,7 +4,7 @@ import type {
   ReactElement,
   ReactNode,
 } from "react";
-import { cloneElement, forwardRef } from "react";
+import { forwardRef } from "react";
 import classNames from "classnames";
 import { useForm } from "@/components/Form";
 import Link from "@/components/Link";
@@ -14,8 +14,10 @@ import classes from "./Button.module.css";
 type Base = {
   /** icon to show next to text */
   icon?: ReactElement;
+  /** whether to flip text/icon sides */
+  flip?: boolean;
   /** look */
-  design?: "normal" | "accent" | "critical";
+  design?: "normal" | "hollow" | "critical";
   /** class */
   className?: string;
 };
@@ -45,14 +47,27 @@ type Props = Base & Description & (_Link | _Button);
  */
 const Button = forwardRef(
   (
-    { text, icon, design = "normal", className, tooltip, ...props }: Props,
+    {
+      text,
+      icon,
+      flip = false,
+      design = "normal",
+      className,
+      tooltip,
+      ...props
+    }: Props,
     ref,
   ) => {
     /** contents of main element */
-    const children = (
+    const children = flip ? (
       <>
+        {icon}
         {text}
-        {icon && cloneElement(icon, { className: "icon" })}
+      </>
+    ) : (
+      <>
+        {icon}
+        {text}
       </>
     );
 
@@ -61,7 +76,7 @@ const Button = forwardRef(
       [classes.square!]: !text && !!icon,
     });
 
-    /** link to form parent */
+    /** link to parent form component */
     const form = useForm();
 
     /** if "to", render as link */

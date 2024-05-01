@@ -1,6 +1,13 @@
 .scroll {
-  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
+}
+
+@media (max-width: 800px) {
+  .expanded th,
+  .expanded td {
+    white-space: nowrap;
+  }
 }
 
 .table {
@@ -9,12 +16,12 @@
 }
 
 .th {
-  display: flex;
+  display: inline-flex;
   gap: 5px;
 }
 
 .th-label {
-  padding-right: 5px;
+  padding-right: 2px;
 }
 
 .header-button {
@@ -32,7 +39,7 @@
 
 .empty {
   padding: 20px;
-  color: var(--gray);
+  color: var(--dark-gray);
   text-align: center;
 }
 
@@ -53,7 +60,7 @@
 }
 
 .page-button {
-  width: 30px;
+  width: 20px;
   height: 30px;
   border-radius: var(--rounded);
   color: var(--accent);
@@ -62,4 +69,8 @@
 
 .page-button:hover {
   color: var(--deep);
+}
+
+.search {
+  max-width: 150px;
 }

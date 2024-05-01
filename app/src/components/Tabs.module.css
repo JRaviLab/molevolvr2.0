@@ -1,26 +1,28 @@
-.container {
+.root {
   display: contents;
 }
 
 .button {
   padding: 5px 10px;
-  gap: 10px;
-  border-bottom: solid 1px currentColor;
-  border-radius: var(--rounded) var(--rounded) 0 0;
-  color: var(--gray);
-  transition: color var(--fast);
+  border-bottom: solid 2px var(--light-gray);
+  border-radius: 0;
+  color: var(--dark-gray);
+  cursor: pointer;
+  transition:
+    color var(--fast),
+    border-color var(--fast);
 }
 
 .button:hover {
-  border-width: 1px;
+  border-color: var(--deep);
   color: var(--deep);
 }
 
-.button[data-selected] {
-  border-width: 3px;
+.active {
+  border-color: var(--accent);
   color: var(--accent);
 }
 
 .content {
-  width: 100%;
+  display: contents;
 }

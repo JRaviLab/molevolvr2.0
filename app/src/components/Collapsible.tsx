@@ -9,18 +9,16 @@ type Props = {
   text: string;
   /** tooltip content */
   tooltip?: ReactNode;
-  /** class on content panel */
-  className?: string;
   /** panel content */
   children: ReactNode;
 };
 
 /** button with expandable/collapsible content beneath */
-const Collapsible = ({ text, tooltip, className, children }: Props) => {
+const Collapsible = ({ text, tooltip, children }: Props) => {
   /** unique id for component instance */
   const id = useId();
 
-  /** track open state */
+  /** open state */
   const [open, setOpen] = useState(false);
 
   return (
@@ -42,7 +40,7 @@ const Collapsible = ({ text, tooltip, className, children }: Props) => {
       {/* content */}
       <div
         id={id}
-        className={className}
+        className={classes.panel}
         style={{ display: open ? "" : "none" }}
       >
         {children}

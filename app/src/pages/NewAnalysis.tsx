@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa6";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "react-use";
+import type { AnalysisType } from "@/api/types";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
@@ -19,7 +20,7 @@ import Heading from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import Section from "@/components/Section";
-import Select from "@/components/Select";
+import SelectSingle from "@/components/SelectSingle";
 import TextBox from "@/components/TextBox";
 import { toast } from "@/components/Toasts";
 import UploadButton from "@/components/UploadButton";
@@ -33,7 +34,7 @@ const types = [
   { id: "interproscan", text: "InterProScan" },
 ] as const;
 
-const sequencePlaceholders: Record<(typeof types)[number]["id"], string> = {
+const sequencePlaceholders: Record<AnalysisType, string> = {
   fasta: "abc\n------\n1234567890",
   accnum: "def\n------\n1234567890",
   msa: "ghi\n------\n1234567890",
@@ -45,12 +46,12 @@ const NewAnalysis = () => {
   const navigate = useNavigate();
 
   /** state */
-  const [type, setType] = useState<(typeof types)[number]>(types[0]);
+  const [type, setType] = useState<AnalysisType>(types[0].id);
   const [, setSequence] = useState("");
   const [email, setEmail] = useLocalStorage("molevolvr-email", "");
 
   const onUpload = () => {
-    console.info("upload");
+    console.debug("upload");
   };
 
   const onExample = () => {
@@ -58,7 +59,7 @@ const NewAnalysis = () => {
   };
 
   const onSubmit = (data: FormData) => {
-    console.info(data);
+    console.debug(data);
     toast("Analysis submitted", "success");
     navigate("/analysis/d4e5f6");
   };
@@ -74,9 +75,9 @@ const NewAnalysis = () => {
           </Heading>
 
           <TextBox
+            className="narrow"
             label="Name"
             placeholder="New Analysis"
-            width={400}
             name="name"
           />
         </Section>
@@ -86,7 +87,7 @@ const NewAnalysis = () => {
             Inputs
           </Heading>
 
-          <Select
+          <SelectSingle
             label="Type"
             layout="horizontal"
             tooltip="Lorem ipsum"
@@ -98,10 +99,9 @@ const NewAnalysis = () => {
 
           <TextBox
             label="Sequence"
-            placeholder={sequencePlaceholders[type.id]}
+            placeholder={sequencePlaceholders[type]}
             multi={true}
             required={true}
-            width="100%"
             name="sequence"
           />
 
@@ -109,17 +109,21 @@ const NewAnalysis = () => {
             <UploadButton
               text="Upload"
               icon={<FaUpload />}
-              onUpload={console.info}
-              design="accent"
+              onUpload={console.debug}
               onClick={onUpload}
             />
             <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
           </div>
 
-          <Collapsible text="Advanced" className="flex-col gap-md">
-            <CheckBox label="Phylogeny" name="phylogeny" />
-            <CheckBox label="Homology" name="homology" />
-            <CheckBox label="Domain Architecture" name="domain-architecture" />
+          <Collapsible text="Advanced">
+            <div className="flex-col gap-md">
+              <CheckBox label="Phylogeny" name="phylogeny" />
+              <CheckBox label="Homology" name="homology" />
+              <CheckBox
+                label="Domain Architecture"
+                name="domain-architecture"
+              />
+            </div>
           </Collapsible>
         </Section>
 
@@ -134,12 +138,12 @@ const NewAnalysis = () => {
           </Alert>
 
           <TextBox
+            className="narrow"
             label={
               <>
                 <FaRegBell /> Email me updates on this analysis
               </>
             }
-            width={360}
             placeholder="my-email@xyz.com"
             tooltip="We can email you when this analysis starts (so you can keep track of it) and when it finishes."
             value={email}

@@ -25,3 +25,7 @@
 .button:hover::after {
   background: var(--deep);
 }
+
+.panel {
+  display: contents;
+}

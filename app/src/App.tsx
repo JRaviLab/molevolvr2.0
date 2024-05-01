@@ -17,16 +17,16 @@ import {
 import { QueryParamProvider } from "use-query-params";
 import { ReactRouter6Adapter } from "use-query-params/adapters/react-router-6";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import FloatButtons from "@/components/FloatButtons";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import TableOfContents from "@/components/TableOfContents";
-import Toasts from "@/components/Toasts";
+import ViewCorner from "@/components/ViewCorner";
 import About from "@/pages/About";
 import Analysis from "@/pages/Analysis";
 import Home from "@/pages/Home";
 import LoadAnalysis from "@/pages/LoadAnalysis";
 import NewAnalysis from "@/pages/NewAnalysis";
+import NotFound from "@/pages/NotFound";
 import Testbed from "@/pages/Testbed";
 import { scrollTo } from "@/util/dom";
 
@@ -69,8 +69,7 @@ const Layout = () => {
         </QueryParamProvider>
       </main>
       <Footer />
-      <Toasts />
-      <FloatButtons />
+      <ViewCorner />
     </IconContext.Provider>
   );
 };
@@ -91,7 +90,7 @@ const routes = [
           /** handle 404 redirect */
           const url = window.sessionStorage.redirect as string;
           if (url) {
-            console.info("Redirecting to:", url);
+            console.debug("Redirecting to:", url);
             window.sessionStorage.removeItem("redirect");
             return redirect(url);
           } else return null;
@@ -120,6 +119,10 @@ const routes = [
         element: <Testbed />,
         loader: () => ({ toc: true }) satisfies Meta,
       },
+      {
+        path: "*",
+        element: <NotFound />,
+      },
     ],
   },
 ];
@@ -131,3 +134,6 @@ const router = createBrowserRouter(routes, {
 
 /** query client */
 const queryClient = new QueryClient();
+
+/** prefix for localStorage keys */
+export const storageKey = "molevolvr-";

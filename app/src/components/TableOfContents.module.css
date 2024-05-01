@@ -23,7 +23,7 @@
 .button {
   width: 40px;
   height: 40px;
-  color: var(--gray);
+  color: var(--dark-gray);
   transition: color var(--fast);
 }
 
@@ -43,7 +43,7 @@
   flex-shrink: 0;
   padding: 5px 10px;
   overflow: hidden;
-  color: var(--gray);
+  color: var(--dark-gray);
   text-decoration: none;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -57,7 +57,7 @@
 }
 
 .link[data-active] {
-  background: var(--pale);
+  background: var(--off-white);
   color: var(--accent);
   font-weight: var(--bold);
 }

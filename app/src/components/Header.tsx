@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
-import { useInterval, useWindowScroll } from "react-use";
+import { useWindowScroll } from "react-use";
 import classNames from "classnames";
 import Logo from "@/assets/logo.svg?react";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
-import { sleep } from "@/util/misc";
 import classes from "./Header.module.css";
 
 /** at top of every page. singleton. */
 const Header = () => {
-  /** logo is animating */
-  const [animated, setAnimated] = useState<true | undefined>();
-
   /** nav menu expanded/collapsed state */
   const [open, setOpen] = useState(false);
 
@@ -25,18 +21,11 @@ const Header = () => {
       (document.querySelector("header")?.clientHeight || 0) + 20 + "px";
   });
 
-  /** periodically animate logo */
-  useInterval(async () => {
-    setAnimated(true);
-    await sleep(4600);
-    setAnimated(undefined);
-  }, 10 * 1000);
-
   return (
     <header className={classes.header} data-scrolled={y > 0 ? "" : undefined}>
       {/* logo and text */}
       <div className={classes.title}>
-        <Logo className={classes.logo} data-animated={animated} />
+        <Logo className={classes.logo} />
         <Link
           className={classNames(classes.link, classes["title-link"])}
           to="/"
@@ -48,6 +37,7 @@ const Header = () => {
       {/* nav toggle */}
       <Tooltip content={open ? "Collapse menu" : "Expand menu"}>
         <button
+          type="button"
           className={classes.toggle}
           onClick={() => setOpen(!open)}
           aria-expanded={open}

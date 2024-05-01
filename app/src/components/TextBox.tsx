@@ -1,48 +1,71 @@
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { useId, useRef, useState } from "react";
 import { FaXmark } from "react-icons/fa6";
+import classNames from "classnames";
+import Asterisk from "@/components/Asterisk";
 import { useForm } from "@/components/Form";
-import type { LabelProps } from "@/components/Label";
-import Label, { forwardLabelProps } from "@/components/Label";
+import Help from "@/components/Help";
+import Tooltip from "@/components/Tooltip";
 import classes from "./TextBox.module.css";
 
 type Base = {
+  /** layout of label and control */
+  layout?: "vertical" | "horizontal";
+  /** label content */
+  label?: ReactNode;
+  /** tooltip on help icon */
+  tooltip?: ReactNode;
   /** hint icon to show on side */
   icon?: ReactElement;
   /** text state */
   value?: string;
   /** on text state change */
   onChange?: (value: string) => void;
-  /** field name */
-  name?: string;
+  /** className */
+  className?: string;
 };
 
 type Single = {
   /** single line */
   multi?: false;
-} & Pick<ComponentProps<"input">, "placeholder" | "type" | "autoComplete">;
+} & Pick<
+  ComponentProps<"input">,
+  "placeholder" | "type" | "autoComplete" | "name" | "required"
+>;
 
 type Multi = {
   /** multi-line */
   multi: true;
-} & Pick<ComponentProps<"textarea">, "placeholder" | "autoComplete">;
+} & Pick<
+  ComponentProps<"textarea">,
+  "placeholder" | "autoComplete" | "name" | "required"
+>;
 
-type Props = Base & LabelProps & (Single | Multi);
+type Props = Base & (Single | Multi);
 
 /** single or multi-line text input box */
-const TextBox = ({ multi, icon, value, onChange, name, ...props }: Props) => {
+const TextBox = ({
+  layout = "vertical",
+  label,
+  tooltip,
+  multi,
+  icon,
+  value,
+  onChange,
+  className,
+  ...props
+}: Props) => {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
 
-  /** track whether input is blank */
-  const [blank, setBlank] = useState(!value?.trim());
+  /** local text state */
+  const [text, setText] = useState(value ?? "");
 
   /** unique id for component instance */
   const id = useId();
 
   /** side element */
   let sideElement: ReactNode = "";
-
-  if (!blank || value)
+  if (text || value)
     sideElement = (
       <button
         type="button"
@@ -50,7 +73,7 @@ const TextBox = ({ multi, icon, value, onChange, name, ...props }: Props) => {
         onClick={() => {
           if (ref.current) ref.current.value = "";
           onChange?.("");
-          setBlank(true);
+          setText("");
         }}
         aria-label="Clear text"
       >
@@ -59,7 +82,7 @@ const TextBox = ({ multi, icon, value, onChange, name, ...props }: Props) => {
     );
   else if (icon) sideElement = <div className={classes.side}>{icon}</div>;
 
-  /** link to form parent */
+  /** link to parent form component */
   const form = useForm();
 
   /** input field */
@@ -71,9 +94,8 @@ const TextBox = ({ multi, icon, value, onChange, name, ...props }: Props) => {
       value={value}
       onChange={(event) => {
         onChange?.(event.target.value);
-        setBlank(!event.target.value);
+        setText(event.target.value);
       }}
-      name={name}
       form={form}
       {...props}
     />
@@ -81,28 +103,40 @@ const TextBox = ({ multi, icon, value, onChange, name, ...props }: Props) => {
     <input
       ref={ref}
       id={id}
-      className={classes.input}
+      className={classNames(
+        classes.input,
+        sideElement && classes["input-side"],
+      )}
       value={value}
-      data-side={sideElement ? "" : undefined}
       onChange={(event) => {
         onChange?.(event.target.value);
-        setBlank(!event.target.value);
+        setText(event.target.value);
       }}
-      name={name}
       form={form}
       {...props}
     />
   );
 
   return (
-    <Label width="100%" {...forwardLabelProps(props, id)}>
-      <div className={classes.container}>
-        {input}
+    <div className={classNames(classes.container, classes[layout], className)}>
+      {(label || props.required) && (
+        <label className={classes.label} htmlFor={id}>
+          {label}
+          {tooltip && <Help tooltip={tooltip} />}
+          {props.required && <Asterisk />}
+        </label>
+      )}
 
-        {/* side element */}
-        {sideElement}
-      </div>
-    </Label>
+      {/* if no label but need tooltip, put it around input */}
+      <Tooltip content={!label && tooltip ? tooltip : undefined}>
+        <div className={classes.wrapper}>
+          {input}
+
+          {/* side element */}
+          {sideElement}
+        </div>
+      </Tooltip>
+    </div>
   );
 };
 
