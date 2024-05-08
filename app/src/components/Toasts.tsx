@@ -98,7 +98,7 @@ const toast = async (
   await sleep();
 
   /** timeout before close, in ms */
-  const timeout = types[type].timeout * 1000 + (text.length - 30) * 100;
+  const timeout = types[type].timeout * 1000 + text.length * 20;
 
   const newToast = {
     id: id ?? uniqueId(),

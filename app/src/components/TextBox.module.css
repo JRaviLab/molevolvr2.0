@@ -31,21 +31,27 @@
   right: 0;
   align-items: center;
   justify-content: center;
-  width: 40px;
   height: 40px;
+  gap: 5px;
   color: var(--dark-gray);
 }
 
-.side svg {
+.side > svg {
   width: 50%;
 }
 
-button.side {
+.side > button {
+  height: 100%;
+  padding: 0 5px;
   color: var(--accent);
   transition: color var(--fast);
 }
 
-button.side:hover {
+.side > button:last-child {
+  padding-right: 10px;
+}
+
+.side > button:hover {
   color: var(--deep);
 }
 

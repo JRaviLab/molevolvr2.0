@@ -1,9 +1,4 @@
-export type AnalysisType =
-  | "fasta"
-  | "accnum"
-  | "msa"
-  | "blast"
-  | "interproscan";
+export type InputFormat = "fasta" | "accnum" | "msa" | "blast" | "interproscan";
 
 /** homepage meta-stats */
 export type Stats = {
