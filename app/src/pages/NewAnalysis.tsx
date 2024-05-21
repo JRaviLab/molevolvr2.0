@@ -90,6 +90,7 @@ const NewAnalysis = () => {
     inputFormats.list[0]!.id,
   );
   const [input, setInput] = useState("");
+  const [, setSecondaryInput] = useState("");
   const [delimiter, setDelimiter] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useLocalStorage("molevolvr-email", "");
@@ -105,8 +106,22 @@ const NewAnalysis = () => {
 
   /** attempt to parse as csv/tsv */
   const csv = delimiter
-    ? parse(input, { delimiter, skip_records_with_error: true })
+    ? (parse(input, { delimiter, skip_records_with_error: true }) as string[][])
     : null;
+
+  /** determine if query sequences also need to be provided */
+  const needQuerySequences =
+    inputType === "external" &&
+    !(
+      /** first col is accession numbers */
+      (
+        csv?.some((row) => Number.isNaN(parseFloat(row[0] ?? ""))) &&
+        /** second col is accession numbers */
+        csv?.some((row) => Number.isNaN(parseFloat(row[1] ?? ""))) &&
+        /** third col is number values */
+        csv?.every((row) => !Number.isNaN(parseFloat(row[2] ?? "")))
+      )
+    );
 
   const onExample = () => {
     setInput(examples[inputFormat]);
@@ -172,7 +187,7 @@ const NewAnalysis = () => {
           {/* stats */}
           {csv?.length ? (
             <>
-              {formatNumber(csv.length)} rows, {formatNumber(csv[0].length)}{" "}
+              {formatNumber(csv.length)} rows, {formatNumber(csv[0]?.length)}{" "}
               cols
             </>
           ) : input ? (
@@ -208,6 +223,18 @@ const NewAnalysis = () => {
             />
             <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
           </div>
+
+          {needQuerySequences && (
+            <>
+              First column of data doesn't seem to be query sequence(s)
+              <UploadButton
+                text="Upload Query Sequence(s)"
+                icon={<FaUpload />}
+                onUpload={async (file) => setSecondaryInput(await file.text())}
+                accept={["fa", "faa", "fasta", "txt"]}
+              />
+            </>
+          )}
 
           {/* external data help links */}
           {inputFormat === "blast" && (
