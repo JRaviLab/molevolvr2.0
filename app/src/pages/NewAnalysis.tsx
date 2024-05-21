@@ -2,14 +2,16 @@ import { useState } from "react";
 import {
   FaArrowRightToBracket,
   FaLightbulb,
-  FaMicroscope,
   FaPlus,
   FaRegBell,
   FaRegPaperPlane,
   FaUpload,
 } from "react-icons/fa6";
+import { MdOutlineFactory } from "react-icons/md";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "react-use";
+import { parse } from "csv-parse/browser/esm/sync";
+import { startCase } from "lodash";
 import type { InputFormat } from "@/api/types";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
@@ -25,6 +27,7 @@ import type { Option } from "@/components/SelectSingle";
 import TextBox from "@/components/TextBox";
 import { toast } from "@/components/Toasts";
 import UploadButton from "@/components/UploadButton";
+import { formatNumber } from "@/util/string";
 
 /** high-level category of inputs */
 const inputTypes = [
@@ -56,50 +59,24 @@ const inputFormats: Record<
   ] as const,
 };
 
-/** examples (and placeholders) for each input format type */
-const sequenceExamples: Record<InputFormat, string> = {
-  fasta: `>ANY95992.1 protein LiaH [Bacillus altitudinis]
-  MVLRRVRDMFVATVNEGLDKLENPRVMLNQYVRDMEDDIAKAKHAIIKQQTIQQGFLRKAEETEAFADKR
-  KKQAELAFQAGEEELVRKALTEMKYFEEKHNEYQEAYQQSVKQLKELKEQLQHLETKLRDVKDKKQALIA
-  RANAAQAKQHMNESMNKVDSESAYKEFLRMENRIEEMETKAGSYAQFADQGAYAHLDYADEVEKEWQKLQ
-  RSKQPEKQPAN
-  
-  >APP15780.1 protein LiaH [Bacillus altitudinis]
-  MVLRRVRDMFVATVNEGLDKLENPRVMLNQYVRDMEDDIAKAKHAIIKQQTIQQGFLRKAEETEAFADKR
-  KKQAELAFHAGEEELARKALTEMKYFEEKHNEYQDAYQQSVKQLKELKEQLQHLETKLRDVKDKKQALIA
-  RANAAQAKQHMNESMNKVDSESAYKEFLRMENRIEEMETKAGSYAQFADQGAYAHLDYADEVEKEWQKLQ
-  RSKQLEKQPAN
-  
-  >AGZ55339.1 hypothetical protein U471_06290 [Bacillus amyloliquefaciens CC178]
-  MSILGRFKDIMSSNINALLDKAENPEKMVDQYLRNLNSDLGKVKAETASVMAEEQRAKRTLTECQADAEK
-  MESYAMKALQAGNEADARTFLERKAAVESRLTELQTAYQLASSNASQMRKMHDKLVADIGELESRRNAIK
-  AKWSVAKTQERMNKLGSSVSNAGQSMTAFGRMEDKVNQALDHANAMAELNASPKDDIDDLTAKYDSNQSS
-  VDDELAALKQKMLFSKDQ
-  
-  >AGZ57835.1 yvqH [Bacillus amyloliquefaciens CC178]
-  MVLKRIRNMFVASVNEGLDKLENPKVMLNQYVRDMESDIAKAKQTIVKQHTIVHQFKKKQEDASETAAKR
-  KNQAQLAFDAGEEELAKKALTEMKYLEGKAAEHEKAYEQAKTQLAELKEQLETLETRLRDVKDKKQALIA
-  RANAANAKEHMNASFDKIDSESAYREFLRMESRIEEMEVRVKYGTSAEANTEYSRSQYSDEVEAEIEKMR
-  SLSLEKTERQKAAHE
-  
-  >AEB64964.1 Laminin subunit gamma-2 Laminin 5 gamma 2 subunit [Bacillus amyloliquefaciens LL3]
-  MVLKRIRDMFVASVNEGLDKLENPKVMLNQYVRDMESDIAKAKQTIVKQHTIVHQFKKKQEDASETAAKR
-  KNQAQLAFDAGEEELAKKALTEMKYLEGKAAEHEKAYDQAKTQLAELKEQLETLETRLRDVKDKKQALIA
-  RANAAKAKEHMNASFDKIDSESAYREFLRMENRIEEMEVRVKYGTSAEANTEVSRSQYSDEVEAELEKMR
-  SLSLEKTEYQKAAHE`,
-  accnum: "ANY95992.1, APP15780.1, AGZ55339.1, AGZ57835.1, AEB64964.1",
-  msa: `>AGZ55339.1 hypothetical protein U471_06290 [Bacillus amyloliquefaciens CC178]
-  ---------------------MSILGRFKDIMSSNINALLDKAENPEKMVDQYLRNLNSDLGKVKAETASVMAEEQRAKRTLTECQADAEKMESYAMKALQAGNEADARTFLERKAAVESRLTELQTAYQLASSNASQMRKMHDKLVADIGELESRRNAIKAKWSVAKTQERMNKLGSSVSNAGQSMTAFGRMEDKVNQALDHANAMAELNASPKDDIDDLTAKYDSNQSSVDDELAALKQKMLFSKDQ
-  >ANY95992.1 protein LiaH [Bacillus altitudinis]
-  ----------------------MVLRRVRDMFVATVNEGLDKLENPRVMLNQYVRDMEDDIAKAKHAIIKQQTIQQGFLRKAEETEAFADKRKKQAELAFQAGEEELVRKALTEMKYFEEKHNEYQEAYQQSVKQLKELKEQLQHLETKLRDVKDKKQALIARANAAQAKQHMNESMNKVDSESAYKE-FLRMENRIEEMETKAGSYAQFADQGAYAHLDYADEVEKEWQKLQRSKQPEKQPAN-----
-  >APP15780.1 protein LiaH
-  XBACILLXSXALTITXDINISXMVLRRVRDMFVATVNEGLDKLENPRVMLNQYVRDMEDDIAKAKHAIIKQQTIQQGFLRKAEETEAFADKRKKQAELAFHAGEEELARKALTEMKYFEEKHNEYQDAYQQSVKQLKELKEQLQHLETKLRDVKDKKQALIARANAAQAKQHMNESMNKVDSESAYKE-FLRMENRIEEMETKAGSYAQFADQGAYAHLDYADEVEKEWQKLQRSKQLEKQPAN-----
-  >AGZ57835.1 yvqH [Bacillus amyloliquefaciens CC178]
-  ----------------------MVLKRIRNMFVASVNEGLDKLENPKVMLNQYVRDMESDIAKAKQTIVKQHTIVHQFKKKQEDASETAAKRKNQAQLAFDAGEEELAKKALTEMKYLEGKAAEHEKAYEQAKTQLAELKEQLETLETRLRDVKDKKQALIARANAANAKEHMNASFDKIDSESAYRE-FLRMESRIEEMEVRVKYGTSAEANTEYSRSQYSDEVEAEIEKM-RSLSLEKTERQKAAHE
-  >AEB64964.1 Laminin subunit gamma-2 Laminin 5 gamma 2 subunit [Bacillus amyloliquefaciens LL3]
-  ----------------------MVLKRIRDMFVASVNEGLDKLENPKVMLNQYVRDMESDIAKAKQTIVKQHTIVHQFKKKQEDASETAAKRKNQAQLAFDAGEEELAKKALTEMKYLEGKAAEHEKAYDQAKTQLAELKEQLETLETRLRDVKDKKQALIARANAAKAKEHMNASFDKIDSESAYRE-FLRMENRIEEMEVRVKYGTSAEANTEVSRSQYSDEVEAELEKM-RSLSLEKTEYQKAAHE`,
-  blast: "",
-  interproscan: "",
+/** placeholders for each input format type */
+const placeholders: Record<InputFormat, string> = {
+  fasta: `>ABCDEF protein ABC [abcdef]
+  ABCDEFGHIJKLMNOPQRSTUVWXYZ`,
+  accnum: "ABC123, DEF456, GHI789",
+  msa: `>ABCDEF hypothetical protein ABC_123 [abcdef]
+  ---------------------ABCDEFGHIJKLMNOPQRSTUVWXYZ`,
+  blast: `ABC123,ABC123,123,123,1,2,3`,
+  interproscan: `ABC123,abcdef123456,123,ABC,ABC,ABC`,
+};
+
+/** examples for each input format type */
+const examples: Record<InputFormat, string> = {
+  fasta: (await import(`./examples/fasta.txt?raw`)).default,
+  accnum: (await import(`./examples/accnum.txt?raw`)).default,
+  msa: (await import(`./examples/msa.txt?raw`)).default,
+  blast: (await import(`./examples/blast.tsv?raw`)).default,
+  interproscan: (await import(`./examples/interproscan.tsv?raw`)).default,
 };
 
 const NewAnalysis = () => {
@@ -112,11 +89,28 @@ const NewAnalysis = () => {
   const [inputFormat, setInputFormat] = useState<InputFormat>(
     inputFormats.list[0]!.id,
   );
-  const [sequence, setSequence] = useState("");
+  const [input, setInput] = useState("");
+  const [delimiter, setDelimiter] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useLocalStorage("molevolvr-email", "");
 
+  /** allowed extensions */
+  const accept = {
+    fasta: ["fa", "faa", "fasta", "txt"],
+    accnum: ["csv", "tsv", "txt"],
+    msa: ["fa", "faa", "fasta", "txt"],
+    blast: ["csv", "tsv"],
+    interproscan: ["csv", "tsv"],
+  }[inputFormat];
+
+  /** attempt to parse as csv/tsv */
+  const csv = delimiter
+    ? parse(input, { delimiter, skip_records_with_error: true })
+    : null;
+
   const onExample = () => {
-    setSequence(sequenceExamples[inputFormat]);
+    setInput(examples[inputFormat]);
+    setDelimiter(inputType === "external" ? "\t" : "");
   };
 
   const onSubmit = (data: FormData) => {
@@ -141,53 +135,96 @@ const NewAnalysis = () => {
             Input
           </Heading>
 
-          <Radios
-            label="What do you want to input?"
-            tooltip="Lorem ipsum"
-            options={inputTypes}
-            value={inputType}
-            onChange={setInputType}
-            name="inputFormat"
-          />
-
-          <SelectSingle
-            label="What format is your input in?"
-            layout="vertical"
-            tooltip="Lorem ipsum"
-            options={inputFormats[inputType]}
-            value={inputFormat}
-            onChange={setInputFormat}
-            name="inputFormat"
-          />
-
-          {inputType === "list" && (
-            <TextBox
-              label="Input"
-              placeholder={sequenceExamples[inputFormat]
-                .split("\n")
-                .slice(0, 2)
-                .join("\n")}
-              multi={true}
-              value={sequence}
-              onChange={setSequence}
-              name="sequence"
+          {/* input questions */}
+          <div className="grid gap-lg align-start">
+            <Radios
+              label="What do you want to input?"
+              options={inputTypes}
+              value={inputType}
+              onChange={setInputType}
+              name="inputFormat"
             />
-          )}
+            <SelectSingle
+              label="What format is your input in?"
+              layout="vertical"
+              options={inputFormats[inputType]}
+              value={inputFormat}
+              onChange={setInputFormat}
+              name="inputFormat"
+            />
+          </div>
 
+          {/* input */}
+          <TextBox
+            label={
+              inputFormats[inputType].find((i) => i.id === inputFormat)?.text
+            }
+            placeholder={placeholders[inputFormat]
+              .split("\n")
+              .slice(0, 2)
+              .join("\n")}
+            multi
+            value={input}
+            onChange={setInput}
+            name="input"
+          />
+
+          {/* stats */}
+          {csv?.length ? (
+            <>
+              {formatNumber(csv.length)} rows, {formatNumber(csv[0].length)}{" "}
+              cols
+            </>
+          ) : input ? (
+            <>
+              {formatNumber(
+                input
+                  .split(inputFormat === "accnum" ? "," : ">")
+                  .map((p) => p.trim())
+                  .filter(Boolean).length,
+              )}{" "}
+              proteins
+            </>
+          ) : null}
+
+          {/* controls */}
           <div className="flex-row gap-sm">
             <UploadButton
               text="Upload"
               icon={<FaUpload />}
-              onUpload={console.debug}
-              accept=".fa,.faa,.fasta"
+              onUpload={async (file, filename, extension) => {
+                const contents = await file.text();
+                setInput(contents);
+                if (!name) setName(startCase(filename));
+                if (file.type === "text/csv" || extension === "csv")
+                  setDelimiter(",");
+                if (
+                  file.type === "text/tab-separated-values" ||
+                  extension === "tsv"
+                )
+                  setDelimiter("\t");
+              }}
+              accept={accept}
             />
             <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
           </div>
+
+          {/* external data help links */}
+          {inputFormat === "blast" && (
+            <Link to="/help#blast" newTab>
+              How to get the right output from BLAST
+            </Link>
+          )}
+          {inputFormat === "interproscan" && (
+            <Link to="/help#interproscan" newTab>
+              How to get the right output from InterProScan
+            </Link>
+          )}
         </Section>
 
         <Section>
-          <Heading level={2} icon={<FaMicroscope />}>
-            Parameters
+          <Heading level={2} icon={<MdOutlineFactory />}>
+            Analysis Type
           </Heading>
         </Section>
 
@@ -198,8 +235,10 @@ const NewAnalysis = () => {
 
           <TextBox
             className="narrow"
-            label="Analaysis Name"
+            label="Analysis Name"
             placeholder="New Analysis"
+            value={name}
+            onChange={setName}
             tooltip="Give your analysis a name to remember it by"
             name="name"
           />

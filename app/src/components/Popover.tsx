@@ -16,7 +16,7 @@ type Props = {
 const Popover = ({ content, children }: Props) => {
   return (
     <Radix.Root>
-      <Radix.Trigger asChild={true}>{children}</Radix.Trigger>
+      <Radix.Trigger asChild>{children}</Radix.Trigger>
       <Radix.Portal>
         <Radix.Content
           className={classes.content}

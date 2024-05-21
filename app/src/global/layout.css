@@ -48,6 +48,11 @@
   gap: 40px;
 }
 
+/** alignment */
+.align-start {
+  align-items: flex-start;
+}
+
 /** adjust max number of grid columns */
 
 .cols-3 {

@@ -113,7 +113,7 @@ const Slider = ({
                 key={index}
                 className="sr-only"
                 tabIndex={-1}
-                aria-hidden={true}
+                aria-hidden
                 type="number"
                 value={value}
                 readOnly

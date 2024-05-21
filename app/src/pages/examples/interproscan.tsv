@@ -1,0 +1,18 @@
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	Phobius	TRANSMEMBRANE	Region of a membrane-bound protein predicted to be embedded in the membrane.	328	346	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	Phobius	NON_CYTOPLASMIC_DOMAIN	Region of a membrane-bound protein predicted to be outside the membrane, in the extracellular region.	268	286	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	Phobius	CYTOPLASMIC_DOMAIN	Region of a membrane-bound protein predicted to be outside the membrane, in the cytoplasm.	168	240	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	TMHMM	TMhelix	Region of a membrane-bound protein predicted to be embedded in the membrane.	324	346	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	TMHMM	TMhelix	Region of a membrane-bound protein predicted to be embedded in the membrane.	145	167	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	Phobius	TRANSMEMBRANE	Region of a membrane-bound protein predicted to be embedded in the membrane.	241	267	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	TMHMM	TMhelix	Region of a membrane-bound protein predicted to be embedded in the membrane.	289	311	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	PANTHER	PTHR33885:SF3	PHAGE SHOCK PROTEIN C	110	242	7.1E-19	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	Phobius	CYTOPLASMIC_DOMAIN	Region of a membrane-bound protein predicted to be outside the membrane, in the cytoplasm.	317	327	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	TMHMM	TMhelix	Region of a membrane-bound protein predicted to be embedded in the membrane.	241	263	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	PANTHER	PTHR33885	PHAGE SHOCK PROTEIN C	110	242	7.1E-19	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	Phobius	NON_CYTOPLASMIC_DOMAIN	Region of a membrane-bound protein predicted to be outside the membrane, in the extracellular region.	347	574	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	Phobius	TRANSMEMBRANE	Region of a membrane-bound protein predicted to be embedded in the membrane.	143	167	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	Phobius	NON_CYTOPLASMIC_DOMAIN	Region of a membrane-bound protein predicted to be outside the membrane, in the extracellular region.	1	142	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	Phobius	TRANSMEMBRANE	Region of a membrane-bound protein predicted to be embedded in the membrane.	287	316	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	TMHMM	TMhelix	Region of a membrane-bound protein predicted to be embedded in the membrane.	122	141	-	T	30-03-2021	-	-
+AFL81617.1	d4fca8d31cf647f3a5cc7cb3230641e5	574	Pfam	PF04024	PspC domain	112	169	1.6E-18	T	30-03-2021	IPR007168	Phage shock protein, PspC, N-terminal	-	-
+

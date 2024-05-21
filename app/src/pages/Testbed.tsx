@@ -257,7 +257,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
           <TextBox
             label="Label"
             placeholder="Search"
-            multi={true}
+            multi
             icon={<FaMagnifyingGlass />}
           />
           <TextBox
@@ -270,7 +270,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
             layout="horizontal"
             label="Label"
             placeholder="Search"
-            multi={true}
+            multi
             icon={<FaMagnifyingGlass />}
           />
         </div>
@@ -341,7 +341,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
           <Slider
             layout="horizontal"
             label="Range"
-            multi={true}
+            multi
             min={0}
             max={10000}
             step={100}
@@ -655,15 +655,10 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
                 type="email"
                 autoComplete="email"
               />
-              <TextBox
-                label="Description"
-                multi={true}
-                name="description"
-                required={true}
-              />
+              <TextBox label="Description" multi name="description" required />
               <NumberBox label="Age" name="age" />
               <Slider label="Cutoff" name="cutoff" />
-              <Slider label="Range" multi={true} name="range" />
+              <Slider label="Range" multi name="range" />
               <Radios
                 label="Order"
                 options={[
@@ -696,7 +691,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
                 name="select-multi"
               />
             </div>
-            <CheckBox label="I consent" name="consent" required={true} />
+            <CheckBox label="I consent" name="consent" required />
             <Button type="submit" text="Submit" design="critical" />
           </Form>
         </div>

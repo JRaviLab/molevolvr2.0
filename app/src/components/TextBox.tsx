@@ -102,7 +102,10 @@ const TextBox = ({
     <textarea
       ref={ref}
       id={id}
-      className={classes.textarea}
+      className={classNames(
+        classes.textarea,
+        sideElement && classes["input-side"],
+      )}
       value={value}
       onChange={(event) => {
         onChange?.(event.target.value);

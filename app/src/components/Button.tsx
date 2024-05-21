@@ -86,7 +86,7 @@ const Button = forwardRef(
           ref={ref as ForwardedRef<HTMLAnchorElement>}
           className={_class}
           tooltip={tooltip}
-          noIcon={true}
+          noIcon
           {...props}
         >
           {children}

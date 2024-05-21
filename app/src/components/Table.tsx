@@ -533,7 +533,7 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
         label="Filter"
         min={min}
         max={max}
-        multi={true}
+        multi
         value={(column.getFilterValue() as [number, number]) ?? [min, max]}
         onChange={(value) => {
           /** return as "unfiltered" if value equals min/max range */

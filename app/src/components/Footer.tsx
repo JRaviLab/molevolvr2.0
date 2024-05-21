@@ -20,7 +20,7 @@ const Footer = () => (
 
     <div>
       A project of the{" "}
-      <Link to="https://www.thekrishnanlab.org" noIcon={true}>
+      <Link to="https://www.thekrishnanlab.org" noIcon>
         Krishnan Lab
       </Link>{" "}
       &copy; 2023

@@ -25,36 +25,6 @@
   width: 100%;
 }
 
-.side {
-  display: flex;
-  position: absolute;
-  right: 0;
-  align-items: center;
-  justify-content: center;
-  height: 40px;
-  gap: 5px;
-  color: var(--dark-gray);
-}
-
-.side > svg {
-  width: 50%;
-}
-
-.side > button {
-  height: 100%;
-  padding: 0 5px;
-  color: var(--accent);
-  transition: color var(--fast);
-}
-
-.side > button:last-child {
-  padding-right: 10px;
-}
-
-.side > button:hover {
-  color: var(--deep);
-}
-
 .input,
 .textarea {
   width: 100%;
@@ -74,11 +44,40 @@
 }
 
 .input-side {
-  padding-right: 40px;
+  padding-right: 60px;
 }
 
 .textarea {
   min-width: 100%;
   max-width: 100%;
   min-height: 3.5lh;
+}
+
+.side {
+  display: flex;
+  position: absolute;
+  top: 2px;
+  right: calc(10px + 2px);
+  bottom: 2px;
+  align-items: center;
+  justify-content: center;
+  height: calc(40px - 2px - 2px);
+  gap: 5px;
+  background: var(--white);
+  color: var(--dark-gray);
+}
+
+.side > svg {
+  width: 50%;
+}
+
+.side > button {
+  height: 100%;
+  padding: 0 5px;
+  color: var(--accent);
+  transition: color var(--fast);
+}
+
+.side > button:hover {
+  color: var(--deep);
 }

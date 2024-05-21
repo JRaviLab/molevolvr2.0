@@ -1,6 +1,7 @@
 import {
   cloneElement,
   Fragment,
+  useEffect,
   useState,
   type ReactElement,
   type ReactNode,
@@ -52,14 +53,20 @@ const SelectSingle = <O extends Option>({
   options,
   name,
 }: Props<O>) => {
-  /** local copy of selected value to programmatically set HUI state */
-  const [local, setLocal] = useState(value);
+  /** local copy of selected value */
+  const [selected, setSelected] = useState(value);
+
+  /** whether selected option undefined and needs to fallback */
+  const fallback =
+    !selected || !options.find((option) => option.id === selected);
 
   /** ensure local selected value always defined */
-  const _local: O["id"] =
-    !local || !options.find((option) => option.id === local)
-      ? options[0]!.id
-      : local;
+  const selectedWFallback: O["id"] = fallback ? options[0]!.id : selected;
+
+  /** notify parent when selected changes */
+  useEffect(() => {
+    onChange?.(selectedWFallback);
+  }, [selectedWFallback, onChange]);
 
   /** link to parent form component */
   const form = useForm();
@@ -67,13 +74,8 @@ const SelectSingle = <O extends Option>({
   return (
     <HUI.Listbox
       className={classNames(classes.container, classes[layout])}
-      value={_local}
-      onChange={(value) => {
-        /** update local value */
-        setLocal(value);
-        /** parent onChange */
-        onChange?.(value);
-      }}
+      value={selectedWFallback}
+      onChange={setSelected}
       name={name}
       form={form}
       as="div"
@@ -92,7 +94,9 @@ const SelectSingle = <O extends Option>({
             if (!(key === "ArrowLeft" || key === "ArrowRight")) return;
 
             /** find curent selected index */
-            let index = options.findIndex((option) => option.id === _local);
+            let index = options.findIndex(
+              (option) => option.id === selectedWFallback,
+            );
             if (index === -1) return;
 
             /** inc/dec selected index */
@@ -103,13 +107,11 @@ const SelectSingle = <O extends Option>({
             const selected = options[index]!;
 
             /** update local value */
-            setLocal(selected.id);
-            /** parent onChange */
-            onChange?.(selected.id);
+            setSelected(selected.id);
           }}
         >
           <span className="truncate">
-            {options.find((option) => option.id === _local)?.text}
+            {options.find((option) => option.id === selectedWFallback)?.text}
           </span>
           <FaAngleDown />
         </HUI.Listbox.Button>

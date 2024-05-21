@@ -61,7 +61,7 @@ const Home = () => {
     <>
       <Meta title="Home" />
 
-      <Section fill={true}>
+      <Section fill>
         <Heading level={1} className="sr-only">
           Home
         </Heading>
@@ -205,7 +205,7 @@ const Home = () => {
         </div>
       </Section>
 
-      <Section fill={true}>
+      <Section fill>
         <Heading level={2} icon={<FaQuoteRight />}>
           Cite
         </Heading>

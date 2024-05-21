@@ -3,6 +3,7 @@ html {
   font-size: 13pt;
   line-height: var(--compact);
   font-family: var(--sans);
+  text-underline-offset: 0.2em;
 }
 
 *,
@@ -224,8 +225,8 @@ textarea {
 /** scrollbar */
 
 :not(html) ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 999px;
   background-color: var(--off-white);
 }
