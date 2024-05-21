@@ -44,13 +44,9 @@
   --cell: min(100%, calc(var(--content) / var(--cols) - 100px));
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--cell), 1fr));
+  align-items: flex-start;
   max-width: 100%;
   gap: 40px;
-}
-
-/** alignment */
-.align-start {
-  align-items: flex-start;
 }
 
 /** adjust max number of grid columns */

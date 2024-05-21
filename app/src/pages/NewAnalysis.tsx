@@ -136,7 +136,7 @@ const NewAnalysis = () => {
           </Heading>
 
           {/* input questions */}
-          <div className="grid gap-lg align-start">
+          <div className="grid gap-lg">
             <Radios
               label="What do you want to input?"
               options={inputTypes}
