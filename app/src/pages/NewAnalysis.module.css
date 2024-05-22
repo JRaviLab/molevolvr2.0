@@ -5,6 +5,20 @@
 .questions-right {
   display: flex;
   flex-direction: column;
-  gap: 20px;
   align-items: flex-start;
+  gap: 20px;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 60px;
+}
+
+.blast-params {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }

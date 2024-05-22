@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import {
   FaArrowRightToBracket,
+  FaGear,
   FaLightbulb,
   FaPlus,
   FaRegBell,
   FaRegPaperPlane,
   FaUpload,
 } from "react-icons/fa6";
-import { MdOutlineFactory } from "react-icons/md";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "react-use";
 import classNames from "classnames";
@@ -16,19 +16,28 @@ import { isEmpty, startCase } from "lodash";
 import type { AnalysisType, InputFormat } from "@/api/types";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
+import CheckBox from "@/components/CheckBox";
 import Form from "@/components/Form";
 import type { FormData } from "@/components/Form";
 import Heading from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
+import NumberBox from "@/components/NumberBox";
 import Radios from "@/components/Radios";
 import Section from "@/components/Section";
 import SelectSingle from "@/components/SelectSingle";
 import type { Option } from "@/components/SelectSingle";
+import Slider from "@/components/Slider";
+import Table from "@/components/Table";
 import TextBox from "@/components/TextBox";
 import { toast } from "@/components/Toasts";
 import UploadButton from "@/components/UploadButton";
 import { formatNumber } from "@/util/string";
+import accnumExample from "./examples/accnum.txt?raw";
+import blastExample from "./examples/blast.tsv?raw";
+import fastaExample from "./examples/fasta.txt?raw";
+import interproscanExample from "./examples/interproscan.tsv?raw";
+import msaExample from "./examples/msa.txt?raw";
 import classes from "./NewAnalysis.module.css";
 
 /** high-level category of inputs */
@@ -36,12 +45,12 @@ const inputTypes = [
   {
     id: "list",
     primary: "Proteins of interest",
-    secondary: "Provide a list of FASTA or MSA sequences or accession numbers",
+    secondary: "Provide list of FASTA or MSA sequences or accession numbers",
   },
   {
     id: "external",
     primary: "External data",
-    secondary: "Provide output from BLAST or Interproscan",
+    secondary: "Provide tabular output from BLAST or Interproscan",
   },
 ] as const;
 
@@ -74,11 +83,11 @@ const placeholders: Record<InputFormat, string> = {
 
 /** examples for each input format type */
 const examples: Record<InputFormat, string> = {
-  fasta: (await import(`./examples/fasta.txt?raw`)).default,
-  accnum: (await import(`./examples/accnum.txt?raw`)).default,
-  msa: (await import(`./examples/msa.txt?raw`)).default,
-  blast: (await import(`./examples/blast.tsv?raw`)).default,
-  interproscan: (await import(`./examples/interproscan.tsv?raw`)).default,
+  fasta: fastaExample,
+  accnum: accnumExample,
+  msa: msaExample,
+  blast: blastExample,
+  interproscan: interproscanExample,
 };
 
 /** high-level category of inputs */
@@ -105,6 +114,34 @@ const analysisTypes = [
   },
 ] as const;
 
+/** csv cols */
+const tableCols = [
+  "Query",
+  "AccNum",
+  "PcIdentity",
+  "AlnLength",
+  "Mismatch",
+  "GapOpen",
+  "QStart",
+  "QEnd",
+  "SStart",
+  "SEnd",
+  "EValue",
+  "BitScore",
+  "PcPosOrig",
+];
+
+/** parse text as csv/tsv */
+const parseTable = (
+  input: string,
+  delimiter: string,
+): Record<string, unknown>[] =>
+  parse(input, {
+    delimiter,
+    columns: tableCols,
+    skip_records_with_error: true,
+  });
+
 const NewAnalysis = () => {
   const navigate = useNavigate();
 
@@ -115,9 +152,12 @@ const NewAnalysis = () => {
   const [inputFormat, setInputFormat] = useState<InputFormat>(
     inputFormats.list[0]!.id,
   );
-  const [input, setInput] = useState("");
-  const [, setSecondaryInput] = useState("");
-  const [delimiter, setDelimiter] = useState("");
+  const [listInput, setListInput] = useState("");
+  const [tableInput, setTableInput] = useState<ReturnType<
+    typeof parseTable
+  > | null>(null);
+  const [, setQuerySequenceInput] = useState("");
+  const [haveQuerySequences, setHaveQuerySequences] = useState(true);
   const [analysisType, setAnalysisType] = useState<AnalysisType>(
     analysisTypes[0]!.id,
   );
@@ -133,34 +173,14 @@ const NewAnalysis = () => {
     interproscan: ["csv", "tsv"],
   }[inputFormat];
 
-  /** attempt to parse as csv/tsv */
-  const csv = delimiter
-    ? (parse(input, { delimiter, skip_records_with_error: true }) as string[][])
-    : null;
-
-  /** determine if query sequences also need to be provided */
-  const needQuerySequences =
-    inputType === "external" &&
-    input &&
-    !(
-      /** first col is accession numbers */
-      (
-        csv?.some((row) => Number.isNaN(parseFloat(row[0] ?? ""))) &&
-        /** second col is accession numbers */
-        csv?.some((row) => Number.isNaN(parseFloat(row[1] ?? ""))) &&
-        /** third col is number values */
-        csv?.every((row) => !Number.isNaN(parseFloat(row[2] ?? "")))
-      )
-    );
-
   /** high-level stats of input for review */
   const stats: Record<string, string> = {};
-  if (csv?.length) {
-    stats.rows = formatNumber(csv.length);
-    stats.cols = formatNumber(csv[0]?.length);
-  } else if (input)
+  if (tableInput?.length) {
+    stats.rows = formatNumber(tableInput.length);
+    stats.cols = formatNumber(Object.keys(tableInput[0] || {})?.length);
+  } else if (listInput)
     stats.proteins = formatNumber(
-      input
+      listInput
         .split(inputFormat === "accnum" ? "," : ">")
         .map((p) => p.trim())
         .filter(Boolean).length,
@@ -168,8 +188,9 @@ const NewAnalysis = () => {
 
   /** use example */
   const onExample = () => {
-    setInput(examples[inputFormat]);
-    setDelimiter(inputType === "external" ? "\t" : "");
+    if (inputType === "list") setListInput(examples[inputFormat]);
+    if (inputType === "external")
+      setTableInput(parseTable(examples[inputFormat], "\t"));
   };
 
   /** submit analysis */
@@ -179,11 +200,14 @@ const NewAnalysis = () => {
     navigate("/analysis/d4e5f6");
   };
 
-  /** clear inputs when selected input type changes */
+  console.log(tableInput);
+
+  /** clear inputs when selected input format changes */
   useEffect(() => {
-    setInput("");
-    setSecondaryInput("");
-  }, [inputType]);
+    setListInput("");
+    setTableInput(null);
+    setQuerySequenceInput("");
+  }, [inputFormat]);
 
   return (
     <>
@@ -234,35 +258,48 @@ const NewAnalysis = () => {
             </div>
           </div>
 
-          {/* input */}
-          <TextBox
-            label={
-              <>
-                {
-                  inputFormats[inputType].find((i) => i.id === inputFormat)
-                    ?.text
-                }{" "}
-                input
-                {!isEmpty(stats) && (
-                  <span className="secondary">
-                    (
-                    {Object.entries(stats)
-                      .map(([key, value]) => `${value} ${startCase(key)}`)
-                      .join(", ")}
-                    )
-                  </span>
-                )}
-              </>
-            }
-            placeholder={placeholders[inputFormat]
-              .split("\n")
-              .slice(0, 2)
-              .join("\n")}
-            multi
-            value={input}
-            onChange={setInput}
-            name="input"
-          />
+          {/* list input */}
+          {inputType === "list" && (
+            <TextBox
+              label={
+                <>
+                  {
+                    inputFormats[inputType].find((i) => i.id === inputFormat)
+                      ?.text
+                  }{" "}
+                  input
+                  {!isEmpty(stats) && (
+                    <span className="secondary">
+                      (
+                      {Object.entries(stats)
+                        .map(([key, value]) => `${value} ${startCase(key)}`)
+                        .join(", ")}
+                      )
+                    </span>
+                  )}
+                </>
+              }
+              placeholder={placeholders[inputFormat]
+                .split("\n")
+                .slice(0, 2)
+                .join("\n")}
+              multi
+              value={listInput}
+              onChange={setListInput}
+              name="input"
+            />
+          )}
+
+          {/* table input */}
+          {inputType === "external" && tableInput && (
+            <Table
+              cols={tableCols.map((col) => ({
+                key: col,
+                name: col,
+              }))}
+              rows={tableInput}
+            />
+          )}
 
           {/* controls */}
           <div className="flex-row gap-sm">
@@ -270,53 +307,107 @@ const NewAnalysis = () => {
               text="Upload"
               icon={<FaUpload />}
               onUpload={async (file, filename, extension) => {
-                const contents = await file.text();
-                setInput(contents);
                 if (!name) setName(startCase(filename));
-                if (file.type === "text/csv" || extension === "csv")
-                  setDelimiter(",");
-                if (
-                  file.type === "text/tab-separated-values" ||
-                  extension === "tsv"
-                )
-                  setDelimiter("\t");
+                const contents = await file.text();
+                if (inputType === "list") setListInput(contents);
+                if (inputType === "external")
+                  setTableInput(
+                    parseTable(
+                      contents,
+                      file.type === "text/tab-separated-values" ||
+                        extension === "tsv"
+                        ? "\t"
+                        : ",",
+                    ),
+                  );
               }}
               accept={accept}
             />
             <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
           </div>
 
-          {needQuerySequences && (
-            <>
-              First column of data doesn't seem to be query sequence(s)
+          <div className="flex-col gap-md">
+            <CheckBox
+              label={
+                <span>
+                  First column (query sequences) is in <i>accession number</i>{" "}
+                  format
+                </span>
+              }
+              tooltip="We need your query sequences(s) as accession numbers so we can look up additional metadata about them. Learn more on the about page."
+              value={haveQuerySequences}
+              onChange={setHaveQuerySequences}
+            />
+            {!haveQuerySequences && (
               <UploadButton
-                text="Upload Query Sequence(s)"
+                text="Upload Query Sequence Accession Numbers"
                 icon={<FaUpload />}
-                onUpload={async (file) => setSecondaryInput(await file.text())}
+                design="hollow"
+                onUpload={async (file) =>
+                  setQuerySequenceInput(await file.text())
+                }
                 accept={["fa", "faa", "fasta", "txt"]}
               />
-            </>
-          )}
+            )}
+          </div>
         </Section>
 
         <Section>
-          <Heading level={2} icon={<MdOutlineFactory />}>
-            Analysis Type
+          <Heading level={2} icon={<FaGear />}>
+            Options
           </Heading>
 
-          <Radios
-            label="What computations do you want to run?"
-            tooltip="These options may be limited depending on your input format. Some computations are necessarily performed together. Learn more on the about page."
-            /** allow specific analysis types based on input format */
-            options={analysisTypes.filter(({ id }) => {
-              if (["fasta", "accnum", "msa"].includes(inputFormat)) return true;
-              if (inputFormat === "blast") return id === "phylogeny-domain";
-              if (inputFormat === "interproscan")
-                return ["phylogeny-domain", "domain"].includes(id);
-            })}
-            value={analysisType}
-            onChange={setAnalysisType}
-            name="analysisType"
+          <div className={classes.options}>
+            <Radios
+              label="What type of analyses do you want to run?"
+              tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
+              /** allow specific analysis types based on input format */
+              options={analysisTypes.filter(({ id }) => {
+                if (["fasta", "accnum", "msa"].includes(inputFormat))
+                  return true;
+                if (inputFormat === "blast") return id === "phylogeny-domain";
+                if (inputFormat === "interproscan")
+                  return ["phylogeny-domain", "domain"].includes(id);
+              })}
+              value={analysisType}
+              onChange={setAnalysisType}
+              name="analysisType"
+            />
+
+            {["homology-domain", "homology"].includes(analysisType) && (
+              <div className={classes["blast-params"]}>
+                <div className="primary">BLAST Parameters</div>
+
+                <SelectSingle
+                  label="Homology search database"
+                  options={[
+                    { id: "refseq", text: "RefSeq" },
+                    { id: "nr", text: "nr" },
+                  ]}
+                  name="blastHomologyDatabase"
+                />
+                <Slider
+                  label="Max hits"
+                  min={10}
+                  max={500}
+                  name="blastMaxHits"
+                />
+                <NumberBox
+                  label="E-value cutoff"
+                  defaultValue={0.00001}
+                  min={0}
+                  max={1}
+                  step={0.000001}
+                  name="blastECutoff"
+                />
+              </div>
+            )}
+          </div>
+
+          <CheckBox
+            label="Split by domain"
+            tooltip="Split input proteins by domain, and run analyses on each part separately"
+            name="splitByDomain"
           />
         </Section>
 
