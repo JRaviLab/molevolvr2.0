@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FaArrowRightToBracket,
   FaLightbulb,
@@ -10,9 +10,10 @@ import {
 import { MdOutlineFactory } from "react-icons/md";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "react-use";
+import classNames from "classnames";
 import { parse } from "csv-parse/browser/esm/sync";
-import { startCase } from "lodash";
-import type { InputFormat } from "@/api/types";
+import { isEmpty, startCase } from "lodash";
+import type { AnalysisType, InputFormat } from "@/api/types";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import Form from "@/components/Form";
@@ -28,6 +29,7 @@ import TextBox from "@/components/TextBox";
 import { toast } from "@/components/Toasts";
 import UploadButton from "@/components/UploadButton";
 import { formatNumber } from "@/util/string";
+import classes from "./NewAnalysis.module.css";
 
 /** high-level category of inputs */
 const inputTypes = [
@@ -79,6 +81,30 @@ const examples: Record<InputFormat, string> = {
   interproscan: (await import(`./examples/interproscan.tsv?raw`)).default,
 };
 
+/** high-level category of inputs */
+const analysisTypes = [
+  {
+    id: "phylogeny-domain",
+    primary: "Phylogeny + Domain Architecture",
+    secondary: "Full analysis",
+  },
+  {
+    id: "homology-domain",
+    primary: "Homology + Domain Architecture",
+    secondary: "Lorem ipsum",
+  },
+  {
+    id: "homology",
+    primary: "Homology",
+    secondary: "Lorem ipsum",
+  },
+  {
+    id: "domain",
+    primary: "Domain architecture",
+    secondary: "Lorem ipsum",
+  },
+] as const;
+
 const NewAnalysis = () => {
   const navigate = useNavigate();
 
@@ -92,6 +118,9 @@ const NewAnalysis = () => {
   const [input, setInput] = useState("");
   const [, setSecondaryInput] = useState("");
   const [delimiter, setDelimiter] = useState("");
+  const [analysisType, setAnalysisType] = useState<AnalysisType>(
+    analysisTypes[0]!.id,
+  );
   const [name, setName] = useState("");
   const [email, setEmail] = useLocalStorage("molevolvr-email", "");
 
@@ -112,6 +141,7 @@ const NewAnalysis = () => {
   /** determine if query sequences also need to be provided */
   const needQuerySequences =
     inputType === "external" &&
+    input &&
     !(
       /** first col is accession numbers */
       (
@@ -123,16 +153,37 @@ const NewAnalysis = () => {
       )
     );
 
+  /** high-level stats of input for review */
+  const stats: Record<string, string> = {};
+  if (csv?.length) {
+    stats.rows = formatNumber(csv.length);
+    stats.cols = formatNumber(csv[0]?.length);
+  } else if (input)
+    stats.proteins = formatNumber(
+      input
+        .split(inputFormat === "accnum" ? "," : ">")
+        .map((p) => p.trim())
+        .filter(Boolean).length,
+    );
+
+  /** use example */
   const onExample = () => {
     setInput(examples[inputFormat]);
     setDelimiter(inputType === "external" ? "\t" : "");
   };
 
+  /** submit analysis */
   const onSubmit = (data: FormData) => {
     console.debug(data);
     toast("Analysis submitted", "success");
     navigate("/analysis/d4e5f6");
   };
+
+  /** clear inputs when selected input type changes */
+  useEffect(() => {
+    setInput("");
+    setSecondaryInput("");
+  }, [inputType]);
 
   return (
     <>
@@ -151,7 +202,7 @@ const NewAnalysis = () => {
           </Heading>
 
           {/* input questions */}
-          <div className="grid gap-lg">
+          <div className={classNames(classes.questions, "grid", "gap-lg")}>
             <Radios
               label="What do you want to input?"
               options={inputTypes}
@@ -159,20 +210,49 @@ const NewAnalysis = () => {
               onChange={setInputType}
               name="inputFormat"
             />
-            <SelectSingle
-              label="What format is your input in?"
-              layout="vertical"
-              options={inputFormats[inputType]}
-              value={inputFormat}
-              onChange={setInputFormat}
-              name="inputFormat"
-            />
+
+            <div className={classes["questions-right"]}>
+              <SelectSingle
+                label="What format is your input in?"
+                layout="vertical"
+                options={inputFormats[inputType]}
+                value={inputFormat}
+                onChange={setInputFormat}
+                name="inputFormat"
+              />
+              {/* external data help links */}
+              {inputFormat === "blast" && (
+                <Link to="/help#blast" newTab>
+                  How to get the right output from BLAST
+                </Link>
+              )}
+              {inputFormat === "interproscan" && (
+                <Link to="/help#interproscan" newTab>
+                  How to get the right output from InterProScan
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* input */}
           <TextBox
             label={
-              inputFormats[inputType].find((i) => i.id === inputFormat)?.text
+              <>
+                {
+                  inputFormats[inputType].find((i) => i.id === inputFormat)
+                    ?.text
+                }{" "}
+                input
+                {!isEmpty(stats) && (
+                  <span className="secondary">
+                    (
+                    {Object.entries(stats)
+                      .map(([key, value]) => `${value} ${startCase(key)}`)
+                      .join(", ")}
+                    )
+                  </span>
+                )}
+              </>
             }
             placeholder={placeholders[inputFormat]
               .split("\n")
@@ -183,24 +263,6 @@ const NewAnalysis = () => {
             onChange={setInput}
             name="input"
           />
-
-          {/* stats */}
-          {csv?.length ? (
-            <>
-              {formatNumber(csv.length)} rows, {formatNumber(csv[0]?.length)}{" "}
-              cols
-            </>
-          ) : input ? (
-            <>
-              {formatNumber(
-                input
-                  .split(inputFormat === "accnum" ? "," : ">")
-                  .map((p) => p.trim())
-                  .filter(Boolean).length,
-              )}{" "}
-              proteins
-            </>
-          ) : null}
 
           {/* controls */}
           <div className="flex-row gap-sm">
@@ -235,24 +297,27 @@ const NewAnalysis = () => {
               />
             </>
           )}
-
-          {/* external data help links */}
-          {inputFormat === "blast" && (
-            <Link to="/help#blast" newTab>
-              How to get the right output from BLAST
-            </Link>
-          )}
-          {inputFormat === "interproscan" && (
-            <Link to="/help#interproscan" newTab>
-              How to get the right output from InterProScan
-            </Link>
-          )}
         </Section>
 
         <Section>
           <Heading level={2} icon={<MdOutlineFactory />}>
             Analysis Type
           </Heading>
+
+          <Radios
+            label="What computations do you want to run?"
+            tooltip="These options may be limited depending on your input format. Some computations are necessarily performed together. Learn more on the about page."
+            /** allow specific analysis types based on input format */
+            options={analysisTypes.filter(({ id }) => {
+              if (["fasta", "accnum", "msa"].includes(inputFormat)) return true;
+              if (inputFormat === "blast") return id === "phylogeny-domain";
+              if (inputFormat === "interproscan")
+                return ["phylogeny-domain", "domain"].includes(id);
+            })}
+            value={analysisType}
+            onChange={setAnalysisType}
+            name="analysisType"
+          />
         </Section>
 
         <Section>

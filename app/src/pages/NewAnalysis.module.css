@@ -1,0 +1,10 @@
+.questions {
+  justify-items: flex-start;
+}
+
+.questions-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+}

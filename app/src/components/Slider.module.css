@@ -16,12 +16,11 @@
 .label {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
 }
 
 .track {
   box-sizing: content-box;
-
   min-width: 100px;
   height: 5px;
   margin: 5px;

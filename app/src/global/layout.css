@@ -37,7 +37,6 @@
 }
 
 /** basic auto-filled grid with max number of columns */
-/** if customization needed, use local class from scratch */
 
 .grid {
   --cols: 2;
