@@ -41,7 +41,7 @@ const CheckBox = ({
 
   /** update local state from controlled value */
   useEffect(() => {
-    if (typeof value === "boolean") setChecked(value);
+    if (value !== undefined) setChecked(value);
   }, [value]);
 
   return (

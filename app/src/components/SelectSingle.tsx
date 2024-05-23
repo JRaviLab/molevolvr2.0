@@ -1,6 +1,7 @@
 import {
   cloneElement,
   Fragment,
+  useEffect,
   useState,
   type ReactElement,
   type ReactNode,
@@ -68,6 +69,11 @@ const SelectSingle = <O extends Option>({
   const previousSelected = usePrevious(selectedWFallback);
   if (previousSelected && previousSelected !== selectedWFallback)
     sleep().then(() => onChange?.(selectedWFallback));
+
+  /** update local state from controlled value */
+  useEffect(() => {
+    if (value !== undefined) setSelected(value);
+  }, [value]);
 
   /** link to parent form component */
   const form = useForm();

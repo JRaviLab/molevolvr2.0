@@ -24,15 +24,7 @@ type Props = {
 /** link to internal route or external url */
 const Link = forwardRef(
   (
-    {
-      to,
-      children,
-      newTab = false,
-      noIcon,
-      tooltip,
-      className,
-      ...props
-    }: Props,
+    { to, children, newTab, noIcon, tooltip, className, ...props }: Props,
     ref: ForwardedRef<HTMLAnchorElement>,
   ) => {
     /** whether link is external (some other site) or internal (within router) */

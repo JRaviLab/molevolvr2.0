@@ -255,7 +255,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
           Text Box
         </Heading>
 
-        <Flex>
+        <div className="grid">
           <TextBox label="Label" placeholder="Search" onChange={logChange} />
           <TextBox
             label="Label"
@@ -276,7 +276,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
             multi
             icon={<FaMagnifyingGlass />}
           />
-        </Flex>
+        </div>
       </Section>
 
       {/* select */}
@@ -696,8 +696,8 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
               }
               name="select-multi"
             />
-            <CheckBox label="I consent" name="consent" required />
           </div>
+          <CheckBox label="I consent" name="consent" required />
           <Button type="submit" text="Submit" design="critical" />
         </Form>
       </Section>

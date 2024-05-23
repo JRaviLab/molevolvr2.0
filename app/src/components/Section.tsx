@@ -23,6 +23,7 @@ const Section = ({ fill, full, className, ...props }: Props) => (
   <Flex
     direction="column"
     gap="lg"
+    vAlign="top"
     className={classNames(classes.section, className, {
       [classes.fill!]: fill,
       [classes.full!]: full,
