@@ -41,10 +41,7 @@ const Tooltip = forwardRef<HTMLButtonElement, Props>(
                   return element;
                 }}
                 className={classes.content}
-                sideOffset={5}
-                collisionPadding={{
-                  top: document.querySelector("header")?.clientHeight,
-                }}
+                side="top"
               >
                 {content}
                 <Radix.Arrow className={classes.arrow} />

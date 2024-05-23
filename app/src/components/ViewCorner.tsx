@@ -1,5 +1,6 @@
 import { FaAngleUp } from "react-icons/fa6";
 import { useWindowScroll } from "react-use";
+import Flex from "@/components/Flex";
 import Toasts from "@/components/Toasts";
 import classes from "./ViewCorner.module.css";
 
@@ -8,7 +9,7 @@ const ViewCorner = () => {
   const { y } = useWindowScroll();
 
   return (
-    <div className={classes.list}>
+    <Flex direction="column" hAlign="right" gap="sm" className={classes.list}>
       <Toasts />
       {y > 100 && (
         <button
@@ -22,7 +23,7 @@ const ViewCorner = () => {
       )}
 
       {/* possibly other buttons/actions in future */}
-    </div>
+    </Flex>
   );
 };
 

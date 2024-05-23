@@ -65,7 +65,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
       }}
     >
       {/* tab buttons */}
-      <Radix.List className="flex-row gap-xs">
+      <Radix.List className={classes.buttons}>
         {tabs.map((tab, index) => (
           <Tooltip key={index} content={tab.tooltip}>
             <Radix.Trigger
@@ -73,8 +73,6 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
               className={classNames(
                 classes.button,
                 tab.id === selected && classes.active,
-                "flex-row",
-                "gap-xs",
               )}
             >
               {tab.text}
@@ -86,11 +84,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
 
       {/* panels */}
       {tabs.map((tab, index) => (
-        <Radix.Content
-          key={index}
-          value={tab.id}
-          className={classNames("flex-col", "gap-lg", classes.content)}
-        >
+        <Radix.Content key={index} value={tab.id} className={classes.content}>
           {tab.children}
         </Radix.Content>
       ))}

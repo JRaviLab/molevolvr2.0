@@ -15,11 +15,6 @@
   min-width: min(max-content, var(--content));
 }
 
-.th {
-  display: inline-flex;
-  gap: 5px;
-}
-
 .th-label {
   padding-right: 2px;
 }
@@ -41,12 +36,6 @@
   padding: 20px;
   color: var(--dark-gray);
   text-align: center;
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
 
 .page-text {

@@ -1,11 +1,8 @@
 .alert {
-  display: flex;
   z-index: 0;
   position: relative;
-  align-items: center;
   padding: 20px;
   overflow: hidden;
-  gap: 20px;
   border-radius: var(--rounded);
   line-height: var(--spacing);
 }

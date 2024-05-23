@@ -4,6 +4,7 @@ import { useLocalStorage } from "react-use";
 import type { Analysis } from "@/api/types";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";
+import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
@@ -29,10 +30,10 @@ const LoadAnalysis = () => {
         </Heading>
 
         <Form onSubmit={(data) => navigate(`/analysis/${data.id}`)}>
-          <div className="flex-col gap-md narrow">
+          <Flex className="narrow">
             <TextBox placeholder="Analysis ID" name="id" />
             <Button text="Lookup" icon={<FaArrowRight />} type="submit" />
-          </div>
+          </Flex>
         </Form>
       </Section>
 
@@ -55,14 +56,14 @@ const LoadAnalysis = () => {
         {!history.length && <div className="placeholder">Nothing yet!</div>}
 
         {/* for testing */}
-        <div className="flex-row gap-sm">
+        <Flex>
           For testing:
           <Button
             text="Add Fakes"
             onClick={() => setHistory(analyses as Analysis[])}
           />
           <Button text="Clear" onClick={() => setHistory([])} />
-        </div>
+        </Flex>
       </Section>
     </>
   );

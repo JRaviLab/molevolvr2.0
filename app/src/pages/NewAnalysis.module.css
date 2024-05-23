@@ -1,24 +1,12 @@
 .questions {
-  justify-items: flex-start;
-}
-
-.questions-right {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   align-items: flex-start;
-  gap: 20px;
+  gap: 40px;
 }
 
-.options {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 60px;
-}
-
-.blast-params {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+@media (max-width: 700px) {
+  .questions {
+    grid-template-columns: 1fr;
+  }
 }

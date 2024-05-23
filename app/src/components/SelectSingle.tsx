@@ -1,18 +1,19 @@
 import {
   cloneElement,
   Fragment,
-  useEffect,
   useState,
   type ReactElement,
   type ReactNode,
 } from "react";
 import { FaAngleDown } from "react-icons/fa6";
 import { VscCircleFilled } from "react-icons/vsc";
+import { usePrevious } from "react-use";
 import classNames from "classnames";
 import { Float } from "@headlessui-float/react";
 import * as HUI from "@headlessui/react";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
+import { sleep } from "@/util/misc";
 import classes from "./Select.module.css";
 
 export type Option<ID = string> = {
@@ -64,9 +65,9 @@ const SelectSingle = <O extends Option>({
   const selectedWFallback: O["id"] = fallback ? options[0]!.id : selected;
 
   /** notify parent when selected changes */
-  useEffect(() => {
-    onChange?.(selectedWFallback);
-  }, [selectedWFallback, onChange]);
+  const previousSelected = usePrevious(selectedWFallback);
+  if (previousSelected && previousSelected !== selectedWFallback)
+    sleep().then(() => onChange?.(selectedWFallback));
 
   /** link to parent form component */
   const form = useForm();

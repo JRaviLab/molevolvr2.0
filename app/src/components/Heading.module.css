@@ -6,13 +6,16 @@
 }
 
 h1.heading,
-h2.heading,
-h3.heading {
+h2.heading {
   justify-content: center;
+  text-align: center;
 }
 
+h3.heading,
 h4.heading {
   justify-content: flex-start;
+  margin-bottom: -1em;
+  text-align: left;
 }
 
 .icon {

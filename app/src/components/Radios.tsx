@@ -1,9 +1,12 @@
 import type { ReactElement, ReactNode } from "react";
-import { cloneElement, useEffect, useId, useState } from "react";
+import { cloneElement, useId, useState } from "react";
 import { FaRegCircle, FaRegCircleDot } from "react-icons/fa6";
+import { usePrevious } from "react-use";
 import classNames from "classnames";
+import Flex from "@/components/Flex";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
+import { sleep } from "@/util/misc";
 import classes from "./Radios.module.css";
 
 export type Option<ID = string> = {
@@ -63,20 +66,33 @@ const Radios = <O extends Option>({
   const selectedWFallback: O["id"] = fallback ? options[0]!.id : selected;
 
   /** notify parent when selected changes */
-  useEffect(() => {
-    onChange?.(selectedWFallback);
-  }, [selectedWFallback, onChange]);
+  const previousSelected = usePrevious(selectedWFallback);
+  if (previousSelected && previousSelected !== selectedWFallback)
+    sleep().then(() => onChange?.(selectedWFallback));
 
   return (
-    <div role="group" className={classes.container}>
+    <Flex
+      direction="column"
+      hAlign="left"
+      role="group"
+      className={classes.container}
+    >
       <legend className={classes.label}>
         {label}
         {tooltip && <Help tooltip={tooltip} />}
       </legend>
 
-      <div className={classes.options}>
+      <Flex direction="column" gap="xs" hAlign="stretch">
         {options.map((option, index) => (
-          <label key={index} className={classes.option}>
+          <Flex
+            tag="label"
+            hAlign="stretch"
+            vAlign="top"
+            wrap={false}
+            gap="sm"
+            key={index}
+            className={classes.option}
+          >
             <input
               className="sr-only"
               type="radio"
@@ -97,7 +113,7 @@ const Radios = <O extends Option>({
             )}
 
             {/* text content */}
-            <div className={classes.text}>
+            <Flex direction="column" hAlign="left" gap="sm">
               <span className="primary">{option.primary}</span>
               {option.secondary && (
                 <span className="secondary">{option.secondary}</span>
@@ -105,15 +121,15 @@ const Radios = <O extends Option>({
               {option.tertiary && (
                 <span className="secondary">{option.tertiary}</span>
               )}
-            </div>
+            </Flex>
 
             {/* icon */}
             {option.icon &&
               cloneElement(option.icon, { className: classes.icon })}
-          </label>
+          </Flex>
         ))}
-      </div>
-    </div>
+      </Flex>
+    </Flex>
   );
 };
 

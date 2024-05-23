@@ -1,6 +1,7 @@
 .container {
   display: flex;
-  width: 100%;
+  flex-grow: 1;
+  max-width: 100%;
   gap: 10px 15px;
 }
 
@@ -22,12 +23,12 @@
 .wrapper {
   display: flex;
   position: relative;
-  width: 100%;
 }
 
 .input,
 .textarea {
-  width: 100%;
+  flex-grow: 1;
+  min-width: 100px;
   padding: 5px 10px;
   border: solid 2px transparent;
   border-radius: var(--rounded);
@@ -48,8 +49,6 @@
 }
 
 .textarea {
-  min-width: 100%;
-  max-width: 100%;
   min-height: 3.5lh;
 }
 

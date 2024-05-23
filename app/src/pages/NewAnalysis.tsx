@@ -10,13 +10,13 @@ import {
 } from "react-icons/fa6";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "react-use";
-import classNames from "classnames";
 import { parse } from "csv-parse/browser/esm/sync";
 import { isEmpty, startCase } from "lodash";
 import type { AnalysisType, InputFormat } from "@/api/types";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
+import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import type { FormData } from "@/components/Form";
 import Heading from "@/components/Heading";
@@ -200,8 +200,6 @@ const NewAnalysis = () => {
     navigate("/analysis/d4e5f6");
   };
 
-  console.log(tableInput);
-
   /** clear inputs when selected input format changes */
   useEffect(() => {
     setListInput("");
@@ -226,7 +224,7 @@ const NewAnalysis = () => {
           </Heading>
 
           {/* input questions */}
-          <div className={classNames(classes.questions, "grid", "gap-lg")}>
+          <div className={classes.questions}>
             <Radios
               label="What do you want to input?"
               options={inputTypes}
@@ -235,7 +233,7 @@ const NewAnalysis = () => {
               name="inputFormat"
             />
 
-            <div className={classes["questions-right"]}>
+            <Flex direction="column" hAlign="left">
               <SelectSingle
                 label="What format is your input in?"
                 layout="vertical"
@@ -255,12 +253,13 @@ const NewAnalysis = () => {
                   How to get the right output from InterProScan
                 </Link>
               )}
-            </div>
+            </Flex>
           </div>
 
           {/* list input */}
           {inputType === "list" && (
             <TextBox
+              className="full"
               label={
                 <>
                   {
@@ -302,7 +301,7 @@ const NewAnalysis = () => {
           )}
 
           {/* controls */}
-          <div className="flex-row gap-sm">
+          <Flex>
             <UploadButton
               text="Upload"
               icon={<FaUpload />}
@@ -324,9 +323,9 @@ const NewAnalysis = () => {
               accept={accept}
             />
             <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
-          </div>
+          </Flex>
 
-          <div className="flex-col gap-md">
+          <Flex direction="column">
             <CheckBox
               label={
                 <span>
@@ -334,7 +333,7 @@ const NewAnalysis = () => {
                   format
                 </span>
               }
-              tooltip="We need your query sequences(s) as accession numbers so we can look up additional metadata about them. Learn more on the about page."
+              tooltip="We need your query sequences(s) as accession numbers so we can look up additional info about them. Learn more on the about page."
               value={haveQuerySequences}
               onChange={setHaveQuerySequences}
             />
@@ -349,7 +348,7 @@ const NewAnalysis = () => {
                 accept={["fa", "faa", "fasta", "txt"]}
               />
             )}
-          </div>
+          </Flex>
         </Section>
 
         <Section>
@@ -357,7 +356,7 @@ const NewAnalysis = () => {
             Options
           </Heading>
 
-          <div className={classes.options}>
+          <Flex>
             <Radios
               label="What type of analyses do you want to run?"
               tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
@@ -375,7 +374,7 @@ const NewAnalysis = () => {
             />
 
             {["homology-domain", "homology"].includes(analysisType) && (
-              <div className={classes["blast-params"]}>
+              <Flex direction="column">
                 <div className="primary">BLAST Parameters</div>
 
                 <SelectSingle
@@ -400,9 +399,9 @@ const NewAnalysis = () => {
                   step={0.000001}
                   name="blastECutoff"
                 />
-              </div>
+              </Flex>
             )}
-          </div>
+          </Flex>
 
           <CheckBox
             label="Split by domain"
