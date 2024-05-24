@@ -356,7 +356,7 @@ const NewAnalysis = () => {
             Options
           </Heading>
 
-          <Flex gap="lg">
+          <Flex>
             <Radios
               label="What type of analyses do you want to run?"
               tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
@@ -374,7 +374,7 @@ const NewAnalysis = () => {
             />
 
             {["homology-domain", "homology"].includes(analysisType) && (
-              <Flex direction="column" hAlign="left">
+              <Flex direction="column">
                 <div className="primary">BLAST Parameters</div>
 
                 <SelectSingle

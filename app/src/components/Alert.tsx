@@ -5,6 +5,7 @@ import {
   FaCircleInfo,
   FaTriangleExclamation,
 } from "react-icons/fa6";
+import classNames from "classnames";
 import Loading from "@/assets/loading.svg?react";
 import Flex from "@/components/Flex";
 import classes from "./Alert.module.css";
@@ -12,6 +13,8 @@ import classes from "./Alert.module.css";
 type Props = {
   /** category of alert, determines style */
   type?: keyof typeof types;
+  /** class */
+  className?: string;
   /** content next to icon */
   children: ReactNode;
 };
@@ -26,13 +29,13 @@ const types = {
 };
 
 /** static box of certain type with icon and text contents */
-const Alert = ({ type = "info", children }: Props) => {
+const Alert = ({ type = "info", className, children }: Props) => {
   const { icon, color } = types[type];
 
   return (
     <Flex
       wrap={false}
-      className={classes.alert}
+      className={classNames(classes.alert, className)}
       style={{ "--color": color } as CSSProperties}
     >
       {icon}
