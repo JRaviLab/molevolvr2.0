@@ -6,7 +6,7 @@ import classes from "./UploadButton.module.css";
 
 type Props = {
   /**
-   * formats to accept. array of mime types or extensions w/ dot.
+   * formats to accept. provide mime type and extensions w/ dot.
    * https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept
    */
   accept?: string[];

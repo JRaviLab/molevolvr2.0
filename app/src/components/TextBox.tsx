@@ -72,7 +72,7 @@ const TextBox = ({
         <button
           type="button"
           onClick={async () => {
-            await window.navigator.clipboard.writeText(text);
+            await window.navigator.clipboard.writeText(text || value || "");
             toast("Copied text", "success");
           }}
           aria-label="Copy text"

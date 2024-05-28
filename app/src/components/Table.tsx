@@ -273,7 +273,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
                     {...getCol(header.column.id)?.attrs}
                   >
                     {header.isPlaceholder ? null : (
-                      <Flex hAlign="left" gap="xs">
+                      <Flex hAlign="left" gap="xs" wrap={false}>
                         {/* header label */}
                         <span className={classes["th-label"]}>
                           {flexRender(
@@ -444,9 +444,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
             label="Rows"
             layout="horizontal"
             options={perPageOptions}
-            onChange={(option) => {
-              table.setPageSize(Number(option));
-            }}
+            onChange={(option) => table.setPageSize(Number(option))}
           />
           {/* visible columns */}
           <SelectMulti

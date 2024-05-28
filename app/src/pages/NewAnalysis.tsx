@@ -95,7 +95,12 @@ const analysisTypes = [
   {
     id: "phylogeny-domain",
     primary: "Phylogeny + Domain Architecture",
-    secondary: "Full analysis",
+    secondary: "Lorem ipsum",
+  },
+  {
+    id: "domain",
+    primary: "Domain architecture",
+    secondary: "Lorem ipsum",
   },
   {
     id: "homology-domain",
@@ -105,11 +110,6 @@ const analysisTypes = [
   {
     id: "homology",
     primary: "Homology",
-    secondary: "Lorem ipsum",
-  },
-  {
-    id: "domain",
-    primary: "Domain architecture",
     secondary: "Lorem ipsum",
   },
 ] as const;
@@ -156,7 +156,7 @@ const NewAnalysis = () => {
   const [tableInput, setTableInput] = useState<ReturnType<
     typeof parseTable
   > | null>(null);
-  const [, setQuerySequenceInput] = useState("");
+  const [querySequenceInput, setQuerySequenceInput] = useState("");
   const [haveQuerySequences, setHaveQuerySequences] = useState(true);
   const [analysisType, setAnalysisType] = useState<AnalysisType>(
     analysisTypes[0]!.id,
@@ -325,30 +325,44 @@ const NewAnalysis = () => {
             <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
           </Flex>
 
-          <Flex direction="column">
-            <CheckBox
-              label={
-                <span>
-                  First column (query sequences) is in <i>accession number</i>{" "}
-                  format
-                </span>
-              }
-              tooltip="We need your query sequences(s) as accession numbers so we can look up additional info about them. Learn more on the about page."
-              value={haveQuerySequences}
-              onChange={setHaveQuerySequences}
-            />
-            {!haveQuerySequences && (
-              <UploadButton
-                text="Upload Query Sequence Accession Numbers"
-                icon={<FaUpload />}
-                design="hollow"
-                onUpload={async (file) =>
-                  setQuerySequenceInput(await file.text())
+          {inputType === "external" && (
+            <Flex direction="column">
+              <CheckBox
+                label={
+                  <span>
+                    First column (query sequences) is in <i>accession number</i>{" "}
+                    format
+                  </span>
                 }
-                accept={["fa", "faa", "fasta", "txt"]}
+                tooltip="We need your query sequences(s) as accession numbers so we can look up additional info about them. Learn more on the about page."
+                value={haveQuerySequences}
+                onChange={setHaveQuerySequences}
               />
-            )}
-          </Flex>
+
+              {!haveQuerySequences && (
+                <>
+                  <TextBox
+                    className="full"
+                    label="Query Sequence"
+                    placeholder={placeholders.accnum}
+                    multi
+                    value={querySequenceInput}
+                    onChange={setQuerySequenceInput}
+                    name="input"
+                  />
+                  <UploadButton
+                    text="Upload Query Sequence Accession Numbers"
+                    icon={<FaUpload />}
+                    design="hollow"
+                    onUpload={async (file) =>
+                      setQuerySequenceInput(await file.text())
+                    }
+                    accept={["fa", "faa", "fasta", "txt"]}
+                  />
+                </>
+              )}
+            </Flex>
+          )}
         </Section>
 
         <Section>
@@ -356,7 +370,7 @@ const NewAnalysis = () => {
             Options
           </Heading>
 
-          <Flex>
+          <Flex gap="lg" vAlign="top">
             <Radios
               label="What type of analyses do you want to run?"
               tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
@@ -374,7 +388,7 @@ const NewAnalysis = () => {
             />
 
             {["homology-domain", "homology"].includes(analysisType) && (
-              <Flex direction="column">
+              <Flex direction="column" hAlign="left">
                 <div className="primary">BLAST Parameters</div>
 
                 <SelectSingle
