@@ -6,16 +6,16 @@ import classes from "./UploadButton.module.css";
 
 type Props = {
   /**
-   * formats to accept.
+   * formats to accept. provide mime type and extensions w/ dot.
    * https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept
    */
-  accept?: string;
+  accept?: string[];
   /** callback with file */
-  onUpload: (file: File, filename: string) => void;
+  onUpload: (file: File, filename: string, extension: string) => void;
 } & ComponentProps<typeof Button>;
 
 /** file dialog or drag & drop button */
-const UploadButton = ({ onUpload, accept = "", tooltip, ...props }: Props) => {
+const UploadButton = ({ onUpload, accept = [], tooltip, ...props }: Props) => {
   const ref = useRef<HTMLInputElement>(null);
 
   /** dragging */
@@ -24,11 +24,14 @@ const UploadButton = ({ onUpload, accept = "", tooltip, ...props }: Props) => {
   /** upload file */
   const upload = async (target: HTMLInputElement | DataTransfer | null) => {
     const file = (target?.files || [])[0];
-    const filename = file?.name || "";
     if (!file) return;
 
+    /** extract filename parts */
+    const [, filename = "", extension = ""] =
+      file.name.match(/(.+)\.(.+)/) || [];
+
     /** pass upload to parent */
-    onUpload(file, filename);
+    onUpload(file, filename, extension);
 
     /** reset file input */
     if (ref.current) ref.current.value = "";
@@ -51,7 +54,15 @@ const UploadButton = ({ onUpload, accept = "", tooltip, ...props }: Props) => {
     <span>
       <Button
         {...props}
-        tooltip={tooltip || "Choose or drag & drop a file"}
+        tooltip={
+          tooltip || (
+            <>
+              Choose or drag & drop a file
+              <br />
+              {accept.filter((type) => type.startsWith(".")).join(" / ")}
+            </>
+          )
+        }
         className={classNames({ [classes.drag!]: drag })}
         onClick={onClick}
         onDragEnter={() => setDrag(true)}
@@ -67,7 +78,7 @@ const UploadButton = ({ onUpload, accept = "", tooltip, ...props }: Props) => {
       <input
         ref={ref}
         type="file"
-        accept={accept}
+        accept={accept.map((ext) => "." + ext).join(", ")}
         style={{ display: "none" }}
         onChange={onChange}
       />

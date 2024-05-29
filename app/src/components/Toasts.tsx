@@ -9,6 +9,7 @@ import {
 import classNames from "classnames";
 import { atom, getDefaultStore, useAtom } from "jotai";
 import { uniqueId } from "lodash";
+import Flex from "@/components/Flex";
 import { sleep } from "@/util/misc";
 import classes from "./Toasts.module.css";
 
@@ -44,7 +45,14 @@ const Toasts = () => {
   const [getToasts] = useAtom(toasts);
 
   return (
-    <div className={classes.list} role="region" aria-label="Notifications">
+    <Flex
+      direction="column"
+      hAlign="stretch"
+      gap="sm"
+      className={classes.list}
+      role="region"
+      aria-label="Notifications"
+    >
       {getToasts.map((toast, index) => (
         <div
           key={index}
@@ -60,7 +68,7 @@ const Toasts = () => {
           </button>
         </div>
       ))}
-    </div>
+    </Flex>
   );
 };
 
@@ -98,7 +106,7 @@ const toast = async (
   await sleep();
 
   /** timeout before close, in ms */
-  const timeout = types[type].timeout * 1000 + (text.length - 30) * 100;
+  const timeout = types[type].timeout * 1000 + text.length * 20;
 
   const newToast = {
     id: id ?? uniqueId(),

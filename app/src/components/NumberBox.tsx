@@ -19,6 +19,8 @@ type Props = {
   max?: number;
   /** inc/dec interval */
   step?: number;
+  /** initial state */
+  defaultValue?: number;
   /** number state */
   value?: number;
   /** on number state change */
@@ -35,6 +37,7 @@ const NumberBox = ({
   min = 0,
   max = 100,
   step = 1,
+  defaultValue,
   value,
   onChange,
   name,
@@ -48,10 +51,13 @@ const NumberBox = ({
       minValue={min}
       maxValue={max}
       step={step}
-      defaultValue={value ?? min}
+      defaultValue={defaultValue ?? min}
       value={value}
       onChange={onChange}
       name={name}
+      formatOptions={{
+        maximumFractionDigits: 10,
+      }}
     >
       {({ state }) => (
         <>
@@ -67,9 +73,6 @@ const NumberBox = ({
             <RAC.Input
               className={classes.input}
               form={form}
-              style={{
-                width: state.inputValue.length + 0.1 + "ex",
-              }}
               onBlurCapture={(event) => {
                 /** https://github.com/adobe/react-spectrum/discussions/6261 */
                 if (!event.currentTarget.value.trim())

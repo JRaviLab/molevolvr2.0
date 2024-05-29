@@ -1,5 +1,6 @@
 .content {
   display: flex;
+  z-index: 3;
   flex-direction: column;
   max-width: 320px;
   padding: 10px 15px;

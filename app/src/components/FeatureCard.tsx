@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import classNames from "classnames";
 import Badge from "@/components/Badge";
+import Flex from "@/components/Flex";
 import classes from "./FeatureCard.module.css";
 
 type Props = {
@@ -15,13 +16,13 @@ type Props = {
 /** card with title, badge, and text/image */
 const FeatureCard = ({ title, badge, content }: Props) => {
   return (
-    <div className={classNames(classes.card, "card")}>
-      <div className={classes.title}>
+    <Flex direction="column" className={classNames(classes.card, "card")}>
+      <Flex wrap={false} gap="sm" className={classNames(classes.title, "full")}>
         <span className="primary">{title}</span>
         {badge && <Badge className={classes.badge}>{badge}</Badge>}
-      </div>
+      </Flex>
       {content}
-    </div>
+    </Flex>
   );
 };
 

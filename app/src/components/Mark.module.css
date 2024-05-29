@@ -1,9 +1,3 @@
-.mark {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
 .mark > svg {
   color: var(--color);
 }

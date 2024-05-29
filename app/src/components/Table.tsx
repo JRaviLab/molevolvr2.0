@@ -30,6 +30,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Button from "@/components/Button";
+import Flex from "@/components/Flex";
 import Help from "@/components/Help";
 import Popover from "@/components/Popover";
 import SelectMulti from "@/components/SelectMulti";
@@ -250,7 +251,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
   });
 
   return (
-    <div className="flex-col gap-md">
+    <Flex direction="column">
       <div className={classNames(classes.scroll, expanded && "expanded")}>
         {/* table */}
         <table
@@ -272,7 +273,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
                     {...getCol(header.column.id)?.attrs}
                   >
                     {header.isPlaceholder ? null : (
-                      <div className={classes.th}>
+                      <Flex hAlign="left" gap="xs" wrap={false}>
                         {/* header label */}
                         <span className={classes["th-label"]}>
                           {flexRender(
@@ -333,7 +334,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
                             </Tooltip>
                           </Popover>
                         ) : null}
-                      </div>
+                      </Flex>
                     )}
                   </th>
                 ))}
@@ -381,9 +382,9 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
       </div>
 
       {/* controls */}
-      <div className="flex-row gap-md">
+      <Flex gap="lg">
         {/* pagination */}
-        <div className={classes.pagination}>
+        <Flex gap="xs">
           <button
             type="button"
             className={classes["page-button"]}
@@ -434,9 +435,10 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
           >
             <FaAnglesRight />
           </button>
-        </div>
+        </Flex>
 
-        <div className="flex-row gap-sm">
+        {/* filters */}
+        <Flex gap="sm">
           {/* per page */}
           <SelectSingle
             label="Rows"
@@ -452,7 +454,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
             value={visibleCols}
             onChange={setVisibleCols}
           />
-        </div>
+        </Flex>
 
         {/* table-wide search */}
         <TextBox
@@ -464,7 +466,8 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
           tooltip="Search entire table for plain text or regex"
         />
 
-        <div className="flex-row gap-xs">
+        {/* actions */}
+        <Flex gap="xs">
           {/* clear filters */}
           <Button
             icon={<MdFilterAltOff />}
@@ -506,9 +509,9 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
             tooltip={expanded ? "Collapse table" : "Expand table"}
             onClick={() => setExpanded(!expanded)}
           />
-        </div>
-      </div>
-    </div>
+        </Flex>
+      </Flex>
+    </Flex>
   );
 };
 
@@ -533,7 +536,7 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
         label="Filter"
         min={min}
         max={max}
-        multi={true}
+        multi
         value={(column.getFilterValue() as [number, number]) ?? [min, max]}
         onChange={(value) => {
           /** return as "unfiltered" if value equals min/max range */

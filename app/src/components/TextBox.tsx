@@ -1,10 +1,11 @@
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { useId, useRef, useState } from "react";
-import { FaXmark } from "react-icons/fa6";
+import { FaRegCopy, FaXmark } from "react-icons/fa6";
 import classNames from "classnames";
 import Asterisk from "@/components/Asterisk";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
+import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
 import classes from "./TextBox.module.css";
 
@@ -67,18 +68,29 @@ const TextBox = ({
   let sideElement: ReactNode = "";
   if (text || value)
     sideElement = (
-      <button
-        type="button"
-        className={classes.side}
-        onClick={() => {
-          if (ref.current) ref.current.value = "";
-          onChange?.("");
-          setText("");
-        }}
-        aria-label="Clear text"
-      >
-        <FaXmark />
-      </button>
+      <div className={classes.side}>
+        <button
+          type="button"
+          onClick={async () => {
+            await window.navigator.clipboard.writeText(text || value || "");
+            toast("Copied text", "success");
+          }}
+          aria-label="Copy text"
+        >
+          <FaRegCopy />
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (ref.current) ref.current.value = "";
+            onChange?.("");
+            setText("");
+          }}
+          aria-label="Clear text"
+        >
+          <FaXmark />
+        </button>
+      </div>
     );
   else if (icon) sideElement = <div className={classes.side}>{icon}</div>;
 
@@ -90,7 +102,10 @@ const TextBox = ({
     <textarea
       ref={ref}
       id={id}
-      className={classes.textarea}
+      className={classNames(
+        classes.textarea,
+        sideElement && classes["input-side"],
+      )}
       value={value}
       onChange={(event) => {
         onChange?.(event.target.value);

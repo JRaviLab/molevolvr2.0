@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { FaRegSquare, FaRegSquareCheck } from "react-icons/fa6";
 import Asterisk from "@/components/Asterisk";
+import Flex from "@/components/Flex";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import classes from "./CheckBox.module.css";
@@ -40,11 +41,11 @@ const CheckBox = ({
 
   /** update local state from controlled value */
   useEffect(() => {
-    if (typeof value === "boolean") setChecked(value);
+    if (value !== undefined) setChecked(value);
   }, [value]);
 
   return (
-    <label className={classes.container}>
+    <Flex tag="label" gap="sm" wrap={false} className={classes.container}>
       <input
         type="checkbox"
         className="sr-only"
@@ -66,7 +67,7 @@ const CheckBox = ({
       {label}
       {tooltip && <Help tooltip={tooltip} />}
       {required && <Asterisk />}
-    </label>
+    </Flex>
   );
 };
 

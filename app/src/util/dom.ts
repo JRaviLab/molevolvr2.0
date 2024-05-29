@@ -72,11 +72,13 @@ export const firstInView = (elements: HTMLElement[]) => {
 /** shrink width to wrapped text https://stackoverflow.com/questions/14596213 */
 export const shrinkWrap = (element: HTMLElement | null) => {
   if (!element) return;
-  const { firstChild, lastChild } = element;
-  if (!firstChild || !lastChild) return;
+  const start = element.childNodes[0];
+  /** radix ui tooltip puts two children at end that aren't part of text content */
+  const end = [...element.childNodes].at(-3);
+  if (!start || !end) return;
   const range = document.createRange();
-  range.setStartBefore(firstChild);
-  range.setEndAfter(lastChild);
+  range.setStartBefore(start);
+  range.setEndAfter(end);
   const { width } = range.getBoundingClientRect();
   element.style.width = width + 1 + "px";
   element.style.boxSizing = "content-box";

@@ -25,6 +25,7 @@ import Alert from "@/components/Alert";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";
 import FeatureCard from "@/components/FeatureCard";
+import Flex from "@/components/Flex";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
 import Section from "@/components/Section";
@@ -61,7 +62,7 @@ const Home = () => {
     <>
       <Meta title="Home" />
 
-      <Section fill={true}>
+      <Section fill>
         <Heading level={1} className="sr-only">
           Home
         </Heading>
@@ -70,7 +71,7 @@ const Home = () => {
           MolEvolvR enables researchers to characterize proteins using molecular
           evolution and phylogeny
         </p>
-        <div className="flex-row gap-sm">
+        <Flex>
           <Button to="/new-analysis" text="New Analysis" icon={<FaPlus />} />
           <Button
             to="/load-analysis"
@@ -78,7 +79,7 @@ const Home = () => {
             icon={<FaArrowRight />}
           />
           <Button to="/testbed" text="Testbed" icon={<FaFlaskVial />} />
-        </div>
+        </Flex>
       </Section>
 
       <Section>
@@ -104,7 +105,7 @@ const Home = () => {
 
         <p className="primary center">Select your inputs...</p>
 
-        <div className="flex-row gap-md">
+        <Flex breakpoint={900}>
           <FeatureCard
             title="Construct protein family"
             badge={<FaScrewdriverWrench />}
@@ -122,11 +123,11 @@ const Home = () => {
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
           />
-        </div>
+        </Flex>
 
         <p className="primary center">...then view your results...</p>
 
-        <div className="flex-row gap-md">
+        <Flex>
           <FeatureCard
             title="Domain architecture"
             badge={<FaBarsStaggered />}
@@ -150,7 +151,7 @@ const Home = () => {
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
           />
-        </div>
+        </Flex>
       </Section>
 
       <Section>
@@ -161,7 +162,7 @@ const Home = () => {
         {statsLoading && <Alert type="loading">Loading Stats</Alert>}
 
         {stats && (
-          <div className="flex-row gap-md">
+          <Flex gap="lg">
             <Tile
               icon={<FaPersonRunning />}
               primary={formatNumber(stats.running, true)}
@@ -177,7 +178,7 @@ const Home = () => {
               primary={formatNumber(stats.proteins, true)}
               secondary="Proteins Processed"
             />
-          </div>
+          </Flex>
         )}
       </Section>
 
@@ -195,17 +196,17 @@ const Home = () => {
           analysis, summarization, and visualization.
         </p>
 
-        <div className="flex-row gap-sm">
+        <Flex>
           <Button
             to="https://biorxiv.org/link-to-paper"
             text="Read the Paper"
             icon={<FaRegNewspaper />}
           />
           <Button to="/about" text="Learn More" icon={<FaCircleInfo />} />
-        </div>
+        </Flex>
       </Section>
 
-      <Section fill={true}>
+      <Section fill>
         <Heading level={2} icon={<FaQuoteRight />}>
           Cite
         </Heading>

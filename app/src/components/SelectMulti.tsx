@@ -53,7 +53,7 @@ const SelectMulti = <O extends Option>({
     <HUI.Listbox
       className={classNames(classes.container, classes[layout])}
       as="div"
-      multiple={true}
+      multiple
       value={value}
       onChange={(value) =>
         onChange?.(
@@ -130,8 +130,8 @@ const SelectMulti = <O extends Option>({
             <select
               className="sr-only"
               tabIndex={-1}
-              aria-hidden={true}
-              multiple={true}
+              aria-hidden
+              multiple
               name={name}
               form={form}
               value={value}

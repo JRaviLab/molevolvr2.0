@@ -1,7 +1,6 @@
 .icon {
   position: relative;
-  top: -0.075em;
-  height: 1em;
-  margin: 0 5px;
+  top: -0.1em;
+  padding-left: 0.5em;
   vertical-align: middle;
 }

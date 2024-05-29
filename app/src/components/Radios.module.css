@@ -1,10 +1,7 @@
 .container {
-  display: inline-flex;
   appearance: none;
-  flex-direction: column;
   margin: 0;
   padding: 0;
-  gap: 10px;
   border: none;
 }
 
@@ -14,17 +11,8 @@
   gap: 5px;
 }
 
-.options {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 5px;
-}
-
 .option {
-  display: flex;
   padding: 5px 10px;
-  gap: 10px;
   border-radius: var(--rounded);
   cursor: pointer;
   transition: background var(--fast);
@@ -41,12 +29,6 @@
 
 .check {
   margin-top: 0.15lh;
-}
-
-.text {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
 }
 
 .icon {

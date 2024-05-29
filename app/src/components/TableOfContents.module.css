@@ -1,6 +1,6 @@
 .table {
   display: flex;
-  z-index: 99;
+  z-index: 3;
   position: fixed;
   flex-direction: column;
   gap: 10px;

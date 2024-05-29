@@ -1,0 +1,12 @@
+.questions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+@media (max-width: 700px) {
+  .questions {
+    grid-template-columns: 1fr;
+  }
+}

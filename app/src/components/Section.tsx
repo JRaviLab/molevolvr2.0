@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import classNames from "classnames";
+import Flex from "@/components/Flex";
 import classes from "./Section.module.css";
 
 type Props = {
@@ -19,7 +20,10 @@ type Props = {
  * colors. do not nest sections.
  */
 const Section = ({ fill, full, className, ...props }: Props) => (
-  <section
+  <Flex
+    direction="column"
+    gap="lg"
+    vAlign="top"
     className={classNames(classes.section, className, {
       [classes.fill!]: fill,
       [classes.full!]: full,

@@ -1,9 +1,12 @@
 .container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  padding: 2px 5px;
   border-radius: var(--rounded);
   cursor: pointer;
+  transition: background var(--fast);
+}
+
+.container:hover {
+  background: var(--off-white);
 }
 
 .check {

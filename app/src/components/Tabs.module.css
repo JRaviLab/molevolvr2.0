@@ -2,8 +2,16 @@
   display: contents;
 }
 
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .button {
+  display: flex;
   padding: 5px 10px;
+  gap: 10px;
   border-bottom: solid 2px var(--light-gray);
   border-radius: 0;
   color: var(--dark-gray);

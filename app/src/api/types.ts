@@ -1,9 +1,9 @@
+export type InputFormat = "fasta" | "accnum" | "msa" | "blast" | "interproscan";
 export type AnalysisType =
-  | "fasta"
-  | "accnum"
-  | "msa"
-  | "blast"
-  | "interproscan";
+  | "phylogeny-domain"
+  | "homology-domain"
+  | "homology"
+  | "domain";
 
 /** homepage meta-stats */
 export type Stats = {

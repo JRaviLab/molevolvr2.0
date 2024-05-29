@@ -1,6 +1,7 @@
 .container {
   display: flex;
-  width: 100%;
+  flex-grow: 1;
+  max-width: 100%;
   gap: 10px 15px;
 }
 
@@ -22,36 +23,12 @@
 .wrapper {
   display: flex;
   position: relative;
-  width: 100%;
-}
-
-.side {
-  display: flex;
-  position: absolute;
-  right: 0;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  color: var(--dark-gray);
-}
-
-.side svg {
-  width: 50%;
-}
-
-button.side {
-  color: var(--accent);
-  transition: color var(--fast);
-}
-
-button.side:hover {
-  color: var(--deep);
 }
 
 .input,
 .textarea {
-  width: 100%;
+  flex-grow: 1;
+  min-width: 100px;
   padding: 5px 10px;
   border: solid 2px transparent;
   border-radius: var(--rounded);
@@ -68,11 +45,34 @@ button.side:hover {
 }
 
 .input-side {
-  padding-right: 40px;
+  padding-right: 60px;
 }
 
 .textarea {
-  min-width: 100%;
-  max-width: 100%;
   min-height: 3.5lh;
+}
+
+.side {
+  display: flex;
+  position: absolute;
+  top: 2px;
+  right: calc(10px + 2px);
+  bottom: 2px;
+  align-items: center;
+  justify-content: center;
+  height: calc(40px - 2px - 2px);
+  gap: 5px;
+  background: var(--white);
+  color: var(--dark-gray);
+}
+
+.side > button {
+  height: 100%;
+  padding: 0 5px;
+  color: var(--accent);
+  transition: color var(--fast);
+}
+
+.side > button:hover {
+  color: var(--deep);
 }

@@ -1,5 +1,7 @@
 .footer {
+  z-index: 2;
   padding: 40px 20px;
+  gap: 10px;
   background: var(--deep);
   box-shadow: var(--shadow);
   color: var(--white);

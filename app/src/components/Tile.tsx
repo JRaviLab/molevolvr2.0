@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import classNames from "classnames";
+import Flex from "@/components/Flex";
 import classes from "./Tile.module.css";
 
 type Props = {
@@ -14,13 +15,13 @@ type Props = {
 /** big icon and primary and secondary content/text */
 const Tile = ({ icon, primary, secondary }: Props) => {
   return (
-    <div className={classes.tile}>
+    <Flex direction="column" className={classes.tile}>
       {icon}
       <div>
         <div className={classNames(classes.primary, "bold")}>{primary}</div>
         <div className="secondary">{secondary}</div>
       </div>
-    </div>
+    </Flex>
   );
 };
 

@@ -67,6 +67,5 @@
   text-decoration: underline;
   text-decoration-style: dashed;
   text-decoration-color: var(--dark-gray);
-  text-underline-offset: 0.2em;
   cursor: help;
 }

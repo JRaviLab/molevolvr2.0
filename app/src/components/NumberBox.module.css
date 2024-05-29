@@ -32,6 +32,8 @@
 
 .input {
   flex-grow: 1;
+  width: 0;
+  min-width: 100px;
   padding: 5px 0;
   border: none;
   outline: none;
@@ -39,13 +41,6 @@
   color: currentColor;
   font-variant-numeric: tabular-nums;
   text-align: center;
-  field-sizing: content;
-}
-
-@supports (field-sizing: content) {
-  .input {
-    width: unset !important;
-  }
 }
 
 .button {

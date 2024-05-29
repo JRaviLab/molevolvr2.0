@@ -38,7 +38,7 @@
 }
 
 .options {
-  z-index: 99 !important;
+  z-index: 1 !important;
   min-width: max-content;
   margin: 0;
   padding: 0;
@@ -49,11 +49,13 @@
 }
 
 .option {
-  display: grid;
-  grid-template-columns: 30px 2fr 1fr 30px;
+  display: flex;
   align-items: center;
+  max-width: calc(100vw - 80px);
   margin: 0;
-  padding: 0;
+  padding: 5px;
+  gap: 5px;
+  line-height: var(--compact);
   text-align: left;
   cursor: pointer;
   transition: background var(--fast);
@@ -74,10 +76,11 @@
 }
 
 .text {
-  padding-right: 10px;
+  flex-grow: 2;
 }
 
 .info {
+  flex-grow: 1;
   justify-self: flex-end;
   padding-right: 10px;
   text-align: right;
@@ -85,5 +88,5 @@
 
 .icon {
   justify-self: flex-end;
-  padding-right: 10px;
+  width: 30px;
 }

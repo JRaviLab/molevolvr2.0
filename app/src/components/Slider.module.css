@@ -21,7 +21,6 @@
 
 .track {
   box-sizing: content-box;
-
   min-width: 100px;
   height: 5px;
   margin: 5px;
@@ -65,16 +64,27 @@
   outline-offset: 2px;
 }
 
-.track:has(:hover) .thumb:not(:hover) .marker,
-.track:has([data-focused]) .thumb:not([data-focused]) .marker {
-  opacity: 0;
-}
-
-.marker {
+.primary-marker,
+.secondary-marker {
   position: absolute;
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
   transition: opacity var(--fast);
+}
+
+.secondary-marker {
+  color: var(--gray);
+  opacity: 0;
+}
+
+.track:has(:hover) .thumb:not(:hover) .primary-marker,
+.track:has([data-focused]) .thumb:not([data-focused]) .primary-marker {
+  opacity: 0;
+}
+
+.track:has(:hover) .secondary-marker,
+.track:has([data-focused]) .secondary-marker {
+  opacity: 1;
 }

@@ -16,7 +16,7 @@ const AnalysisCard = ({
     <Link
       to={`/analysis/${id}`}
       className={classNames(classes.card, "card")}
-      noIcon={true}
+      noIcon
     >
       <div className="bold">{name}</div>
       <div className="secondary">{type}</div>

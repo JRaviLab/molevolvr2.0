@@ -95,13 +95,24 @@ const Slider = ({
                   "%",
               }}
             />
+
+            <div className={classes["secondary-marker"]} style={{ left: "0%" }}>
+              {formatNumber(min, true)}
+            </div>
+            <div
+              className={classes["secondary-marker"]}
+              style={{ left: "100%" }}
+            >
+              {formatNumber(max, true)}
+            </div>
+
             {state.values.map((value, index) => (
               <RAC.SliderThumb
                 key={index}
                 index={index}
                 className={classes.thumb}
               >
-                <div className={classes.marker}>
+                <div className={classes["primary-marker"]}>
                   {formatNumber(value, true)}
                 </div>
               </RAC.SliderThumb>
@@ -113,7 +124,7 @@ const Slider = ({
                 key={index}
                 className="sr-only"
                 tabIndex={-1}
-                aria-hidden={true}
+                aria-hidden
                 type="number"
                 value={value}
                 readOnly

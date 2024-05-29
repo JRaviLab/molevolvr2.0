@@ -3,6 +3,7 @@ import { FaBars, FaXmark } from "react-icons/fa6";
 import { useWindowScroll } from "react-use";
 import classNames from "classnames";
 import Logo from "@/assets/logo.svg?react";
+import Flex from "@/components/Flex";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
 import classes from "./Header.module.css";
@@ -22,7 +23,11 @@ const Header = () => {
   });
 
   return (
-    <header className={classes.header} data-scrolled={y > 0 ? "" : undefined}>
+    <Flex
+      hAlign="space"
+      className={classes.header}
+      data-scrolled={y > 0 ? "" : undefined}
+    >
       {/* logo and text */}
       <div className={classes.title}>
         <Logo className={classes.logo} />
@@ -59,7 +64,7 @@ const Header = () => {
           About
         </Link>
       </nav>
-    </header>
+    </Flex>
   );
 };
 

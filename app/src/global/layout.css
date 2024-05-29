@@ -17,35 +17,16 @@
   width: calc(100vw - 80px);
 }
 
-/** basic, commonly-needed, centered horizontal or vertical flex */
-/** if any customization needed, use local class from scratch */
-
-.flex-row,
-.flex-col {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 100%;
-}
-
-.flex-row {
-  flex-wrap: wrap;
-}
-
-.flex-col {
-  flex-direction: column;
-}
-
 /** basic auto-filled grid with max number of columns */
-/** if customization needed, use local class from scratch */
 
 .grid {
   --cols: 2;
   --cell: min(100%, calc(var(--content) / var(--cols) - 100px));
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--cell), 1fr));
+  align-items: flex-start;
   max-width: 100%;
-  gap: 40px;
+  gap: calc(80px / var(--cols));
 }
 
 /** adjust max number of grid columns */
@@ -56,24 +37,6 @@
 
 .cols-4 {
   --cols: 4;
-}
-
-/** set spacing of flex or grid */
-
-.gap-xs {
-  gap: 5px 10px;
-}
-
-.gap-sm {
-  gap: 10px 20px;
-}
-
-.gap-md {
-  gap: 20px 40px;
-}
-
-.gap-lg {
-  gap: 40px 60px;
 }
 
 /** simple two-col auto-sized table of key/value pairs */
@@ -116,5 +79,5 @@
   aspect-ratio: 3 / 1;
   width: 100%;
   border-radius: var(--rounded);
-  background: var(--gray);
+  background: var(--light-gray);
 }

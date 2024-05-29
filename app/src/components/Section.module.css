@@ -1,9 +1,5 @@
 .section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   padding: 60px max(40px, (100% - var(--content)) / 2);
-  gap: 40px;
   background: var(--white);
 }
 

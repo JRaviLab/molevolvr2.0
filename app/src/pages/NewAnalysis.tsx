@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FaArrowRightToBracket,
+  FaGear,
   FaLightbulb,
   FaPlus,
   FaRegBell,
@@ -9,60 +10,202 @@ import {
 } from "react-icons/fa6";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "react-use";
-import type { AnalysisType } from "@/api/types";
+import { parse } from "csv-parse/browser/esm/sync";
+import { isEmpty, startCase } from "lodash";
+import type { AnalysisType, InputFormat } from "@/api/types";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
-import Collapsible from "@/components/Collapsible";
+import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import type { FormData } from "@/components/Form";
 import Heading from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
+import NumberBox from "@/components/NumberBox";
+import Radios from "@/components/Radios";
 import Section from "@/components/Section";
 import SelectSingle from "@/components/SelectSingle";
+import type { Option } from "@/components/SelectSingle";
+import Slider from "@/components/Slider";
+import Table from "@/components/Table";
 import TextBox from "@/components/TextBox";
 import { toast } from "@/components/Toasts";
 import UploadButton from "@/components/UploadButton";
+import { formatNumber } from "@/util/string";
+import accnumExample from "./examples/accnum.txt?raw";
+import blastExample from "./examples/blast.tsv?raw";
+import fastaExample from "./examples/fasta.txt?raw";
+import interproscanExample from "./examples/interproscan.tsv?raw";
+import msaExample from "./examples/msa.txt?raw";
+import classes from "./NewAnalysis.module.css";
 
-/** types of analyses */
-const types = [
-  { id: "fasta", text: "Fasta" },
-  { id: "accnum", text: "AccNum" },
-  { id: "msa", text: "MSA" },
-  { id: "blast", text: "BLAST" },
-  { id: "interproscan", text: "InterProScan" },
+/** high-level category of inputs */
+const inputTypes = [
+  {
+    id: "list",
+    primary: "Proteins of interest",
+    secondary: "Provide list of FASTA or MSA sequences or accession numbers",
+  },
+  {
+    id: "external",
+    primary: "External data",
+    secondary: "Provide tabular output from BLAST or Interproscan",
+  },
 ] as const;
 
-const sequencePlaceholders: Record<AnalysisType, string> = {
-  fasta: "abc\n------\n1234567890",
-  accnum: "def\n------\n1234567890",
-  msa: "ghi\n------\n1234567890",
-  blast: "jkl\n------\n1234567890",
-  interproscan: "mno\n------\n1234567890",
+/** types of input formats based on input type */
+const inputFormats: Record<
+  (typeof inputTypes)[number]["id"],
+  Option<InputFormat>[]
+> = {
+  list: [
+    { id: "fasta", text: "FASTA" },
+    { id: "accnum", text: "Accession Numbers" },
+    { id: "msa", text: "Multiple Sequence Alignment" },
+  ] as const,
+  external: [
+    { id: "blast", text: "BLAST" },
+    { id: "interproscan", text: "InterProScan" },
+  ] as const,
 };
+
+/** placeholders for each input format type */
+const placeholders: Record<InputFormat, string> = {
+  fasta: `>ABCDEF protein ABC [abcdef]
+  ABCDEFGHIJKLMNOPQRSTUVWXYZ`,
+  accnum: "ABC123, DEF456, GHI789",
+  msa: `>ABCDEF hypothetical protein ABC_123 [abcdef]
+  ---------------------ABCDEFGHIJKLMNOPQRSTUVWXYZ`,
+  blast: `ABC123,ABC123,123,123,1,2,3`,
+  interproscan: `ABC123,abcdef123456,123,ABC,ABC,ABC`,
+};
+
+/** examples for each input format type */
+const examples: Record<InputFormat, string> = {
+  fasta: fastaExample,
+  accnum: accnumExample,
+  msa: msaExample,
+  blast: blastExample,
+  interproscan: interproscanExample,
+};
+
+/** high-level category of inputs */
+const analysisTypes = [
+  {
+    id: "phylogeny-domain",
+    primary: "Phylogeny + Domain Architecture",
+    secondary: "Lorem ipsum",
+  },
+  {
+    id: "domain",
+    primary: "Domain architecture",
+    secondary: "Lorem ipsum",
+  },
+  {
+    id: "homology-domain",
+    primary: "Homology + Domain Architecture",
+    secondary: "Lorem ipsum",
+  },
+  {
+    id: "homology",
+    primary: "Homology",
+    secondary: "Lorem ipsum",
+  },
+] as const;
+
+/** csv cols */
+const tableCols = [
+  "Query",
+  "AccNum",
+  "PcIdentity",
+  "AlnLength",
+  "Mismatch",
+  "GapOpen",
+  "QStart",
+  "QEnd",
+  "SStart",
+  "SEnd",
+  "EValue",
+  "BitScore",
+  "PcPosOrig",
+];
+
+/** parse text as csv/tsv */
+const parseTable = (
+  input: string,
+  delimiter: string,
+): Record<string, unknown>[] =>
+  parse(input, {
+    delimiter,
+    columns: tableCols,
+    skip_records_with_error: true,
+  });
 
 const NewAnalysis = () => {
   const navigate = useNavigate();
 
   /** state */
-  const [type, setType] = useState<AnalysisType>(types[0].id);
-  const [, setSequence] = useState("");
+  const [inputType, setInputType] = useState<(typeof inputTypes)[number]["id"]>(
+    inputTypes[0].id,
+  );
+  const [inputFormat, setInputFormat] = useState<InputFormat>(
+    inputFormats.list[0]!.id,
+  );
+  const [listInput, setListInput] = useState("");
+  const [tableInput, setTableInput] = useState<ReturnType<
+    typeof parseTable
+  > | null>(null);
+  const [querySequenceInput, setQuerySequenceInput] = useState("");
+  const [haveQuerySequences, setHaveQuerySequences] = useState(true);
+  const [analysisType, setAnalysisType] = useState<AnalysisType>(
+    analysisTypes[0]!.id,
+  );
+  const [name, setName] = useState("");
   const [email, setEmail] = useLocalStorage("molevolvr-email", "");
 
-  const onUpload = () => {
-    console.debug("upload");
-  };
+  /** allowed extensions */
+  const accept = {
+    fasta: ["fa", "faa", "fasta", "txt"],
+    accnum: ["csv", "tsv", "txt"],
+    msa: ["fa", "faa", "fasta", "txt"],
+    blast: ["csv", "tsv"],
+    interproscan: ["csv", "tsv"],
+  }[inputFormat];
 
+  /** high-level stats of input for review */
+  const stats: Record<string, string> = {};
+  if (tableInput?.length) {
+    stats.rows = formatNumber(tableInput.length);
+    stats.cols = formatNumber(Object.keys(tableInput[0] || {})?.length);
+  } else if (listInput)
+    stats.proteins = formatNumber(
+      listInput
+        .split(inputFormat === "accnum" ? "," : ">")
+        .map((p) => p.trim())
+        .filter(Boolean).length,
+    );
+
+  /** use example */
   const onExample = () => {
-    setSequence("abcdefghijklmnopqrstuvwxyz");
+    if (inputType === "list") setListInput(examples[inputFormat]);
+    if (inputType === "external")
+      setTableInput(parseTable(examples[inputFormat], "\t"));
   };
 
+  /** submit analysis */
   const onSubmit = (data: FormData) => {
     console.debug(data);
     toast("Analysis submitted", "success");
     navigate("/analysis/d4e5f6");
   };
+
+  /** clear inputs when selected input format changes */
+  useEffect(() => {
+    setListInput("");
+    setTableInput(null);
+    setQuerySequenceInput("");
+  }, [inputFormat]);
 
   return (
     <>
@@ -73,58 +216,220 @@ const NewAnalysis = () => {
           <Heading level={1} icon={<FaPlus />}>
             New Analysis
           </Heading>
-
-          <TextBox
-            className="narrow"
-            label="Name"
-            placeholder="New Analysis"
-            name="name"
-          />
         </Section>
 
         <Section>
           <Heading level={2} icon={<FaArrowRightToBracket />}>
-            Inputs
+            Input
           </Heading>
 
-          <SelectSingle
-            label="Type"
-            layout="horizontal"
-            tooltip="Lorem ipsum"
-            options={types}
-            value={type}
-            onChange={setType}
-            name="type"
-          />
+          {/* input questions */}
+          <div className={classes.questions}>
+            <Radios
+              label="What do you want to input?"
+              options={inputTypes}
+              value={inputType}
+              onChange={setInputType}
+              name="inputFormat"
+            />
 
-          <TextBox
-            label="Sequence"
-            placeholder={sequencePlaceholders[type]}
-            multi={true}
-            required={true}
-            name="sequence"
-          />
+            <Flex direction="column" hAlign="left">
+              <SelectSingle
+                label="What format is your input in?"
+                layout="vertical"
+                options={inputFormats[inputType]}
+                value={inputFormat}
+                onChange={setInputFormat}
+                name="inputFormat"
+              />
+              {/* external data help links */}
+              {inputFormat === "blast" && (
+                <Link to="/help#blast" newTab>
+                  How to get the right output from BLAST
+                </Link>
+              )}
+              {inputFormat === "interproscan" && (
+                <Link to="/help#interproscan" newTab>
+                  How to get the right output from InterProScan
+                </Link>
+              )}
+            </Flex>
+          </div>
 
-          <div className="flex-row gap-sm">
+          {/* list input */}
+          {inputType === "list" && (
+            <TextBox
+              className="full"
+              label={
+                <>
+                  {
+                    inputFormats[inputType].find((i) => i.id === inputFormat)
+                      ?.text
+                  }{" "}
+                  input
+                  {!isEmpty(stats) && (
+                    <span className="secondary">
+                      (
+                      {Object.entries(stats)
+                        .map(([key, value]) => `${value} ${startCase(key)}`)
+                        .join(", ")}
+                      )
+                    </span>
+                  )}
+                </>
+              }
+              placeholder={placeholders[inputFormat]
+                .split("\n")
+                .slice(0, 2)
+                .join("\n")}
+              multi
+              value={listInput}
+              onChange={setListInput}
+              name="listInput"
+            />
+          )}
+
+          {/* table input */}
+          {inputType === "external" && tableInput && (
+            <>
+              <TextBox
+                className="sr-only"
+                aria-hidden
+                value={JSON.stringify(tableInput)}
+                name="tableInput"
+              />
+              <Table
+                cols={tableCols.map((col) => ({
+                  key: col,
+                  name: col,
+                }))}
+                rows={tableInput}
+              />
+            </>
+          )}
+
+          {/* controls */}
+          <Flex>
             <UploadButton
               text="Upload"
               icon={<FaUpload />}
-              onUpload={console.debug}
-              onClick={onUpload}
+              onUpload={async (file, filename, extension) => {
+                if (!name) setName(startCase(filename));
+                const contents = await file.text();
+                if (inputType === "list") setListInput(contents);
+                if (inputType === "external")
+                  setTableInput(
+                    parseTable(
+                      contents,
+                      file.type === "text/tab-separated-values" ||
+                        extension === "tsv"
+                        ? "\t"
+                        : ",",
+                    ),
+                  );
+              }}
+              accept={accept}
             />
             <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
-          </div>
+          </Flex>
 
-          <Collapsible text="Advanced">
-            <div className="flex-col gap-md">
-              <CheckBox label="Phylogeny" name="phylogeny" />
-              <CheckBox label="Homology" name="homology" />
+          {inputType === "external" && (
+            <Flex direction="column">
               <CheckBox
-                label="Domain Architecture"
-                name="domain-architecture"
+                label={
+                  <span>
+                    First column (query sequences) is in <i>accession number</i>{" "}
+                    format
+                  </span>
+                }
+                tooltip="We need your query sequences(s) as accession numbers so we can look up additional info about them. Learn more on the about page."
+                value={haveQuerySequences}
+                onChange={setHaveQuerySequences}
               />
-            </div>
-          </Collapsible>
+
+              {!haveQuerySequences && (
+                <>
+                  <TextBox
+                    className="full"
+                    label="Query Sequence"
+                    placeholder={placeholders.accnum}
+                    multi
+                    value={querySequenceInput}
+                    onChange={setQuerySequenceInput}
+                    name="querySequenceInput"
+                  />
+                  <UploadButton
+                    text="Upload Query Sequence Accession Numbers"
+                    icon={<FaUpload />}
+                    design="hollow"
+                    onUpload={async (file) =>
+                      setQuerySequenceInput(await file.text())
+                    }
+                    accept={["fa", "faa", "fasta", "txt"]}
+                  />
+                </>
+              )}
+            </Flex>
+          )}
+        </Section>
+
+        <Section>
+          <Heading level={2} icon={<FaGear />}>
+            Options
+          </Heading>
+
+          <Flex gap="lg" vAlign="top">
+            <Radios
+              label="What type of analyses do you want to run?"
+              tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
+              /** allow specific analysis types based on input format */
+              options={analysisTypes.filter(({ id }) => {
+                if (["fasta", "accnum", "msa"].includes(inputFormat))
+                  return true;
+                if (inputFormat === "blast") return id === "phylogeny-domain";
+                if (inputFormat === "interproscan")
+                  return ["phylogeny-domain", "domain"].includes(id);
+              })}
+              value={analysisType}
+              onChange={setAnalysisType}
+              name="analysisType"
+            />
+
+            {["homology-domain", "homology"].includes(analysisType) && (
+              <Flex direction="column" hAlign="left">
+                <div className="primary">BLAST Parameters</div>
+
+                <SelectSingle
+                  label="Homology search database"
+                  options={[
+                    { id: "refseq", text: "RefSeq" },
+                    { id: "nr", text: "nr" },
+                  ]}
+                  name="blastHomologyDatabase"
+                />
+                <Slider
+                  label="Max hits"
+                  min={10}
+                  max={500}
+                  name="blastMaxHits"
+                />
+                <NumberBox
+                  label="E-value cutoff"
+                  defaultValue={0.00001}
+                  min={0}
+                  max={1}
+                  step={0.000001}
+                  name="blastECutoff"
+                />
+              </Flex>
+            )}
+          </Flex>
+
+          <CheckBox
+            label="Split by domain"
+            tooltip="Split input proteins by domain, and run analyses on each part separately"
+            name="splitByDomain"
+          />
         </Section>
 
         <Section>
@@ -132,10 +437,15 @@ const NewAnalysis = () => {
             Submit
           </Heading>
 
-          <Alert>
-            An analysis takes <strong>several hours to run</strong>!{" "}
-            <Link to="/about">Learn more</Link>.
-          </Alert>
+          <TextBox
+            className="narrow"
+            label="Analysis Name"
+            placeholder="New Analysis"
+            value={name}
+            onChange={setName}
+            tooltip="Give your analysis a name to remember it by"
+            name="name"
+          />
 
           <TextBox
             className="narrow"
@@ -149,6 +459,11 @@ const NewAnalysis = () => {
             value={email}
             onChange={setEmail}
           />
+
+          <Alert>
+            An analysis takes <strong>several hours to run</strong>!{" "}
+            <Link to="/about">Learn more</Link>.
+          </Alert>
 
           <Button
             text="Submit"
