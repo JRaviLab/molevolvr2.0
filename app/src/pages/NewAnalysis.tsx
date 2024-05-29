@@ -285,19 +285,27 @@ const NewAnalysis = () => {
               multi
               value={listInput}
               onChange={setListInput}
-              name="input"
+              name="listInput"
             />
           )}
 
           {/* table input */}
           {inputType === "external" && tableInput && (
-            <Table
-              cols={tableCols.map((col) => ({
-                key: col,
-                name: col,
-              }))}
-              rows={tableInput}
-            />
+            <>
+              <TextBox
+                className="sr-only"
+                aria-hidden
+                value={JSON.stringify(tableInput)}
+                name="tableInput"
+              />
+              <Table
+                cols={tableCols.map((col) => ({
+                  key: col,
+                  name: col,
+                }))}
+                rows={tableInput}
+              />
+            </>
           )}
 
           {/* controls */}
@@ -348,7 +356,7 @@ const NewAnalysis = () => {
                     multi
                     value={querySequenceInput}
                     onChange={setQuerySequenceInput}
-                    name="input"
+                    name="querySequenceInput"
                   />
                   <UploadButton
                     text="Upload Query Sequence Accession Numbers"

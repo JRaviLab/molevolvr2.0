@@ -1,6 +1,5 @@
 html {
   font-weight: var(--regular);
-  font-size: 13pt;
   line-height: var(--compact);
   font-family: var(--sans);
   text-underline-offset: 0.2em;
