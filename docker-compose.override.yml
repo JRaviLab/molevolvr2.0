@@ -1,0 +1,36 @@
+services:
+  backend:
+    volumes:
+      - ./backend/:/app/
+      # - ./backend/api/:/app/api/
+      # - ./backend/schema/:/app/schema/
+      # - ./backend/entrypoint.R:/app/entrypoint.R
+      # - ./backend/run_tests.sh:/app/run_tests.sh
+    ports:
+      - "9050:9050"
+    environment:
+      - "POSTGRES_DEV_HOST=dev-db"
+      - "PLUMBER_DEBUG=1"
+    depends_on:
+      - "dev-db"
+
+  app:
+    build:
+      context: ./app
+      target: dev
+    volumes:
+      - ./app/src:/app/src
+    environment:
+      - 'VITE_API=http://localhost:9050'
+    ports:
+      - "5713:5713"
+
+  db:
+    ports:
+      - "5460:5432"
+    
+  # used by atlas to create migrations
+  dev-db:
+    image: postgres:16
+    env_file:
+      - .env

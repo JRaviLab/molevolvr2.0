@@ -1,0 +1,32 @@
+services:
+  backend:
+    image: molevolvr-backend
+    platform: linux/amd64
+    build:
+      context: ./backend
+      dockerfile: ./docker/Dockerfile
+    env_file:
+      - .env
+    environment:
+      - API_PORT=9050
+      - "POSTGRES_HOST=db"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    image: molevolvr-frontend
+    build: ./app
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:16
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
