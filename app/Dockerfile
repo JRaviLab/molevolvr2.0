@@ -37,8 +37,7 @@ CMD [ "vite", "--host", "--port", "5713" ]
 # copy production dependencies and source code into final image
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /app/main.tsx .
-COPY --from=prerelease /app/package.json .
+COPY . .
 
 # produce a bundle that'll then be served via a reverse http proxy, e.g. nginx
 # (you'll want /app/dist to be mapped to a volume that's served by the reverse
