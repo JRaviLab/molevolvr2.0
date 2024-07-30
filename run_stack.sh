@@ -165,7 +165,7 @@ if [ $# -gt 0 ]; then
 fi
 
 # check if a "control" command is the current first argument; if so, skip the build
-if [[ "$1" =~ ^(down|restart|logs)$ ]]; then
+if [[ "$1" =~ ^(down|restart|logs|build)$ ]]; then
     echo "* Skipping build, since we're running a control command: $1"
     SKIP_BUILD=1
     # also skip the post-launch command so we don't get stuck, e.g., tailing
