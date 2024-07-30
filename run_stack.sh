@@ -54,12 +54,27 @@ SKIP_BUILD=${SKIP_BUILD:-0}
 POST_LAUNCH_CMD=":"
 # if 1, clears the screen before running the post-launch command
 DO_CLEAR="0"
+# if 1, opens the browser window to the app after launching the stack
+DO_OPEN_BROWSER=${DO_OPEN_BROWSER:-1}
 
 # helper function to print a message and exit with a specific code
 # in one command
 function fatal() {
     echo "${1:-fatal error, aborting}"
     exit ${2:-1}
+}
+
+# cross-platform helper function to open a browser window
+function open_browser() {
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        xdg-open "$1"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        open "$1"
+    elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+        start "$1"
+    else
+        echo "WARNING: Unsupported OS: $OSTYPE, unable to open browser"
+    fi
 }
 
 # ===========================================================================
@@ -150,6 +165,8 @@ if [[ "$1" =~ ^(down|restart|logs)$ ]]; then
     SKIP_BUILD=1
     # also skip the post-launch command so we don't get stuck, e.g., tailing
     POST_LAUNCH_CMD=""
+    # also skip opening a browser window
+    DO_OPEN_BROWSER=0
 fi
 
 # if SKIP_BUILD is 0 and 'down' isn't the docker compose command, build images
@@ -171,4 +188,8 @@ fi
 echo "Running: ${COMPOSE_CMD} ${DEFAULT_ARGS}"
 ${COMPOSE_CMD} ${DEFAULT_ARGS} && \
 ( [[ ${DO_CLEAR} = "1" ]] && clear || exit 0 ) && \
+(
+    [[ ${DO_OPEN_BROWSER} = "1" ]] && \
+        open_browser "http://localhost:5713"
+) &&
 ${POST_LAUNCH_CMD}
