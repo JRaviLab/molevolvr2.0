@@ -30,7 +30,7 @@ COPY . .
 # (this requires a new script, container-dev, in package.json that sets up vite
 # to accept connections on any interface, e.g. from outside the container, and
 # to always run on port 5713)
-CMD [ "vite", "dev", "--host", "--port", "5713" ]
+CMD [ "vite", "--host", "--port", "5713" ]
 
 
 # -----------------------------------------------------------
@@ -44,3 +44,4 @@ COPY --from=prerelease /app/package.json .
 # (you'll want /app/dist to be mapped to a volume that's served by the reverse
 # http proxy)
 CMD [ "vite", "build" ]
+ 

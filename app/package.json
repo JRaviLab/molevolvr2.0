@@ -3,7 +3,6 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "container-dev": "vite --host --port 5713",
     "lint": "FIX=true ./lint.sh",
     "preview": "vite preview",
     "test": "bun run test:lint && bun run test:types",
