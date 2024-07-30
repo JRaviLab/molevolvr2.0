@@ -1,1 +1,28 @@
-# currently empty, but will add production services
+volumes:
+  app_bundle:
+  caddy_data:
+  caddy_config:
+
+services:
+  app:
+    image: molevolvr-frontend
+    build:
+      context: ./app
+      target: release
+    volumes:
+      - app_bundle:/app/dist
+    depends_on:
+      - backend
+  
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - app_bundle:/srv
+      - ./services/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app

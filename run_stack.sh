@@ -57,6 +57,9 @@ DO_CLEAR="0"
 # if 1, opens the browser window to the app after launching the stack
 DO_OPEN_BROWSER=${DO_OPEN_BROWSER:-1}
 
+# the URL to open when we invoke the browser
+FRONTEND_URL=${FRONTEND_URL:-"http://localhost:5713"}
+
 # helper function to print a message and exit with a specific code
 # in one command
 function fatal() {
@@ -124,9 +127,11 @@ case ${TARGET_ENV} in
     "prod")
         DEFAULT_ARGS="up -d"
         COMPOSE_CMD="docker compose -f docker-compose.yml -f docker-compose.prod.yml"
-        DO_CLEAR="1"
+        DO_CLEAR="0"
+        # never launch the browser in production
+        DO_OPEN_BROWSER=0
         # watch the logs after, since we detached after bringing up the stack
-        POST_LAUNCH_CMD="docker compose logs -f"
+        POST_LAUNCH_CMD="${COMPOSE_CMD} logs -f"
         ;;
     "dev")
         DEFAULT_ARGS="up -d"
@@ -189,7 +194,8 @@ echo "Running: ${COMPOSE_CMD} ${DEFAULT_ARGS}"
 ${COMPOSE_CMD} ${DEFAULT_ARGS} && \
 ( [[ ${DO_CLEAR} = "1" ]] && clear || exit 0 ) && \
 (
-    [[ ${DO_OPEN_BROWSER} = "1" ]] && \
-        open_browser "http://localhost:5713"
+    [[ ${DO_OPEN_BROWSER} = "1" ]] \
+        && open_browser "${FRONTEND_URL}" \
+        || exit 0
 ) &&
 ${POST_LAUNCH_CMD}
