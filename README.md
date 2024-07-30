@@ -15,7 +15,7 @@ themselves call methods of the package at each stage of processing.
 
 ## Running the Stack in Development
 
-To run the stack, you will need to have Docker and Docker Compose installed.
+To run the stack, you'll need to [install Docker and Docker Compose](https://www.docker.com/).
 
 First, copy `.env.TEMPLATE` to `.env` and fill in the necessary values. You
 should supply a random password for the `POSTGRES_PASSWORD` variable. Of note
