@@ -15,10 +15,15 @@ COPY package.json bun.lockb /temp/dev/
 RUN cd /temp/dev/ && \
     bun install --frozen-lockfile
 
-# install with --production (exclude devDependencies)
-COPY package.json bun.lockb /temp/prod/
-RUN cd /temp/prod && \
-    bun install --frozen-lockfile --production
+# FA: the production-only install is currently commented out since we always
+# require the dev dependencies, specifically vite, to run *or* build the app.
+# i'm leaving it here because perhaps someday we'll think of a reason why we
+# want just the production dependencies.
+
+# # install with --production (exclude devDependencies)
+# COPY package.json bun.lockb /temp/prod/
+# RUN cd /temp/prod && \
+#     bun install --frozen-lockfile --production
 
 # -----------------------------------------------------------
 # copy node_modules from dev stage, copy entire app
@@ -35,7 +40,7 @@ CMD [ "vite", "--host", "--port", "5713" ]
 # -----------------------------------------------------------
 # copy production dependencies and source code into final image
 FROM base AS release
-COPY --from=install /temp/prod/node_modules node_modules
+COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
 
 # produce a bundle that'll then be served via a reverse http proxy, e.g. nginx
