@@ -1,7 +1,7 @@
 # MolEvolvR Stack
 
 This repo contains the implementation of the MolEvolvR stack, i.e.:
-- `app`: the frontend, written in Vue
+- `app`: the frontend webapp, written in React
 - `backend`: a backend written in [Plumber](https://www.rplumber.io/index.html)
 - `cluster`: the containerized SLURM "cluster" on which jobs are run
 - `services`: a collection of services on which the stack relies:
