@@ -27,7 +27,7 @@ FROM base AS dev
 COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
 # run the app in hot-reloading development mode
-# (this requires a new script, container-dev, in package.json that sets up vite
+# set up vite
 # to accept connections on any interface, e.g. from outside the container, and
 # to always run on port 5713)
 CMD [ "vite", "--host", "--port", "5713" ]
