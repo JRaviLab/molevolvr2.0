@@ -17,7 +17,10 @@ export const waitFor = async <El extends Element>(
 };
 
 /** scroll to element by selector */
-export const scrollTo = async (selector: string) => {
+export const scrollTo = async (
+  selector: string,
+  options?: ScrollIntoViewOptions,
+) => {
   /** wait for element to appear */
   const element = await waitFor(selector);
   if (!element) return;
@@ -26,7 +29,7 @@ export const scrollTo = async (selector: string) => {
   await sleep(100);
 
   /** scroll to element */
-  element.scrollIntoView({ behavior: "smooth" });
+  element.scrollIntoView({ behavior: "smooth", ...options });
 };
 
 /** get text content of react node */
