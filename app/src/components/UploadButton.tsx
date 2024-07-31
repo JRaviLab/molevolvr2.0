@@ -6,7 +6,7 @@ import classes from "./UploadButton.module.css";
 
 type Props = {
   /**
-   * formats to accept. provide mime type and extensions w/ dot.
+   * formats to accept. array of mime types or extensions w/ dot.
    * https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept
    */
   accept?: string[];
@@ -54,16 +54,13 @@ const UploadButton = ({ onUpload, accept = [], tooltip, ...props }: Props) => {
     <span>
       <Button
         {...props}
-        tooltip={
-          tooltip || (
-            <>
-              Choose or drag & drop a file
-              <br />
-              {accept.filter((type) => type.startsWith(".")).join(" / ")}
-            </>
-          )
-        }
         className={classNames({ [classes.drag!]: drag })}
+        tooltip={
+          <>
+            {tooltip}Choose or drag & drop a{" "}
+            {accept.filter((type) => type.startsWith(".")).join("/")} file.
+          </>
+        }
         onClick={onClick}
         onDragEnter={() => setDrag(true)}
         onDragLeave={() => setDrag(false)}
@@ -78,7 +75,7 @@ const UploadButton = ({ onUpload, accept = [], tooltip, ...props }: Props) => {
       <input
         ref={ref}
         type="file"
-        accept={accept.map((ext) => "." + ext).join(", ")}
+        accept={accept.join(",")}
         style={{ display: "none" }}
         onChange={onChange}
       />

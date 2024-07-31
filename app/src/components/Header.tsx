@@ -24,6 +24,7 @@ const Header = () => {
 
   return (
     <Flex
+      tag="header"
       hAlign="space"
       className={classes.header}
       data-scrolled={y > 0 ? "" : undefined}

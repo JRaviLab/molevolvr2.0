@@ -30,8 +30,8 @@ type _Link = Pick<ComponentProps<typeof Link>, "to">;
 
 type _Button = Pick<
   ComponentProps<"button">,
-  | "onClick"
   | "type"
+  | "onClick"
   | "onDrag"
   | "onDragEnter"
   | "onDragLeave"

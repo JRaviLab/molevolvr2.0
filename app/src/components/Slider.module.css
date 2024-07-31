@@ -21,9 +21,9 @@
 
 .track {
   box-sizing: content-box;
-  min-width: 100px;
+  min-width: 150px;
   height: 5px;
-  margin: 5px;
+  margin: 10px 5px;
   padding: 5px;
   border-radius: 999px;
   background: var(--gray);
@@ -67,24 +67,28 @@
 .primary-marker,
 .secondary-marker {
   position: absolute;
-  top: 100%;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
   white-space: nowrap;
   transition: opacity var(--fast);
 }
 
+.primary-marker {
+  transform: translate(-50%, calc(-50% + 1.2em));
+}
+
+.track:has(.thumb:is(:hover, [data-focused]))
+  .thumb:not(:is(:hover, [data-focused]))
+  .primary-marker {
+  opacity: 0;
+}
+
 .secondary-marker {
+  transform: translate(-50%, calc(-50% - 1.2em));
   color: var(--gray);
   opacity: 0;
 }
 
-.track:has(:hover) .thumb:not(:hover) .primary-marker,
-.track:has([data-focused]) .thumb:not([data-focused]) .primary-marker {
-  opacity: 0;
-}
-
-.track:has(:hover) .secondary-marker,
-.track:has([data-focused]) .secondary-marker {
+.track:has(.thumb:is(:hover, [data-focused])) .secondary-marker {
   opacity: 1;
 }

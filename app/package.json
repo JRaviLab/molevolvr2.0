@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite",
+    "dev": "vite --open",
     "lint": "FIX=true ./lint.sh",
     "preview": "vite preview",
     "test": "bun run test:lint && bun run test:types",
