@@ -83,6 +83,6 @@ export const shrinkWrap = (element: HTMLElement | null) => {
   range.setStartBefore(start);
   range.setEndAfter(end);
   const { width } = range.getBoundingClientRect();
-  element.style.width = width + 1 + "px";
+  element.style.width = width + "px";
   element.style.boxSizing = "content-box";
 };
