@@ -259,7 +259,6 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
         {/* table */}
         <table
           className={classes.table}
-          /** https://tanstack.com/table/v8/docs/guide/migrating#migrate-table-markup */
           aria-rowcount={table.getPrePaginationRowModel().rows.length}
           aria-colcount={cols.length}
         >
@@ -535,11 +534,7 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
 
   /** filter as number range */
   if (type === "number") {
-    /**
-     * need flat for tanstack table bug
-     * https:github.com/TanStack/table/pull/5676
-     */
-    const [min = 0, max = 100] = (column.getFacetedMinMaxValues() ?? []).flat();
+    const [min = 0, max = 100] = column.getFacetedMinMaxValues() ?? [];
 
     return (
       <Slider

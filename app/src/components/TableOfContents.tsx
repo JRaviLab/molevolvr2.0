@@ -21,8 +21,10 @@ const getHeadings = () => [
  * turned on/off at route level. singleton.
  */
 const TableOfContents = () => {
+  /** elements */
   const root = useRef<HTMLElement>(null);
   const list = useRef<HTMLDivElement>(null);
+  const active = useRef<HTMLAnchorElement>(null);
 
   const { state } = useLocation();
 
@@ -34,8 +36,8 @@ const TableOfContents = () => {
     { text: string; id: string; level: number }[]
   >([]);
 
-  /** active heading (first in view) */
-  const [active, setActive] = useState("");
+  /** active heading id (first in view) */
+  const [activeId, setActiveId] = useState("");
 
   /** click off to close on small screens */
   useClickAway(root, () => {
@@ -48,13 +50,24 @@ const TableOfContents = () => {
      * debounce to avoid chrome issue
      * https://stackoverflow.com/questions/49318497/google-chrome-simultaneously-smooth-scrollintoview-with-more-elements-doesn
      */
-    () => debounce(() => scrollTo("[data-active]", { block: "center" }), 100),
+    () =>
+      debounce(
+        () =>
+          scrollTo(active.current ?? list.current?.firstElementChild, {
+            block: "center",
+          }),
+        10,
+      ),
     [],
   );
 
   /** close if covering something important */
   const closeIfCovering = useMemo(
     () =>
+      /**
+       * debounce so doesn't run if briefly passing over element. has to rest
+       * over it for a while.
+       */
       debounce(() => {
         if (!root.current) return;
         const { x, y, width, height } =
@@ -62,16 +75,18 @@ const TableOfContents = () => {
         /** top-most element under bottom right corner of toc */
         const covering = document.elementFromPoint(x + width, y + height);
         if (!covering?.matches("section")) setOpen(false);
-      }, 100),
+      }, 1000),
     [],
   );
 
   /** on window scroll */
   useEvent("scroll", () => {
     /** get active heading */
-    setActive(firstInView(getHeadings())?.id || "");
-    closeIfCovering();
-    scrollActive();
+    setActiveId(firstInView(getHeadings())?.id || "");
+    if (open) {
+      closeIfCovering();
+      scrollActive();
+    }
   });
 
   useMutation(
@@ -126,12 +141,13 @@ const TableOfContents = () => {
           {headings.map((heading, index) => (
             <Link
               key={index}
+              ref={heading.id === activeId ? active : undefined}
+              data-active={heading.id === activeId ? "" : undefined}
               className={classes.link}
               to={{ hash: "#" + heading.id }}
               /** preserve state */
               state={state}
               replace={true}
-              data-active={heading.id === active ? "" : undefined}
               style={{ paddingLeft: heading.level * 10 }}
             >
               {heading.text}

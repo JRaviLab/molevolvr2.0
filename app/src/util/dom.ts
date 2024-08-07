@@ -18,11 +18,12 @@ export const waitFor = async <El extends Element>(
 
 /** scroll to element by selector */
 export const scrollTo = async (
-  selector: string,
+  selector?: string | Element | null,
   options?: ScrollIntoViewOptions,
 ) => {
   /** wait for element to appear */
-  const element = await waitFor(selector);
+  const element =
+    typeof selector === "string" ? await waitFor(selector) : selector;
   if (!element) return;
 
   /** wait for layout shifts */
