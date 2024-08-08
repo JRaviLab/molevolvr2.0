@@ -41,7 +41,7 @@ const TableOfContents = () => {
 
   /** click off to close on small screens */
   useClickAway(root, () => {
-    if (window.innerWidth < 1500) setOpen(false);
+    if (window.innerWidth < 1000) setOpen(false);
   });
 
   /** scroll toc list active item into view */
@@ -56,7 +56,7 @@ const TableOfContents = () => {
           scrollTo(active.current ?? list.current?.firstElementChild, {
             block: "center",
           }),
-        10,
+        100,
       ),
     [],
   );
@@ -70,6 +70,7 @@ const TableOfContents = () => {
        */
       debounce(() => {
         if (!root.current) return;
+        if (root.current.matches(":hover, :focus-within")) return;
         const { x, y, width, height } =
           root.current.getBoundingClientRect() ?? {};
         /** top-most element under bottom right corner of toc */

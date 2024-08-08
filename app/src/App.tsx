@@ -46,8 +46,7 @@ const Layout = () => {
 
   /** scroll to hash in url */
   useEffect(() => {
-    if (!hash) return;
-    scrollTo(hash);
+    if (hash) scrollTo(hash);
   }, [hash]);
 
   return (
