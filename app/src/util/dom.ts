@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import reactToText from "react-to-text";
+import { debounce } from "lodash";
 import { sleep } from "@/util/misc";
 
 /** wait for element matching selector to appear, checking periodically */
@@ -16,7 +17,7 @@ export const waitFor = async <El extends Element>(
   }
 };
 
-/** scroll to element by selector */
+/** scroll to element, optionally by selector */
 export const scrollTo = async (
   selector?: string | Element | null,
   options?: ScrollIntoViewOptions,
@@ -32,6 +33,12 @@ export const scrollTo = async (
   /** scroll to element */
   element.scrollIntoView({ behavior: "smooth", ...options });
 };
+
+/**
+ * debounced version of scroll-to
+ * https://stackoverflow.com/questions/49318497/google-chrome-simultaneously-smooth-scrollintoview-with-more-elements-doesn
+ */
+export const debouncedScrollTo = debounce(scrollTo, 100);
 
 /** get text content of react node */
 export const renderText = (node: ReactNode) => {

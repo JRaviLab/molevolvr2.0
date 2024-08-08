@@ -5,12 +5,13 @@ import { useClickAway, useEvent } from "react-use";
 import classNames from "classnames";
 import { debounce } from "lodash";
 import Tooltip from "@/components/Tooltip";
-import { firstInView, scrollTo } from "@/util/dom";
+import { debouncedScrollTo, firstInView } from "@/util/dom";
 import { useMutation } from "@/util/hooks";
 import classes from "./TableOfContents.module.css";
 
 /** all used heading elements */
 const headingSelector = "h1, h2, h3, h4";
+
 /** get all used heading elements */
 const getHeadings = () => [
   ...document.querySelectorAll<HTMLHeadingElement>(headingSelector),
@@ -44,38 +45,34 @@ const TableOfContents = () => {
     if (window.innerWidth < 1000) setOpen(false);
   });
 
-  /** scroll toc list active item into view */
-  const scrollActive = useMemo(
-    /**
-     * debounce to avoid chrome issue
-     * https://stackoverflow.com/questions/49318497/google-chrome-simultaneously-smooth-scrollintoview-with-more-elements-doesn
-     */
+  /** if covering something important, close */
+  const isCovering = useMemo(
     () =>
-      debounce(
-        () =>
-          scrollTo(active.current ?? list.current?.firstElementChild, {
-            block: "center",
-          }),
-        100,
-      ),
-    [],
-  );
-
-  /** close if covering something important */
-  const closeIfCovering = useMemo(
-    () =>
-      /**
-       * debounce so doesn't run if briefly passing over element. has to rest
-       * over it for a while.
-       */
       debounce(() => {
         if (!root.current) return;
+
+        /** don't close if user interacting with toc */
         if (root.current.matches(":hover, :focus-within")) return;
-        const { x, y, width, height } =
+
+        /** density of points to check */
+        const gap = 10;
+        /** check a grid of points under element */
+        const { left, top, width, height } =
           root.current.getBoundingClientRect() ?? {};
-        /** top-most element under bottom right corner of toc */
-        const covering = document.elementFromPoint(x + width, y + height);
-        if (!covering?.matches("section")) setOpen(false);
+        for (let x = left; x < width; x += gap) {
+          for (let y = top; y < height; y += gap) {
+            /** get element under toc at point */
+            const covering = document
+              .elementsFromPoint(x, y)
+              .filter(
+                (element) =>
+                  element !== root.current && !root.current?.contains(element),
+              )
+              .shift();
+            /** is "important" element */
+            if (!covering?.matches("section")) return setOpen(false);
+          }
+        }
       }, 1000),
     [],
   );
@@ -85,8 +82,10 @@ const TableOfContents = () => {
     /** get active heading */
     setActiveId(firstInView(getHeadings())?.id || "");
     if (open) {
-      closeIfCovering();
-      scrollActive();
+      isCovering();
+      debouncedScrollTo(active.current ?? list.current?.firstElementChild, {
+        block: "center",
+      });
     }
   });
 
