@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
-import * as RAC from "react-aria-components";
+import {
+  Label,
+  Slider as RACSlider,
+  SliderThumb,
+  SliderTrack,
+} from "react-aria-components";
 import classNames from "classnames";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -63,9 +68,9 @@ const Slider = ({
   const form = useForm();
 
   return (
-    <RAC.Slider
+    <RACSlider
       className={classNames(classes.container, classes[layout])}
-      defaultValue={value ?? multi ? [min, max] : min}
+      defaultValue={(value ?? multi) ? [min, max] : min}
       value={value}
       minValue={min}
       maxValue={max}
@@ -77,11 +82,11 @@ const Slider = ({
     >
       {({ state }) => (
         <>
-          <RAC.Label>
+          <Label>
             {label}
             {tooltip && <Help tooltip={tooltip} />}
-          </RAC.Label>
-          <RAC.SliderTrack className={classes.track}>
+          </Label>
+          <SliderTrack className={classes.track}>
             {/* fill */}
             <div
               className={classes.fill}
@@ -107,15 +112,11 @@ const Slider = ({
             </div>
 
             {state.values.map((value, index) => (
-              <RAC.SliderThumb
-                key={index}
-                index={index}
-                className={classes.thumb}
-              >
+              <SliderThumb key={index} index={index} className={classes.thumb}>
                 <div className={classes["primary-marker"]}>
                   {formatNumber(value, true)}
                 </div>
-              </RAC.SliderThumb>
+              </SliderThumb>
             ))}
 
             {/* https://github.com/adobe/react-spectrum/issues/4117 */}
@@ -132,10 +133,10 @@ const Slider = ({
                 name={name}
               />
             ))}
-          </RAC.SliderTrack>
+          </SliderTrack>
         </>
       )}
-    </RAC.Slider>
+    </RACSlider>
   );
 };
 

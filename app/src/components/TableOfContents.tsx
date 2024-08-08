@@ -1,12 +1,13 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
 import { Link, useLocation } from "react-router-dom";
 import { useClickAway, useEvent } from "react-use";
 import classNames from "classnames";
 import { debounce } from "lodash";
 import Tooltip from "@/components/Tooltip";
-import { debouncedScrollTo, firstInView } from "@/util/dom";
+import { debouncedScrollTo, firstInView, isCovering } from "@/util/dom";
 import { useMutation } from "@/util/hooks";
+import { sleep } from "@/util/misc";
 import classes from "./TableOfContents.module.css";
 
 /** all used heading elements */
@@ -16,6 +17,17 @@ const headingSelector = "h1, h2, h3, h4";
 const getHeadings = () => [
   ...document.querySelectorAll<HTMLHeadingElement>(headingSelector),
 ];
+
+/**
+ * check if covering something important and run func to close. debounce to
+ * avoid closing if just briefly scrolling over important element.
+ */
+const debouncedIsCovering = debounce(
+  (element: Parameters<typeof isCovering>[0], close: () => void) => {
+    if (isCovering(element)) close();
+  },
+  1000,
+);
 
 /**
  * floating table of contents that outlines sections/headings on page. can be
@@ -40,49 +52,21 @@ const TableOfContents = () => {
   /** active heading id (first in view) */
   const [activeId, setActiveId] = useState("");
 
-  /** click off to close on small screens */
-  useClickAway(root, () => {
-    if (window.innerWidth < 1000) setOpen(false);
+  /** click off to close */
+  useClickAway(root, async () => {
+    /** wait for any element inside toc to lose focus */
+    await sleep();
+    if (isCovering(root.current) || window.innerWidth < 1000) setOpen(false);
   });
-
-  /** if covering something important, close */
-  const isCovering = useMemo(
-    () =>
-      debounce(() => {
-        if (!root.current) return;
-
-        /** don't close if user interacting with toc */
-        if (root.current.matches(":hover, :focus-within")) return;
-
-        /** density of points to check */
-        const gap = 10;
-        /** check a grid of points under element */
-        const { left, top, width, height } =
-          root.current.getBoundingClientRect() ?? {};
-        for (let x = left; x < width; x += gap) {
-          for (let y = top; y < height; y += gap) {
-            /** get element under toc at point */
-            const covering = document
-              .elementsFromPoint(x, y)
-              .filter(
-                (element) =>
-                  element !== root.current && !root.current?.contains(element),
-              )
-              .shift();
-            /** is "important" element */
-            if (!covering?.matches("section")) return setOpen(false);
-          }
-        }
-      }, 1000),
-    [],
-  );
 
   /** on window scroll */
   useEvent("scroll", () => {
     /** get active heading */
     setActiveId(firstInView(getHeadings())?.id || "");
     if (open) {
-      isCovering();
+      /** if covering something important, close */
+      debouncedIsCovering(root.current, () => setOpen(false));
+      /** scroll active toc item into view */
       debouncedScrollTo(active.current ?? list.current?.firstElementChild, {
         block: "center",
       });

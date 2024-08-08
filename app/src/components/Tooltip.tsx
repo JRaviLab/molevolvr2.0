@@ -1,6 +1,13 @@
 import type { ReactElement, ReactNode } from "react";
 import { forwardRef } from "react";
-import * as Radix from "@radix-ui/react-tooltip";
+import {
+  Arrow,
+  Content,
+  Portal,
+  Provider,
+  Root,
+  Trigger,
+} from "@radix-ui/react-tooltip";
 import { renderText, shrinkWrap } from "@/util/dom";
 import classes from "./Tooltip.module.css";
 
@@ -22,20 +29,20 @@ const Tooltip = forwardRef<HTMLButtonElement, Props>(
   ({ content, children, ...props }: Props, ref) => {
     if (content)
       return (
-        <Radix.Provider delayDuration={200}>
-          <Radix.Root>
+        <Provider delayDuration={200}>
+          <Root>
             {/* allows nesting tooltip within popover https://github.com/radix-ui/primitives/discussions/560#discussioncomment-5325935 */}
-            <Radix.Trigger
+            <Trigger
               asChild
               ref={ref}
               {...props}
               aria-label={renderText(content)}
             >
               {children}
-            </Radix.Trigger>
+            </Trigger>
 
-            <Radix.Portal>
-              <Radix.Content
+            <Portal>
+              <Content
                 ref={(element) => {
                   window.setTimeout(() => shrinkWrap(element));
                   return element;
@@ -44,11 +51,11 @@ const Tooltip = forwardRef<HTMLButtonElement, Props>(
                 side="top"
               >
                 {content}
-                <Radix.Arrow className={classes.arrow} />
-              </Radix.Content>
-            </Radix.Portal>
-          </Radix.Root>
-        </Radix.Provider>
+                <Arrow className={classes.arrow} />
+              </Content>
+            </Portal>
+          </Root>
+        </Provider>
       );
     else return children;
   },

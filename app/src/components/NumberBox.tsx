@@ -1,5 +1,11 @@
 import type { ReactNode } from "react";
-import * as RAC from "react-aria-components";
+import {
+  Button,
+  Group,
+  Input,
+  Label,
+  NumberField,
+} from "react-aria-components";
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import classNames from "classnames";
 import { useForm } from "@/components/Form";
@@ -46,7 +52,7 @@ const NumberBox = ({
   const form = useForm();
 
   return (
-    <RAC.NumberField
+    <NumberField
       className={classNames(classes.container, classes[layout])}
       minValue={min}
       maxValue={max}
@@ -61,16 +67,16 @@ const NumberBox = ({
     >
       {({ state }) => (
         <>
-          <RAC.Label className={classes.label}>
+          <Label className={classes.label}>
             {label}
             {tooltip && <Help tooltip={tooltip} />}
-          </RAC.Label>
+          </Label>
 
-          <RAC.Group className={classes.group}>
-            <RAC.Button slot="decrement" className={classes.button}>
+          <Group className={classes.group}>
+            <Button slot="decrement" className={classes.button}>
               <FaMinus />
-            </RAC.Button>
-            <RAC.Input
+            </Button>
+            <Input
               className={classes.input}
               form={form}
               onBlurCapture={(event) => {
@@ -79,13 +85,13 @@ const NumberBox = ({
                   state.setInputValue(String(min));
               }}
             />
-            <RAC.Button slot="increment" className={classes.button}>
+            <Button slot="increment" className={classes.button}>
               <FaPlus />
-            </RAC.Button>
-          </RAC.Group>
+            </Button>
+          </Group>
         </>
       )}
-    </RAC.NumberField>
+    </NumberField>
   );
 };
 

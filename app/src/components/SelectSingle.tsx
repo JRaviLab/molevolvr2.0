@@ -6,12 +6,17 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
+import { Label } from "react-aria-components";
 import { FaAngleDown } from "react-icons/fa6";
 import { VscCircleFilled } from "react-icons/vsc";
 import { usePrevious } from "react-use";
 import classNames from "classnames";
-import { Float } from "@headlessui-float/react";
-import * as HUI from "@headlessui/react";
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+} from "@headlessui/react";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { sleep } from "@/util/misc";
@@ -79,7 +84,7 @@ const SelectSingle = <O extends Option>({
   const form = useForm();
 
   return (
-    <HUI.Listbox
+    <Listbox
       className={classNames(classes.container, classes[layout])}
       value={selectedWFallback}
       onChange={setSelected}
@@ -88,74 +93,76 @@ const SelectSingle = <O extends Option>({
       as="div"
     >
       {/* label */}
-      <HUI.Listbox.Label className={classes.label}>
+      <Label className={classes.label}>
         {label}
         {tooltip && <Help tooltip={tooltip} />}
-      </HUI.Listbox.Label>
+      </Label>
 
-      <Float placement="bottom-start" floatingAs={Fragment} adaptiveWidth>
-        {/* button */}
-        <HUI.Listbox.Button
-          className={classes.button}
-          onKeyDown={({ key }) => {
-            if (!(key === "ArrowLeft" || key === "ArrowRight")) return;
+      {/* button */}
+      <ListboxButton
+        className={classes.button}
+        onKeyDown={({ key }) => {
+          if (!(key === "ArrowLeft" || key === "ArrowRight")) return;
 
-            /** find curent selected index */
-            let index = options.findIndex(
-              (option) => option.id === selectedWFallback,
-            );
-            if (index === -1) return;
+          /** find curent selected index */
+          let index = options.findIndex(
+            (option) => option.id === selectedWFallback,
+          );
+          if (index === -1) return;
 
-            /** inc/dec selected index */
-            if (key === "ArrowLeft" && index > 0) index--;
-            if (key === "ArrowRight" && index < options.length - 1) index++;
+          /** inc/dec selected index */
+          if (key === "ArrowLeft" && index > 0) index--;
+          if (key === "ArrowRight" && index < options.length - 1) index++;
 
-            /** new selected index */
-            const selected = options[index]!;
+          /** new selected index */
+          const selected = options[index]!;
 
-            /** update local value */
-            setSelected(selected.id);
-          }}
-        >
-          <span className="truncate">
-            {options.find((option) => option.id === selectedWFallback)?.text}
-          </span>
-          <FaAngleDown />
-        </HUI.Listbox.Button>
+          /** update local value */
+          setSelected(selected.id);
+        }}
+      >
+        <span className="truncate">
+          {options.find((option) => option.id === selectedWFallback)?.text}
+        </span>
+        <FaAngleDown />
+      </ListboxButton>
 
-        {/* dropdown */}
-        <HUI.Listbox.Options className={classes.options}>
-          {options.map((option) => (
-            <HUI.Listbox.Option key={option.id} value={option.id} as={Fragment}>
-              {({ active, selected }) => (
-                <li
-                  className={classNames(
-                    classes.option,
-                    active && classes["option-active"],
-                  )}
-                >
-                  {/* check mark */}
-                  <VscCircleFilled
-                    className={classes.check}
-                    style={{ opacity: selected ? 1 : 0 }}
-                  />
-                  {/* text */}
-                  <span className={classes.text}>{option.text}</span>
-                  <span className={classNames(classes.info, "secondary")}>
-                    {option.info}
-                  </span>
-                  {/* icon */}
-                  {option.icon &&
-                    cloneElement(option.icon, {
-                      className: classNames(classes.icon, "secondary"),
-                    })}
-                </li>
-              )}
-            </HUI.Listbox.Option>
-          ))}
-        </HUI.Listbox.Options>
-      </Float>
-    </HUI.Listbox>
+      {/* dropdown */}
+      <ListboxOptions
+        className={classes.options}
+        anchor="bottom start"
+        modal={false}
+      >
+        {options.map((option) => (
+          <ListboxOption key={option.id} value={option.id} as={Fragment}>
+            {({ focus, selected }) => (
+              <li
+                className={classNames(
+                  classes.option,
+                  focus && classes["option-active"],
+                )}
+              >
+                {/* check mark */}
+                <VscCircleFilled
+                  className={classes.check}
+                  style={{ opacity: selected ? 1 : 0 }}
+                />
+                {/* text */}
+                <span className={classes.text}>{option.text}</span>
+                <span className={classNames(classes.info, "secondary")}>
+                  {option.info}
+                </span>
+                {/* icon */}
+                {option.icon &&
+                  cloneElement(option.icon, {
+                    className: classNames(classes.icon, "secondary"),
+                  })}
+              </li>
+            )}
+          </ListboxOption>
+        ))}
+      </ListboxOptions>
+    </Listbox>
   );
 };
 

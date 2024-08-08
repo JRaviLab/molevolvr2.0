@@ -31,7 +31,7 @@ const Link = forwardRef(
     const external = to.startsWith("http");
 
     /** whether to open link in new tab */
-    const target = newTab ?? external ? "_blank" : "";
+    const target = (newTab ?? external) ? "_blank" : "";
 
     /** whether to show icon */
     const showIcon = target && !noIcon;

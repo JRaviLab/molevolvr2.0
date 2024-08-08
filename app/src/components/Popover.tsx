@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
-import * as Radix from "@radix-ui/react-popover";
+import { Arrow, Content, Portal, Root, Trigger } from "@radix-ui/react-popover";
 import classes from "./Popover.module.css";
 
 type Props = {
@@ -15,15 +15,15 @@ type Props = {
  */
 const Popover = ({ content, children }: Props) => {
   return (
-    <Radix.Root>
-      <Radix.Trigger asChild>{children}</Radix.Trigger>
-      <Radix.Portal>
-        <Radix.Content className={classes.content} side="top">
+    <Root>
+      <Trigger asChild>{children}</Trigger>
+      <Portal>
+        <Content className={classes.content} side="top">
           {content}
-          <Radix.Arrow className={classes.arrow} />
-        </Radix.Content>
-      </Radix.Portal>
-    </Radix.Root>
+          <Arrow className={classes.arrow} />
+        </Content>
+      </Portal>
+    </Root>
   );
 };
 

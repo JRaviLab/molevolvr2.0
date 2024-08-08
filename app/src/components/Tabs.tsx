@@ -3,7 +3,7 @@ import { Fragment, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import classNames from "classnames";
 import { kebabCase } from "lodash";
-import * as Radix from "@radix-ui/react-tabs";
+import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
 import Tooltip from "@/components/Tooltip";
 import classes from "./Tabs.module.css";
 
@@ -48,7 +48,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
   }, [fromUrl]);
 
   return (
-    <Radix.Root
+    <Root
       className={classes.root}
       value={selected}
       onValueChange={(value) => {
@@ -65,10 +65,10 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
       }}
     >
       {/* tab buttons */}
-      <Radix.List className={classes.buttons}>
+      <List className={classes.buttons}>
         {tabs.map((tab, index) => (
           <Tooltip key={index} content={tab.tooltip}>
-            <Radix.Trigger
+            <Trigger
               value={tab.id}
               className={classNames(
                 classes.button,
@@ -77,18 +77,18 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
             >
               {tab.text}
               {tab.icon}
-            </Radix.Trigger>
+            </Trigger>
           </Tooltip>
         ))}
-      </Radix.List>
+      </List>
 
       {/* panels */}
       {tabs.map((tab, index) => (
-        <Radix.Content key={index} value={tab.id} className={classes.content}>
+        <Content key={index} value={tab.id} className={classes.content}>
           {tab.children}
-        </Radix.Content>
+        </Content>
       ))}
-    </Radix.Root>
+    </Root>
   );
 };
 
