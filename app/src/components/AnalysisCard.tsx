@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import clsx from "clsx";
 import type { Analysis } from "@/api/types";
 import Ago from "@/components/Ago";
 import Link from "@/components/Link";
@@ -21,11 +21,7 @@ const AnalysisCard = ({
   };
 
   return (
-    <Link
-      to={`/analysis/${id}`}
-      className={classNames(classes.card, "card")}
-      noIcon
-    >
+    <Link to={`/analysis/${id}`} className={clsx(classes.card, "card")} noIcon>
       <div className="bold">{name}</div>
       <div className="secondary">{type}</div>
       {info && <div className="secondary">{info}</div>}

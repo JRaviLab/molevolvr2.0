@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
 import { Link, useLocation } from "react-router-dom";
 import { useClickAway, useEvent } from "react-use";
-import classNames from "classnames";
+import clsx from "clsx";
 import { debounce } from "lodash";
 import Tooltip from "@/components/Tooltip";
 import { debouncedScrollTo, firstInView, isCovering } from "@/util/dom";
@@ -101,7 +101,7 @@ const TableOfContents = () => {
       <div className={classes.heading}>
         {/* top text */}
         {open && (
-          <span className={classNames(classes.title, "primary")}>
+          <span className={clsx(classes.title, "primary")}>
             Table Of Contents
           </span>
         )}

@@ -2,7 +2,7 @@ import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { Link as RouterLink } from "react-router-dom";
-import classNames from "classnames";
+import clsx from "clsx";
 import Tooltip from "@/components/Tooltip";
 import classes from "./Link.module.css";
 
@@ -42,7 +42,7 @@ const Link = forwardRef(
         ref={ref}
         href={to}
         target={target}
-        className={classNames(classes.link, className)}
+        className={clsx(classes.link, className)}
         {...props}
       >
         {children}
@@ -53,7 +53,7 @@ const Link = forwardRef(
         ref={ref}
         to={to}
         target={target}
-        className={classNames(classes.link, className)}
+        className={clsx(classes.link, className)}
         {...props}
       >
         {children}

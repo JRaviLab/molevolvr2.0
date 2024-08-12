@@ -1,6 +1,6 @@
 import type { ChangeEvent, ComponentProps, DragEvent } from "react";
 import { useRef, useState } from "react";
-import classNames from "classnames";
+import clsx from "clsx";
 import Button from "@/components/Button";
 import classes from "./UploadButton.module.css";
 
@@ -54,7 +54,7 @@ const UploadButton = ({ onUpload, accept = [], tooltip, ...props }: Props) => {
     <span>
       <Button
         {...props}
-        className={classNames({ [classes.drag!]: drag })}
+        className={clsx({ [classes.drag!]: drag })}
         tooltip={
           <>
             {tooltip}Choose or drag & drop a{" "}

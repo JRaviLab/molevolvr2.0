@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
 import { useWindowScroll } from "react-use";
-import classNames from "classnames";
+import clsx from "clsx";
 import { useDebounce } from "use-debounce";
 import Logo from "@/assets/logo.svg?react";
 import Flex from "@/components/Flex";
@@ -34,10 +34,7 @@ const Header = () => {
       {/* logo and text */}
       <div className={classes.title}>
         <Logo className={classes.logo} />
-        <Link
-          className={classNames(classes.link, classes["title-link"])}
-          to="/"
-        >
+        <Link className={clsx(classes.link, classes["title-link"])} to="/">
           {import.meta.env.VITE_TITLE}
         </Link>
       </div>

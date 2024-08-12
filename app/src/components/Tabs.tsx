@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { Fragment, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import classNames from "classnames";
+import clsx from "clsx";
 import { kebabCase } from "lodash";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
 import Tooltip from "@/components/Tooltip";
@@ -70,7 +70,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
           <Tooltip key={index} content={tab.tooltip}>
             <Trigger
               value={tab.id}
-              className={classNames(
+              className={clsx(
                 classes.button,
                 tab.id === selected && classes.active,
               )}

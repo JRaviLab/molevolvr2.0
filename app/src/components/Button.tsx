@@ -5,7 +5,7 @@ import type {
   ReactNode,
 } from "react";
 import { forwardRef } from "react";
-import classNames from "classnames";
+import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
@@ -72,7 +72,7 @@ const Button = forwardRef(
     );
 
     /** class name string */
-    const _class = classNames(className, classes.button, classes[design], {
+    const _class = clsx(className, classes.button, classes[design], {
       [classes.square!]: !text && !!icon,
     });
 

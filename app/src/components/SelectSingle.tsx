@@ -10,7 +10,7 @@ import { Label } from "react-aria-components";
 import { FaAngleDown } from "react-icons/fa6";
 import { VscCircleFilled } from "react-icons/vsc";
 import { usePrevious } from "react-use";
-import classNames from "classnames";
+import clsx from "clsx";
 import {
   Listbox,
   ListboxButton,
@@ -85,7 +85,7 @@ const SelectSingle = <O extends Option>({
 
   return (
     <Listbox
-      className={classNames(classes.container, classes[layout])}
+      className={clsx(classes.container, classes[layout])}
       value={selectedWFallback}
       onChange={setSelected}
       name={name}
@@ -137,7 +137,7 @@ const SelectSingle = <O extends Option>({
           <ListboxOption key={option.id} value={option.id} as={Fragment}>
             {({ focus, selected }) => (
               <li
-                className={classNames(
+                className={clsx(
                   classes.option,
                   focus && classes["option-active"],
                 )}
@@ -149,13 +149,13 @@ const SelectSingle = <O extends Option>({
                 />
                 {/* text */}
                 <span className={classes.text}>{option.text}</span>
-                <span className={classNames(classes.info, "secondary")}>
+                <span className={clsx(classes.info, "secondary")}>
                   {option.info}
                 </span>
                 {/* icon */}
                 {option.icon &&
                   cloneElement(option.icon, {
-                    className: classNames(classes.icon, "secondary"),
+                    className: clsx(classes.icon, "secondary"),
                   })}
               </li>
             )}

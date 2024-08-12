@@ -14,7 +14,7 @@ import {
   FaSortUp,
 } from "react-icons/fa6";
 import { MdFilterAltOff } from "react-icons/md";
-import classNames from "classnames";
+import clsx from "clsx";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
 import type { Column, FilterFn, NoInfer } from "@tanstack/react-table";
 import {
@@ -255,7 +255,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
 
   return (
     <Flex direction="column">
-      <div className={classNames(classes.scroll, expanded && "expanded")}>
+      <div className={clsx(classes.scroll, expanded && "expanded")}>
         {/* table */}
         <table
           className={classes.table}

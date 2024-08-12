@@ -6,7 +6,7 @@ import {
   FaTriangleExclamation,
   FaXmark,
 } from "react-icons/fa6";
-import classNames from "classnames";
+import clsx from "clsx";
 import { atom, getDefaultStore, useAtom } from "jotai";
 import { uniqueId } from "lodash";
 import Flex from "@/components/Flex";
@@ -56,7 +56,7 @@ const Toasts = () => {
       {getToasts.map((toast, index) => (
         <div
           key={index}
-          className={classNames(classes.toast, "card")}
+          className={clsx(classes.toast, "card")}
           style={{ "--color": types[toast.type].color } as CSSProperties}
         >
           {types[toast.type].icon}

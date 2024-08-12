@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { useId, useRef, useState } from "react";
 import { FaRegCopy, FaXmark } from "react-icons/fa6";
-import classNames from "classnames";
+import clsx from "clsx";
 import Asterisk from "@/components/Asterisk";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -102,10 +102,7 @@ const TextBox = ({
     <textarea
       ref={ref}
       id={id}
-      className={classNames(
-        classes.textarea,
-        sideElement && classes["input-side"],
-      )}
+      className={clsx(classes.textarea, sideElement && classes["input-side"])}
       value={value}
       onChange={(event) => {
         onChange?.(event.target.value);
@@ -118,10 +115,7 @@ const TextBox = ({
     <input
       ref={ref}
       id={id}
-      className={classNames(
-        classes.input,
-        sideElement && classes["input-side"],
-      )}
+      className={clsx(classes.input, sideElement && classes["input-side"])}
       value={value}
       onChange={(event) => {
         onChange?.(event.target.value);
@@ -133,7 +127,7 @@ const TextBox = ({
   );
 
   return (
-    <div className={classNames(classes.container, classes[layout], className)}>
+    <div className={clsx(classes.container, classes[layout], className)}>
       {(label || props.required) && (
         <label className={classes.label} htmlFor={id}>
           {label}

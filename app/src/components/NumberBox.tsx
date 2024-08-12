@@ -7,7 +7,7 @@ import {
   NumberField,
 } from "react-aria-components";
 import { FaMinus, FaPlus } from "react-icons/fa6";
-import classNames from "classnames";
+import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import classes from "./NumberBox.module.css";
@@ -53,7 +53,7 @@ const NumberBox = ({
 
   return (
     <NumberField
-      className={classNames(classes.container, classes[layout])}
+      className={clsx(classes.container, classes[layout])}
       minValue={min}
       maxValue={max}
       step={step}

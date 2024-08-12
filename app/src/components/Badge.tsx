@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import classNames from "classnames";
+import clsx from "clsx";
 import classes from "./Badge.module.css";
 
 type Props = {
@@ -14,7 +14,7 @@ type Props = {
  * directly.
  */
 const Badge = ({ className, children }: Props) => (
-  <span className={classNames(classes.badge, className)} aria-hidden="true">
+  <span className={clsx(classes.badge, className)} aria-hidden="true">
     {children}
   </span>
 );

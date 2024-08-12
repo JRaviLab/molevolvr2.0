@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { cloneElement, Fragment } from "react";
 import { FaAngleDown, FaCheck } from "react-icons/fa6";
-import classNames from "classnames";
+import clsx from "clsx";
 import {
   Label,
   Listbox,
@@ -56,7 +56,7 @@ const SelectMulti = <O extends Option>({
 
   return (
     <Listbox
-      className={classNames(classes.container, classes[layout])}
+      className={clsx(classes.container, classes[layout])}
       as="div"
       multiple
       value={value}
@@ -106,7 +106,7 @@ const SelectMulti = <O extends Option>({
                 <ListboxOption key={option.id} value={option.id} as={Fragment}>
                   {({ focus, selected }) => (
                     <li
-                      className={classNames(
+                      className={clsx(
                         classes.option,
                         focus && classes["option-active"],
                       )}
@@ -116,12 +116,12 @@ const SelectMulti = <O extends Option>({
                         style={{ opacity: selected ? 1 : 0 }}
                       />
                       <span className={classes.text}>{option.text}</span>
-                      <span className={classNames(classes.info, "secondary")}>
+                      <span className={clsx(classes.info, "secondary")}>
                         {option.info}
                       </span>
                       {option.icon &&
                         cloneElement(option.icon, {
-                          className: classNames(classes.icon, "secondary"),
+                          className: clsx(classes.icon, "secondary"),
                         })}
                     </li>
                   )}

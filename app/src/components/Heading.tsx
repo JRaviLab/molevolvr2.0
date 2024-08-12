@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { cloneElement, useRef } from "react";
 import { FaLink } from "react-icons/fa6";
-import classNames from "classnames";
+import clsx from "clsx";
 import { kebabCase } from "lodash";
 import Badge from "@/components/Badge";
 import { renderText } from "@/util/dom";
@@ -48,7 +48,7 @@ const Heading = ({
     );
 
   return (
-    <Tag id={id} ref={ref} className={classNames(className, classes.heading)}>
+    <Tag id={id} ref={ref} className={clsx(className, classes.heading)}>
       {iconElement}
 
       {/* content */}

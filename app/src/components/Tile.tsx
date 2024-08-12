@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
-import classNames from "classnames";
+import clsx from "clsx";
 import Flex from "@/components/Flex";
 import classes from "./Tile.module.css";
 
@@ -18,7 +18,7 @@ const Tile = ({ icon, primary, secondary }: Props) => {
     <Flex direction="column" className={classes.tile}>
       {icon}
       <div>
-        <div className={classNames(classes.primary, "bold")}>{primary}</div>
+        <div className={clsx(classes.primary, "bold")}>{primary}</div>
         <div className="secondary">{secondary}</div>
       </div>
     </Flex>

@@ -5,7 +5,7 @@ import {
   SliderThumb,
   SliderTrack,
 } from "react-aria-components";
-import classNames from "classnames";
+import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { formatNumber } from "@/util/string";
@@ -69,7 +69,7 @@ const Slider = ({
 
   return (
     <RACSlider
-      className={classNames(classes.container, classes[layout])}
+      className={clsx(classes.container, classes[layout])}
       defaultValue={(value ?? multi) ? [min, max] : min}
       value={value}
       minValue={min}

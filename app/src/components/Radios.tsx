@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from "react";
 import { cloneElement, useEffect, useId, useState } from "react";
 import { FaRegCircle, FaRegCircleDot } from "react-icons/fa6";
 import { usePrevious } from "react-use";
-import classNames from "classnames";
+import clsx from "clsx";
 import Flex from "@/components/Flex";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -111,7 +111,7 @@ const Radios = <O extends Option>({
             {/* check mark */}
             {selectedWFallback === option.id ? (
               <FaRegCircleDot
-                className={classNames(classes.check, classes.selected)}
+                className={clsx(classes.check, classes.selected)}
               />
             ) : (
               <FaRegCircle className={classes.check} />
