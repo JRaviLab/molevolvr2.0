@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
 import { useWindowScroll } from "react-use";
 import classNames from "classnames";
+import { useDebounce } from "use-debounce";
 import Logo from "@/assets/logo.svg?react";
 import Flex from "@/components/Flex";
 import Link from "@/components/Link";
@@ -15,6 +16,7 @@ const Header = () => {
 
   /** document scroll */
   const { y } = useWindowScroll();
+  const [debouncedY] = useDebounce(y, 100);
 
   useEffect(() => {
     /** make sure all scrolls take into account header height */
@@ -27,7 +29,7 @@ const Header = () => {
       tag="header"
       hAlign="space"
       className={classes.header}
-      data-scrolled={y > 0 ? "" : undefined}
+      data-scrolled={debouncedY > 0 ? "" : undefined}
     >
       {/* logo and text */}
       <div className={classes.title}>

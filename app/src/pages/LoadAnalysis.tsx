@@ -29,7 +29,12 @@ const LoadAnalysis = () => {
           Load Analysis
         </Heading>
 
-        <Form onSubmit={(data) => navigate(`/analysis/${data.id}`)}>
+        <Form
+          onSubmit={(data) => {
+            if (String(data.id).trim()) navigate(`/analysis/${data.id}`);
+            else window.alert("Please enter an analysis id");
+          }}
+        >
           <Flex className="narrow">
             <TextBox placeholder="Analysis ID" name="id" />
             <Button text="Lookup" icon={<FaArrowRight />} type="submit" />
