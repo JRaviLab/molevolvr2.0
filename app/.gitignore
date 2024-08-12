@@ -25,3 +25,7 @@ dist-ssr
 *.sw?
 
 mockServiceWorker.js
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

@@ -1,18 +1,19 @@
 {
   "type": "module",
   "scripts": {
+    "install-playwright": "bunx playwright install --with-deps",
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
     "lint": "eslint . --fix && prettier **/*.{tsx,ts,css,html,md,json,yaml} --write --no-error-on-unmatched-pattern",
     "test:lint": "eslint . && prettier **/*.{tsx,ts,css,html,md,json,yaml} --check --no-error-on-unmatched-pattern",
     "test:types": "tsc",
+    "test:e2e": "playwright test",
     "test": "bun run test:lint && bun run test:types",
     "test:spelling": "bunx cspell src/**/*.{tsx,ts}",
     "clean": "rm -rf node_modules dist bun.lockb && bun pm cache rm"
   },
   "dependencies": {
-    "@headlessui-float/react": "^0.14.1",
     "@headlessui/react": "^2.1.2",
     "@radix-ui/react-popover": "^1.1.1",
     "@radix-ui/react-slider": "^1.2.0",
@@ -43,6 +44,7 @@
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.8.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
+    "@playwright/test": "^1.46.0",
     "@types/d3": "^7.4.3",
     "@types/lodash": "^4.17.7",
     "@types/node": "^22.1.0",
@@ -51,6 +53,7 @@
     "@typescript-eslint/eslint-plugin": "^8.0.1",
     "@typescript-eslint/parser": "^8.0.1",
     "@vitejs/plugin-react-swc": "^3.7.0",
+    "axe-playwright": "^2.0.1",
     "eslint-plugin-jsx-a11y": "^6.9.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react-hooks": "^4.6.2",

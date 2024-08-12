@@ -4,7 +4,12 @@
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "skipLibCheck": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": ["axe-playwright"],
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "playwright.config.ts", "tests", "fixtures"]
 }

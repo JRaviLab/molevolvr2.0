@@ -70,7 +70,7 @@ const Layout = () => {
 type Meta = { toc?: true } | undefined;
 
 /** route definitions */
-const routes = [
+export const routes = [
   {
     path: "/",
     element: <Layout />,

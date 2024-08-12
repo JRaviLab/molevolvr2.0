@@ -24,7 +24,8 @@ jobs:
       - name: Install packages
         run: bunx msw init && bun install
 
-      - if: runner.debug == '1'
+      - name: SSH debug
+        if: runner.debug == '1'
         uses: mxschmitt/action-tmate@v3
 
       - name: Run test
@@ -43,7 +44,8 @@ jobs:
       - name: Install packages
         run: bunx msw init && bun install
 
-      - if: runner.debug == '1'
+      - name: SSH debug
+        if: runner.debug == '1'
         uses: mxschmitt/action-tmate@v3
 
       - name: Run test
@@ -62,8 +64,32 @@ jobs:
       - name: Install packages
         run: bunx msw init && bun install
 
-      - if: runner.debug == '1'
+      - name: SSH debug
+        if: runner.debug == '1'
         uses: mxschmitt/action-tmate@v3
 
       - name: Run test
         run: bun run test:lint
+
+  # run end to end integration tests
+  test-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install packages
+        run: bun install
+
+      - name: Install Playwright
+        run: bunx playwright install
+
+      - name: SSH debug
+        if: runner.debug == '1'
+        uses: mxschmitt/action-tmate@v3
+
+      - name: Run test
+        run: bun run test:e2e
