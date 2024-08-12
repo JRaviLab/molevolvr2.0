@@ -1,6 +1,6 @@
 {
   "plugins": [
-    "@miller-svt/prettier-plugin-sort-imports",
+    "@ianvs/prettier-plugin-sort-imports",
     "./node_modules/prettier-plugin-jsdoc/dist/index.js",
     "prettier-plugin-css-order"
   ],
@@ -13,7 +13,7 @@
     "^./",
     "^../"
   ],
-  "importOrderParserPlugins": ["importAssertions"],
+  "importOrderParserPlugins": ["typescript", "importAssertions"],
   "cssDeclarationSorterOrder": "smacss",
   "jsdocCapitalizeDescription": false,
   "htmlWhitespaceSensitivity": "strict"

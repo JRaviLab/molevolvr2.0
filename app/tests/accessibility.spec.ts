@@ -1,6 +1,6 @@
 import { configureAxe, getViolations, injectAxe } from "axe-playwright";
 import { expect, test } from "@playwright/test";
-import analyses from "@/fixtures/analyses.json" assert { type: 'json' }
+import analyses from "@/fixtures/analyses.json" with { type: "json" };
 import { log } from "./util";
 
 log();
