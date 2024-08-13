@@ -11,5 +11,5 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["vite.config.ts", "playwright.config.ts", "tests", "fixtures"]
+  "include": ["vite.config.ts", "playwright.config.ts", "tests"]
 }

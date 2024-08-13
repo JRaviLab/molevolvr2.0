@@ -1,6 +1,4 @@
 {
-  "references": [{ "path": "./tsconfig.node.json" }],
-  "include": ["src"],
   "compilerOptions": {
     "composite": true,
     "isolatedModules": true,
@@ -11,12 +9,12 @@
     "noEmit": true,
     "noErrorTruncation": true,
     "noUncheckedIndexedAccess": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    },
+    "paths": { "@/*": ["./src/*"] },
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext"
-  }
+  },
+  "include": ["src", "fixtures"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

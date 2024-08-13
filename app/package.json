@@ -9,7 +9,7 @@
     "test:lint": "eslint . && prettier **/*.{tsx,ts,css,html,md,json,yaml} --check --no-error-on-unmatched-pattern",
     "test:types": "tsc",
     "test:e2e": "playwright test",
-    "test": "bun run test:lint && bun run test:types",
+    "test": "bun run test:lint && bun run test:types && bun run test:e2e",
     "test:spelling": "bunx cspell src/**/*.{tsx,ts}",
     "clean": "rm -rf node_modules dist bun.lockb && bun pm cache rm"
   },
