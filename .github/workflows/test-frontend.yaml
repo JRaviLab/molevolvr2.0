@@ -117,6 +117,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: playwright-report
-          path: playwright-report/
+          path: ./app/playwright-report
           retention-days: 30
-          working-directory: ./app
