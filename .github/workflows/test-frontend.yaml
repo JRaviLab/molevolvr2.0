@@ -97,18 +97,18 @@ jobs:
 
       - name: Cache Playwright
         id: cache-playwright
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ env.PLAYWRIGHT_VERSION }}
 
-      - name: Install Playwright with dependencies
+      - name: Install Playwright and browsers
         if: steps.cache-playwright.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
-      - name: Install Playwright's dependencies
+      - name: Install Playwright
         if: steps.cache-playwright.outputs.cache-hit == 'true'
-        run: npx playwright install-deps
+        run: npx playwright install
 
       - name: Run test
         run: bun run test:e2e
