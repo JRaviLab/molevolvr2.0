@@ -102,13 +102,13 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ env.PLAYWRIGHT_VERSION }}
 
-      - name: Install Playwright and browsers
+      - name: Install Playwright with dependencies
         if: steps.cache-playwright.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
-      - name: Install Playwright
+      - name: Install Playwright's dependencies
         if: steps.cache-playwright.outputs.cache-hit == 'true'
-        run: npx playwright install
+        run: npx playwright install-deps
 
       - name: Run test
         run: bun run test:e2e
