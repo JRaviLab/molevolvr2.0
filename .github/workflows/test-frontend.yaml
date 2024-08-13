@@ -3,12 +3,11 @@ name: Test Frontend
 on:
   pull_request:
     paths:
-      - "frontend/**"
-      - "package.json"
+      - "app/**"
 
 defaults:
   run:
-    working-directory: ./frontend
+    working-directory: ./app
 
 jobs:
   # test that app can build without issues
