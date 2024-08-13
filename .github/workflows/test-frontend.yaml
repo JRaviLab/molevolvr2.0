@@ -73,6 +73,8 @@ jobs:
   # run end to end integration tests
   test-e2e:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.46.0-jammy
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -82,9 +84,6 @@ jobs:
 
       - name: Install packages
         run: bun install
-
-      - name: Install Playwright
-        run: bun run install-playwright
 
       - name: SSH debug
         if: runner.debug == '1'
