@@ -17,14 +17,14 @@ const paths = [
 /** axe rule overrides */
 const rules = [
   /**
-   * axe doesn't like light gray secondary text. also, color standards are not
-   * always correct:
+   * color contrast standards are often not correct:
    *
-   * https://uxmovement.com/buttons/the-myths-of-color-contrast-accessibility/
    * https://github.com/w3c/wcag/issues/695
-   * https://twitter.com/DanHollick/status/1468958644364402702
+   * https://uxmovement.com/buttons/the-myths-of-color-contrast-accessibility/
    * https://github.com/Myndex/SAPC-APCA
+   * https://twitter.com/AlPackah/status/1773375760125857949
    * https://twitter.com/DanHollick/status/1417895151003865090
+   * https://twitter.com/DanHollick/status/1468958644364402702
    * https://twitter.com/argyleink/status/1329091518032867328
    */
   { id: "color-contrast", enabled: false },
@@ -40,6 +40,7 @@ const checkPage = (path: string) =>
 
     /** wait for content to load */
     await page.waitForSelector("footer");
+    await page.waitForTimeout(1000);
 
     /** setup axe */
     await injectAxe(page);
