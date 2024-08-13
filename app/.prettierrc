@@ -13,7 +13,7 @@
     "^./",
     "^../"
   ],
-  "importOrderParserPlugins": ["typescript", "importAssertions"],
+  "importOrderParserPlugins": ["typescript", "jsx", "importAssertions"],
   "cssDeclarationSorterOrder": "smacss",
   "jsdocCapitalizeDescription": false,
   "htmlWhitespaceSensitivity": "strict"

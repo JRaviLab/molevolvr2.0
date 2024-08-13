@@ -84,7 +84,7 @@ jobs:
         run: bun install
 
       - name: Install Playwright
-        run: bunx playwright install
+        run: bun run install-playwright
 
       - name: SSH debug
         if: runner.debug == '1'
