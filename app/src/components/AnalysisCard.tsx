@@ -21,7 +21,11 @@ const AnalysisCard = ({
   };
 
   return (
-    <Link to={`/analysis/${id}`} className={clsx(classes.card, "card")} noIcon>
+    <Link
+      to={`/analysis/${id}`}
+      className={clsx(classes.card, "card")}
+      showArrow={false}
+    >
       <div className="bold">{name}</div>
       <div className="secondary">{type}</div>
       {info && <div className="secondary">{info}</div>}

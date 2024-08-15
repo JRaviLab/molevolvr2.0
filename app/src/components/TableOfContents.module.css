@@ -4,6 +4,7 @@
   position: fixed;
   flex-direction: column;
   gap: 10px;
+  transform: translateY(calc(-1 * var(--header-shrink)));
   border-radius: 0 0 var(--rounded) 0;
   background: var(--white);
   box-shadow: var(--shadow);

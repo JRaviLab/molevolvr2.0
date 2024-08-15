@@ -1,20 +1,24 @@
+:root {
+  --header-padding-shrink: clamp(0px, calc(var(--y) / 4), 10px);
+  --header-logo-shrink: clamp(0px, calc(var(--y) / 2), 10px);
+  --header-shrink: calc(
+    var(--header-padding-shrink) + var(--header-logo-shrink)
+  );
+}
+
 .header {
   z-index: 2;
   position: sticky;
   top: 0;
-  padding: 20px;
+  margin-bottom: var(--header-shrink);
+  padding: calc(20px - var(--header-padding-shrink));
   background: var(--deep);
   box-shadow: var(--shadow);
   color: var(--white);
-  transition: padding var(--slow);
 }
 
-.header[data-scrolled] {
-  padding: 8px 12px;
-}
-
-.header[data-scrolled] .logo {
-  height: 30px;
+.logo {
+  height: calc(40px - var(--header-logo-shrink));
 }
 
 .title {
@@ -29,10 +33,6 @@
   letter-spacing: 1px;
   text-align: center;
   text-transform: uppercase;
-}
-
-.logo {
-  height: 40px;
 }
 
 .toggle {
@@ -77,14 +77,6 @@
 }
 
 @media (max-width: 620px) {
-  .logo {
-    height: 30px;
-  }
-
-  .title-link {
-    font-size: 1rem;
-  }
-
   .toggle {
     display: flex;
   }

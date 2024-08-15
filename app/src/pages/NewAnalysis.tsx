@@ -462,7 +462,10 @@ const NewAnalysis = () => {
 
           <Alert>
             An analysis takes <strong>several hours to run</strong>!{" "}
-            <Link to="/about">Learn more</Link>.
+            <Link to="/about" newTab={true}>
+              Learn more
+            </Link>
+            .
           </Alert>
 
           <Button
