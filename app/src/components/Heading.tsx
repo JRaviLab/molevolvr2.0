@@ -4,6 +4,7 @@ import { FaLink } from "react-icons/fa6";
 import clsx from "clsx";
 import { kebabCase } from "lodash";
 import Badge from "@/components/Badge";
+import Link from "@/components/Link";
 import { renderText } from "@/util/dom";
 import classes from "./Heading.module.css";
 
@@ -57,13 +58,13 @@ const Heading = ({
 
         {/* link to section */}
         {id && (
-          <a
-            href={"#" + id}
+          <Link
+            to={"#" + id}
             className={classes.anchor}
             aria-label="Heading link"
           >
             <FaLink />
-          </a>
+          </Link>
         )}
       </span>
     </Tag>

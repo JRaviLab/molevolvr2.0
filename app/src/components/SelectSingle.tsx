@@ -9,7 +9,6 @@ import {
 import { Label } from "react-aria-components";
 import { FaAngleDown } from "react-icons/fa6";
 import { VscCircleFilled } from "react-icons/vsc";
-import { usePrevious } from "react-use";
 import clsx from "clsx";
 import {
   Listbox,
@@ -17,6 +16,7 @@ import {
   ListboxOption,
   ListboxOptions,
 } from "@headlessui/react";
+import { usePrevious } from "@reactuses/core";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { sleep } from "@/util/misc";

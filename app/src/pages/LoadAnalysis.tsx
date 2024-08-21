@@ -1,6 +1,6 @@
 import { FaArrowRight, FaClockRotateLeft } from "react-icons/fa6";
 import { useNavigate } from "react-router";
-import { useLocalStorage } from "react-use";
+import { useLocalStorage } from "@reactuses/core";
 import type { Analysis } from "@/api/types";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";
@@ -12,13 +12,13 @@ import Section from "@/components/Section";
 import TextBox from "@/components/TextBox";
 import analyses from "../../fixtures/analyses.json";
 
-export const storageKey = "molevolvr-history";
+export const storageKey = "history";
 
 const LoadAnalysis = () => {
   const navigate = useNavigate();
 
   /** analysis history */
-  const [history = [], setHistory] = useLocalStorage<Analysis[]>(storageKey);
+  const [history, setHistory] = useLocalStorage<Analysis[]>(storageKey, []);
 
   return (
     <>
@@ -49,7 +49,7 @@ const LoadAnalysis = () => {
 
         <p className="primary">Analyses submitted on this device</p>
 
-        {!!history.length && (
+        {!!history?.length && (
           <div className="grid full gap-md cols-3">
             {history.map((analysis, index) => (
               <AnalysisCard key={index} analysis={analysis} />
@@ -58,7 +58,7 @@ const LoadAnalysis = () => {
         )}
 
         {/* empty */}
-        {!history.length && <div className="placeholder">Nothing yet!</div>}
+        {!history?.length && <div className="placeholder">Nothing yet!</div>}
 
         {/* for testing */}
         <Flex>

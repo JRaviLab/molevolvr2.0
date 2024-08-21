@@ -20,6 +20,7 @@
 }
 
 .header-button {
+  padding: 2px;
   color: var(--light-gray);
   transition: color var(--fast);
 }

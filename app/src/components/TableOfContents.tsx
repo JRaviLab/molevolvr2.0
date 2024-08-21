@@ -1,12 +1,20 @@
 import { useRef, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
-import { Link, useLocation } from "react-router-dom";
-import { useClickAway, useEvent } from "react-use";
 import clsx from "clsx";
 import { debounce } from "lodash";
+import {
+  useClickOutside,
+  useEventListener,
+  useMutationObserver,
+} from "@reactuses/core";
+import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
-import { debouncedScrollTo, firstInView, isCovering } from "@/util/dom";
-import { useMutation } from "@/util/hooks";
+import {
+  debouncedScrollTo,
+  firstInView,
+  isCovering,
+  scrollTo,
+} from "@/util/dom";
 import { sleep } from "@/util/misc";
 import classes from "./TableOfContents.module.css";
 
@@ -39,8 +47,6 @@ const TableOfContents = () => {
   const list = useRef<HTMLDivElement>(null);
   const active = useRef<HTMLAnchorElement>(null);
 
-  const { state } = useLocation();
-
   /** open/closed state */
   const [open, setOpen] = useState(window.innerWidth > 1500);
 
@@ -53,14 +59,14 @@ const TableOfContents = () => {
   const [activeId, setActiveId] = useState("");
 
   /** click off to close */
-  useClickAway(root, async () => {
+  useClickOutside(root, async () => {
     /** wait for any element inside toc to lose focus */
     await sleep();
     if (isCovering(root.current) || window.innerWidth < 1000) setOpen(false);
   });
 
   /** on window scroll */
-  useEvent("scroll", () => {
+  useEventListener("scroll", () => {
     /** get active heading */
     setActiveId(firstInView(getHeadings())?.id || "");
     if (open) {
@@ -73,14 +79,7 @@ const TableOfContents = () => {
     }
   });
 
-  useMutation(
-    /** listen to changes on page */
-    document.documentElement,
-    /** only listen for elements added/removed */
-    {
-      subtree: true,
-      childList: true,
-    },
+  useMutationObserver(
     () => {
       /** read headings from page */
       setHeadings(
@@ -90,6 +89,13 @@ const TableOfContents = () => {
           level: parseInt(heading.tagName.slice(1)) || 0,
         })),
       );
+    },
+    /** listen to changes on page */
+    document.documentElement,
+    /** only listen for elements added/removed */
+    {
+      subtree: true,
+      childList: true,
     },
   );
 
@@ -129,10 +135,9 @@ const TableOfContents = () => {
               data-active={heading.id === activeId ? "" : undefined}
               className={classes.link}
               to={{ hash: "#" + heading.id }}
-              /** preserve state */
-              state={state}
               replace={true}
               style={{ paddingLeft: heading.level * 10 }}
+              onClick={() => scrollTo("#" + heading.id)}
             >
               {heading.text}
             </Link>

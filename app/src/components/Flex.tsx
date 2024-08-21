@@ -4,7 +4,7 @@ import {
   type CSSProperties,
   type ForwardedRef,
 } from "react";
-import { useMedia } from "react-use";
+import { useMediaQuery } from "@reactuses/core";
 
 type TagNames = keyof HTMLElementTagNameMap;
 
@@ -65,7 +65,7 @@ const Flex = forwardRef(
     }: Props<TagName>,
     ref: ForwardedRef<HTMLElementTagNameMap[TagName]>,
   ) => {
-    const belowBreakpoint = useMedia(`(max-width: ${breakpoint}px)`);
+    const belowBreakpoint = useMediaQuery(`(max-width: ${breakpoint}px)`);
 
     const flexStyles: CSSProperties = {
       display: display === "block" ? "flex" : "inline-flex",

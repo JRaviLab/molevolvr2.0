@@ -6,7 +6,7 @@ import classes from "./Asterisk.module.css";
 const Asterisk = () => (
   <Tooltip content="Required">
     {/* https://github.com/react-icons/react-icons/issues/336 */}
-    <span>
+    <span aria-hidden>
       <FaAsterisk className={classes.asterisk} />
     </span>
   </Tooltip>

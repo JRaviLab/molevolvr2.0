@@ -43,6 +43,7 @@ export default [
       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
       "@typescript-eslint/consistent-type-imports": "error",
       "react-refresh/only-export-components": ["off"],
+      "jsx-a11y/no-noninteractive-tabindex": ["error", { tags: ["pre"] }],
     },
   },
 ];

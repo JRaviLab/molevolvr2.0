@@ -1,6 +1,5 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { FaCompressArrowsAlt, FaExpandArrowsAlt } from "react-icons/fa";
 import {
   FaAngleLeft,
   FaAngleRight,
@@ -9,6 +8,8 @@ import {
   FaDownload,
   FaFilter,
   FaMagnifyingGlass,
+  FaMaximize,
+  FaMinimize,
   FaSort,
   FaSortDown,
   FaSortUp,
@@ -509,7 +510,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
           />
           {/* expand/collapse */}
           <Button
-            icon={expanded ? <FaCompressArrowsAlt /> : <FaExpandArrowsAlt />}
+            icon={expanded ? <FaMinimize /> : <FaMaximize />}
             design="hollow"
             tooltip={expanded ? "Collapse table" : "Expand table"}
             onClick={() => setExpanded(!expanded)}
@@ -568,7 +569,7 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
     ).map(({ name, count }) => ({
       id: String(name),
       text: String(name),
-      info: count.toLocaleString(),
+      info: formatNumber(count),
     }));
 
     return (
@@ -593,21 +594,19 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
       {
         id: "all",
         text: "All",
-        info: sum(
-          Array.from(column.getFacetedUniqueValues().values()),
-        ).toLocaleString(),
+        info: formatNumber(
+          sum(Array.from(column.getFacetedUniqueValues().values())),
+        ),
       },
       {
         id: "true",
         text: "True/Yes",
-        info: (column.getFacetedUniqueValues().get(true) ?? 0).toLocaleString(),
+        info: formatNumber(column.getFacetedUniqueValues().get(true) ?? 0),
       },
       {
         id: "false",
         text: "False/No",
-        info: (
-          column.getFacetedUniqueValues().get(false) ?? 0
-        ).toLocaleString(),
+        info: formatNumber(column.getFacetedUniqueValues().get(false) ?? 0),
       },
     ];
 

@@ -7,6 +7,7 @@ log();
 
 /** pages to test */
 const paths = [
+  "/testbed",
   "/",
   "/load-analysis",
   "/new-analysis",

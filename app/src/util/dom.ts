@@ -95,8 +95,14 @@ export const shrinkWrap = (element: HTMLElement | null) => {
   element.style.boxSizing = "content-box";
 };
 
-/** is element covering anything "important" */
-export const isCovering = (element: HTMLElement | undefined | null) => {
+/**
+ * is element covering anything "important" (above anything besides a
+ * "background" element)
+ */
+export const isCovering = (
+  element: HTMLElement | undefined | null,
+  background = "section",
+) => {
   if (!element) return;
 
   /** don't consider covering if user interacting with element */
@@ -114,12 +120,12 @@ export const isCovering = (element: HTMLElement | undefined | null) => {
         /** get elements under point */
         .elementsFromPoint(x, y)
         /** only count elements "under" this one */
-        .filter((element) => element !== element && !element?.contains(element))
+        .filter((el) => el !== element && !element.contains(el))
         /** top-most */
         .shift();
 
       /** is "important" element */
-      if (!covering?.matches("section")) return true;
+      if (!covering?.matches(background)) return covering;
     }
   }
 

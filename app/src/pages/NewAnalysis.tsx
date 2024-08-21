@@ -9,9 +9,9 @@ import {
   FaUpload,
 } from "react-icons/fa6";
 import { useNavigate } from "react-router";
-import { useLocalStorage } from "react-use";
 import { parse } from "csv-parse/browser/esm/sync";
 import { isEmpty, startCase } from "lodash";
+import { useLocalStorage } from "@reactuses/core";
 import type { AnalysisType, InputFormat } from "@/api/types";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
@@ -162,7 +162,7 @@ const NewAnalysis = () => {
     analysisTypes[0]!.id,
   );
   const [name, setName] = useState("");
-  const [email, setEmail] = useLocalStorage("molevolvr-email", "");
+  const [email, setEmail] = useLocalStorage("email", "");
 
   /** allowed extensions */
   const accept = {
@@ -456,7 +456,7 @@ const NewAnalysis = () => {
             }
             placeholder="my-email@xyz.com"
             tooltip="We can email you when this analysis starts (so you can keep track of it) and when it finishes."
-            value={email}
+            value={email || ""}
             onChange={setEmail}
           />
 

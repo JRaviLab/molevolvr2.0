@@ -96,6 +96,7 @@ const TestbedPage = () => {
           ].map((color, index) => (
             <Tooltip key={index} content={color}>
               <div
+                aria-hidden
                 style={{
                   width: 50,
                   height: 50,
@@ -174,8 +175,9 @@ const TestbedPage = () => {
           Some <code>inline code</code>.
         </p>
 
-        <pre>
-          {`const popup = document.querySelector("#popup"); 
+        <pre tabIndex={0}>
+          {`
+const popup = document.querySelector("#popup"); 
 popup.style.width = "100%";
 popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 `}

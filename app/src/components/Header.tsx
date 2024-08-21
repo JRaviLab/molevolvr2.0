@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
-import { useMeasure } from "react-use";
 import clsx from "clsx";
+import { useElementSize } from "@reactuses/core";
 import Logo from "@/assets/logo.svg?react";
 import Flex from "@/components/Flex";
 import Link from "@/components/Link";
@@ -22,7 +22,8 @@ const Header = () => {
   const [open, setOpen] = useState(false);
 
   /** header height */
-  const [ref, { height }] = useMeasure<HTMLElement>();
+  const ref = useRef<HTMLElement | null>(null);
+  const [, height] = useElementSize(ref, { box: "border-box" });
 
   useEffect(() => {
     /** make sure all scrolls take into account header height */

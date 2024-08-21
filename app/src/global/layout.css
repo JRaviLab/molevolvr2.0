@@ -20,7 +20,7 @@
 /** basic auto-filled grid with max number of columns */
 
 .grid {
-  --cols: 2;
+  --cols: 3;
   --cell: min(100%, calc(var(--content) / var(--cols) - 100px));
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--cell), 1fr));
@@ -30,6 +30,10 @@
 }
 
 /** adjust max number of grid columns */
+
+.cols-2 {
+  --cols: 2;
+}
 
 .cols-3 {
   --cols: 3;
@@ -76,7 +80,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 3 / 1;
+  aspect-ratio: 4 / 1;
   width: 100%;
   border-radius: var(--rounded);
   background: var(--light-gray);

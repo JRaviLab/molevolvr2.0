@@ -1,5 +1,5 @@
 import { FaAngleUp } from "react-icons/fa6";
-import { useWindowScroll } from "react-use";
+import { useWindowScroll } from "@reactuses/core";
 import Flex from "@/components/Flex";
 import Toasts from "@/components/Toasts";
 import classes from "./ViewCorner.module.css";

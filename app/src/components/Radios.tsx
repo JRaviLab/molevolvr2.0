@@ -1,8 +1,8 @@
 import type { ReactElement, ReactNode } from "react";
 import { cloneElement, useEffect, useId, useState } from "react";
 import { FaRegCircle, FaRegCircleDot } from "react-icons/fa6";
-import { usePrevious } from "react-use";
 import clsx from "clsx";
+import { usePrevious } from "@reactuses/core";
 import Flex from "@/components/Flex";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
