@@ -9,7 +9,8 @@ This project was scaffolded using Vite, and has the following key features:
 
 ## Requirements
 
-- [Bun](https://bun.sh/)
+- [Node](https://nodejs.org/) v22+
+- [Bun](https://bun.sh/) v1.1+
 
 ## Commands
 
@@ -60,14 +61,14 @@ Anything else 👇 is abstraction or convenience built on top of them, and must 
 
 - **[Node](https://nodejs.org/en/)**.
   An environment for running JavaScript locally instead of in a browser.
-  Has APIs that browsers cannot have, such as filesystem access, and lacks some of the APIs browsers do have, such as functions to manipulate the DOM (there is no DOM or browser).
+  Has APIs that browsers cannot have, such as filesystem access, and lacks some of the APIs browsers do have, such as functions to manipulate the DOM (because there is no browser).
   That is, not all Node code can run in the browser, and vice-versa.
   Vite and other packages that do things locally are ultimately intended to run on top of this.
 
 - **[Bun](https://bun.sh/)**.
-  A very new tool that aims to be an all-in-one replacement for Node, Yarn, Vite, and many other tools.
+  A new tool that aims to be an all-in-one replacement for Node, Yarn, Vite, and many other tools.
   Since it is so new, in this project will only use it as a runtime (replacement for Node) and package manager (replacement for Yarn).
-  If you encounter issues, install [Node](https://nodejs.org/en) (`v18` or later) and try running the above commands with `npm` instead of `bun`.
+  [Node is still used under-the-hood by some packages](https://bun.sh/docs/cli/run#bun), so installing Node is still required.
   Do not use functionality that is Bun-only (not "backwards-compatible" with Node).
 
 - **[ESLint](https://eslint.org/)**.
