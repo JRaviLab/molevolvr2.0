@@ -95,39 +95,32 @@ export const shrinkWrap = (element: HTMLElement | null) => {
   element.style.boxSizing = "content-box";
 };
 
-/**
- * is element covering anything "important" (above anything besides a
- * "background" element)
- */
+/** is element covering anything "important" */
 export const isCovering = (
   element: HTMLElement | undefined | null,
-  background = "section",
+  important = "section > *",
 ) => {
   if (!element) return;
 
   /** don't consider covering if user interacting with element */
   if (element.matches(":hover, :focus-within")) return;
 
-  /** density of points to check */
-  const gap = 10;
-
-  const { left, top, width, height } = element.getBoundingClientRect() ?? {};
-
-  /** check a grid of points under element */
-  for (let x = left; x < width; x += gap) {
-    for (let y = top; y < height; y += gap) {
-      const covering = document
-        /** get elements under point */
-        .elementsFromPoint(x, y)
-        /** only count elements "under" this one */
-        .filter((el) => el !== element && !element.contains(el))
-        /** top-most */
-        .shift();
-
-      /** is "important" element */
-      if (!covering?.matches(background)) return covering;
-    }
-  }
+  /** check important elements for intersection with element */
+  for (const importantElement of document.querySelectorAll(important))
+    if (importantElement !== element && overlap(element, importantElement))
+      return true;
 
   return false;
+};
+
+/** check if two elements are overlapping */
+const overlap = (elA: Element, elB: Element) => {
+  const bboxA = elA.getBoundingClientRect();
+  const bboxB = elB.getBoundingClientRect();
+  return !(
+    bboxA.top > bboxB.bottom ||
+    bboxA.right < bboxB.left ||
+    bboxA.bottom < bboxB.top ||
+    bboxA.left > bboxB.right
+  );
 };
