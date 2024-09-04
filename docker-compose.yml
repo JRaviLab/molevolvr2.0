@@ -1,5 +1,9 @@
+volumes:
+  pgdata:
+
 services:
   backend:
+    hostname: backend-${TARGET_ENV}
     image: molevolvr-backend
     platform: linux/amd64
     build:
@@ -15,15 +19,19 @@ services:
         condition: service_healthy
 
   app:
+    hostname: app-${TARGET_ENV}
     image: molevolvr-frontend
     build: ./app
     depends_on:
       - backend
 
   db:
+    hostname: ${POSTGRES_HOST}
     image: postgres:16
     env_file:
       - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
       interval: 30s
