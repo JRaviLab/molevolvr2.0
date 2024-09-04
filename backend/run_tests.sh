@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# INSTRUCTIONS: run this script from within the backend container to recursively
+# descend into each subdirectory of tests/testthat to run tests.
+# it's expected to run into error messages like 'rlang::abort("No test files
+# found")' when there aren't any tests to run in the target directory.
+
 cd /app/api
 
 # set some colors and styles
