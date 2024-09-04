@@ -165,13 +165,18 @@ if [ $# -gt 0 ]; then
 fi
 
 # check if a "control" command is the current first argument; if so, skip the build
-if [[ "$1" =~ ^(down|restart|logs|build)$ ]]; then
+if [[ "$1" =~ ^(down|restart|logs|build|shell)$ ]]; then
     echo "* Skipping build, since we're running a control command: $1"
     SKIP_BUILD=1
     # also skip the post-launch command so we don't get stuck, e.g., tailing
     POST_LAUNCH_CMD=""
     # also skip opening a browser window
     DO_OPEN_BROWSER=0
+
+    # if it's the shell command, also change COMPOSE_CMD to launch a shell instead
+    if [ "$1" == "shell" ]; then
+        DEFAULT_ARGS="exec backend /bin/bash"
+    fi
 fi
 
 # if SKIP_BUILD is 0 and 'down' isn't the docker compose command, build images
