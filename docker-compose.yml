@@ -4,7 +4,7 @@ volumes:
 services:
   backend:
     hostname: backend-${TARGET_ENV}
-    image: molevolvr-backend
+    image: ${REGISTRY_PREFIX}/molevolvr-backend:${IMAGE_TAG}
     platform: linux/amd64
     build:
       context: ./backend

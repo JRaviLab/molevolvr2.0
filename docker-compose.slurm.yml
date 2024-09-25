@@ -18,7 +18,7 @@ services:
     hostname: ${SLURM_MASTER}
     privileged: true
     cgroup: private
-    image: molevolvr20-slurm-node
+    image: ${REGISTRY_PREFIX}/molevolvr-slurm-node:${IMAGE_TAG}
     platform: linux/amd64
     build:
       context: ./cluster
@@ -39,7 +39,7 @@ services:
     hostname: ${SLURM_WORKER}
     privileged: true
     cgroup: private
-    image: molevolvr20-slurm-node
+    image: ${REGISTRY_PREFIX}/molevolvr-slurm-node:${IMAGE_TAG}
     platform: linux/amd64
     build:
       context: ./cluster

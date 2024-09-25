@@ -147,6 +147,11 @@ esac
 
 # ensure that docker compose can see the target env, so it can, e.g., namespace hosts to their environment
 export TARGET_ENV=${TARGET_ENV}
+# ensure that the registry prefix is exported to the env as well
+export REGISTRY_PREFIX=${REGISTRY_PREFIX}
+# for tags used when pulling/building images, use 'latest' if we're running prod, and use TARGET_ENV otherwise
+# FIXME: we should consider a version-based tagging system
+export IMAGE_TAG=$( [[ ${TARGET_ENV} = "prod" ]] && echo "latest" || echo ${TARGET_ENV} )
 
 # if any arguments were specified after the target env, use those instead of the default
 if [ $# -gt 0 ]; then
@@ -155,7 +160,7 @@ if [ $# -gt 0 ]; then
 fi
 
 # check if a "control" command is the current first argument; if so, skip the build
-if [[ "$1" =~ ^(down|restart|logs|build|shell)$ ]]; then
+if [[ "$1" =~ ^(down|restart|logs|build|pull|push|shell)$ ]]; then
     echo "* Skipping build, since we're running a control command: $1"
     SKIP_BUILD=1
     # also skip the post-launch command so we don't get stuck, e.g., tailing
@@ -174,12 +179,6 @@ fi
 # each built image is tagged with its target env, so they don't collide with
 # each other; in the case of prod, the tag is "latest".
 if [ "${SKIP_BUILD}" -eq 0 ]; then
-    if [ "${TARGET_ENV}" == "prod" ] || [ "${TARGET_ENV}" == "app" ]; then
-        IMAGE_TAG="latest"
-    else
-        IMAGE_TAG="${TARGET_ENV}"
-    fi
-
     echo "* Building images for ${TARGET_ENV} (tag: ${IMAGE_TAG})"
     # ./build_images.sh ${IMAGE_TAG} || fatal "Failed to build images for ${TARGET_ENV}"
     ${COMPOSE_CMD} build || fatal "Failed to build images for ${TARGET_ENV}"
