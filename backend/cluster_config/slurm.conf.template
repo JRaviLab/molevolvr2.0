@@ -1,0 +1,3 @@
+# this is a simplified slurm.conf for clients of the cluster
+ClusterName=${CLUSTER_NAME}
+SlurmctldHost=${SLURM_MASTER}
