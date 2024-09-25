@@ -75,13 +75,19 @@
   opacity: 0;
 }
 
-.text {
+.primary {
+  display: flex;
   flex-grow: 2;
+  align-items: center;
 }
 
-.info {
+.secondary {
+  display: flex;
   flex-grow: 1;
+  align-items: center;
+  justify-content: flex-end;
   justify-self: flex-end;
+  font-size: 0.9rem;
   text-align: right;
 }
 

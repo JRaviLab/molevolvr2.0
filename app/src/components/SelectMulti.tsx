@@ -16,10 +16,10 @@ import classes from "./Select.module.css";
 export type Option<ID = string> = {
   /** unique id */
   id: ID;
-  /** text label */
-  text: string;
-  /** secondary text */
-  info?: string;
+  /** primary label */
+  primary: ReactNode;
+  /** secondary label */
+  secondary?: ReactNode;
   /** icon */
   icon?: ReactElement;
 };
@@ -73,13 +73,13 @@ const SelectMulti = <O extends Option>({
       }
     >
       {({ value }) => {
-        let selectedLabel = "";
+        let selectedLabel: ReactNode = "";
         const count = value.length;
-        if (count === 0) selectedLabel = "None";
+        if (count === 0) selectedLabel = "None selected";
         else if (count === 1)
           selectedLabel =
-            options.find((option) => option.id === value[0])?.text || "";
-        else if (count === options.length) selectedLabel = "All";
+            options.find((option) => option.id === value[0])?.primary || "";
+        else if (count === options.length) selectedLabel = "All selected";
         else selectedLabel = count + " selected";
 
         return (
@@ -115,9 +115,9 @@ const SelectMulti = <O extends Option>({
                         className={classes.check}
                         style={{ opacity: selected ? 1 : 0 }}
                       />
-                      <span className={classes.text}>{option.text}</span>
-                      <span className={clsx(classes.info, "secondary")}>
-                        {option.info}
+                      <span className={classes.primary}>{option.primary}</span>
+                      <span className={clsx(classes.secondary, "secondary")}>
+                        {option.secondary}
                       </span>
                       {option.icon &&
                         cloneElement(option.icon, {
@@ -142,7 +142,7 @@ const SelectMulti = <O extends Option>({
             >
               {options.map((option, index) => (
                 <option key={index} value={option.id}>
-                  {option.text}
+                  {option.primary}
                 </option>
               ))}
             </select>

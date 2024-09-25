@@ -7,8 +7,8 @@
       console.debug("With state:", history.state);
       const { origin, pathname, search, hash } = location;
       sessionStorage.redirectPath = pathname + search + hash;
+      // don't fail redirection all together if state exceeds session storage limit
       try {
-        // don't fail redirection all together in case that state size exceeds session storage limit
         sessionStorage.redirectState = JSON.stringify(history.state);
       } catch (error) {
         console.error(error);

@@ -60,13 +60,13 @@ const inputFormats: Record<
   Option<InputFormat>[]
 > = {
   list: [
-    { id: "fasta", text: "FASTA" },
-    { id: "accnum", text: "Accession Numbers" },
-    { id: "msa", text: "Multiple Sequence Alignment" },
+    { id: "fasta", primary: "FASTA" },
+    { id: "accnum", primary: "Accession Numbers" },
+    { id: "msa", primary: "Multiple Sequence Alignment" },
   ] as const,
   external: [
-    { id: "blast", text: "BLAST" },
-    { id: "interproscan", text: "InterProScan" },
+    { id: "blast", primary: "BLAST" },
+    { id: "interproscan", primary: "InterProScan" },
   ] as const,
 };
 
@@ -264,7 +264,7 @@ const NewAnalysis = () => {
                 <>
                   {
                     inputFormats[inputType].find((i) => i.id === inputFormat)
-                      ?.text
+                      ?.primary
                   }{" "}
                   input
                   {!isEmpty(stats) && (
@@ -402,8 +402,8 @@ const NewAnalysis = () => {
                 <SelectSingle
                   label="Homology search database"
                   options={[
-                    { id: "refseq", text: "RefSeq" },
-                    { id: "nr", text: "nr" },
+                    { id: "refseq", primary: "RefSeq" },
+                    { id: "nr", primary: "nr" },
                   ]}
                   name="blastHomologyDatabase"
                 />
@@ -462,7 +462,7 @@ const NewAnalysis = () => {
 
           <Alert>
             An analysis takes <strong>several hours to run</strong>!{" "}
-            <Link to="/about" newTab={true}>
+            <Link to="/about" newTab>
               Learn more
             </Link>
             .

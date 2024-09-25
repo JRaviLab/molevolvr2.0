@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { cloneElement, useEffect, useId, useState } from "react";
-import { FaRegCircle, FaRegCircleDot } from "react-icons/fa6";
+import { FaCircleDot, FaRegCircle } from "react-icons/fa6";
 import clsx from "clsx";
 import { usePrevious } from "@reactuses/core";
 import Flex from "@/components/Flex";
@@ -110,16 +110,21 @@ const Radios = <O extends Option>({
 
             {/* check mark */}
             {selectedWFallback === option.id ? (
-              <FaRegCircleDot
-                className={clsx(classes.check, classes.selected)}
-              />
+              <FaCircleDot className={clsx(classes.check, classes.checked)} />
             ) : (
               <FaRegCircle className={classes.check} />
             )}
 
             {/* text content */}
             <Flex direction="column" hAlign="left" gap="sm">
-              <span className="primary">{option.primary}</span>
+              <span
+                className={clsx(
+                  "primary",
+                  selectedWFallback === option.id && classes.checked,
+                )}
+              >
+                {option.primary}
+              </span>
               {option.secondary && (
                 <span className="secondary">{option.secondary}</span>
               )}

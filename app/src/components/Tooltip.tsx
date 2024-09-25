@@ -29,7 +29,7 @@ const Tooltip = forwardRef<HTMLButtonElement, Props>(
   ({ content, children, ...props }: Props, ref) => {
     if (content)
       return (
-        <Provider delayDuration={200}>
+        <Provider delayDuration={100}>
           <Root>
             {/* allows nesting tooltip within popover https://github.com/radix-ui/primitives/discussions/560#discussioncomment-5325935 */}
             <Trigger

@@ -1,3 +1,11 @@
+.collapsed {
+  max-width: 100%;
+}
+
+.expanded {
+  max-width: calc(100vw - 40px);
+}
+
 .scroll {
   max-width: 100%;
   overflow-x: auto;

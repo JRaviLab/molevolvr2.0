@@ -3,6 +3,29 @@ import reactToText from "react-to-text";
 import { debounce } from "lodash";
 import { sleep } from "@/util/misc";
 
+/** css on :root */
+const rootStyles = window.getComputedStyle(document.documentElement);
+
+/** theme css variables https://stackoverflow.com/a/78994961/2180570 */
+export const themeVariables = Object.fromEntries(
+  Array.from(document.styleSheets)
+    .flatMap((styleSheet) => {
+      try {
+        return Array.from(styleSheet.cssRules);
+      } catch (error) {
+        return [];
+      }
+    })
+    .filter((cssRule) => cssRule instanceof CSSStyleRule)
+    .flatMap((cssRule) => Array.from(cssRule.style))
+    .filter((style) => style.startsWith("--"))
+    .map((variable) => [variable, rootStyles.getPropertyValue(variable)]),
+);
+
+/** get css theme variable */
+export const theme = (variable: `--${string}`) =>
+  themeVariables[variable] ?? "";
+
 /** wait for element matching selector to appear, checking periodically */
 export const waitFor = async <El extends Element>(
   selector: string,
@@ -95,32 +118,39 @@ export const shrinkWrap = (element: HTMLElement | null) => {
   element.style.boxSizing = "content-box";
 };
 
-/** is element covering anything "important" */
+/**
+ * is element covering anything "important" (above anything besides a
+ * "background" element)
+ */
 export const isCovering = (
   element: HTMLElement | undefined | null,
-  important = "section > *",
+  background = "section",
 ) => {
   if (!element) return;
 
   /** don't consider covering if user interacting with element */
   if (element.matches(":hover, :focus-within")) return;
 
-  /** check important elements for intersection with element */
-  for (const importantElement of document.querySelectorAll(important))
-    if (importantElement !== element && overlap(element, importantElement))
-      return true;
+  /** density of points to check */
+  const gap = 20;
+
+  const { left, top, width, height } = element.getBoundingClientRect() ?? {};
+
+  /** check a grid of points under element */
+  for (let x = left + gap; x < width - gap; x += gap) {
+    for (let y = top + gap; y < height - gap; y += gap) {
+      const covering = document
+        /** get elements under point */
+        .elementsFromPoint(x, y)
+        /** only count elements "under" this one */
+        .filter((el) => el !== element && !element.contains(el))
+        /** top-most */
+        .shift();
+
+      /** is "important" element */
+      if (!covering?.matches(background)) return covering;
+    }
+  }
 
   return false;
-};
-
-/** check if two elements are overlapping */
-const overlap = (elA: Element, elB: Element) => {
-  const bboxA = elA.getBoundingClientRect();
-  const bboxB = elB.getBoundingClientRect();
-  return !(
-    bboxA.top > bboxB.bottom ||
-    bboxA.right < bboxB.left ||
-    bboxA.bottom < bboxB.top ||
-    bboxA.left > bboxB.right
-  );
 };

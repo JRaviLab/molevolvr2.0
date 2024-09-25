@@ -135,7 +135,7 @@ const TableOfContents = () => {
               data-active={heading.id === activeId ? "" : undefined}
               className={classes.link}
               to={{ hash: "#" + heading.id }}
-              replace={true}
+              replace
               style={{ paddingLeft: heading.level * 10 }}
               onClick={() => scrollTo("#" + heading.id)}
             >

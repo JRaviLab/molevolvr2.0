@@ -14,3 +14,13 @@
 .arrow {
   fill: var(--off-black);
 }
+
+.content[data-state="delayed-open"] {
+  animation: fade var(--fast);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}

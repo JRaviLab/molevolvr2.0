@@ -2,6 +2,7 @@ import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { useId, useRef, useState } from "react";
 import { FaRegCopy, FaXmark } from "react-icons/fa6";
 import clsx from "clsx";
+import { useElementBounding } from "@reactuses/core";
 import Asterisk from "@/components/Asterisk";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -57,6 +58,7 @@ const TextBox = ({
   ...props
 }: Props) => {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
+  const side = useRef<HTMLDivElement>(null);
 
   /** local text state */
   const [text, setText] = useState(value ?? "");
@@ -68,7 +70,7 @@ const TextBox = ({
   let sideElement: ReactNode = "";
   if (text || value)
     sideElement = (
-      <div className={classes.side}>
+      <div ref={side} className={classes.side}>
         <button
           type="button"
           onClick={async () => {
@@ -92,7 +94,15 @@ const TextBox = ({
         </button>
       </div>
     );
-  else if (icon) sideElement = <div className={classes.side}>{icon}</div>;
+  else if (icon)
+    sideElement = (
+      <div ref={side} className={classes.side}>
+        {icon}
+      </div>
+    );
+
+  /** extra padding needed for side element */
+  const sidePadding = useElementBounding(side).width;
 
   /** link to parent form component */
   const form = useForm();
@@ -102,7 +112,8 @@ const TextBox = ({
     <textarea
       ref={ref}
       id={id}
-      className={clsx(classes.textarea, sideElement && classes["input-side"])}
+      className={classes.textarea}
+      style={{ paddingRight: sidePadding ? sidePadding + 10 : "" }}
       value={value}
       onChange={(event) => {
         onChange?.(event.target.value);
@@ -116,6 +127,7 @@ const TextBox = ({
       ref={ref}
       id={id}
       className={clsx(classes.input, sideElement && classes["input-side"])}
+      style={{ paddingRight: sidePadding ? sidePadding + 10 : "" }}
       value={value}
       onChange={(event) => {
         onChange?.(event.target.value);

@@ -25,10 +25,10 @@ import classes from "./Select.module.css";
 export type Option<ID = string> = {
   /** unique id */
   id: ID;
-  /** text label */
-  text: string;
-  /** secondary text */
-  info?: string;
+  /** primary label */
+  primary: ReactNode;
+  /** secondary label */
+  secondary?: ReactNode;
   /** icon */
   icon?: ReactElement;
 };
@@ -122,7 +122,7 @@ const SelectSingle = <O extends Option>({
         }}
       >
         <span className="truncate">
-          {options.find((option) => option.id === selectedWFallback)?.text}
+          {options.find((option) => option.id === selectedWFallback)?.primary}
         </span>
         <FaAngleDown />
       </ListboxButton>
@@ -148,9 +148,9 @@ const SelectSingle = <O extends Option>({
                   style={{ opacity: selected ? 1 : 0 }}
                 />
                 {/* text */}
-                <span className={classes.text}>{option.text}</span>
-                <span className={clsx(classes.info, "secondary")}>
-                  {option.info}
+                <span className={classes.primary}>{option.primary}</span>
+                <span className={clsx(classes.secondary, "secondary")}>
+                  {option.secondary}
                 </span>
                 {/* icon */}
                 {option.icon &&

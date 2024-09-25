@@ -14,8 +14,7 @@ export const formatNumber = (value: number | undefined, compact = false) => {
   if (Math.abs(value) < 0.01 && value) return value.toExponential(1);
   const options: Intl.NumberFormatOptions = {};
   if (compact) options.notation = "compact";
-  if (Math.abs(value) > 1) options.maximumFractionDigits = 2;
-  if (Math.abs(value) < 1) options.maximumSignificantDigits = 2;
+  options.maximumSignificantDigits = compact ? 2 : 4;
   return value.toLocaleString(undefined, options).toLowerCase();
 };
 
@@ -39,7 +38,7 @@ export const formatDate = (date: string | Date | undefined) => {
       dateStyle: "medium",
       timeStyle: "short",
     });
-  return null;
+  return "";
 };
 
 /** make label (e.g. aria label) from html string */

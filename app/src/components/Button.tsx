@@ -66,8 +66,8 @@ const Button = forwardRef(
       </>
     ) : (
       <>
-        {icon}
         {text}
+        {icon}
       </>
     );
 

@@ -31,25 +31,30 @@
 
 /** adjust max number of grid columns */
 
+.cols-1 {
+  --cols: 1 !important;
+}
+
 .cols-2 {
-  --cols: 2;
+  --cols: 2 !important;
 }
 
 .cols-3 {
-  --cols: 3;
+  --cols: 3 !important;
 }
 
 .cols-4 {
-  --cols: 4;
+  --cols: 4 !important;
 }
 
 /** simple two-col auto-sized table of key/value pairs */
 
 .mini-table {
+  --cols: 2;
   display: grid;
-  grid-template-columns: max-content auto;
+  grid-template-columns: repeat(var(--cols), auto);
   grid-auto-rows: min-content;
-  gap: 5px 20px;
+  gap: 10px 20px;
   text-align: left;
 }
 
@@ -58,11 +63,18 @@
   align-items: center;
   align-self: flex-start;
   gap: 10px;
-  color: var(--dark-gray);
+  color: var(--deep);
+  font-weight: var(--medium);
 }
 
 .mini-table > :nth-child(even) {
-  font-weight: var(--medium);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.mini-table > :nth-child(even):empty::after {
+  content: "-";
+  color: var(--gray);
 }
 
 /** automatically applied to all icons (react-icons and imported custom icons) */

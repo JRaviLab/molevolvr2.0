@@ -13,3 +13,13 @@
 .arrow {
   fill: var(--white);
 }
+
+.content[data-state="open"] {
+  animation: fade var(--fast);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}

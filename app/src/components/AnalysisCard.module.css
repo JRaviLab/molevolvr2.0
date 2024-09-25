@@ -12,6 +12,10 @@
   border-color: var(--accent);
 }
 
+.card:has(button:hover) {
+  border-color: transparent;
+}
+
 .button {
   align-self: center;
   margin-top: 10px;

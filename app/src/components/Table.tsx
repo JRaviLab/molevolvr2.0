@@ -15,9 +15,14 @@ import {
   FaSortUp,
 } from "react-icons/fa6";
 import { MdFilterAltOff } from "react-icons/md";
-import clsx from "clsx";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
-import type { Column, FilterFn, NoInfer } from "@tanstack/react-table";
+import { useLocalStorage } from "@reactuses/core";
+import type {
+  Column,
+  FilterFn,
+  NoInfer,
+  SortingState,
+} from "@tanstack/react-table";
 import {
   createColumnHelper,
   flexRender,
@@ -41,7 +46,7 @@ import Slider from "@/components/Slider";
 import TextBox from "@/components/TextBox";
 import Tooltip from "@/components/Tooltip";
 import { downloadCsv } from "@/util/download";
-import { formatNumber } from "@/util/string";
+import { formatDate, formatNumber } from "@/util/string";
 import classes from "./Table.module.css";
 
 type Col<
@@ -69,12 +74,15 @@ type Col<
   show?: boolean;
   /** tooltip to show in header cell */
   tooltip?: ReactNode;
-  /** custom render function for cell */
-  render?: (cell: NoInfer<Datum[Key]>) => ReactNode;
+  /**
+   * custom render function for cell. return undefined or null to fallback to
+   * default formatting.
+   */
+  render?: (cell: NoInfer<Datum[Key]>, row: Datum) => ReactNode;
 };
 
 /**
- * https://stackoverflow.com/questions/68274805/typescript-reference-type-of-property-by-other-property-of-same-object
+ * https://stackoverflow.com/quezstions/68274805/typescript-reference-type-of-property-by-other-property-of-same-object
  * https://github.com/vuejs/core/discussions/8851
  */
 type _Col<Datum extends object> = {
@@ -84,6 +92,7 @@ type _Col<Datum extends object> = {
 type Props<Datum extends object> = {
   cols: _Col<Datum>[];
   rows: Datum[];
+  sort?: SortingState;
 };
 
 /** map column definition to multi-select option */
@@ -92,7 +101,7 @@ const colToOption = <Datum extends object>(
   index: number,
 ): Option => ({
   id: String(index),
-  text: col.name,
+  primary: col.name,
 });
 
 /**
@@ -101,9 +110,9 @@ const colToOption = <Datum extends object>(
  * reference:
  * https://codesandbox.io/p/devbox/tanstack-table-example-kitchen-sink-vv4871
  */
-const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
+const Table = <Datum extends object>({ cols, rows, sort }: Props<Datum>) => {
   /** expanded state */
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useLocalStorage("table-expanded", false);
 
   /** column visibility options for multi-select */
   const visibleOptions = cols.map(colToOption);
@@ -120,12 +129,12 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
 
   /** per page options */
   const perPageOptions = [
-    { id: "5", text: 5 },
-    { id: "10", text: 10 },
-    { id: "50", text: 50 },
-    { id: "100", text: 100 },
-    { id: "500", text: 500 },
-  ].map((option) => ({ ...option, text: formatNumber(option.text) }));
+    { id: "5", primary: formatNumber(5) },
+    { id: "10", primary: formatNumber(10) },
+    { id: "50", primary: formatNumber(50) },
+    { id: "100", primary: formatNumber(100) },
+    { id: "500", primary: formatNumber(500) },
+  ];
 
   /** initial per page */
   const defaultPerPage = perPageOptions[1]!.id;
@@ -212,8 +221,13 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
       /** func to use for filtering individual column */
       filterFn: filterFunc,
       /** render func for cell */
-      cell: (cell) =>
-        col.render ? col.render(cell.getValue()) : cell.getValue(),
+      cell: ({ cell, row }) => {
+        const raw = cell.getValue();
+        const rendered = col.render?.(raw, row.original);
+        return rendered === undefined || rendered === null
+          ? defaultFormat(raw)
+          : rendered;
+      },
     }),
   );
 
@@ -234,7 +248,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
     columnResizeMode: "onChange",
     /** initial sort, page, etc. state */
     initialState: {
-      sorting: [{ id: "0", desc: false }],
+      sorting: sort ?? [{ id: "0", desc: false }],
       pagination: {
         pageIndex: 0,
         pageSize: Number(defaultPerPage),
@@ -255,8 +269,11 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
   });
 
   return (
-    <Flex direction="column">
-      <div className={clsx(classes.scroll, expanded && "expanded")}>
+    <Flex
+      direction="column"
+      className={expanded ? classes.expanded : classes.collapsed}
+    >
+      <div className={classes.scroll}>
         {/* table */}
         <table
           className={classes.table}
@@ -285,7 +302,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
                           )}
                         </span>
 
-                        {/* header tooltip */}
+                        {/*z header tooltip */}
                         {getCol(header.column.id)?.tooltip && (
                           <Help tooltip={getCol(header.column.id)?.tooltip} />
                         )}
@@ -385,7 +402,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
       </div>
 
       {/* controls */}
-      <Flex gap="lg">
+      <Flex style={{ columnGap: "40px" }}>
         {/* pagination */}
         <Flex gap="xs">
           <button
@@ -441,7 +458,7 @@ const Table = <Datum extends object>({ cols, rows }: Props<Datum>) => {
         </Flex>
 
         {/* filters */}
-        <Flex gap="sm">
+        <Flex gap="md">
           {/* per page */}
           <SelectSingle
             label="Rows"
@@ -539,7 +556,7 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
 
     return (
       <Slider
-        label="Filter"
+        label="Filter by number"
         min={min}
         max={max}
         step={(max - min) / 100}
@@ -568,15 +585,18 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
       "count",
     ).map(({ name, count }) => ({
       id: String(name),
-      text: String(name),
-      info: formatNumber(count),
+      primary: String(name),
+      secondary: formatNumber(count),
     }));
 
     return (
       <SelectMulti
-        label="Filter"
+        label="Filter by types"
         options={options}
-        value={(column.getFilterValue() as Option["id"][]) ?? options}
+        value={
+          (column.getFilterValue() as Option["id"][] | undefined) ??
+          options.map((option) => option.id)
+        }
         onChange={(value, count) =>
           /** return as "unfiltered" if all or none are selected */
           column.setFilterValue(
@@ -593,28 +613,33 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
     const options: Option[] = [
       {
         id: "all",
-        text: "All",
-        info: formatNumber(
+        primary: "All",
+        secondary: formatNumber(
           sum(Array.from(column.getFacetedUniqueValues().values())),
         ),
       },
       {
         id: "true",
-        text: "True/Yes",
-        info: formatNumber(column.getFacetedUniqueValues().get(true) ?? 0),
+        primary: "True/Yes",
+        secondary: formatNumber(column.getFacetedUniqueValues().get(true) ?? 0),
       },
       {
         id: "false",
-        text: "False/No",
-        info: formatNumber(column.getFacetedUniqueValues().get(false) ?? 0),
+        primary: "False/No",
+        secondary: formatNumber(
+          column.getFacetedUniqueValues().get(false) ?? 0,
+        ),
       },
     ];
 
     return (
       <SelectSingle
-        label="Filter"
+        label="Filter by type"
         options={options}
-        value={(column.getFilterValue() as Option["id"]) ?? options[0]!.id}
+        value={
+          (column.getFilterValue() as Option["id"] | undefined) ??
+          options[0]!.id
+        }
         onChange={(value) =>
           /** return as "unfiltered" if all are selected */
           column.setFilterValue(value === "all" ? undefined : value)
@@ -626,10 +651,25 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
   /** filter as text */
   return (
     <TextBox
+      label="Filter by text"
       placeholder="Search"
       value={(column.getFilterValue() as string | undefined) ?? ""}
       onChange={column.setFilterValue}
       icon={<FaMagnifyingGlass />}
     />
   );
+};
+
+/** default cell formatter based on detected type */
+const defaultFormat = (cell: unknown) => {
+  if (typeof cell === "number") return formatNumber(cell);
+  if (typeof cell === "boolean") return cell ? "True" : "False";
+  /** if falsey (except 0 and false) */
+  if (!cell) return "-";
+  if (Array.isArray(cell)) return cell.length.toLocaleString();
+  if (cell instanceof Date) return formatDate(cell);
+  if (typeof cell === "object")
+    return Object.keys(cell).length.toLocaleString();
+  if (typeof cell === "string") return cell;
+  return String(cell);
 };
