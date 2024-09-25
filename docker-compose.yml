@@ -9,6 +9,8 @@ services:
     build:
       context: ./backend
       dockerfile: ./docker/Dockerfile
+      args:
+        - PRIOR_LAYER=backend-base
     env_file:
       - .env
     environment:

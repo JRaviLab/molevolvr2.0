@@ -126,7 +126,7 @@ esac
 case ${TARGET_ENV} in
     "prod")
         DEFAULT_ARGS="up -d"
-        COMPOSE_CMD="docker compose -f docker-compose.yml -f docker-compose.prod.yml"
+        COMPOSE_CMD="docker compose -f docker-compose.yml -f docker-compose.slurm.yml -f docker-compose.prod.yml"
         DO_CLEAR="0"
         # never launch the browser in production
         DO_OPEN_BROWSER=0
@@ -135,7 +135,7 @@ case ${TARGET_ENV} in
         ;;
     "dev")
         DEFAULT_ARGS="up -d"
-        COMPOSE_CMD="docker compose -f docker-compose.yml -f docker-compose.override.yml"
+        COMPOSE_CMD="docker compose -f docker-compose.yml -f docker-compose.slurm.yml -f docker-compose.override.yml"
         DO_CLEAR="1"
         # watch the logs after, since we detached after bringing up the stack
         POST_LAUNCH_CMD="${COMPOSE_CMD} logs -f"

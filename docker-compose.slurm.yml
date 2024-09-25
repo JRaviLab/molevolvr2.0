@@ -1,0 +1,66 @@
+volumes:
+  accounting_data:
+  munge:
+  shared_tmp:
+  shared_jobs:
+  
+services:
+  backend:
+    build:
+      args:
+        - PRIOR_LAYER=backend-slurm
+    volumes:
+      - munge:/etc/munge/
+      - shared_tmp:/tmp/
+      - shared_jobs:/opt/shared-jobs/
+
+  master:
+    hostname: ${SLURM_MASTER}
+    privileged: true
+    cgroup: private
+    image: molevolvr20-slurm-node
+    platform: linux/amd64
+    build:
+      context: ./cluster
+    environment:
+      - CLUSTER_ROLE=controller,dbd
+    env_file:
+      - .env
+    volumes:
+      - munge:/etc/munge/
+      - shared_tmp:/tmp/
+      - shared_jobs:/opt/shared-jobs/
+      - ./cluster/test-jobs/:/opt/test-jobs/
+      # - /sys/fs/cgroup:/sys/fs/cgroup
+    depends_on:
+      - accounting
+
+  worker:
+    hostname: ${SLURM_WORKER}
+    privileged: true
+    cgroup: private
+    image: molevolvr20-slurm-node
+    platform: linux/amd64
+    build:
+      context: ./cluster
+    environment:
+      - CLUSTER_ROLE=worker
+    env_file:
+      - .env
+    volumes:
+      - munge:/etc/munge/
+      - shared_tmp:/tmp/
+      - shared_jobs:/opt/shared-jobs/
+      - ./cluster/test-jobs/:/opt/test-jobs/
+      # - /sys/fs/cgroup:/sys/fs/cgroup
+
+  # used by slurmdbd to store accounting information
+  accounting:
+    hostname: ${MARIADB_HOST}
+    image: mariadb:11.2
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - "./services/mariadb/:/etc/mysql/mariadb.conf.d/:ro"
+      - accounting_data:/var/lib/mysql

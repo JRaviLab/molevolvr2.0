@@ -1,0 +1,10 @@
+# CgroupAutomount=no
+# CgroupReleaseAgentDir="/etc/slurm/cgroup"
+# CgroupMountpoint=/sys/fs/cgroup
+ConstrainCores=yes
+ConstrainDevices=yes
+ConstrainRAMSpace=yes
+
+# https://fossies.org/linux/slurm/src/plugins/cgroup/v2/cgroup_v2.c
+IgnoreSystemd=yes
+CgroupPlugin=autodetect
