@@ -18,10 +18,10 @@ services:
       db:
         condition: service_healthy
 
-  app:
-    hostname: app-${TARGET_ENV}
+  frontend:
+    hostname: frontend-${TARGET_ENV}
     image: molevolvr-frontend
-    build: ./app
+    build: ./frontend
     depends_on:
       - backend
 

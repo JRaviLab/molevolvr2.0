@@ -1,16 +1,16 @@
 volumes:
-  app_bundle:
+  frontend_dist:
   caddy_data:
   caddy_config:
 
 services:
-  app:
+  frontend:
     image: molevolvr-frontend
     build:
-      context: ./app
+      context: ./frontend
       target: release
     volumes:
-      - app_bundle:/app/dist
+      - frontend_dist:/app/frontend/dist
     depends_on:
       - backend
   
@@ -20,9 +20,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - app_bundle:/srv
+      - frontend_dist:/srv
       - ./services/caddy/Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      - app
+      - frontend

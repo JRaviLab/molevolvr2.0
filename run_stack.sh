@@ -35,7 +35,7 @@
 #
 # the current environments are as follows (contact FSA for details):
 # - prod: the production environment, which runs the full stack, including the
-#   shiny app, the job scheduler, and the accounting database. it's the most
+#   web app, the job scheduler, and the accounting database. it's the most
 #   resource-intensive environment, and is intended for use in production.
 # - dev/staging: these are effectively dev environments that specific users run
 #   on the server for testing purposes.
@@ -139,16 +139,6 @@ case ${TARGET_ENV} in
         DO_CLEAR="1"
         # watch the logs after, since we detached after bringing up the stack
         POST_LAUNCH_CMD="${COMPOSE_CMD} logs -f"
-        ;;
-    "app")
-        # launches just the services necessary to run the shiny app, for frontend development.
-        # note that you won't be able to submit jobs or query the accounting database.
-        DEFAULT_ARGS="up"
-        COMPOSE_CMD="docker compose -f docker-compose.apponly.yml"
-        DO_CLEAR="1"
-        SKIP_BUILD="1" # don't build images for the app environment, since it uses so few of them
-        # watch the logs after, since we detached after bringing up the stack
-        # POST_LAUNCH_CMD="${COMPOSE_CMD} logs -f app"
         ;;
     *)
         echo "ERROR: Unknown target environment: ${TARGET_ENV}"

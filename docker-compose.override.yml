@@ -14,12 +14,12 @@ services:
     depends_on:
       - "dev-db"
 
-  app:
+  frontend:
     build:
-      context: ./app
+      context: ./frontend
       target: dev
     volumes:
-      - ./app/src:/app/src
+      - ./frontend:/app/frontend
     environment:
       - 'VITE_API=http://localhost:9050'
     ports:
