@@ -4,7 +4,7 @@
 
 box::use(
   plumber[register_serializer, serializer_content_type],
-  api/support/string_helpers[inline_str_list]
+  api/helpers/string_helpers[inline_str_list]
 )
 
 #' Register custom serializers, e.g. for JSON with specific defaults

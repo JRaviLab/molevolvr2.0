@@ -2,7 +2,7 @@
 
 box::use(
   plumber[...],
-  api/support/custom_serializers[setup_custom_serializers]
+  api/helpers/custom_serializers[setup_custom_serializers]
 )
 
 # bring in custom serializers
@@ -33,12 +33,12 @@ index <- function() {
   )
 }
 
-# Define a custom error handler that includes a traceback
+# define a custom error handler that includes a traceback
 custom_error_handler <- function(req, res, err) {
-  # Capture the traceback
+  # capture the traceback
   traceback <- paste(capture.output(traceback()), collapse = "\n")
 
-  # Set the response status code and body
+  # set the response status code and body
   res$status <- 500
   list(
     error = err$message,
@@ -49,7 +49,7 @@ custom_error_handler <- function(req, res, err) {
 #' @plumber
 function(pr) {
   pr %>%
-    pr_set_debug(TRUE) %>%
+    pr_set_debug(Sys.getenv("PLUMBER_DEBUG", unset="0") == "1") %>%
     pr_set_error(custom_error_handler) %>%
     pr_mount("/analyses", pr("./endpoints/analyses.R")) %>%
     pr_mount("/stats", pr("./endpoints/stats.R"))
