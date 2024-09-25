@@ -29,7 +29,7 @@ test_that("submitted analyses can be retrieved and matches submission", {
 
   box::use(
     api/db[getCon],
-    api/models/analyses[db_submit_analysis, db_get_analyses]
+    api/models/analyses[db_submit_analysis, db_get_analyses, db_get_analysis_by_id]
   )
 
   con <- getCon()
@@ -50,6 +50,11 @@ test_that("submitted analyses can be retrieved and matches submission", {
   expect_equal( last_analysis$name, "hey" )
   expect_equal( last_analysis$type, "there" )
   expect_equal( toString(last_analysis$status), "submitted" )
+
+  # wait for a bit, then quwry and check the status again
+  Sys.sleep(10)
+  result <- db_get_analysis_by_id(code, con=con)
+  expect_equal( toString(result$status), "submitted" )
 
   # and revert so we don't affect the database
   DBI::dbRollback(con)
