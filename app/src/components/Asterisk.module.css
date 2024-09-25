@@ -1,5 +1,6 @@
 .asterisk {
   margin: 0 -5px;
-  transform: scale(0.75) translateY(-0.35em);
+  translate: 0 -0.35em;
+  scale: 0.75;
   color: var(--accent);
 }

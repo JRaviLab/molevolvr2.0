@@ -1,81 +1,48 @@
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="-50 -50 100 100"
-  data-id="logo"
->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100" data-logo="">
   <style>
-    [data-id="logo"][data-animated] .logo-draw,
-    [data-id="logo"]:hover .logo-draw {
-      animation: logo-draw 4s linear infinite both;
-      animation-delay: var(--delay);
+    [data-logo] {
+      --duration: 4s;
+    }
+
+    [data-logo] * {
+      animation-duration: var(--duration);
+      animation-timing-function: ease-in-out;
+      animation-delay: calc(var(--duration) * var(--delay));
+      animation-iteration-count: infinite;
+      animation-fill-mode: both;
+    }
+
+    [data-logo]:is(:hover, [data-animated]) .logo-draw {
+      animation-name: logo-draw;
       stroke-dasharray: 1;
-      animation-composition: accumulate;
     }
 
     @keyframes logo-draw {
       0% {
-        stroke-dashoffset: calc(2px);
+        stroke-dashoffset: 2;
       }
-      20% {
-        stroke-dashoffset: calc(2px);
-      }
-      40% {
-        stroke-dashoffset: calc(1px);
+      30% {
+        stroke-dashoffset: 1;
       }
       60% {
-        stroke-dashoffset: calc(1px);
-      }
-      80% {
-        stroke-dashoffset: 0;
-      }
-      100% {
         stroke-dashoffset: 0;
       }
     }
 
-    [data-id="logo"][data-animated] .logo-grow,
-    [data-id="logo"]:hover .logo-grow {
-      animation: logo-grow 4s ease-in-out infinite both;
-      animation-composition: accumulate;
-      animation-delay: var(--delay);
+    [data-logo]:is(:hover, [data-animated]) .logo-grow {
+      animation-name: logo-grow;
     }
 
     @keyframes logo-grow {
-      0% {
-        transform: scale(1);
-      }
-      20% {
-        transform: scale(1);
-      }
-      40% {
-        transform: scale(0);
-      }
+      0%,
       60% {
-        transform: scale(0);
+        scale: 1;
       }
-      80% {
-        transform: scale(1);
-      }
-      100% {
-        transform: scale(1);
+      30% {
+        scale: 0;
       }
     }
   </style>
-
-  <defs>
-    <!-- bonds center cutout -->
-    <mask id="cutout">
-      <rect fill="white" x="-50" y="-50" width="100" height="100" />
-      <circle
-        class="logo-grow"
-        style="--delay: 1.2s"
-        fill="black"
-        cx="0"
-        cy="0"
-        r="18"
-      />
-    </mask>
-  </defs>
 
   <!-- bonds -->
   <g
@@ -83,12 +50,12 @@
     stroke="currentColor"
     stroke-linecap="round"
     stroke-linejoin="round"
-    stroke-width="5"
-    mask="url(#cutout)"
+    stroke-width="6"
+    mask="url(#logo-mask)"
   >
     <path
       class="logo-draw"
-      style="--delay: 0.3s"
+      style="--delay: 0.1"
       pathLength="1"
       d="
         M 0 0
@@ -98,7 +65,7 @@
     />
     <path
       class="logo-draw"
-      style="--delay: 0.6s"
+      style="--delay: 0.2"
       pathLength="1"
       d="
         M 0 0
@@ -108,7 +75,7 @@
     />
     <path
       class="logo-draw"
-      style="--delay: 0.9s"
+      style="--delay: 0.3"
       pathLength="1"
       d="
         M 0 0
@@ -120,25 +87,52 @@
   <!-- electrons -->
   <g fill="currentColor">
     <g transform="translate(-40, -30)">
-      <circle class="logo-grow" style="--delay: 0s" r="8" />
+      <circle class="logo-grow" style="--delay: 0" r="9" />
     </g>
     <g transform="translate(40, -30)">
-      <circle class="logo-grow" style="--delay: 0.3s" r="8" />
+      <circle class="logo-grow" style="--delay: 0.1" r="9" />
     </g>
     <g transform="translate(0, 40)">
-      <circle class="logo-grow" style="--delay: 0.6s" r="8" />
+      <circle class="logo-grow" style="--delay: 0.2" r="9" />
     </g>
   </g>
 
   <!-- nucleus -->
   <circle
     class="logo-grow"
-    style="--delay: 1.5s"
+    style="--delay: 0.4"
     fill="none"
     stroke="currentColor"
-    stroke-width="7"
+    stroke-width="8"
     cx="0"
     cy="0"
-    r="8"
+    r="9"
   />
+
+  <defs>
+    <!-- nucleus cutout -->
+    <mask id="logo-mask">
+      <rect fill="white" x="-50" y="-50" width="100" height="100" />
+      <circle
+        class="logo-grow"
+        style="--delay: 0.4"
+        fill="black"
+        cx="0"
+        cy="0"
+        r="20"
+      />
+    </mask>
+  </defs>
+
+  <!-- avoid mask id collisions -->
+  <script>
+    {
+      const svg = document.currentScript.closest("svg");
+      const mask = svg.querySelector("mask");
+      const target = svg.querySelector("[mask]");
+      const id = `mask-${String(Math.random()).slice(2)}`;
+      mask.setAttribute("id", id);
+      target.setAttribute("mask", `url(#${id})`);
+    }
+  </script>
 </svg>

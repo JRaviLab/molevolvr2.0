@@ -6,7 +6,7 @@ import {
   FaTriangleExclamation,
 } from "react-icons/fa6";
 import clsx from "clsx";
-import Loading from "@/assets/loading.svg?react";
+import Logo from "@/assets/logo.svg?react";
 import Flex from "@/components/Flex";
 import classes from "./Mark.module.css";
 
@@ -24,7 +24,10 @@ type Props = {
 /** available categories of marks and associated styles */
 export const types = {
   info: { color: "var(--deep)", icon: <FaCircleInfo /> },
-  loading: { color: "var(--deep)", icon: <Loading /> },
+  loading: {
+    color: "var(--deep)",
+    icon: <Logo data-animated style={{ height: "1.5em" }} />,
+  },
   success: { color: "var(--success)", icon: <FaCircleCheck /> },
   warning: { color: "var(--warning)", icon: <FaCircleExclamation /> },
   error: { color: "var(--error)", icon: <FaTriangleExclamation /> },

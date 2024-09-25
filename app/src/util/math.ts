@@ -13,5 +13,5 @@ export const lerp = (
   targetMax: number,
 ) =>
   targetMin +
-  clamp((value - sourceMin) / (sourceMax - sourceMin), 0, 1) *
+  clamp((value - sourceMin) / (sourceMax - sourceMin || 1), 0, 1) *
     (targetMax - targetMin);

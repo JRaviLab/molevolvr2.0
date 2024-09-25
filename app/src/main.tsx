@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 
-console.debug(import.meta);
+console.debug({ env: import.meta.env });
 
 const mock = true;
 

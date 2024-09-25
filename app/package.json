@@ -3,10 +3,10 @@
   "scripts": {
     "install-playwright": "bunx playwright install --with-deps",
     "build": "vite build",
-    "dev": "vite",
+    "dev": "vite --open",
     "preview": "vite preview",
-    "lint": "eslint . --fix && prettier **/*.{tsx,ts,css,html,md,json,yaml} --write --no-error-on-unmatched-pattern",
-    "test:lint": "eslint . && prettier **/*.{tsx,ts,css,html,md,json,yaml} --check --no-error-on-unmatched-pattern",
+    "lint": "eslint . --fix && prettier **/*.{tsx,ts,module.css,css,html,md,json,yaml} --write --no-error-on-unmatched-pattern",
+    "test:lint": "eslint . && prettier **/*.{tsx,ts,module.css,css,html,md,json,yaml} --check --no-error-on-unmatched-pattern",
     "test:types": "tsc",
     "test:e2e": "playwright test",
     "test": "bun run test:lint && bun run test:types && bun run test:e2e",

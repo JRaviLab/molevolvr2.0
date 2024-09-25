@@ -50,6 +50,7 @@ import TextBox from "@/components/TextBox";
 import Tile from "@/components/Tile";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
+import { themeVariables } from "@/util/dom";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
 
@@ -78,33 +79,18 @@ const TestbedPage = () => {
 
         {/* color palette */}
         <Flex gap="none">
-          {[
-            "accent",
-            "deep",
-            "deep-mid",
-            "deep-light",
-            "black",
-            "off-black",
-            "dark-gray",
-            "gray",
-            "light-gray",
-            "off-white",
-            "white",
-            "success",
-            "warning",
-            "error",
-          ].map((color, index) => (
-            <Tooltip key={index} content={color}>
-              <div
-                aria-hidden
-                style={{
-                  width: 50,
-                  height: 50,
-                  background: `var(--${color})`,
-                }}
-              />
-            </Tooltip>
-          ))}
+          {Object.entries(themeVariables)
+            .filter(
+              ([, value]) => value.startsWith("#") || value.startsWith("hsl"),
+            )
+            .map(([variable, color], index) => (
+              <Tooltip key={index} content={variable}>
+                <div
+                  aria-hidden
+                  style={{ width: 50, height: 50, background: color }}
+                />
+              </Tooltip>
+            ))}
         </Flex>
 
         <p>

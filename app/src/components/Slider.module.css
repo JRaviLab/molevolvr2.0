@@ -45,7 +45,7 @@
   position: absolute;
   top: 50%;
   height: 5px;
-  transform: translateY(-50%);
+  translate: 0 -50%;
   border-radius: 999px;
   background: currentColor;
 }
@@ -74,7 +74,7 @@
 }
 
 .primary-marker {
-  transform: translate(-50%, calc(-50% + 1.2em));
+  translate: -50% calc(-50% + 1.2em);
 }
 
 .track:has(.thumb:is(:hover, [data-focused]))
@@ -84,7 +84,7 @@
 }
 
 .secondary-marker {
-  transform: translate(-50%, calc(-50% - 1.2em));
+  translate: -50% calc(-50% - 1.2em);
   color: var(--gray);
   opacity: 0;
 }

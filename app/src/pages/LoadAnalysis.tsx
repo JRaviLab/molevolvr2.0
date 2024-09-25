@@ -47,7 +47,7 @@ const LoadAnalysis = () => {
           History
         </Heading>
 
-        <p className="primary">Analyses submitted on this device</p>
+        <p className="primary center">Analyses submitted on this device</p>
 
         {!!history?.length && (
           <div className="grid full gap-md cols-3">

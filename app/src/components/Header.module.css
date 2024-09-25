@@ -66,14 +66,14 @@
   bottom: 0.1em;
   left: 5px;
   height: 1px;
-  transform: scaleX(0);
+  scale: 0 1;
   background: currentColor;
   content: "";
-  transition: transform var(--fast);
+  transition: scale var(--fast);
 }
 
 .link:hover::after {
-  transform: scaleX(1);
+  scale: 1 1;
 }
 
 @media (max-width: 620px) {
