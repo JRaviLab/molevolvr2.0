@@ -43,6 +43,10 @@ table "analyses" {
     null = false
     default = "submitted"
   }
+  column "reason" {
+    null = true
+    type = text
+  }
 
   primary_key {
     columns = [
