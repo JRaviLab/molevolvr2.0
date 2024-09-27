@@ -135,7 +135,7 @@ case ${TARGET_ENV} in
         ;;
     "dev")
         DEFAULT_ARGS="up -d"
-        COMPOSE_CMD="docker compose -f docker-compose.yml -f docker-compose.slurm.yml -f docker-compose.override.yml"
+        COMPOSE_CMD="docker compose -f docker-compose.yml -f docker-compose.slurm.yml -f docker-compose.dev.yml"
         DO_CLEAR="1"
         # watch the logs after, since we detached after bringing up the stack
         POST_LAUNCH_CMD="${COMPOSE_CMD} logs -f"

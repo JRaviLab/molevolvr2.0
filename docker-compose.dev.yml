@@ -23,7 +23,7 @@ services:
     environment:
       - 'VITE_API=http://localhost:9050'
     ports:
-      - "5713:5713"
+      - "5173:5173"
 
   db:
     ports:
