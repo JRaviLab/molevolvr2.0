@@ -22,6 +22,10 @@ services:
     platform: linux/amd64
     build:
       context: ./cluster
+      cache_from:
+        - type=registry,ref=${REGISTRY_PREFIX}/molevolvr-slurm-node:${IMAGE_TAG}
+      cache_to:
+        - type=inline,ref=${REGISTRY_PREFIX}/molevolvr-slurm-node:${IMAGE_TAG},mode=max
     environment:
       - CLUSTER_ROLE=controller,dbd
     env_file:
@@ -43,6 +47,10 @@ services:
     platform: linux/amd64
     build:
       context: ./cluster
+      cache_from:
+        - type=registry,ref=${REGISTRY_PREFIX}/molevolvr-slurm-node:${IMAGE_TAG}
+      cache_to:
+        - type=inline,ref=${REGISTRY_PREFIX}/molevolvr-slurm-node:${IMAGE_TAG},mode=max
     environment:
       - CLUSTER_ROLE=worker
     env_file:

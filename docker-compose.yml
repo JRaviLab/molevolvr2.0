@@ -11,6 +11,10 @@ services:
       dockerfile: ./docker/Dockerfile
       args:
         - PRIOR_LAYER=backend-base
+      cache_from:
+        - type=registry,ref=${REGISTRY_PREFIX}/molevolvr-backend:${IMAGE_TAG}
+      cache_to:
+        - type=inline,ref=${REGISTRY_PREFIX}/molevolvr-backend:${IMAGE_TAG},mode=max
     env_file:
       - .env
     environment:
@@ -22,8 +26,13 @@ services:
 
   frontend:
     hostname: frontend-${TARGET_ENV}
-    image: molevolvr-frontend
-    build: ./frontend
+    image: ${REGISTRY_PREFIX}/molevolvr-frontend:${IMAGE_TAG}
+    build:
+      context: ./frontend
+      cache_from:
+        - type=registry,ref=${REGISTRY_PREFIX}/molevolvr-frontend:${IMAGE_TAG}
+      cache_to:
+        - type=inline,ref=${REGISTRY_PREFIX}/molevolvr-frontend:${IMAGE_TAG},mode=max
     depends_on:
       - backend
 
