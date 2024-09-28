@@ -37,7 +37,7 @@
   --shadow: 0 0 2px #00000020, 2px 2px 5px #00000020;
   --focus: 0 0 5px var(--accent);
   --spacing: 2;
-  --compact: 1.5;
+  --compact: 1.25;
 
   /** sizes */
   --content: 1000px;

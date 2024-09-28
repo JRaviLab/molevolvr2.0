@@ -17,8 +17,12 @@ type Props<TagName extends TagNames = "div"> = {
   direction?: "row" | "column";
   /** amount of space between items */
   gap?: "md" | "none" | "xs" | "sm" | "lg" | "xl";
+  /** vertical gap fraction of horizontal gap */
+  gapRatio?: 1 | 0.5;
   /** whether to wrap items */
   wrap?: true | false;
+  /** whether to make full width */
+  full?: true | false;
   /** horizontal alignment */
   hAlign?: "center" | "left" | "right" | "stretch" | "space";
   /** vertical alignment */
@@ -56,7 +60,9 @@ const Flex = forwardRef(
       display = "block",
       direction = "row",
       gap = "md",
+      gapRatio = 1,
       wrap = true,
+      full = false,
       hAlign = "center",
       vAlign = "center",
       breakpoint = 0,
@@ -75,7 +81,8 @@ const Flex = forwardRef(
         direction === "column" ? alignMap[vAlign] : alignMap[hAlign],
       alignItems: direction === "column" ? alignMap[hAlign] : alignMap[vAlign],
       flexWrap: wrap && direction === "row" ? "wrap" : "nowrap",
-      gap: gapMap[gap],
+      gap: `${gapMap[gap] * gapRatio}px ${gapMap[gap]}px`,
+      width: full ? "100%" : undefined,
       ...style,
     };
 

@@ -1,0 +1,46 @@
+.network {
+  display: grid;
+  grid-template-columns: max-content auto;
+  width: 100%;
+  box-shadow: var(--shadow);
+}
+
+.expanded {
+  aspect-ratio: unset !important;
+  width: calc(100vw - 100px);
+  height: calc(100vh - 200px);
+}
+
+.legend {
+  max-width: 220px;
+  height: 0;
+  min-height: 100%;
+  padding: 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--white);
+  box-shadow: inset -5px 0 5px -5px #00000020;
+  overflow-wrap: anywhere;
+}
+
+.node-symbol {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+}
+
+.edge-symbol {
+  width: 20px;
+  height: 3px;
+  rotate: -30deg;
+  border-radius: 999px;
+}
+
+.container {
+  background: var(--white);
+}
+
+.container > * {
+  width: 100% !important;
+  height: 100% !important;
+}

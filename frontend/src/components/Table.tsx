@@ -402,7 +402,7 @@ const Table = <Datum extends object>({ cols, rows, sort }: Props<Datum>) => {
       </div>
 
       {/* controls */}
-      <Flex style={{ columnGap: "40px" }}>
+      <Flex gapRatio={0.5}>
         {/* pagination */}
         <Flex gap="xs">
           <button

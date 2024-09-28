@@ -50,9 +50,8 @@
 /** simple two-col auto-sized table of key/value pairs */
 
 .mini-table {
-  --cols: 2;
   display: grid;
-  grid-template-columns: repeat(var(--cols), auto);
+  grid-template-columns: auto auto;
   grid-auto-rows: min-content;
   gap: 10px 20px;
   text-align: left;
@@ -65,11 +64,6 @@
   gap: 10px;
   color: var(--deep);
   font-weight: var(--medium);
-}
-
-.mini-table > :nth-child(even) {
-  max-height: 300px;
-  overflow-y: auto;
 }
 
 .mini-table > :nth-child(even):empty::after {

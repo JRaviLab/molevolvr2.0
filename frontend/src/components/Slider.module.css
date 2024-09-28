@@ -1,6 +1,5 @@
 .container {
   display: flex;
-  margin-bottom: 15px;
   gap: 10px 15px;
   border-radius: var(--rounded);
 }

@@ -21,11 +21,12 @@ import {
   FaRegHourglass,
   FaRegMessage,
   FaRegSquareCheck,
+  FaShareNodes,
   FaSliders,
   FaStop,
   FaTableCells,
 } from "react-icons/fa6";
-import { sample } from "lodash";
+import { sample, uniqueId } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -37,6 +38,7 @@ import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
+import Network from "@/components/Network";
 import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
 import Radios from "@/components/Radios";
@@ -61,14 +63,81 @@ const logChange = (...args: unknown[]) => {
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
+  /** generate fake node data */
+  const nodes = Array(200)
+    .fill(null)
+    .map(() => ({
+      id: uniqueId(),
+      label: sample([
+        "Lbl.",
+        "Label",
+        "Long Label",
+        "Really Long Label",
+        undefined,
+      ]),
+      type: sample([
+        "gene",
+        "disease",
+        "compound",
+        "anatomy",
+        "phenotype",
+        undefined,
+      ]),
+      strength: sample([0, 0.1, 0.02, 0.003, 0.0004, 0.00005, undefined]),
+      extra: sample(["cat", "dog", "bird"]),
+    }));
+  const ids = nodes.map((node) => node.id);
+  /** generate fake edge data */
+  const edges = Array(500)
+    .fill(null)
+    .map(() => ({
+      id: uniqueId(),
+      label: sample([
+        "Lbl.",
+        "Label",
+        "Long Label",
+        "Really Long Label",
+        undefined,
+      ]),
+      source: sample(ids)!,
+      target: sample(ids)!,
+      type: sample([
+        "causes",
+        "interacts with",
+        "upregulates",
+        "includes",
+        "presents",
+        undefined,
+      ]),
+      direction: sample([-1, 0, 1, undefined] as const),
+      strength: sample([10, 11, 12, 13, 14, 15, undefined]),
+    }));
+
+  /** add some duplicate edges */
+  for (let times = 0; times < 10; times++)
+    edges.push({ ...sample(edges)!, id: uniqueId() });
+
+  /** add some loop edges */
+  for (let times = 0; times < 10; times++) {
+    const { id } = sample(nodes)!;
+    const edge = sample(edges)!;
+    edges.push({ ...edge, id: uniqueId(), source: id, target: id });
+  }
+
   return (
     <>
       <Meta title="Testbed" />
 
       <Section>
-        <Heading level={1} icon={<CustomIcon />}>
-          Testbed
+        <Heading level={1}>Testbed</Heading>
+      </Section>
+
+      <Section>
+        <Heading level={2} icon={<FaShareNodes />}>
+          Network
         </Heading>
+
+        <Network nodes={nodes} edges={edges} />
       </Section>
 
       {/* regular html elements and css classes for basic formatting */}
