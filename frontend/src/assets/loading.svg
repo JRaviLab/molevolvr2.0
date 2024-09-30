@@ -4,7 +4,7 @@
       animation:
         loading-draw 2s linear infinite,
         loading-spin 4s linear infinite;
-      stroke-dasharray: 1
+      stroke-dasharray: 1;
     }
 
     @keyframes loading-draw {

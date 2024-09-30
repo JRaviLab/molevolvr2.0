@@ -1,24 +1,25 @@
 /**
+ * https://www.materialpalette.com/colors
+ * https://gist.github.com/kawanet/a880c83f06d6baf742e45ac9ac52af96
  * https://tailwindcss.com/docs/customizing-colors
  * https://github.com/tailwindlabs/tailwindcss/blob/main/src/public/colors.js
- * https://www.materialpalette.com/colors
  */
 const palette = [
-  "#78909c",
-  "#ef5350",
-  "#ec407a",
-  "#ab47bc",
-  "#7e57c2",
-  "#5c6bc0",
-  "#42a5f5",
-  "#29b6f6",
-  "#26c6da",
-  "#26a69a",
-  "#66bb6a",
-  "#9ccc65",
-  "#ffca28",
-  "#ffa726",
-  "#ff7043",
+  "#90a4ae",
+  "#e57373",
+  "#f06292",
+  "#ba68c8",
+  "#9575cd",
+  "#7986cb",
+  "#64b5f6",
+  "#4fc3f7",
+  "#4dd0e1",
+  "#4db6ac",
+  "#81c784",
+  "#aed581",
+  "#ffd54f",
+  "#ffb74d",
+  "#ff8a65",
 ];
 
 /** map enumerated values to colors */

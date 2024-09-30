@@ -97,10 +97,10 @@ const padding = 10;
 const selectedColor = "black";
 const aspectRatio = 16 / 9;
 const boundingBox = {
-  x1: (-minNodeSize * aspectRatio) / 2,
-  y1: -minNodeSize / 2,
-  x2: (minNodeSize * aspectRatio) / 2,
-  y2: minNodeSize / 2,
+  x1: 8 * -minNodeSize * aspectRatio,
+  y1: 8 * -minNodeSize,
+  x2: 8 * minNodeSize * aspectRatio,
+  y2: 8 * minNodeSize,
 };
 
 /** style accessors, extracted to avoid repetition */
@@ -267,6 +267,7 @@ const layouts = [
     label: "Cola",
     padding,
     boundingBox,
+    animate: false,
     nodeSpacing: 0,
     avoidOverlap: true,
     edgeLength: edgeLength,
@@ -573,7 +574,9 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                       className={classes["node-symbol"]}
                       style={{ background: value }}
                     />
-                    <div>{startCase(key) || "-"}</div>
+                    <div className={clsx(!key && "secondary")}>
+                      {startCase(key) || "none"}
+                    </div>
                   </Flex>
                 ))}
               </Flex>
@@ -592,7 +595,9 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                       className={classes["edge-symbol"]}
                       style={{ background: value }}
                     />
-                    <div>{startCase(key) || "-"}</div>
+                    <div className={clsx(!key && "secondary")}>
+                      {startCase(key) || "none"}
+                    </div>
                   </Flex>
                 ))}
               </Flex>
