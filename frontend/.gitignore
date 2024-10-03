@@ -24,7 +24,6 @@ dist-ssr
 *.sln
 *.sw?
 
-mockServiceWorker.js
 /test-results/
 /playwright-report/
 /blob-report/
