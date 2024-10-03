@@ -13,7 +13,7 @@
   margin-bottom: var(--header-shrink);
   padding: calc(20px - var(--header-padding-shrink));
   background: var(--deep);
-  box-shadow: var(--shadow);
+  box-shadow: var(--box-shadow);
   color: var(--white);
 }
 

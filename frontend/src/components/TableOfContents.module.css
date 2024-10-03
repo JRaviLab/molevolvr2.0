@@ -7,7 +7,7 @@
   translate: 0 calc(-1 * var(--header-shrink));
   border-radius: 0 0 var(--rounded) 0;
   background: var(--white);
-  box-shadow: var(--shadow);
+  box-shadow: var(--box-shadow);
 }
 
 .heading {

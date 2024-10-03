@@ -8,7 +8,7 @@
 }
 
 .section:nth-child(even) {
-  background: #fafafa;
+  background: var(--alt-white);
 }
 
 .fill {

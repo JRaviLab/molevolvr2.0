@@ -3,29 +3,6 @@ import reactToText from "react-to-text";
 import { debounce } from "lodash";
 import { sleep } from "@/util/misc";
 
-/** css on :root */
-const rootStyles = window.getComputedStyle(document.documentElement);
-
-/** theme css variables https://stackoverflow.com/a/78994961/2180570 */
-export const themeVariables = Object.fromEntries(
-  Array.from(document.styleSheets)
-    .flatMap((styleSheet) => {
-      try {
-        return Array.from(styleSheet.cssRules);
-      } catch (error) {
-        return [];
-      }
-    })
-    .filter((cssRule) => cssRule instanceof CSSStyleRule)
-    .flatMap((cssRule) => Array.from(cssRule.style))
-    .filter((style) => style.startsWith("--"))
-    .map((variable) => [variable, rootStyles.getPropertyValue(variable)]),
-);
-
-/** get css theme variable */
-export const theme = (variable: `--${string}`) =>
-  themeVariables[variable] ?? "";
-
 /** wait for element matching selector to appear, checking periodically */
 export const waitFor = async <El extends Element>(
   selector: string,

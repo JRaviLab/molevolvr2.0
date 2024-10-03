@@ -1,9 +1,6 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-svgr/client" />
 
-/** cytoscape layout algorithm libraries */
-declare module "cytoscape-*" {
-  // eslint-disable-next-line
-  const x: any;
-  export = x;
-}
+/** no type def libraries for these libraries */
+declare module "cytoscape-cola";
+declare module "cytoscape-spread";

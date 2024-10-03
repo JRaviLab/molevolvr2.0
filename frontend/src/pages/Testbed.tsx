@@ -52,7 +52,7 @@ import TextBox from "@/components/TextBox";
 import Tile from "@/components/Tile";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
-import { themeVariables } from "@/util/dom";
+import { useTheme } from "@/util/hooks";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
 
@@ -61,69 +61,69 @@ const logChange = (...args: unknown[]) => {
   console.debug(...args);
 };
 
+/** generate fake node data */
+const nodes = Array(200)
+  .fill(null)
+  .map(() => ({
+    id: uniqueId(),
+    label: sample([
+      "Lbl.",
+      "Label",
+      "Long Label",
+      "Really Long Label",
+      undefined,
+    ]),
+    type: sample([
+      "gene",
+      "disease",
+      "compound",
+      "anatomy",
+      "phenotype",
+      undefined,
+    ]),
+    strength: sample([0, 0.1, 0.02, 0.003, 0.0004, 0.00005, undefined]),
+    extra: sample(["cat", "dog", "bird"]),
+  }));
+const ids = nodes.map((node) => node.id);
+/** generate fake edge data */
+const edges = Array(500)
+  .fill(null)
+  .map(() => ({
+    id: uniqueId(),
+    label: sample([
+      "Lbl.",
+      "Label",
+      "Long Label",
+      "Really Long Label",
+      undefined,
+    ]),
+    source: sample(ids)!,
+    target: sample(ids)!,
+    type: sample([
+      "causes",
+      "interacts with",
+      "upregulates",
+      "includes",
+      "presents",
+      undefined,
+    ]),
+    direction: sample([-1, 0, 1, undefined] as const),
+    strength: sample([10, 11, 12, 13, 14, 15, undefined]),
+  }));
+
+/** add some duplicate edges */
+for (let times = 0; times < 10; times++)
+  edges.push({ ...sample(edges)!, id: uniqueId() });
+
+/** add some loop edges */
+for (let times = 0; times < 10; times++) {
+  const { id } = sample(nodes)!;
+  const edge = sample(edges)!;
+  edges.push({ ...edge, id: uniqueId(), source: id, target: id });
+}
+
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
-  /** generate fake node data */
-  const nodes = Array(200)
-    .fill(null)
-    .map(() => ({
-      id: uniqueId(),
-      label: sample([
-        "Lbl.",
-        "Label",
-        "Long Label",
-        "Really Long Label",
-        undefined,
-      ]),
-      type: sample([
-        "gene",
-        "disease",
-        "compound",
-        "anatomy",
-        "phenotype",
-        undefined,
-      ]),
-      strength: sample([0, 0.1, 0.02, 0.003, 0.0004, 0.00005, undefined]),
-      extra: sample(["cat", "dog", "bird"]),
-    }));
-  const ids = nodes.map((node) => node.id);
-  /** generate fake edge data */
-  const edges = Array(500)
-    .fill(null)
-    .map(() => ({
-      id: uniqueId(),
-      label: sample([
-        "Lbl.",
-        "Label",
-        "Long Label",
-        "Really Long Label",
-        undefined,
-      ]),
-      source: sample(ids)!,
-      target: sample(ids)!,
-      type: sample([
-        "causes",
-        "interacts with",
-        "upregulates",
-        "includes",
-        "presents",
-        undefined,
-      ]),
-      direction: sample([-1, 0, 1, undefined] as const),
-      strength: sample([10, 11, 12, 13, 14, 15, undefined]),
-    }));
-
-  /** add some duplicate edges */
-  for (let times = 0; times < 10; times++)
-    edges.push({ ...sample(edges)!, id: uniqueId() });
-
-  /** add some loop edges */
-  for (let times = 0; times < 10; times++) {
-    const { id } = sample(nodes)!;
-    const edge = sample(edges)!;
-    edges.push({ ...edge, id: uniqueId(), source: id, target: id });
-  }
-
   return (
     <>
       <Meta title="Testbed" />
@@ -148,15 +148,19 @@ const TestbedPage = () => {
 
         {/* color palette */}
         <Flex gap="none">
-          {Object.entries(themeVariables)
+          {Object.entries(useTheme())
             .filter(
               ([, value]) => value.startsWith("#") || value.startsWith("hsl"),
             )
-            .map(([variable, color], index) => (
+            .map(([variable], index) => (
               <Tooltip key={index} content={variable}>
                 <div
                   aria-hidden
-                  style={{ width: 50, height: 50, background: color }}
+                  style={{
+                    width: 50,
+                    height: 50,
+                    background: `var(${variable})`,
+                  }}
                 />
               </Tooltip>
             ))}
@@ -231,8 +235,7 @@ const TestbedPage = () => {
         </p>
 
         <pre tabIndex={0}>
-          {`
-const popup = document.querySelector("#popup"); 
+          {`const popup = document.querySelector("#popup"); 
 popup.style.width = "100%";
 popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 `}

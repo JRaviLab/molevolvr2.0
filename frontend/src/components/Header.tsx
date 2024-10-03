@@ -3,6 +3,7 @@ import { FaBars, FaXmark } from "react-icons/fa6";
 import clsx from "clsx";
 import { useElementSize } from "@reactuses/core";
 import Logo from "@/assets/logo.svg?react";
+import { DarkMode } from "@/components/DarkMode";
 import Flex from "@/components/Flex";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
@@ -64,6 +65,7 @@ const Header = () => {
         <Link className={classes.link} to="/about">
           About
         </Link>
+        <DarkMode />
       </nav>
     </Flex>
   );

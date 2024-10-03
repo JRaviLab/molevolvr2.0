@@ -10,7 +10,7 @@
   height: 30px;
   border-radius: 999px;
   background: var(--deep);
-  box-shadow: var(--shadow);
+  box-shadow: var(--box-shadow);
   color: var(--white);
   transition: background var(--fast);
 }

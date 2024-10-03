@@ -32,7 +32,7 @@
   padding: 5px 10px;
   border: solid 2px transparent;
   border-radius: var(--rounded);
-  box-shadow: var(--shadow);
+  box-shadow: var(--box-shadow);
   transition: border-color var(--fast);
 }
 

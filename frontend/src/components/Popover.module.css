@@ -7,7 +7,7 @@
   gap: 20px;
   border-radius: var(--rounded);
   background: var(--white);
-  box-shadow: 0 0 0 9999px #00000040;
+  box-shadow: 0 0 0 9999px var(--shadow);
 }
 
 .arrow {

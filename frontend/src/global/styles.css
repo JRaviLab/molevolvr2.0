@@ -16,6 +16,8 @@ html {
 
 body {
   margin: 0;
+  background: var(--white);
+  color: var(--black);
 }
 
 #app {
@@ -177,8 +179,13 @@ td {
   border-right: solid 1px var(--light-gray);
 }
 
+thead tr:nth-child(odd),
 tr:nth-child(even) {
-  background: #fafafa;
+  background: var(--white);
+}
+
+tr:nth-child(odd) {
+  background: var(--alt-white);
 }
 
 thead tr {
@@ -213,7 +220,9 @@ textarea {
   appearance: none;
   min-width: 0;
   padding: 5px;
-  border: solid 1px black;
+  border: solid 1px var(--black);
+  background: var(--white);
+  color: var(--black);
   font: inherit;
 }
 

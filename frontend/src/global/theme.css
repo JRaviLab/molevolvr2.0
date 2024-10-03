@@ -1,26 +1,58 @@
-:root {
+:root[data-dark="false"] {
   /* accent */
-  --accent: #2a9294;
+  --accent: hsl(180, 55%, 35%);
 
   /** deep */
-  --deep: #5c4863;
-  --deep-mid: #9a7da5;
-  --deep-light: #f7ede2;
+  --deep: hsl(285, 20%, 35%);
+  --deep-mid: hsl(285, 20%, 55%);
+  --deep-light: hsl(30, 55%, 90%);
 
   /** grays */
+  --shadow: #00000020;
   --black: #000000;
   --off-black: #303030;
   --dark-gray: #606060;
   --gray: #b0b0b0;
   --light-gray: #e0e0e0;
   --off-white: #f0f0f0;
+  --alt-white: #fafafa;
   --white: #ffffff;
 
   /** util colors */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #f43f5e;
+  --box-shadow: 0 0 2px var(--shadow), 2px 2px 5px var(--shadow);
+  --success: hsl(160, 90%, 40%);
+  --warning: hsl(40, 90%, 50%);
+  --error: hsl(350, 90%, 60%);
+}
 
+:root[data-dark="true"] {
+  /* accent */
+  --accent: hsl(180, 50%, 60%);
+
+  /** deep */
+  --deep: hsl(285, 20%, 65%);
+  --deep-mid: hsl(285, 20%, 45%);
+  --deep-light: hsl(285, 15%, 20%);
+
+  /** grays */
+  --shadow: #ffffff40;
+  --black: #ffffff;
+  --off-black: #f0f0f0;
+  --dark-gray: #e0e0e0;
+  --gray: #b0b0b0;
+  --light-gray: #606060;
+  --off-white: #303030;
+  --alt-white: #181818;
+  --white: #000000;
+
+  /** util colors */
+  --box-shadow: 0 0 2px var(--shadow), 2px 2px 5px var(--shadow);
+  --success: hsl(160, 90%, 40%);
+  --warning: hsl(40, 90%, 50%);
+  --error: hsl(350, 90%, 60%);
+}
+
+:root {
   /** font families */
   --sans: "Poppins", sans-serif;
   --mono: "IBM Plex Mono", monospace;
@@ -34,7 +66,6 @@
   --rounded: 5px;
   --fast: 0.15s ease;
   --slow: 0.35s ease;
-  --shadow: 0 0 2px #00000020, 2px 2px 5px #00000020;
   --focus: 0 0 5px var(--accent);
   --spacing: 2;
   --compact: 1.25;

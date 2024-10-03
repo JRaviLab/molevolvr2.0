@@ -1,4 +1,5 @@
-import { configureAxe, getViolations, injectAxe } from "axe-playwright";
+import registerAPCACheck from "apca-check";
+import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import analyses from "@/fixtures/analyses.json" with { type: "json" };
 import { log } from "./util";
@@ -15,25 +16,13 @@ const paths = [
   ...analyses.map((analysis) => `/analysis/${analysis.id}`),
 ];
 
-/** axe rule overrides */
-const rules = [
-  /**
-   * color contrast standards are often not correct:
-   *
-   * https://github.com/w3c/wcag/issues/695
-   * https://uxmovement.com/buttons/the-myths-of-color-contrast-accessibility/
-   * https://github.com/Myndex/SAPC-APCA
-   * https://twitter.com/AlPackah/status/1773375760125857949
-   * https://twitter.com/DanHollick/status/1417895151003865090
-   * https://twitter.com/DanHollick/status/1468958644364402702
-   * https://twitter.com/argyleink/status/1329091518032867328
-   */
-  { id: "color-contrast", enabled: false },
-];
+/** NOT WORKING YET https://github.com/StackExchange/apca-check/issues/143 */
+registerAPCACheck("bronze");
 
 /** generic page axe test */
 const checkPage = (path: string) =>
   test(`Accessibility check ${path}`, async ({ page, browserName }) => {
+    /** axe tests should be independent of browser, so only run one */
     test.skip(browserName !== "chromium", "Only test Axe on chromium");
 
     /** navigate to page */
@@ -43,14 +32,21 @@ const checkPage = (path: string) =>
     await page.waitForSelector("footer");
     await page.waitForTimeout(1000);
 
-    /** setup axe */
-    await injectAxe(page);
-    await configureAxe(page, { rules });
-
     /** axe check */
-    const violations = await getViolations(page);
-    const violationsMessage = JSON.stringify(violations, null, 2);
-    expect(violationsMessage).toBe("[]");
+    const check = async () => {
+      const { violations } = await new AxeBuilder({ page })
+        /** https://github.com/dequelabs/axe-core/issues/3325 */
+        .options({ rules: { "color-contrast": { enabled: false } } })
+        .analyze();
+      expect(violations).toEqual([]);
+    };
+
+    await check();
+    /** check dark mode */
+    await page
+      .locator("header button[role='switch'][aria-label*='mode']")
+      .click();
+    await check();
   });
 
 /** check all pages */

@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: max-content auto;
   width: 100%;
-  box-shadow: var(--shadow);
+  box-shadow: var(--box-shadow);
 }
 
 .expanded {
@@ -19,7 +19,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   background: var(--white);
-  box-shadow: inset -5px 0 5px -5px #00000020;
+  box-shadow: inset -5px 0 5px -7px var(--black);
   overflow-wrap: anywhere;
 }
 

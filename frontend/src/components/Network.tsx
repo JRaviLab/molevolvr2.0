@@ -17,12 +17,25 @@ import {
 } from "react-icons/fa6";
 import clsx from "clsx";
 import cytoscape from "cytoscape";
-import type { Core, Css, EdgeSingular, Layouts, NodeSingular } from "cytoscape";
-import avsdf from "cytoscape-avsdf";
+import type {
+  BreadthFirstLayoutOptions,
+  CircleLayoutOptions,
+  ConcentricLayoutOptions,
+  Core,
+  CoseLayoutOptions,
+  Css,
+  EdgeSingular,
+  GridLayoutOptions,
+  LayoutOptions,
+  Layouts,
+  NodeSingular,
+  RandomLayoutOptions,
+} from "cytoscape";
+import avsdf, { type AvsdfLayoutOptions } from "cytoscape-avsdf";
 import cola from "cytoscape-cola";
-import dagre from "cytoscape-dagre";
-import fcose from "cytoscape-fcose";
-import klay from "cytoscape-klay";
+import dagre, { type DagreLayoutOptions } from "cytoscape-dagre";
+import fcose, { type FcoseLayoutOptions } from "cytoscape-fcose";
+import klay, { type KlayLayoutOptions } from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
 import { omit, orderBy, startCase, truncate } from "lodash";
@@ -176,6 +189,9 @@ cytoscape.use(klay);
 cytoscape.use(avsdf);
 cytoscape.use(spread);
 
+/** extra props on layout options */
+type LayoutExtras = { label: string };
+
 /** layout algorithms and their options */
 const layouts = [
   {
@@ -184,7 +200,7 @@ const layouts = [
     label: "Random",
     padding,
     boundingBox,
-  },
+  } satisfies RandomLayoutOptions & LayoutExtras,
   {
     /** https://js.cytoscape.org/#layouts/grid */
     name: "grid",
@@ -196,7 +212,7 @@ const layouts = [
     spacingFactor: 1.5,
     condense: true,
     sort: undefined,
-  },
+  } satisfies GridLayoutOptions & LayoutExtras,
   {
     /** https://js.cytoscape.org/#layouts/circle */
     name: "circle",
@@ -209,7 +225,7 @@ const layouts = [
     startAngle: (3 / 2) * Math.PI,
     clockwise: true,
     sort: undefined,
-  },
+  } satisfies CircleLayoutOptions & LayoutExtras,
   {
     /** https://js.cytoscape.org/#layouts/concentric */
     name: "concentric",
@@ -221,7 +237,7 @@ const layouts = [
     minNodeSpacing: minNodeSize,
     avoidOverlap: true,
     spacingFactor: 1,
-  },
+  } satisfies ConcentricLayoutOptions & LayoutExtras,
   /** https://js.cytoscape.org/#layouts/breadthfirst */
   {
     name: "breadthfirst",
@@ -233,7 +249,7 @@ const layouts = [
     grid: false,
     spacingFactor: 1.5,
     avoidOverlap: true,
-  },
+  } satisfies BreadthFirstLayoutOptions & LayoutExtras,
   {
     /** https://js.cytoscape.org/#layouts/cose */
     name: "cose",
@@ -241,18 +257,19 @@ const layouts = [
     padding,
     boundingBox,
     componentSpacing: maxNodeSize,
-    idealEdgeLength: edgeLength,
-  },
+    idealEdgeLength: () => edgeLength,
+  } satisfies CoseLayoutOptions & LayoutExtras,
   {
     /** https://github.com/iVis-at-Bilkent/cytoscape.js-fcose?tab=readme-ov-file#api */
     name: "fcose",
     label: "fCoSE",
     padding,
-    quality: "default",
+    quality: "proof",
+    randomize: false,
     animate: false,
     nodeSeparation: minNodeSize,
     idealEdgeLength: edgeLength,
-  },
+  } satisfies FcoseLayoutOptions & LayoutExtras,
   {
     /** https://github.com/cytoscape/cytoscape.js-dagre?tab=readme-ov-file#api */
     name: "dagre",
@@ -260,7 +277,7 @@ const layouts = [
     padding,
     boundingBox,
     spacingFactor: 1,
-  },
+  } satisfies DagreLayoutOptions & LayoutExtras,
   {
     /** https://github.com/cytoscape/cytoscape.js-cola?tab=readme-ov-file#api */
     name: "cola",
@@ -273,7 +290,7 @@ const layouts = [
     edgeLength: edgeLength,
     edgeSymDiffLength: edgeLength,
     edgeJaccardLength: edgeLength,
-  },
+  } as LayoutOptions & LayoutExtras,
   {
     /** https://github.com/cytoscape/cytoscape.js-klay?tab=readme-ov-file#api */
     name: "klay",
@@ -288,7 +305,7 @@ const layouts = [
       spacing: minNodeSize,
       thoroughness: 7,
     },
-  },
+  } satisfies KlayLayoutOptions & LayoutExtras,
   {
     /** https://github.com/iVis-at-Bilkent/cytoscape.js-avsdf?tab=readme-ov-file#api */
     name: "avsdf",
@@ -296,7 +313,7 @@ const layouts = [
     padding,
     animate: false,
     nodeSeparation: edgeLength,
-  },
+  } satisfies AvsdfLayoutOptions & LayoutExtras,
   {
     /** https://github.com/cytoscape/cytoscape.js-spread?tab=readme-ov-file#api */
     name: "spread",
@@ -304,7 +321,7 @@ const layouts = [
     padding,
     boundingBox,
     minDist: edgeLength,
-  },
+  } as LayoutOptions & LayoutExtras,
 ] as const;
 
 /** layout algorithm dropdown options */

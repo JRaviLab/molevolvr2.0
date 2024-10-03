@@ -3,7 +3,7 @@
   padding: 40px 20px;
   gap: 10px;
   background: var(--deep);
-  box-shadow: var(--shadow);
+  box-shadow: var(--box-shadow);
   color: var(--white);
   text-align: center;
 }
