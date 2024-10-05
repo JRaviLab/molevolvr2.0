@@ -145,10 +145,10 @@ const About = () => {
         <div>
           <p>
             Upon submission, a url link to retrieve the results will display.{" "}
-            <b>
+            <strong>
               The link provides job progress info and, once finished, the
               results.
-            </b>
+            </strong>
           </p>
 
           <p>Recommendations:</p>
@@ -167,10 +167,10 @@ const About = () => {
         <div>
           <p>
             Upon submission, a url link to retrieve the results will display.{" "}
-            <b>
+            <strong>
               The link provides job progress info and, once finished, the
               results.
-            </b>
+            </strong>
           </p>
 
           <p>Key factors of job duration:</p>
@@ -202,28 +202,28 @@ const About = () => {
 
           <ul>
             <li>
-              <b>Frontend</b>: the frontend web app, written in React
+              <strong>Frontend</strong>: the frontend web app, written in React
             </li>
 
             <li>
-              <b>Backend</b>: the backend written in{" "}
+              <strong>Backend</strong>: the backend written in{" "}
               <Link to="https://www.rplumber.io/index.html">Plumber</Link>
             </li>
 
             <li>
-              <b>Cluster</b>: the containerized SLURM <code>cluster</code> on
-              which jobs are run
+              <strong>Cluster</strong>: the containerized SLURM{" "}
+              <code>cluster</code> on which jobs are run
             </li>
 
             <li>
-              <b>Services</b>: a collection of services on which the stack
-              relies
+              <strong>Services</strong>: a collection of services on which the
+              stack relies
             </li>
 
             <li>
-              <b>Postgres</b>: configuration for a PostgreSQL database, which
-              stores job information Most of the data processing is accomplished
-              via the{" "}
+              <strong>Postgres</strong>: configuration for a PostgreSQL
+              database, which stores job information Most of the data processing
+              is accomplished via the{" "}
               <Link to="https://github.com/JRaviLab/molevolvr">
                 MolEvolvR package.
               </Link>
@@ -277,20 +277,20 @@ const About = () => {
           Chen*, Lo Sosinski*, Faisal S Alquaddoomi, Evan P Brenner, Ethan P
           Wolfe, Vince P Rubinetti, Shaddai Amolitos, Kellen M Reason, John B
           Johnston, Janani Ravi. [*Co-primary] bioRxiv 2022.02.18.461833;{" "}
-          <p>
+          <span>
             doi:{" "}
             <Link to="https://doi.org/10.1101/2022.02.18.461833">
-              https://doi.org/10.1101/2022.02.18.461833
+              https://doi.org/10.1101/2022.02.18.461833;
             </Link>
-          </p>
-          <p>
+          </span>{" "}
+          <span>
             web-app:{" "}
             <span>
               <Link to="http://jravilab.org/molevolvr">
                 http://jravilab.org/molevolvr
               </Link>
             </span>
-          </p>
+          </span>
         </blockquote>
 
         <Heading level={3}>Team</Heading>
@@ -304,7 +304,7 @@ const About = () => {
               <Link to="https://mobile.twitter.com/janani137">X(Twitter)</Link>{" "}
               |{" "}
               <span>
-                <b>(Corresponding author)</b>
+                <strong>(Corresponding author)</strong>
               </span>
             </li>
 
@@ -458,7 +458,7 @@ const About = () => {
         </div>
 
         <Heading level={3}>
-          Surface layer proteins in Gram-positive bacteria (Bacillota)s
+          Surface layer proteins in Gram-positive bacteria (Bacillota)
         </Heading>
         <ul>
           <li>
@@ -502,32 +502,47 @@ const About = () => {
           <li>
             <p>Glutathione import system</p>
             <ol>
-              <Link to="https://doi.org/10.1371/journal.pgen.1010834">
-                Publication
-              </Link>
-              <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=sasulf&p=resultsSummary">
-                MolEvolvR results
-              </Link>
+              <li>
+                <Link to="https://doi.org/10.1371/journal.pgen.1010834">
+                  Publication
+                </Link>
+              </li>
+              <li>
+                <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=sasulf&p=resultsSummary">
+                  MolEvolvR results
+                </Link>
+              </li>
             </ol>
           </li>
           <li>
             <p>Cystine transporters</p>
             <ol>
-              <Link to="https://doi.org/10.1128/iai.00690-19">Publication</Link>
-              <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=saabct&p=resultsSummary">
-                MolEvolvR results
-              </Link>
+              <li>
+                <Link to="https://doi.org/10.1128/iai.00690-19">
+                  Publication
+                </Link>
+              </li>
+              <li>
+                <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=saabct&p=resultsSummary">
+                  MolEvolvR results
+                </Link>
+              </li>
             </ol>
           </li>
           <li>
             <p>V. cholerae phage defense system</p>
             <ol>
-              <Link to="https://doi.org/10.1038/s41564-022-01162-4">
-                Publication
-              </Link>
-              <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=vcpdef&p=resultsSummary">
-                MolEvolvR results
-              </Link>
+              <li>
+                <Link to="https://doi.org/10.1038/s41564-022-01162-4">
+                  Publication
+                </Link>
+              </li>
+              <li>
+                {" "}
+                <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=vcpdef&p=resultsSummary">
+                  MolEvolvR results
+                </Link>
+              </li>
             </ol>
           </li>
         </ul>
