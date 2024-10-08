@@ -62,11 +62,6 @@ import { lerp } from "@/util/math";
 import { formatNumber } from "@/util/string";
 import classes from "./Network.module.css";
 
-type Pan = {
-  x: number;
-  y: number;
-}
-
 type Node = {
   /** unique id */
   id: string;
@@ -428,147 +423,6 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     [_edges, nodes, minEdgeStrength, maxEdgeStrength, edgeColors],
   );
 
-  const setupCytoscapePanLimits = () => {
-    let panning = false;
-    let currentPan: Pan | undefined = undefined;
-    let animationInProgress = false;
-  
-    if (!graph.current) return; 
-
-    graph.current.on("viewport", (event) => {
-      /* Prevent recursive calls and don't interfere with ongoing animations */
-      if (panning || animationInProgress) return;
-      panning = true;
-  
-      const cy = event.cy;
-      const width = cy.width();
-      const height = cy.height();
-      const zoom = cy.zoom();
-      const viewport = cy.extent();
-      const boundingBox = cy.elements().boundingBox();
-      const pan = cy.pan();
-  
-      /* Check if the graph can fit inside viewport */
-      if (viewport.h > boundingBox.h && viewport.w > boundingBox.w) {
-        const transformedBounds = {
-          x1: boundingBox.x1 * zoom + pan.x,
-          y1: boundingBox.y1 * zoom + pan.y,
-          x2: boundingBox.x2 * zoom + pan.x,
-          y2: boundingBox.y2 * zoom + pan.y
-        };
-  
-        const isOutsideViewport =
-          transformedBounds.x1 < 0 ||
-          transformedBounds.y1 < 0 ||
-          transformedBounds.x2 > width ||
-          transformedBounds.y2 > height;
-  
-        if (!isOutsideViewport) {
-          currentPan = { ...pan };
-        } else {
-          if (currentPan) {
-            animationInProgress = true;
-            cy.animation({
-              pan: currentPan,
-              easing: 'ease-out-cubic',
-              duration: 300
-            }).play().promise().then(() => {
-              animationInProgress = false;
-            });            
-          } else {
-            animationInProgress = true;
-            cy.animation({
-              pan: { x: 0, y: 0 },
-              easing: 'ease-out-cubic',
-              duration: 300
-            }).play().promise().then(() => {
-              animationInProgress = false; // Animation is done
-            });
-          }
-        }
-      } else {
-        /* GRAPH CAN'T FIT IN THE VIEWPORT */
-        const EDGE_PADDING = 10;
-
-        /* Calculate graph dimensions and center point*/
-        const graphWidth = (boundingBox.x2 - boundingBox.x1) * zoom;
-        const graphHeight = (boundingBox.y2 - boundingBox.y1) * zoom;
-        const graphCenterX = ((boundingBox.x1 + boundingBox.x2) / 2) * zoom;
-        const graphCenterY = ((boundingBox.y1 + boundingBox.y2) / 2) * zoom;
-
-        /* Calculate the maximum allowed panning distance from the center */
-        const maxPanX = (graphWidth / 2) + EDGE_PADDING;
-        const maxPanY = (graphHeight / 2) + EDGE_PADDING;
-
-        /* Calculate the viewport center */
-        const viewportCenterX = width / 2;
-        const viewportCenterY = height / 2;
-
-        /* Calculate how far we've panned from having the graph centered */
-        const panFromCenterX = viewportCenterX - (graphCenterX + pan.x);
-        const panFromCenterY = viewportCenterY - (graphCenterY + pan.y);
-
-        /* Determine if we need to adjust the pan */
-        const needsAdjustmentX = Math.abs(panFromCenterX) > maxPanX;
-        const needsAdjustmentY = Math.abs(panFromCenterY) > maxPanY;
-
-        if (needsAdjustmentX || needsAdjustmentY) {
-          /* Calculate the constrained pan position */
-          const constrainedPan = {
-            x: needsAdjustmentX 
-              ? viewportCenterX - graphCenterX - (maxPanX * Math.sign(panFromCenterX))
-              : pan.x,
-            y: needsAdjustmentY
-              ? viewportCenterY - graphCenterY - (maxPanY * Math.sign(panFromCenterY))
-              : pan.y
-          };
-
-          /* Ensure at least a minimal part of the graph is visible */
-          const isPartiallyVisible = (testPan: Pan) => {
-            const bounds = {
-              left: boundingBox.x1 * zoom + testPan.x,
-              right: boundingBox.x2 * zoom + testPan.x,
-              top: boundingBox.y1 * zoom + testPan.y,
-              bottom: boundingBox.y2 * zoom + testPan.y
-            };
-
-            return !(bounds.right < EDGE_PADDING || 
-                    bounds.left > width - EDGE_PADDING || 
-                    bounds.bottom < EDGE_PADDING || 
-                    bounds.top > height - EDGE_PADDING);
-          };
-
-          if (isPartiallyVisible(constrainedPan)) {
-            animationInProgress = true;
-            cy.animation({
-              pan: constrainedPan,
-              easing: 'ease-out-cubic',
-              duration: 300
-            }).play().promise().then(() => {
-              currentPan = constrainedPan;
-              animationInProgress = false;
-            });            
-          } else {
-            animationInProgress = true;
-            cy.animation({
-              center: {
-                eles: cy.elements()
-              },
-              easing: 'ease-out-cubic',
-              duration: 300
-            }).play().promise().then(() => {
-              currentPan = cy.pan();
-              animationInProgress = false;
-            });            
-          }
-        } else {
-          currentPan = { ...pan };
-        }
-    }
-      panning = false;
-    });
-  };
-   
   useEffect(() => {
     if (!container.current) return;
     if (graph.current) return;
@@ -584,16 +438,53 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       ],
     });
 
-    /** attach listeners */
+    /** reset view */
     graph.current.on("dblclick", () => graph.current?.fit(undefined, padding));
-    graph.current.on("select unselect", "node, edge", (event) =>
+
+    /** select/deselect items */
+    graph.current.on("select unselect", "node, edge", () =>
       setSelectedItems(
-        event.cy
-          .elements(":selected")
-          .map((element) => element.data() as Node | Edge),
+        graph.current
+          ?.elements(":selected")
+          .map((element) => element.data() as Node | Edge) ?? [],
       ),
     );
-    setupCytoscapePanLimits();
+
+    /** prevent infinite recursion from pan adjustment */
+    let justPanned = false;
+
+    /** when panning, limit pan */
+    graph.current.on("viewport", () => {
+      if (!graph.current) return;
+
+      if (justPanned) return (justPanned = false);
+      justPanned = true;
+
+      /** get current graph props */
+      const zoom = graph.current.zoom();
+      const pan = graph.current.pan();
+      const width = graph.current.width();
+      const height = graph.current.height();
+      const paddingH = width / 2;
+      const paddingV = height / 2;
+
+      /** get bounding box of graph elements */
+      const { x1, y1, x2, y2 } = graph.current.elements().boundingBox();
+
+      /** limit left pan */
+      if (x2 * zoom + pan.x < paddingH) pan.x = paddingH - x2 * zoom;
+      /** limit up pan */
+      if (y2 * zoom + pan.y < paddingV) pan.y = paddingV - y2 * zoom;
+      /** limit right pan */
+      if (x1 * zoom + pan.x > width - paddingH)
+        pan.x = width - paddingH - x1 * zoom;
+      /** limit down pan */
+      if (y1 * zoom + pan.y > height - paddingV)
+        pan.y = height - paddingV - y1 * zoom;
+
+      /** adjust pan */
+      graph.current.pan(pan);
+    });
   }, [nodes, edges]);
 
   useEffect(() => {
