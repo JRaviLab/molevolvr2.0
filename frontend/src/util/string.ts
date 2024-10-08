@@ -46,3 +46,7 @@ export const makeLabel = (string: string) =>
   (
     new DOMParser().parseFromString(string, "text/html").body.textContent || ""
   ).replaceAll(/\s+/g, " ");
+
+/** trim white-space */
+export const trim = (string: string) =>
+  string.replaceAll(/^\s+/gm, "").replaceAll(/\s+$/gm, "");

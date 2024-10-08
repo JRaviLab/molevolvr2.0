@@ -18,7 +18,7 @@ type Props<TagName extends TagNames = "div"> = {
   /** amount of space between items */
   gap?: "md" | "none" | "xs" | "sm" | "lg" | "xl";
   /** vertical gap fraction of horizontal gap */
-  gapRatio?: 1 | 0.5;
+  gapRatio?: 1 | 0.5 | 0.25 | 0;
   /** whether to wrap items */
   wrap?: true | false;
   /** whether to make full width */

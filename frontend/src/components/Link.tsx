@@ -51,7 +51,7 @@ const Link = forwardRef(
         {...props}
       >
         {children}
-        {_showArrow && <FaArrowUpRightFromSquare className={classes.icon} />}
+        {_showArrow && <FaArrowUpRightFromSquare />}
       </a>
     ) : (
       <RouterLink
@@ -64,7 +64,7 @@ const Link = forwardRef(
         {...props}
       >
         {children}
-        {_showArrow && <FaArrowUpRightFromSquare className={classes.icon} />}
+        {_showArrow && <FaArrowUpRightFromSquare />}
       </RouterLink>
     );
 

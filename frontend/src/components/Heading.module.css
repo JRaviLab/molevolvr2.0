@@ -14,8 +14,11 @@ h2.heading {
 h3.heading,
 h4.heading {
   justify-content: flex-start;
-  margin-bottom: -1em;
   text-align: left;
+}
+
+:is(h3.heading, h4.heading) + :not(h3.heading, h4.heading) {
+  margin-top: -1em;
 }
 
 .icon {

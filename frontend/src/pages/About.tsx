@@ -1,10 +1,79 @@
-import { FaPenNib } from "react-icons/fa6";
+import {
+  FaBook,
+  FaCommentDots,
+  FaDoorOpen,
+  FaEnvelope,
+  FaGithub,
+  FaMicroscope,
+  FaPenNib,
+  FaTwitter,
+  FaUsers,
+} from "react-icons/fa6";
+import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Heading from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import Section from "@/components/Section";
-import classes from "./About.module.css";
+import { trim } from "@/util/string";
+
+const team = [
+  {
+    name: "Janani Ravi (corresponding author)",
+    email: "janani.ravi@cuanschutz.edu",
+    github: "jananiravi",
+    twitter: "janani137",
+  },
+  {
+    name: "Jacob D Krol",
+    email: "jacob.krol@cuanschutz.edu",
+    github: "jakekrol",
+  },
+  {
+    name: "Joseph T Burke",
+    email: "burkej24@msu.edu",
+    github: "jburke11",
+  },
+  {
+    name: "Samuel Z Chen",
+    email: "chensam2@msu.edu",
+    github: "samuelzornchen",
+    twitter: "SamuelZChen",
+  },
+  {
+    name: "Lo Sosinski",
+    email: "sosinsk7@msu.edu",
+    github: "lsosinski",
+    twitter: "lo_sosinski",
+  },
+  {
+    name: "Faisal S Alquaddoomi",
+    email: "faisal.alquaddoomi@cuanschutz.edu",
+    github: "falquaddoomi",
+  },
+  {
+    name: "Evan P Brenner",
+    email: "evan.brenner@cuanschutz.edu",
+    github: "epbrenner",
+  },
+  {
+    name: "Vince P Rubinetti",
+    email: "vincent.rubinetti@cuanschutz.edu",
+    github: "vincerubinetti",
+  },
+  {
+    name: "Shaddai Amolitos",
+    email: "shaddai.amolitos@cuanschutz.edu",
+  },
+  {
+    name: "Kellen M Reason",
+    email: "reasonke@msu.edu",
+  },
+  {
+    name: "John B Johnston",
+    email: "johnj@msu.edu",
+  },
+];
 
 const About = () => {
   return (
@@ -17,174 +86,167 @@ const About = () => {
         </Heading>
       </Section>
 
-      <Section className={classes.section}>
-        <Heading level={2}>FAQs</Heading>
-
-        <Heading level={3} anchor="receive-an-email">
-          Will I receive an email when the job is done?
+      <Section>
+        <Heading level={2} icon={<FaCommentDots />}>
+          FAQs
         </Heading>
 
-        <p>
-          Yes, if you supplied an (optional) email on the submission page, then
-          an email will be sent to confirm when a job is ready.
-        </p>
-
-        <Heading level={3} anchor="how-to-paste-protein-sequences">
-          How to paste/upload protein sequences?
+        <Heading level={3}>
+          How will I know when my analysis is done? Where are my past analyses?
         </Heading>
 
-        <Heading level={3} anchor="interproscan">
-          Acceptable formats
-        </Heading>
-
-        <ul>
-          <li className={classes.list}>
-            <Link to="https://www.ncbi.nlm.nih.gov/genbank/fastaformat">
-              NCBI FASTA
-            </Link>
-
-            <pre>
-              <code className={classes.code}>
-                {">"}sp|P01189|COLI_HUMAN Pro-opiomelanocortin OS=Homo sapiens
-                OX=9606 GN=POMC PE=1 SV=2
-                MPRSCCSRSGALLLALLLQASMEVRGWCLESSQCQDLTTESNLLECIRACKPDLSAETPM
-                FPGNGDEQPLTENPRKYVMGHFRWDRFGRRNSSSSGSSGAGQKREDVSAGEDCGPLPEGG
-                PEPRSDGAKPGPREGKRSYSMEHFRWGKPVGKKRRPVKVYPNGAEDESAEAFPLEFKREL
-                TGQRLREGDGPDGPADDGAGAQADLEHSLLVAAEKKDEGPYRMEHFRWGSPPKDKRYGGF
-                MTSEKSQTPLVTLFKNAIIKNAYKKGE
-              </code>
-            </pre>
-          </li>
-
-          <li className={classes.list}>
-            <Link to="https://www.uniprot.org/help/fasta-headers">
-              UniProt FASTA
-            </Link>
-
-            <pre>
-              <code className={classes.code}>
-                {">"}sp|P01189|COLI_HUMAN Pro-opiomelanocortin OS=Homo sapiens
-                OX=9606 GN=POMC PE=1 SV=2
-                MPRSCCSRSGALLLALLLQASMEVRGWCLESSQCQDLTTESNLLECIRACKPDLSAETPM
-                FPGNGDEQPLTENPRKYVMGHFRWDRFGRRNSSSSGSSGAGQKREDVSAGEDCGPLPEGG
-                PEPRSDGAKPGPREGKRSYSMEHFRWGKPVGKKRRPVKVYPNGAEDESAEAFPLEFKREL
-                TGQRLREGDGPDGPADDGAGAQADLEHSLLVAAEKKDEGPYRMEHFRWGSPPKDKRYGGF
-                MTSEKSQTPLVTLFKNAIIKNAYKKGE
-              </code>
-            </pre>
-          </li>
-
-          <li className={classes.list}>
-            <span>Custom FASTA header (not recommended)</span>
-
-            <pre>
-              <code className={classes.code}>
-                {">"}SEQUENCE154 UNKNOWN
-                <br />
-                MPRSCCSRSGALLLALLLQASMEVRGWCLESSQCQDLTTESNLLECIRACKPDLSAETPM FPG
-              </code>
-            </pre>
-          </li>
-        </ul>
-
-        <p>
-          The application uses NCBI or UniProt accessions to get taxonomy info
-          from query proteins. Therefore, it is recommended to include valid
-          protein accession numbers in the header when possible.
-        </p>
-
-        <Heading level={3} anchor="common-mistakes">
-          Common mistakes
-        </Heading>
-
-        <ul>
-          <li className={classes.list}>
-            <p>
-              No header lines (missing <code>{">"}</code> header delimiter)
-            </p>
-
-            <pre>
-              <code className={classes.code}>
-                MRIDKFLANMGVGTRNEVKQLLKKGLVNVNEQVIKSPKTHIEPENDKITVRGELIEYIENVYIMLNKPKG
-                <br />
-                MPRSCCSRSGALLLALLLQASMEVRGWCLESSQCQDLTTESNLLECIRACKPDLSAETPM
-              </code>
-            </pre>
-          </li>
-
-          <li className={classes.list}>
-            <p>Duplicate headers/accnums</p>
-
-            <pre>
-              <code className={classes.code}>
-                {">"}GCF_000013425.1
-                <br />
-                MVPEEKGSITLSKEAAIIFAIAKFKPFKNRIKNNPQKTNPFLKLHENKKS
-                <br />
-                {">"}GCF_000013425.1
-                <br />
-                MKQKKSKNIFWVFSILAVVFLVLFSFAVGASNVPMMILTFILLVATFGIGFTTKKKYRENDWL
-                <br />
-                {">"}protein
-                <br />
-                MKLTLMKFFVGGFAVLLSYIVSVTLPWKEFGGIFATFPAVFLVSMFITGMQYGDKVAVHVSRGAVFGMTGVLVCILVTWM
-                MLHMTHMWLISIVVGFLSWFISAVCIFEAVEFIAQKRLEKHSWKAGKSNSK
-                <br />
-                {">"}protein
-                <br />
-                MVKRTYQPNKRKHSKVHGFRKRMSTKNGRKVLARRRRKGRKVLSA
-              </code>
-            </pre>
-          </li>
-        </ul>
-
-        <Heading level={3} anchor="is-job-running">
-          Is my job still running? Did it complete?
-        </Heading>
-
-        <div>
+        <Flex direction="column" gap="sm" full>
           <p>
-            Upon submission, a url link to retrieve the results will display.{" "}
-            <strong>
-              The link provides job progress info and, once finished, the
-              results.
-            </strong>
+            When you submit an analysis, you'll be taken to a dedicated page for
+            it where you can its status, and eventually, the results. You can
+            bookmark this page or otherwise save its URL to view it later.
           </p>
 
-          <p>Recommendations:</p>
-
-          <ul>
-            <li>Bookmark link</li>
-            <li>Supply an optional email to receive the link</li>
-          </ul>
-        </div>
-
-        <Heading level={3} anchor="how-long-submission">
-          How long will my submission take to process? When can I expect my
-          results?
-        </Heading>
-
-        <div>
           <p>
-            Upon submission, a url link to retrieve the results will display.{" "}
-            <strong>
-              The link provides job progress info and, once finished, the
-              results.
-            </strong>
+            You may also supply your email before submitting your analysis.
+            We'll send you link to the analysis' page when its done.
           </p>
 
-          <p>Key factors of job duration:</p>
+          <p>
+            You can see the most recent analyses you submitted on your current
+            device in the{" "}
+            <Link to="load-analysis#history">history section</Link>.
+          </p>
+        </Flex>
+
+        <Heading level={3}>When can I expect my results?</Heading>
+
+        <Flex direction="column" gap="sm" full>
+          <p>
+            The time it takes to complete an analysis can be as little as a few
+            minutes or as much as a few hours. It depends on many factors, such
+            as:
+          </p>
 
           <ul>
             <li>Number of sequences submitted</li>
             <li>Number of homologs to search for each sequence</li>
             <li>Length & complexity of sequences</li>
           </ul>
-        </div>
+
+          <p>
+            We try to provide helpful status information for monitoring
+            analyses.
+          </p>
+        </Flex>
+
+        <Heading level={3}>How do I upload protein sequences?</Heading>
+
+        <Flex direction="column" gap="sm" full>
+          <p>
+            <strong>Protein sequence formats</strong> we support:
+          </p>
+
+          <ul>
+            <li>
+              <Link to="https://www.ncbi.nlm.nih.gov/genbank/fastaformat">
+                NCBI FASTA
+              </Link>
+
+              <pre>
+                <code>
+                  {trim(
+                    `>OHS91782.1 16S rRNA pseudouridine(516) synthase [Staphylococcus aureus]
+                  MRIDKFLANMGVGTRNEVKQLLKKGLVNVNEQVIKSPKTHIEPENDKITVRGELIEYIENVYIMLNKPKG
+                  YISATEDHHSKTVIDLIPEYQHLNIFPVGRLDKDTEGLLLITNDGDFNHELMSPNKHVSKKYEVISANPI
+                  TEDDIQAFKEGVTLTDGKVKPAILTYIDNQTSHVTIYEGKYHQVKRMFHSIQNEVLHLRRIKIADLELDS
+                  NLDSGEYRLLTENDFDKLNYK`,
+                  )}
+                </code>
+              </pre>
+            </li>
+
+            <li>
+              <Link to="https://www.uniprot.org/help/fasta-headers">
+                UniProt FASTA
+              </Link>
+
+              <pre>
+                {trim(
+                  `>sp|P01189|COLI_HUMAN Pro-opiomelanocortin OS=Homo sapiens OX=9606 GN=POMC PE=1 SV=2
+                MPRSCCSRSGALLLALLLQASMEVRGWCLESSQCQDLTTESNLLECIRACKPDLSAETPM
+                FPGNGDEQPLTENPRKYVMGHFRWDRFGRRNSSSSGSSGAGQKREDVSAGEDCGPLPEGG
+                PEPRSDGAKPGPREGKRSYSMEHFRWGKPVGKKRRPVKVYPNGAEDESAEAFPLEFKREL
+                TGQRLREGDGPDGPADDGAGAQADLEHSLLVAAEKKDEGPYRMEHFRWGSPPKDKRYGGF
+                MTSEKSQTPLVTLFKNAIIKNAYKKGE`,
+                )}
+              </pre>
+            </li>
+
+            <li>
+              <span>Custom FASTA header (not recommended)</span>
+
+              <pre>
+                <code>
+                  {trim(
+                    `>SEQUENCE154 UNKNOWN 
+                  MPRSCCSRSGALLLALLLQASMEVRGWCLESSQCQDLTTESNLLECIRACKPDLSAETPM
+                  FPG`,
+                  )}
+                </code>
+              </pre>
+            </li>
+          </ul>
+
+          <p>
+            We use NCBI or UniProt accessions to get taxonomy info from query
+            proteins. Therefore, we recommend you include valid protein
+            accession numbers in the header when possible.
+          </p>
+
+          <p>
+            <strong>Common mistakes:</strong>
+          </p>
+
+          <ul>
+            <li>
+              <p>
+                No header lines (missing <code>{">"}</code> header delimiter)
+              </p>
+
+              <pre>
+                <code>
+                  {trim(
+                    `MRIDKFLANMGVGTRNEVKQLLKKGLVNVNEQVIKSPKTHIEPENDKITVRGELIEYIENVYIMLNKPKG
+
+                  MPRSCCSRSGALLLALLLQASMEVRGWCLESSQCQDLTTESNLLECIRACKPDLSAETPM`,
+                  )}
+                </code>
+              </pre>
+            </li>
+
+            <li>
+              <p>Duplicate headers/accnums</p>
+
+              <pre>
+                <code>
+                  {trim(
+                    `>GCF_000013425.1
+                  MVPEEKGSITLSKEAAIIFAIAKFKPFKNRIKNNPQKTNPFLKLHENKKS
+                  >GCF_000013425.1
+                  MKQKKSKNIFWVFSILAVVFLVLFSFAVGASNVPMMILTFILLVATFGIGFTTKKKYRENDWL
+                  >protein
+                  MKLTLMKFFVGGFAVLLSYIVSVTLPWKEFGGIFATFPAVFLVSMFITGMQYGDKVAVHVSRGAVFGMTGVLVCILVTWM
+                  MLHMTHMWLISIVVGFLSWFISAVCIFEAVEFIAQKRLEKHSWKAGKSNSK
+                  >protein
+                  MVKRTYQPNKRKHSKVHGFRKRMSTKNGRKVLARRRRKGRKVLSA`,
+                  )}
+                </code>
+              </pre>
+            </li>
+          </ul>
+        </Flex>
       </Section>
 
-      <Section className={classes.section}>
-        <Heading level={2}>Behind MolEvolvR</Heading>
+      <Section>
+        <Heading level={2} icon={<FaDoorOpen />}>
+          Behind MolEvolvR
+        </Heading>
 
         <Heading level={3}>Data sources</Heading>
 
@@ -197,49 +259,47 @@ const About = () => {
         </ul>
 
         <Heading level={3}>Technologies</Heading>
-        <div>
-          <p>This platform is powered by MolEvolvR stack which consists of:</p>
+
+        <Flex direction="column" gap="sm" full>
+          <p>
+            MolEvolvR is a coordination of several different technologies,
+            consisting of:
+          </p>
 
           <ul>
             <li>
-              <strong>Frontend</strong>: the frontend web app, written in React
+              <strong>
+                <Link to="https://github.com/JRaviLab/molevolvr">
+                  MolEvolvR package
+                </Link>
+              </strong>{" "}
+              &ndash; the R package at the core of everything, which does most
+              of the analysis calculations
+            </li>
+            <li>
+              <strong>Frontend</strong> &ndash; a web app written in React
             </li>
 
             <li>
-              <strong>Backend</strong>: the backend written in{" "}
+              <strong>Backend</strong> &ndash; a backend written in{" "}
               <Link to="https://www.rplumber.io/index.html">Plumber</Link>
             </li>
 
             <li>
-              <strong>Cluster</strong>: the containerized SLURM{" "}
-              <code>cluster</code> on which jobs are run
+              <strong>Cluster</strong> &ndash; a containerized SLURM cluster on
+              which jobs are run
             </li>
 
             <li>
-              <strong>Services</strong>: a collection of services on which the
-              stack relies
-            </li>
-
-            <li>
-              <strong>Postgres</strong>: configuration for a PostgreSQL
-              database, which stores job information Most of the data processing
-              is accomplished via the{" "}
-              <Link to="https://github.com/JRaviLab/molevolvr">
-                MolEvolvR package.
-              </Link>
+              <strong>Postgres</strong> &ndash; configuration for a database
+              which stores job information
             </li>
           </ul>
-
-          <p>
-            The stack simply provides a user-friendly interface for accepting
-            and monitoring the progress of jobs, and orchestrates running the
-            jobs on SLURM. The jobs themselves call methods of the package at
-            each stage of processing.
-          </p>
-        </div>
+        </Flex>
 
         <Heading level={3}>Compatibility</Heading>
-        <div>
+
+        <Flex direction="column" gap="sm" full>
           <p>This web-app is regularly tested on the following:</p>
 
           <ul>
@@ -254,302 +314,166 @@ const About = () => {
           </p>
 
           <ul>
-            <li>Microsoft Internet Explorer.</li>
+            <li>Internet Explorer</li>
             <li>
-              Smart watches, or any device with a screen width {"<"} ~250px.
+              Smart watches, or any device with a screen width {"<"} ~250px
             </li>
-            <li>
-              Browsers without JavaScript enabled (interactive features won’t
-              work).
-            </li>
+            <li>Browsers without JavaScript enabled</li>
           </ul>
 
           <p>
             If you encounter a bug, please{" "}
-            <Link to="mailto:janani.ravi@cuanschutz.edu">let us know! </Link>
+            <Link to="mailto:janani.ravi@cuanschutz.edu">let us know</Link>!
           </p>
-        </div>
-
-        <Heading level={3}>How to Cite</Heading>
-        <blockquote>
-          MolEvolvR: a web-app for characterizing proteins using molecular
-          evolution and phylogeny. Jacob D Krol*, Joseph T Burke*, Samuel Z
-          Chen*, Lo Sosinski*, Faisal S Alquaddoomi, Evan P Brenner, Ethan P
-          Wolfe, Vince P Rubinetti, Shaddai Amolitos, Kellen M Reason, John B
-          Johnston, Janani Ravi. [*Co-primary] bioRxiv 2022.02.18.461833;{" "}
-          <span>
-            doi:{" "}
-            <Link to="https://doi.org/10.1101/2022.02.18.461833">
-              https://doi.org/10.1101/2022.02.18.461833;
-            </Link>
-          </span>{" "}
-          <span>
-            web-app:{" "}
-            <span>
-              <Link to="http://jravilab.org/molevolvr">
-                http://jravilab.org/molevolvr
-              </Link>
-            </span>
-          </span>
-        </blockquote>
-
-        <Heading level={3}>Team</Heading>
-
-        <p>
-          <ul>
-            <li>
-              Janani Ravi |{" "}
-              <Link to="mailto:janani.ravi@cuanschutz.edu">Email</Link> |{" "}
-              <Link to="https://github.com/jananiravi">GitHub</Link> |{" "}
-              <Link to="https://mobile.twitter.com/janani137">X(Twitter)</Link>{" "}
-              |{" "}
-              <span>
-                <strong>(Corresponding author)</strong>
-              </span>
-            </li>
-
-            <li>
-              Jacob D Krol |{" "}
-              <Link to="mailto:jacob.krol@cuanschutz.edu">Email</Link> |{" "}
-              <Link to="https://github.com/jakekrol">GitHub</Link>
-            </li>
-
-            <li>
-              Joseph T Burke | <Link to="mailto:burkej24@msu.edu">Email</Link> |{" "}
-              <Link to="https://github.com/jburke11">GitHub</Link> |{" "}
-              <Link to="https://mobile.twitter.com/TBD">X(Twitter)</Link>
-            </li>
-
-            <li>
-              Samuel Z Chen | <Link to="mailto:chensam2@msu.edu">Email</Link> |{" "}
-              <Link to="https://github.com/samuelzornchen">GitHub</Link> |{" "}
-              <Link to="https://mobile.twitter.com/SamuelZChen">
-                X(Twitter)
-              </Link>
-            </li>
-
-            <li>
-              Lo Sosinski | <Link to="mailto:sosinsk7@msu.edu">Email</Link> |{" "}
-              <Link to="https://github.com/lsosinski">GitHub</Link> |{" "}
-              <Link to="https://mobile.twitter.com/lo_sosinski">
-                X(Twitter)
-              </Link>
-            </li>
-
-            <li>
-              Faisal S Alquaddoom |{" "}
-              <Link to="mailto:faisal.alquaddoomi@cuanschutz.edu">Email</Link> |{" "}
-              <Link to="https://github.com/falquaddoomi">GitHub</Link>
-            </li>
-
-            <li>
-              Evan P Brenner |{" "}
-              <Link to="mailto:evan.brenner@cuanschutz.edu">Email</Link> |{" "}
-              <Link to="https://github.com/epbrenner">GitHub</Link>
-            </li>
-
-            <li>
-              Vince P Rubinett |{" "}
-              <Link to="mailto:vincent.rubinetti@cuanschutz.edu">Email</Link> |{" "}
-              <Link to="https://github.com/vincerubinetti">GitHub</Link>
-            </li>
-
-            <li>
-              Shaddai Amolitos |{" "}
-              <Link to="mailto:shaddai.amolitos@cuanschutz.edu">Email</Link>
-            </li>
-
-            <li>
-              Kellen M Reason | <Link to="mailto:Kellen M Reason">Email</Link>
-            </li>
-
-            <li>
-              John B Johnston | <Link to="mailto:johnj@msu.edu">Email</Link>
-            </li>
-          </ul>
-        </p>
+        </Flex>
       </Section>
 
       <Section>
-        <Heading level={2}>Getting Sequences</Heading>
-
-        <Heading level={3} anchor="interproscan">
-          From Iprscan5{" "}
-          <span className="secondary">(for InterProScan analyses)</span>
+        <Heading level={2} icon={<FaBook />}>
+          Case studies
         </Heading>
 
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
-        </p>
-
-        <Heading level={3} anchor="blast">
-          From NCBI BLAST{" "}
-          <span className="secondary">(for BLAST analyses)</span>
-        </Heading>
-
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
-        </p>
-      </Section>
-
-      <Section>
-        <Heading level={2}>In-depth Info</Heading>
-
-        <Heading level={3}>Format of protein sequences</Heading>
-
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
-        </p>
-
-        <Heading level={3}>Accession numbers and FASTA</Heading>
-
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
-        </p>
-
-        <Heading level={3}>Query heatmap missing lineages</Heading>
-
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
-        </p>
-      </Section>
-
-      <Section className={classes.section}>
-        <Heading level={2}>Case studies</Heading>
-        <div>
+        <Flex direction="column" gap="sm" full>
           <p>
             The computational methods underlying MolEvolvR have enabled
             understanding fundamental biological systems and protein evolution.
           </p>
+
           <p>
             In this section, companion MolEvolvR jobs for proteins studied in
             these publications are provided for users to explore.
           </p>
-        </div>
+        </Flex>
 
-        <Heading level={3}>
-          Surface layer proteins in Gram-positive bacteria (Bacillota)
-        </Heading>
-        <ul>
-          <li>
-            <Link to="https://doi.org/10.3389%2Ffmicb.2021.663468">
-              Publication
-            </Link>
-          </li>
-          <li>
-            <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=slayer&p=resultsSummary">
-              MolEvolvR results
-            </Link>
-          </li>
-        </ul>
+        <Flex direction="column" full>
+          <Heading level={3}>
+            Surface layer proteins in Gram-positive bacteria (Bacillota)
+          </Heading>
 
-        <Heading level={3}>Helicase operators in bacteria</Heading>
-        <ul>
-          <li>
-            <Link to="https://doi.org/10.1128/jb.00163-22">Publication</Link>
-          </li>
-          <li>
-            <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=dciahe&p=resultsSummary">
-              MolEvolvR results
-            </Link>
-          </li>
-        </ul>
+          <ul>
+            <li>
+              <Link to="https://doi.org/10.3389%2Ffmicb.2021.663468">
+                Publication
+              </Link>
+            </li>
 
-        <Heading level={3}>Novel internalin P homologs in Listeria</Heading>
-        <ul>
-          <li>
-            <Link to="https://doi.org/10.1099/mgen.0.000828">Publication</Link>
-          </li>
-          <li>
-            <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=liinlp&p=resultsSummary">
-              MolEvolvR results
-            </Link>
-          </li>
-        </ul>
+            <li>
+              <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=slayer&p=resultsSummary">
+                MolEvolvR results
+              </Link>
+            </li>
+          </ul>
 
-        <Heading level={3}>Staphylococcus aureus sulfur acquisition</Heading>
-        <ul>
-          <li>
-            <p>Glutathione import system</p>
-            <ol>
-              <li>
-                <Link to="https://doi.org/10.1371/journal.pgen.1010834">
-                  Publication
-                </Link>
-              </li>
-              <li>
-                <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=sasulf&p=resultsSummary">
-                  MolEvolvR results
-                </Link>
-              </li>
-            </ol>
-          </li>
-          <li>
-            <p>Cystine transporters</p>
-            <ol>
-              <li>
-                <Link to="https://doi.org/10.1128/iai.00690-19">
-                  Publication
-                </Link>
-              </li>
-              <li>
-                <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=saabct&p=resultsSummary">
-                  MolEvolvR results
-                </Link>
-              </li>
-            </ol>
-          </li>
-          <li>
-            <p>V. cholerae phage defense system</p>
-            <ol>
-              <li>
-                <Link to="https://doi.org/10.1038/s41564-022-01162-4">
-                  Publication
-                </Link>
-              </li>
-              <li>
-                {" "}
-                <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=vcpdef&p=resultsSummary">
-                  MolEvolvR results
-                </Link>
-              </li>
-            </ol>
-          </li>
-        </ul>
+          <Heading level={3}>Helicase operators in bacteria</Heading>
+
+          <ul>
+            <li>
+              <Link to="https://doi.org/10.1128/jb.00163-22">Publication</Link>
+            </li>
+
+            <li>
+              <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=dciahe&p=resultsSummary">
+                MolEvolvR results
+              </Link>
+            </li>
+          </ul>
+
+          <Heading level={3}>Novel internalin P homologs in Listeria</Heading>
+
+          <ul>
+            <li>
+              <Link to="https://doi.org/10.1099/mgen.0.000828">
+                Publication
+              </Link>
+            </li>
+
+            <li>
+              <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=liinlp&p=resultsSummary">
+                MolEvolvR results
+              </Link>
+            </li>
+          </ul>
+
+          <Heading level={3}>Staphylococcus aureus sulfur acquisition</Heading>
+
+          <Heading level={4}>Glutathione import system</Heading>
+
+          <ul>
+            <li>
+              <Link to="https://doi.org/10.1371/journal.pgen.1010834">
+                Publication
+              </Link>
+            </li>
+            <li>
+              <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=sasulf&p=resultsSummary">
+                MolEvolvR results
+              </Link>
+            </li>
+          </ul>
+
+          <Heading level={4}>Cystine transporters</Heading>
+
+          <ul>
+            <li>
+              <Link to="https://doi.org/10.1128/iai.00690-19">Publication</Link>
+            </li>
+            <li>
+              <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=saabct&p=resultsSummary">
+                MolEvolvR results
+              </Link>
+            </li>
+          </ul>
+
+          <Heading level={4}>V. cholerae phage defense system</Heading>
+
+          <ul>
+            <li>
+              <Link to="https://doi.org/10.1038/s41564-022-01162-4">
+                Publication
+              </Link>
+            </li>
+            <li>
+              {" "}
+              <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=vcpdef&p=resultsSummary">
+                MolEvolvR results
+              </Link>
+            </li>
+          </ul>
+        </Flex>
       </Section>
 
       <Section>
-        <Heading level={2}>Get to know us</Heading>
+        <Heading level={2} icon={<FaUsers />}>
+          Get to know us
+        </Heading>
+
+        <Heading level={3}>Team</Heading>
+
+        <ul>
+          {team.map(({ name, email, github, twitter }, index) => (
+            <li key={index}>
+              <Flex hAlign="left" gap="sm" gapRatio={0}>
+                <span>{name}</span>
+                {email && (
+                  <Link to={`mailto:${email}`}>
+                    <FaEnvelope />
+                    {email}
+                  </Link>
+                )}
+                {github && (
+                  <Link to={`https://github.com/${github}`} showArrow={false}>
+                    <FaGithub />@{github}
+                  </Link>
+                )}
+                {twitter && (
+                  <Link to={`https://twitter.com/${twitter}`} showArrow={false}>
+                    <FaTwitter />@{twitter}
+                  </Link>
+                )}
+              </Flex>
+            </li>
+          ))}
+        </ul>
 
         <Heading level={3}>Funding</Heading>
 
@@ -562,30 +486,36 @@ const About = () => {
           to EPB.
         </p>
 
-        <Heading level={3}>More from JRaviLab</Heading>
+        <Heading level={3}>Contact</Heading>
 
-        <ul>
-          <li>
-            <Link to="https://jravilab.github.io/">JRaviLab Website</Link>
-          </li>
-          <li>
-            <Link to="https://twitter.com/jravilab">X(Twitter)</Link>
-          </li>
-          <li>
-            <Link to="https://github.com/jravilab">GitHub</Link>
-          </li>
-        </ul>
+        <Flex hAlign="left" full>
+          <Button
+            to="mailto:janani.ravi@cuanschutz.edu"
+            text="janani.ravi@cuanschutz.edu"
+            icon={<FaEnvelope />}
+          />
+        </Flex>
 
-        <Heading level={3}>Contact Us</Heading>
+        <Heading level={3}>Follow</Heading>
 
-        <p>
-          Questions? Email us at{" "}
-          <span>
-            <Link to="mailto:janani.ravi@cuanschutz.edu">
-              janani.ravi@cuanschutz.edu.
-            </Link>
-          </span>
-        </p>
+        <Flex hAlign="left" full>
+          <Button
+            to="https://jravilab.github.io/"
+            text="JRaviLab"
+            icon={<FaMicroscope />}
+            tooltip="JRaviLab website"
+          />
+          <Button
+            to="https://github.com/jravilab"
+            text="GitHub"
+            icon={<FaGithub />}
+          />
+          <Button
+            to="https://twitter.com/jravilab"
+            text="Twitter"
+            icon={<FaTwitter />}
+          />
+        </Flex>
       </Section>
     </>
   );
