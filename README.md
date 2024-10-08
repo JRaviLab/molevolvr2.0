@@ -18,11 +18,9 @@ To run the stack, you'll need to [install Docker and Docker Compose](https://www
 ## Setup
 
 1. Clone this repository:
-   git clone `<https://github.com/JRaviLab/molevolvr2.0.git>`
-
-   then `cd <your-repository-directory>`
-   to move into your cloned directory
+`git clone https://github.com/JRaviLab/molevolvr2.0.git`
+then `cd molevolvr2.0` to move into your cloned directory.
 
 2. Copy  `.env.TEMPLATE` to `.env` and fill in the necessary values.
-You should supply a random password for the `POSTGRES_PASSWORD` variable.
+You should supply a random password for the `POSTGRES_PASSWORD` variable and any other `_PASSWORD` fields that are blank.
 Of note is the `DEFAULT_ENV` variable, which gives `run_stack.sh` a default environment in which to operate; in development, this should be set to `dev`.
