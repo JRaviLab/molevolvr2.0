@@ -7,10 +7,9 @@ import {
   useState,
 } from "react";
 import {
+  FaCropSimple,
   FaDownload,
   FaExpand,
-  FaMaximize,
-  FaMinimize,
   FaRegImage,
   FaShareNodes,
   FaTableCellsLarge,
@@ -44,6 +43,8 @@ import {
   useLocalStorage,
   useResizeObserver,
 } from "@reactuses/core";
+import Collapse from "@/assets/collapse.svg?react";
+import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
@@ -732,8 +733,15 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
           </Popover>
 
           <Button
-            icon={expanded ? <FaMinimize /> : <FaMaximize />}
-            tooltip={expanded ? "Collapse viz" : "Expand viz"}
+            icon={<FaCropSimple />}
+            design="hollow"
+            tooltip="Fit view to contents"
+            onClick={() => graph.current?.fit(undefined, padding)}
+          />
+
+          <Button
+            icon={expanded ? <Collapse /> : <Expand />}
+            tooltip={expanded ? "Collapse width" : "Expand width"}
             design="hollow"
             onClick={() => setExpanded(!expanded)}
           />

@@ -8,8 +8,6 @@ import {
   FaDownload,
   FaFilter,
   FaMagnifyingGlass,
-  FaMaximize,
-  FaMinimize,
   FaSort,
   FaSortDown,
   FaSortUp,
@@ -35,6 +33,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import Collapse from "@/assets/collapse.svg?react";
+import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Help from "@/components/Help";
@@ -527,7 +527,7 @@ const Table = <Datum extends object>({ cols, rows, sort }: Props<Datum>) => {
           />
           {/* expand/collapse */}
           <Button
-            icon={expanded ? <FaMinimize /> : <FaMaximize />}
+            icon={expanded ? <Collapse /> : <Expand />}
             design="hollow"
             tooltip={expanded ? "Collapse table" : "Expand table"}
             onClick={() => setExpanded(!expanded)}

@@ -1,14 +1,12 @@
-.collapsed {
-  max-width: 100%;
-}
-
 .expanded {
-  max-width: calc(100vw - 40px);
+  width: calc(100vw - 40px);
 }
 
 .scroll {
   max-width: 100%;
   overflow-x: auto;
+  border-radius: var(--rounded);
+  box-shadow: var(--box-shadow);
 }
 
 @media (max-width: 800px) {
