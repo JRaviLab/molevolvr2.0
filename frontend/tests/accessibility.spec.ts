@@ -1,4 +1,3 @@
-import registerAPCACheck from "apca-check";
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import analyses from "@/fixtures/analyses.json" with { type: "json" };
@@ -16,9 +15,6 @@ const paths = [
   ...analyses.map((analysis) => `/analysis/${analysis.id}`),
 ];
 
-/** NOT WORKING YET https://github.com/StackExchange/apca-check/issues/143 */
-registerAPCACheck("bronze");
-
 /** generic page axe test */
 const checkPage = (path: string) =>
   test(`Accessibility check ${path}`, async ({ page, browserName }) => {
@@ -34,11 +30,26 @@ const checkPage = (path: string) =>
 
     /** axe check */
     const check = async () => {
-      const { violations } = await new AxeBuilder({ page })
-        /** https://github.com/dequelabs/axe-core/issues/3325 */
-        .options({ rules: { "color-contrast": { enabled: false } } })
-        .analyze();
-      expect(violations).toEqual([]);
+      /** get page violations */
+      const { violations } = await new AxeBuilder({ page }).analyze();
+
+      const warnRules = [
+        /** just warn about color-contrast violations */
+        /** https://github.com/dequelabs/axe-core/issues/3325#issuecomment-2383832705 */
+        "color-contrast",
+      ];
+
+      /** split up critical/non-critical violations */
+      const isCritical =
+        (match: boolean) => (violation: (typeof violations)[number]) =>
+          !warnRules.includes(violation.id) === match;
+      const criticals = violations.filter(isCritical(true));
+      const warnings = violations.filter(isCritical(false));
+
+      /** fail test on critical violations */
+      expect(criticals).toEqual([]);
+      /** just console log warnings on non-critical violations */
+      console.warn(warnings);
     };
 
     await check();
