@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
   FaArrowRightToBracket,
@@ -144,6 +145,8 @@ const parseTable = (
 
 const NewAnalysis = () => {
   const navigate = useNavigate();
+  /** msa state */
+  const [msaData, setMsaData] = useState(""); 
 
   /** state */
   const [inputType, setInputType] = useState<(typeof inputTypes)[number]["id"]>(
@@ -195,10 +198,20 @@ const NewAnalysis = () => {
 
   /** submit analysis */
   const onSubmit = (data: FormData) => {
+      let dataToSubmit = { ...data };
+
+  if (inputType === "list" && inputFormat === "msa") {
+    // Process MSA data
+    setMsaData(listInput);
+    dataToSubmit.msaData = listInput;
+  }
+
     console.debug(data);
     toast("Analysis submitted", "success");
-    navigate("/analysis/d4e5f6");
+    navigate("/analysis/d4e5f6", { state: { msaData: dataToSubmit.msaData } });
   };
+
+
 
   /** clear inputs when selected input format changes */
   useEffect(() => {
@@ -394,6 +407,10 @@ const NewAnalysis = () => {
               onChange={setAnalysisType}
               name="analysisType"
             />
+            /** msa submittedData new state **/
+            {inputType === "list" && inputFormat === "msa" && (
+            <input type="hidden" name="msaData" value={msaData} />
+            )}
 
             {["homology-domain", "homology"].includes(analysisType) && (
               <Flex direction="column" hAlign="left">
