@@ -1,29 +1,33 @@
-import React, { useEffect, useRef } from 'react';
-import '@nightingale-elements/nightingale-msa'; 
-import { Region, SequencesMSA } from '@nightingale-elements/nightingale-msa'; 
+import React, { useEffect, useRef } from "react";
+import "@nightingale-elements/nightingale-msa";
+import type { Region, SequencesMSA } from "@nightingale-elements/nightingale-msa";
 
-interface NightingaleMSAWrapperProps {
-sequences: SequencesMSA;
-features: Array<Region>;
-}
+type Props = {
+  sequences: SequencesMSA;
+  features?: Region[];
+};
 
 // Define the type for the custom element
-interface NightingaleMSAElement extends HTMLElement {
-data: SequencesMSA;
-features: Array<Region>;
-}
+type NightingaleMSAElement = {
+  data: SequencesMSA;
+  features?: Region[];
+} & HTMLElement;
 
-const NightingaleMSAWrapper: React.FC<NightingaleMSAWrapperProps> = ({ sequences, features }) => {
-const msaRef = useRef<NightingaleMSAElement>(null);
+const NightingaleMSAWrapper = ({ sequences, features }: Props) => {
+  const msaRef = useRef<NightingaleMSAElement>(null);
 
-useEffect(() => {
-if (msaRef.current) {
-msaRef.current.data = sequences;
-msaRef.current.features = features;
-}
-}, [sequences, features]);
+  useEffect(() => {
+    if (msaRef.current) {
+      msaRef.current.data = sequences;
+      if (features) {
+        msaRef.current.features = features.map(feature => ({
+          ...feature,
+        }));
+      }
+    }
+  }, [sequences, features]);
 
-return <nightingale-msa ref={msaRef}></nightingale-msa>;
+  return <nightingale-msa ref={msaRef}></nightingale-msa>;
 };
 
 export default NightingaleMSAWrapper;
