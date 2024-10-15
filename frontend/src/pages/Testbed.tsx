@@ -55,6 +55,8 @@ import Tooltip from "@/components/Tooltip";
 import { useTheme } from "@/util/hooks";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
+import type { SequencesMSA, Region } from "@nightingale-elements/nightingale-msa";
+import NightingaleMSAWrapper from "@/components/nightingale-wrapper/NightingaleMSAWrapper";
 
 /** util func to log change to components for testing */
 const logChange = (...args: unknown[]) => {
@@ -121,9 +123,42 @@ for (let times = 0; times < 10; times++) {
   const edge = sample(edges)!;
   edges.push({ ...edge, id: uniqueId(), source: id, target: id });
 }
-
+type ExtendedRegion = Region & {
+  type: string;
+  start: number;
+  end: number;
+};
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
+  const mockSequences: SequencesMSA = [
+    { name: "Seq1", sequence: "ATGCATGCATGC" },
+    { name: "Seq2", sequence: "ATGC-TGCATGC" },
+    { name: "Seq3", sequence: "ATGCATGC-TGC" },
+  ];
+
+  const mockFeatures: ExtendedRegion[] = [
+    {
+      type: "domain",
+      start: 1,
+      end: 6,
+      residues: { from: 1, to: 6 },
+      sequences: { from: 0, to: 2 },
+      mouseOverFillColor: "rgba(255, 0, 0, 0.5)",
+      fillColor: "rgba(255, 0, 0, 0.3)",
+      borderColor: "rgb(255, 0, 0)",
+    },
+    {
+      type: "motif",
+      start: 8,
+      end: 12,
+      residues: { from: 8, to: 12 },
+      sequences: { from: 0, to: 2 },
+      mouseOverFillColor: "rgba(255, 0, 0, 0.5)",
+      fillColor: "rgba(255, 0, 0, 0.3)",
+      borderColor: "rgb(255, 0, 0)",
+    },
+  ];
+
   return (
     <>
       <Meta title="Testbed" />
@@ -139,6 +174,16 @@ const TestbedPage = () => {
 
         <Network nodes={nodes} edges={edges} />
       </Section>
+
+      <Section>
+        <Heading level={2} icon={<FaBars />}>
+          MSA Visualization
+        </Heading>
+        <NightingaleMSAWrapper sequences={mockSequences} features={mockFeatures} />
+
+      </Section>
+
+
 
       {/* regular html elements and css classes for basic formatting */}
       <Section>
