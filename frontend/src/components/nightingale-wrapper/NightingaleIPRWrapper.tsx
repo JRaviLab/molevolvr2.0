@@ -42,11 +42,20 @@ const NightingaleIPRWrapper = ({ sequence, features }: Props) => {
   return <nightingale-interpro-track ref={iprRef}></nightingale-interpro-track>;
 };
 
+// Use type augmentation instead of namespace
 declare global {
+  type CustomElement<T> = Partial<
+    T &
+      React.DOMAttributes<T> & { children: React.ReactNode; ref?: React.Ref<T> }
+  >;
+
+  type CustomElementTag = {
+    "nightingale-interpro-track": CustomElement<HTMLElement>;
+  };
+
+  // Augment the JSX.IntrinsicElements interface
   namespace JSX {
-    interface IntrinsicElements {
-      'nightingale-interpro-track': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-    }
+    interface IntrinsicElements extends CustomElementTag {}
   }
 }
 

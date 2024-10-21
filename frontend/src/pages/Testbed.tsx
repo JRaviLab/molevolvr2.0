@@ -39,6 +39,7 @@ import Heading from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import Network from "@/components/Network";
+import NightingaleIPRWrapper from "@/components/nightingale-wrapper/NightingaleIPRWrapper";
 import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
 import Radios from "@/components/Radios";
@@ -54,10 +55,25 @@ import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
 import { useTheme } from "@/util/hooks";
 import { formatDate, formatNumber } from "@/util/string";
-import NightingaleIPRWrapper from "@/components/nightingale-wrapper/NightingaleIPRWrapper";
-import type  {Feature}  from "@nightingale-elements/nightingale-interpro-track";
-
 import tableData from "../../fixtures/table.json";
+
+// Define types for IPR Visualization
+type Fragment = {
+  start: number;
+  end: number;
+};
+
+type Location = {
+  fragments: Fragment[];
+};
+
+type Feature = {
+  accession: string;
+  color: string;
+  locations: Location[];
+  shape: string;
+  type: string;
+};
 
 /** util func to log change to components for testing */
 const logChange = (...args: unknown[]) => {
@@ -91,9 +107,9 @@ const ids = nodes.map((node) => node.id);
 /** generate fake edge data */
 const edges = Array(500)
   .fill(null)
-  .map(() => ({ 
+  .map(() => ({
     id: uniqueId(),
-    label: sample([ 
+    label: sample([
       "Lbl.",
       "Label",
       "Long Label",
@@ -127,29 +143,27 @@ for (let times = 0; times < 10; times++) {
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
-  const mockSequence = "MKVLWAALLVTFLAGCQAKVEQAVETEPEPELRQQTEWQSGQRWELALGRFWDYLRWVQTLSEQVQEELLSSQVTQELRALMDETMKELKAYKSELEEQLTPVAEETRARLSKELQAAQARLGADVLASHGRLVQYRGEVQAMLGQSTEELRVRLASHLRKLRKRLLRDADDLQKRLAVYQAGAREGAERGLSAIRERLGPLVEQGRVRAATVGSLAGQPLQERAQAWGERLRARMEEMGSRTRDRLDEVKEQVAEVRAKLEEQAQQRLGSVTGRPRLVLCEEVKVLAGDLPPGGGAPGCHAIPGFNPRGFTPFSGEGSQYSMKLRTLLMVGRYSSWRRNMLLSHSLTRY";
+  const mockSequence =
+    "MKVLWAALLVTFLAGCQAKVEQAVETEPEPELRQQTEWQSGQRWELALGRFWDYLRWVQTLSEQVQEELLSSQVTQELRALMDETMKELKAYKSELEEQLTPVAEETRARLSKELQAAQARLGADVLASHGRLVQYRGEVQAMLGQSTEELRVRLASHLRKLRKRLLRDADDLQKRLAVYQAGAREGAERGLSAIRERLGPLVEQGRVRAATVGSLAGQPLQERAQAWGERLRARMEEMGSRTRDRLDEVKEQVAEVRAKLEEQAQQRLGSVTGRPRLVLCEEVKVLAGDLPPGGGAPGCHAIPGFNPRGFTPFSGEGSQYSMKLRTLLMVGRYSSWRRNMLLSHSLTRY";
   const mockIPRFeatures: Feature[] = [
     {
       accession: "IPR000001",
       color: "#00ff00",
-      start: 10,
-      end: 50,
+      locations: [{ fragments: [{ start: 10, end: 50 }] }],
       shape: "rectangle",
       type: "Domain",
     },
     {
       accession: "IPR000002",
       color: "#ff0000",
-      start: 60,
-      end: 100,
+      locations: [{ fragments: [{ start: 60, end: 100 }] }],
       shape: "rectangle",
       type: "Family",
     },
     {
       accession: "IPR000003",
       color: "#0000ff",
-      start: 120,
-      end: 180,
+      locations: [{ fragments: [{ start: 120, end: 180 }] }],
       shape: "rectangle",
       type: "Repeat",
     },
@@ -162,12 +176,14 @@ const TestbedPage = () => {
         <Heading level={1}>Testbed</Heading>
       </Section>
 
-
       <Section>
         <Heading level={2} icon={<FaBars />}>
           IPR Visualization
         </Heading>
-        <NightingaleIPRWrapper sequence={mockSequence} features={mockIPRFeatures} />
+        <NightingaleIPRWrapper
+          sequence={mockSequence}
+          features={mockIPRFeatures}
+        />
       </Section>
 
       <Section>

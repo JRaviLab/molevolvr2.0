@@ -4,5 +4,3 @@
 /** no type def libraries for these libraries */
 declare module "cytoscape-cola";
 declare module "cytoscape-spread";
-
-
