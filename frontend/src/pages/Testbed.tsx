@@ -54,6 +54,9 @@ import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
 import { useTheme } from "@/util/hooks";
 import { formatDate, formatNumber } from "@/util/string";
+import NightingaleIPRWrapper from "@/components/nightingale-wrapper/NightingaleIPRWrapper";
+import type  {Feature}  from "@nightingale-elements/nightingale-interpro-track";
+
 import tableData from "../../fixtures/table.json";
 
 /** util func to log change to components for testing */
@@ -88,9 +91,9 @@ const ids = nodes.map((node) => node.id);
 /** generate fake edge data */
 const edges = Array(500)
   .fill(null)
-  .map(() => ({
+  .map(() => ({ 
     id: uniqueId(),
-    label: sample([
+    label: sample([ 
       "Lbl.",
       "Label",
       "Long Label",
@@ -124,12 +127,47 @@ for (let times = 0; times < 10; times++) {
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
+  const mockSequence = "MKVLWAALLVTFLAGCQAKVEQAVETEPEPELRQQTEWQSGQRWELALGRFWDYLRWVQTLSEQVQEELLSSQVTQELRALMDETMKELKAYKSELEEQLTPVAEETRARLSKELQAAQARLGADVLASHGRLVQYRGEVQAMLGQSTEELRVRLASHLRKLRKRLLRDADDLQKRLAVYQAGAREGAERGLSAIRERLGPLVEQGRVRAATVGSLAGQPLQERAQAWGERLRARMEEMGSRTRDRLDEVKEQVAEVRAKLEEQAQQRLGSVTGRPRLVLCEEVKVLAGDLPPGGGAPGCHAIPGFNPRGFTPFSGEGSQYSMKLRTLLMVGRYSSWRRNMLLSHSLTRY";
+  const mockIPRFeatures: Feature[] = [
+    {
+      accession: "IPR000001",
+      color: "#00ff00",
+      start: 10,
+      end: 50,
+      shape: "rectangle",
+      type: "Domain",
+    },
+    {
+      accession: "IPR000002",
+      color: "#ff0000",
+      start: 60,
+      end: 100,
+      shape: "rectangle",
+      type: "Family",
+    },
+    {
+      accession: "IPR000003",
+      color: "#0000ff",
+      start: 120,
+      end: 180,
+      shape: "rectangle",
+      type: "Repeat",
+    },
+  ];
   return (
     <>
       <Meta title="Testbed" />
 
       <Section>
         <Heading level={1}>Testbed</Heading>
+      </Section>
+
+
+      <Section>
+        <Heading level={2} icon={<FaBars />}>
+          IPR Visualization
+        </Heading>
+        <NightingaleIPRWrapper sequence={mockSequence} features={mockIPRFeatures} />
       </Section>
 
       <Section>
