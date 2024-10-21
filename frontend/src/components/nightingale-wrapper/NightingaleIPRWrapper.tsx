@@ -26,7 +26,7 @@ type Props = {
 
 type NightingaleIPRElement = {
   sequence: string;
-  features: Feature[];
+  features: Feature[]; 
 } & HTMLElement;
 
 const NightingaleIPRWrapper = ({ sequence, features }: Props) => {

@@ -143,6 +143,8 @@ for (let times = 0; times < 10; times++) {
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
+
+  //mockSequence for IPR Visualization
   const mockSequence =
     "MKVLWAALLVTFLAGCQAKVEQAVETEPEPELRQQTEWQSGQRWELALGRFWDYLRWVQTLSEQVQEELLSSQVTQELRALMDETMKELKAYKSELEEQLTPVAEETRARLSKELQAAQARLGADVLASHGRLVQYRGEVQAMLGQSTEELRVRLASHLRKLRKRLLRDADDLQKRLAVYQAGAREGAERGLSAIRERLGPLVEQGRVRAATVGSLAGQPLQERAQAWGERLRARMEEMGSRTRDRLDEVKEQVAEVRAKLEEQAQQRLGSVTGRPRLVLCEEVKVLAGDLPPGGGAPGCHAIPGFNPRGFTPFSGEGSQYSMKLRTLLMVGRYSSWRRNMLLSHSLTRY";
   const mockIPRFeatures: Feature[] = [
@@ -176,6 +178,7 @@ const TestbedPage = () => {
         <Heading level={1}>Testbed</Heading>
       </Section>
 
+    {/* NightingaleIPRWrapper */}
       <Section>
         <Heading level={2} icon={<FaBars />}>
           IPR Visualization
