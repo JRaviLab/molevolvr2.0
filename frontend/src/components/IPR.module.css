@@ -38,3 +38,7 @@
   width: 10px;
   height: 10px;
 }
+
+:global(.zoom-polygon) {
+  fill: currentColor;
+}
