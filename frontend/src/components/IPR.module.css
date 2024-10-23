@@ -1,0 +1,40 @@
+.manager {
+  width: 100%;
+}
+
+.grid {
+  display: grid !important;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 5px 20px;
+  line-height: unset !important;
+}
+
+.grid > *:nth-child(1),
+.grid > *:nth-child(3) {
+  font-weight: var(--bold);
+}
+
+.grid > *:nth-child(odd) {
+  line-height: var(--compact);
+  text-align: right;
+}
+
+.grid > *:nth-child(even) {
+  width: 0;
+  min-width: 100%;
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(auto, 50px));
+  justify-content: center;
+  width: 100%;
+  gap: 20px;
+}
+
+.legend-entry {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+}

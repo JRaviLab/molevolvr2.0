@@ -1,6 +1,7 @@
 import {
   FaArrowRight,
   FaArrowsUpDown,
+  FaBarcode,
   FaBars,
   FaBeerMugEmpty,
   FaBrush,
@@ -26,7 +27,7 @@ import {
   FaStop,
   FaTableCells,
 } from "react-icons/fa6";
-import { sample, uniqueId } from "lodash";
+import { random, sample, uniqueId } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -36,10 +37,10 @@ import Collapsible from "@/components/Collapsible";
 import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import Heading from "@/components/Heading";
+import IPR from "@/components/IPR";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import Network from "@/components/Network";
-import NightingaleIPRWrapper from "@/components/nightingale-wrapper/NightingaleIPRWrapper";
 import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
 import Radios from "@/components/Radios";
@@ -56,24 +57,6 @@ import Tooltip from "@/components/Tooltip";
 import { useTheme } from "@/util/hooks";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
-
-// Define types for IPR Visualization
-type Fragment = {
-  start: number;
-  end: number;
-};
-
-type Location = {
-  fragments: Fragment[];
-};
-
-type Feature = {
-  accession: string;
-  color: string;
-  locations: Location[];
-  shape: string;
-  type: string;
-};
 
 /** util func to log change to components for testing */
 const logChange = (...args: unknown[]) => {
@@ -141,35 +124,43 @@ for (let times = 0; times < 10; times++) {
   edges.push({ ...edge, id: uniqueId(), source: id, target: id });
 }
 
+/** generate fake sequence data */
+const sequence = Array(random(10, 100))
+  .fill(null)
+  .map(() => sample(["G", "A", "T", "C"]))
+  .join("");
+
+/** generate fake interproscan track data */
+const tracks = Array(10)
+  .fill(null)
+  .map(() => ({
+    label: sample(["Lbl.", "Label", "Long Label", "Really Long Label"]),
+    features: Array(random(1, 3))
+      .fill(null)
+      .map(() => {
+        const start = random(1, Math.floor(sequence.length / 2));
+        const end = random(
+          start + Math.floor(sequence.length / 4),
+          sequence.length,
+        );
+        return {
+          id: uniqueId(),
+          label: sample([
+            "Lbl.",
+            "Label",
+            "Long Label",
+            "Really Long Label",
+            undefined,
+          ]),
+          type: sample(["cat", "dog", "bird", undefined]),
+          start,
+          end,
+        };
+      }),
+  }));
+
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
-
-  //mockSequence for IPR Visualization
-  const mockSequence =
-    "MKVLWAALLVTFLAGCQAKVEQAVETEPEPELRQQTEWQSGQRWELALGRFWDYLRWVQTLSEQVQEELLSSQVTQELRALMDETMKELKAYKSELEEQLTPVAEETRARLSKELQAAQARLGADVLASHGRLVQYRGEVQAMLGQSTEELRVRLASHLRKLRKRLLRDADDLQKRLAVYQAGAREGAERGLSAIRERLGPLVEQGRVRAATVGSLAGQPLQERAQAWGERLRARMEEMGSRTRDRLDEVKEQVAEVRAKLEEQAQQRLGSVTGRPRLVLCEEVKVLAGDLPPGGGAPGCHAIPGFNPRGFTPFSGEGSQYSMKLRTLLMVGRYSSWRRNMLLSHSLTRY";
-  const mockIPRFeatures: Feature[] = [
-    {
-      accession: "IPR000001",
-      color: "#00ff00",
-      locations: [{ fragments: [{ start: 10, end: 50 }] }],
-      shape: "rectangle",
-      type: "Domain",
-    },
-    {
-      accession: "IPR000002",
-      color: "#ff0000",
-      locations: [{ fragments: [{ start: 60, end: 100 }] }],
-      shape: "rectangle",
-      type: "Family",
-    },
-    {
-      accession: "IPR000003",
-      color: "#0000ff",
-      locations: [{ fragments: [{ start: 120, end: 180 }] }],
-      shape: "rectangle",
-      type: "Repeat",
-    },
-  ];
   return (
     <>
       <Meta title="Testbed" />
@@ -178,15 +169,13 @@ const TestbedPage = () => {
         <Heading level={1}>Testbed</Heading>
       </Section>
 
-    {/* NightingaleIPRWrapper */}
+      {/* IPR */}
       <Section>
-        <Heading level={2} icon={<FaBars />}>
-          IPR Visualization
+        <Heading level={2} icon={<FaBarcode />}>
+          IPR
         </Heading>
-        <NightingaleIPRWrapper
-          sequence={mockSequence}
-          features={mockIPRFeatures}
-        />
+
+        <IPR sequence={sequence} tracks={tracks} />
       </Section>
 
       <Section>
