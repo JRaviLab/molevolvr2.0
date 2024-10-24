@@ -1,23 +1,19 @@
 import cytoscape from "cytoscape";
+import { omit } from "lodash";
 
-export type NodeShape = {
-  name: string;
-  points?: number[];
-};
+type NodeShapesRecord = Record<cytoscape.Css.NodeShape, { points?: number[] }>;
 
 type CytoscapeRenderer = {
   prototype: {
     registerNodeShapes: () => void;
-    nodeShapes: Record<string, NodeShape>;
+    nodeShapes: NodeShapesRecord;
   };
 };
 
 /** initialise cytoscape base renderer extension and access only nodeShapes */
-export const nodeShapes = ((): Record<string, NodeShape> => {
+export const nodeShapes = ((): NodeShapesRecord => {
   const baseRenderer = cytoscape("renderer", "base") as CytoscapeRenderer;
   baseRenderer.prototype.registerNodeShapes();
   const shapes = baseRenderer.prototype.nodeShapes;
-  return Object.fromEntries(
-    Object.entries(shapes).filter(([key]) => key !== "makePolygon"),
-  );
+  return omit(shapes, "makePolygon");
 })();
