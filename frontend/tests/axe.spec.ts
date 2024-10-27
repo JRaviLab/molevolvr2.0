@@ -1,14 +1,15 @@
 import { AxeBuilder } from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import analyses from "@/fixtures/analyses.json" with { type: "json" };
 import { log } from "./util";
 
 log();
 
-/** pages to test */
-const paths = [
+/** pages to test */ 
+//exported path Also to be used in lighthouse.spec.ts
+export const paths = [
   "/testbed",
-  "/",
+  "/", 
   "/load-analysis",
   "/new-analysis",
   "/about",
@@ -31,7 +32,7 @@ const checkPage = (path: string) =>
     /** axe check */
     const check = async () => {
       /** get page violations */
-      const { violations } = await new AxeBuilder({ page }).analyze();
+      const { violations } = await new AxeBuilder({ page  }).analyze();
 
       const warnRules = [
         /** just warn about color-contrast violations */
@@ -50,9 +51,9 @@ const checkPage = (path: string) =>
       expect(criticals).toEqual([]);
       /** just console log warnings on non-critical violations */
       console.warn(warnings);
-    };
+    }; 
 
-    await check();
+    await check(); 
     /** check dark mode */
     await page
       .locator("header button[role='switch'][aria-label*='mode']")

@@ -5,6 +5,7 @@ const url = `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: "./tests",
+  //testMatch: "tests/lighthouse.spec.ts", //This runs light house test for only the lighhouse.spec.ts file
   fullyParallel: true,
   reporter: "html",
   use: {
@@ -16,12 +17,12 @@ export default defineConfig({
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
-    // { name: "Mobile Chrome", use: { ...devices["Pixel 5"] } },
-    // { name: "Mobile Safari", use: { ...devices["iPhone 12"] } },
   ],
 
   webServer: {
-    command: `bun run dev --port ${port}`,
+    command: process.env.CI
+      ? `bun run build && bun run start --port ${port}` // production build for CI/Lighthouse
+      : `bun run dev --port ${port}`, // dev build for regular testing
     url,
     reuseExistingServer: !process.env.CI,
   },
