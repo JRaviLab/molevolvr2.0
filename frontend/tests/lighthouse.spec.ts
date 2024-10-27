@@ -6,28 +6,28 @@ import { test } from "@playwright/test";
 import analyses from "@/fixtures/analyses.json" with { type: "json" };
 import { log } from "./util";
 
-log();
+log(); 
 
 export const paths = [
   "/testbed",
   "/", 
   "/load-analysis", 
-  "/new-analysis",
+  "/new-analysis", 
   "/about",
   ...analyses.map((analysis) => `/analysis/${analysis.id}`),
 ];
 
 const thresholds = {
   performance: 80,
-  accessibility: 90,
-  "best-practices": 85,
+  accessibility: 90, 
+  "best-practices": 85, 
   seo: 85,
   pwa: 50,
 };
 
 const config = {
   extends: "lighthouse:default",
-  settings: {
+  settings: { 
     formFactor: "desktop" as const,
     screenEmulation: { disabled: true },
     //emulatedUserAgent: "desktop",

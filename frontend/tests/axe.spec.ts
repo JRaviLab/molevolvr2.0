@@ -1,5 +1,5 @@
 import { AxeBuilder } from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import analyses from "@/fixtures/analyses.json" with { type: "json" };
 import { log } from "./util";
 
