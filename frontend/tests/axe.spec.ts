@@ -1,24 +1,13 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import analyses from "@/fixtures/analyses.json" with { type: "json" };
+import { paths } from "./paths";
 import { log } from "./util";
 
 log();
 
-/** pages to test */ 
-//exported path Also to be used in lighthouse.spec.ts
-export const paths = [
-  "/testbed",
-  "/", 
-  "/load-analysis",
-  "/new-analysis",
-  "/about",
-  ...analyses.map((analysis) => `/analysis/${analysis.id}`),
-];
-
 /** generic page axe test */
 const checkPage = (path: string) =>
-  test(`Accessibility check ${path}`, async ({ page, browserName }) => {
+  test(`Axe check ${path}`, async ({ page, browserName }) => {
     /** axe tests should be independent of browser, so only run one */
     test.skip(browserName !== "chromium", "Only test Axe on chromium");
 
@@ -32,7 +21,7 @@ const checkPage = (path: string) =>
     /** axe check */
     const check = async () => {
       /** get page violations */
-      const { violations } = await new AxeBuilder({ page  }).analyze();
+      const { violations } = await new AxeBuilder({ page }).analyze();
 
       const warnRules = [
         /** just warn about color-contrast violations */
@@ -51,9 +40,9 @@ const checkPage = (path: string) =>
       expect(criticals).toEqual([]);
       /** just console log warnings on non-critical violations */
       console.warn(warnings);
-    }; 
+    };
 
-    await check(); 
+    await check();
     /** check dark mode */
     await page
       .locator("header button[role='switch'][aria-label*='mode']")
