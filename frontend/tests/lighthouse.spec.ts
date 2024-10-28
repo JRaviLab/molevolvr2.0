@@ -1,5 +1,6 @@
+import type { Config } from "lighthouse";
 import { playAudit } from "playwright-lighthouse";
-import { chromium, test } from "@playwright/test";
+import { test } from "@playwright/test";
 import { paths } from "./paths";
 import { log } from "./util";
 
@@ -8,19 +9,19 @@ log();
 const port = 1234;
 
 const thresholds = {
-  performance: 80,
+  /** https://github.com/abhinaba-ghosh/playwright-lighthouse/issues/31 */
+  performance: 40,
   accessibility: 90,
   "best-practices": 85,
   seo: 85,
   pwa: 0,
 };
 
-const config = {
+const config: Config = {
   extends: "lighthouse:default",
   settings: {
-    formFactor: "desktop" as const,
+    formFactor: "desktop",
     screenEmulation: { disabled: true },
-    accessibilityScoring: "apca",
   },
 };
 
@@ -28,14 +29,8 @@ const config = {
 const directory = "lighthouse";
 
 const checkPage = (path: string) =>
-  test(`Lighthouse check ${path}`, async ({ browserName }) => {
+  test(`Lighthouse check ${path}`, async ({ page, browserName }) => {
     test.skip(browserName !== "chromium", "Lighthouse only works in Chromium");
-
-    /** launch chromium with necessary flags */
-    const browser = await chromium.launch({
-      args: [`--remote-debugging-port=${port}`],
-    });
-    const page = await browser.newPage();
 
     /** navigate to page */
     await page.goto(path);
@@ -56,9 +51,6 @@ const checkPage = (path: string) =>
         directory,
       },
     });
-
-    /** clean up */
-    await browser.close();
   });
 
 /** check all pages */
