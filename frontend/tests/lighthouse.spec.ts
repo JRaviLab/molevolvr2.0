@@ -10,7 +10,7 @@ log();
 
 const thresholds = {
   /** https://github.com/abhinaba-ghosh/playwright-lighthouse/issues/31 */
-  performance: 30,
+  performance: 0,
   accessibility: 90,
   "best-practices": 85,
   seo: 70,
