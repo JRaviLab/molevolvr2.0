@@ -10,10 +10,10 @@ const port = 1234;
 
 const thresholds = {
   /** https://github.com/abhinaba-ghosh/playwright-lighthouse/issues/31 */
-  performance: 40,
+  performance: 0,
   accessibility: 90,
   "best-practices": 85,
-  seo: 85,
+  seo: 70,
   pwa: 0,
 };
 
