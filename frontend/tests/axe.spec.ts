@@ -1,23 +1,13 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import analyses from "@/fixtures/analyses.json" with { type: "json" };
+import { paths } from "./paths";
 import { log } from "./util";
 
 log();
 
-/** pages to test */
-const paths = [
-  "/testbed",
-  "/",
-  "/load-analysis",
-  "/new-analysis",
-  "/about",
-  ...analyses.map((analysis) => `/analysis/${analysis.id}`),
-];
-
 /** generic page axe test */
 const checkPage = (path: string) =>
-  test(`Accessibility check ${path}`, async ({ page, browserName }) => {
+  test(`Axe check ${path}`, async ({ browserName, page }) => {
     /** axe tests should be independent of browser, so only run one */
     test.skip(browserName !== "chromium", "Only test Axe on chromium");
 
@@ -48,8 +38,11 @@ const checkPage = (path: string) =>
 
       /** fail test on critical violations */
       expect(criticals).toEqual([]);
-      /** just console log warnings on non-critical violations */
-      console.warn(warnings);
+      /** just log warnings on non-critical violations */
+      test.info().annotations.push({
+        type: " Warning",
+        description: JSON.stringify(warnings),
+      });
     };
 
     await check();
@@ -61,4 +54,4 @@ const checkPage = (path: string) =>
   });
 
 /** check all pages */
-for (const path of paths) checkPage(path);
+await Promise.all(paths.map(checkPage));

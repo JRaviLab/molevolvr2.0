@@ -1,28 +1,25 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const port = "1234";
+const port = 1234;
 const url = `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
+  workers: "75%",
   reporter: "html",
-  use: {
-    baseURL: url,
-    // headless: false,
-  },
+  use: { baseURL: url },
 
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
-    // { name: "Mobile Chrome", use: { ...devices["Pixel 5"] } },
-    // { name: "Mobile Safari", use: { ...devices["iPhone 12"] } },
   ],
 
   webServer: {
-    command: `bun run dev --port ${port}`,
+    /** dev mode penalizes lighthouse performance checks */
+    command: `bun run build && bun run preview --port ${port}`,
     url,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
   },
 });
