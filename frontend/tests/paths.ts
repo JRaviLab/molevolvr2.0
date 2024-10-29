@@ -1,4 +1,6 @@
-import analyses from "@/fixtures/analyses.json" with { type: "json" };
+import { createRequire } from "module";
+
+const analyses = createRequire(import.meta.url)("@/fixtures/analyses.json");
 
 /** page paths to test */
 export const paths = [

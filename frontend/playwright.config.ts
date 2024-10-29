@@ -16,17 +16,14 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: {
-        ...devices["Desktop Chrome"],
-        launchOptions: { args: [`--remote-debugging-port=${port}`] },
-      },
+      use: { ...devices["Desktop Chrome"] },
     },
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
   ],
 
   webServer: {
-    /** do production build to not be penalized in lighthouse checks */
+    /** dev mode penalizes lighthouse performance checks */
     command: `bun run build && bun run preview --port ${port}`,
     url,
     reuseExistingServer: true,

@@ -7,7 +7,7 @@ log();
 
 /** generic page axe test */
 const checkPage = (path: string) =>
-  test(`Axe check ${path}`, async ({ page, browserName }) => {
+  test(`Axe check ${path}`, async ({ browserName, page }) => {
     /** axe tests should be independent of browser, so only run one */
     test.skip(browserName !== "chromium", "Only test Axe on chromium");
 
@@ -38,8 +38,11 @@ const checkPage = (path: string) =>
 
       /** fail test on critical violations */
       expect(criticals).toEqual([]);
-      /** just console log warnings on non-critical violations */
-      console.warn(warnings);
+      /** just log warnings on non-critical violations */
+      test.info().annotations.push({
+        type: " Warning",
+        description: JSON.stringify(warnings),
+      });
     };
 
     await check();
@@ -51,4 +54,4 @@ const checkPage = (path: string) =>
   });
 
 /** check all pages */
-paths.forEach(checkPage);
+await Promise.all(paths.map(checkPage));
