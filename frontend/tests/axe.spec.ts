@@ -51,4 +51,4 @@ const checkPage = (path: string) =>
   });
 
 /** check all pages */
-for (const path of paths) checkPage(path);
+paths.forEach(checkPage);

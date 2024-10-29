@@ -6,6 +6,7 @@ const url = `http://localhost:${port}`;
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
+  workers: "75%",
   reporter: "html",
   use: {
     baseURL: url,
@@ -28,6 +29,6 @@ export default defineConfig({
     /** do production build to not be penalized in lighthouse checks */
     command: `bun run build && bun run preview --port ${port}`,
     url,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
   },
 });
