@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2017",
     "allowSyntheticDefaultImports": true,
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "types": ["node", "@axe-core/playwright"],
+    "types": ["@axe-core/playwright"],
     "paths": {
       "@/*": ["./*"]
     }
