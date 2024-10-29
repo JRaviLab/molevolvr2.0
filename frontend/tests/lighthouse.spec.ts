@@ -26,7 +26,7 @@ const config: Config = {
 };
 
 /** output directory */
-const directory = "lighthouse";
+const directory = "lighthouse-report";
 
 const checkPage = (path: string) =>
   test(`Lighthouse check ${path}`, async ({ page, browserName }) => {
