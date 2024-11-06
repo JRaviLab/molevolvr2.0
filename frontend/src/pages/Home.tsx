@@ -87,7 +87,7 @@ const Home = () => {
           Examples
         </Heading>
 
-        <p className="primary">
+        <p className="primary center">
           See what MolEvolvR results look like without inputting anything
         </p>
 
