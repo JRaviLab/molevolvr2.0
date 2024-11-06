@@ -17,11 +17,17 @@ export const waitFor = async <El extends Element>(
   }
 };
 
+/** https://stackoverflow.com/questions/49318497/google-chrome-simultaneously-smooth-scrollintoview-with-more-elements-doesn */
+let isSmoothScrolling = false;
+
 /** scroll to element, optionally by selector */
 export const scrollTo = async (
   selector?: string | Element | null,
-  options?: ScrollIntoViewOptions,
+  options: ScrollIntoViewOptions = { behavior: "smooth" },
 ) => {
+  /** don't interfere with smooth scroll bug */
+  if (isSmoothScrolling) return;
+
   /** wait for element to appear */
   const element =
     typeof selector === "string" ? await waitFor(selector) : selector;
@@ -31,14 +37,20 @@ export const scrollTo = async (
   await sleep(100);
 
   /** scroll to element */
-  element.scrollIntoView({ behavior: "smooth", ...options });
-};
+  element.scrollIntoView(options);
 
-/**
- * debounced version of scroll-to
- * https://stackoverflow.com/questions/49318497/google-chrome-simultaneously-smooth-scrollintoview-with-more-elements-doesn
- */
-export const debouncedScrollTo = debounce(scrollTo, 100);
+  if (options.behavior === "smooth") {
+    /** set smooth scrolling flag */
+    isSmoothScrolling = true;
+
+    /** unset smooth scrolling flag once done */
+    const unset = debounce(() => {
+      isSmoothScrolling = false;
+      window.removeEventListener("scroll", unset, true);
+    }, 100);
+    window.addEventListener("scroll", unset, true);
+  }
+};
 
 /** get text content of react node */
 export const renderText = (node: ReactNode) => {
