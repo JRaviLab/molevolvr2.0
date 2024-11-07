@@ -629,6 +629,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
           hAlign="left"
           vAlign="top"
           className={classes.legend}
+          tabIndex={0}
         >
           {selectedItems.length ? (
             /** show info about selected nodes/edges */
