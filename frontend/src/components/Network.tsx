@@ -270,6 +270,7 @@ const layoutOptions = layouts.map(({ name, label }) => ({
 })) satisfies Option[];
 
 const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
+  const root = useRef<HTMLDivElement | null>(null);
   const container = useRef<HTMLDivElement | null>(null);
   const graph = useRef<Core | null>(null);
   const layout = useRef<Layouts | null>(null);
@@ -406,8 +407,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     let justPanned = false;
 
     /** when panning, limit pan */
-    graph.current.on("viewport", (event) => {
-      console.log(event.target._private);
+    graph.current.on("viewport", () => {
       if (!graph.current) return;
 
       if (justPanned) return (justPanned = false);
@@ -572,9 +572,9 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   }, [nodes, edges, layoutParams]);
 
   /** on resize */
-  useResizeObserver(container, () => {
+  useResizeObserver(root, () => {
     graph.current?.resize();
-    graph.current?.fit(undefined, padding);
+    // graph.current?.fit(undefined, padding);
   });
 
   /** download network */
@@ -619,6 +619,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   return (
     <Flex direction="column" full>
       <div
+        ref={root}
         className={clsx(classes.network, expanded && classes.expanded)}
         style={{ aspectRatio }}
       >
