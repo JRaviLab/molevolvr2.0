@@ -9,12 +9,7 @@ import {
 } from "@reactuses/core";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
-import {
-  debouncedScrollTo,
-  firstInView,
-  isCovering,
-  scrollTo,
-} from "@/util/dom";
+import { firstInView, isCovering, scrollTo } from "@/util/dom";
 import { sleep } from "@/util/misc";
 import classes from "./TableOfContents.module.css";
 
@@ -73,7 +68,8 @@ const TableOfContents = () => {
       /** if covering something important, close */
       debouncedIsCovering(root.current, () => setOpen(false));
       /** scroll active toc item into view */
-      debouncedScrollTo(active.current ?? list.current?.firstElementChild, {
+      scrollTo(active.current ?? list.current?.firstElementChild, {
+        behavior: "instant",
         block: "center",
       });
     }

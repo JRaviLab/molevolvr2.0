@@ -1,4 +1,5 @@
 .list {
+  z-index: 3;
   position: fixed;
   right: 0;
   bottom: 0;

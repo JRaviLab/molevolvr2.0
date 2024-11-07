@@ -49,7 +49,6 @@ const Toasts = () => {
       direction="column"
       hAlign="stretch"
       gap="sm"
-      className={classes.list}
       role="region"
       aria-label="Notifications"
     >
