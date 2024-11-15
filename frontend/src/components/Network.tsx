@@ -382,10 +382,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   );
 
   /** fit view to contents */
-  const fit = async () => {
-    await sleep(10);
-    graph.current?.fit(undefined, padding);
-  };
+  const fit = async () => graph.current?.fit(undefined, padding);
 
   /** init cytoscape graph and attach event listeners */
   useEffect(() => {
@@ -445,7 +442,11 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     });
 
     /** fit view */
-    graph.current.on("layoutstop", fit);
+    graph.current.on("layoutstop", async () => {
+      /** some layout algos aren't fully done when this event is called */
+      await sleep(10);
+      fit();
+    });
     graph.current.on("dblclick", fit);
 
     /** indicate hover-ability */
