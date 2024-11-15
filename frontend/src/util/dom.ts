@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import reactToText from "react-to-text";
+import { onlyText } from "react-children-utilities";
 import { debounce } from "lodash";
 import { sleep } from "@/util/misc";
 
@@ -64,23 +64,10 @@ export const renderText = (node: ReactNode) => {
    * alternative react suggests (createRoot, flushSync, root.render) completely
    * impractical. has same context issue, and also can't be called during
    * render/lifecycle (could be worked around by making it async, but then using
-   * this function in situ becomes much more of pain)
+   * this function in situ becomes much more of pain).
    */
 
-  /** try normally */
-  let text = reactToText(node);
-  if (text.trim()) return text.trim();
-
-  /** https://github.com/lhansford/react-to-text/issues/332 */
-  try {
-    // @ts-expect-error not checking deep props
-    text = reactToText(node.type.render(node.props));
-  } catch (error) {
-    //
-  }
-  if (text.trim()) return text.trim();
-
-  return "";
+  return onlyText(node);
 };
 
 /** find index of first element "in view". model behavior off of wikiwand.com. */

@@ -37,6 +37,7 @@ import fcose, { type FcoseLayoutOptions } from "cytoscape-fcose";
 import klay, { type KlayLayoutOptions } from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
+import domtoimage from "dom-to-image-more";
 import { omit, orderBy, startCase, truncate } from "lodash";
 import {
   useFullscreen,
@@ -61,6 +62,7 @@ import {
 } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { lerp } from "@/util/math";
+import { sleep } from "@/util/misc";
 import { getShapeMap } from "@/util/shapes";
 import { formatNumber } from "@/util/string";
 import classes from "./Network.module.css";
@@ -379,6 +381,9 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     [_edges, nodes, minEdgeStrength, maxEdgeStrength, edgeColors],
   );
 
+  /** fit view to contents */
+  const fit = async () => graph.current?.fit(undefined, padding);
+
   /** init cytoscape graph and attach event listeners */
   useEffect(() => {
     if (!container.current) return;
@@ -390,9 +395,6 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       minZoom,
       maxZoom,
     });
-
-    /** reset view */
-    graph.current.on("dblclick", () => graph.current?.fit(undefined, padding));
 
     /** select/deselect items */
     graph.current.on("select unselect", "node, edge", () =>
@@ -438,6 +440,14 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       /** adjust pan */
       graph.current.pan(pan);
     });
+
+    /** fit view */
+    graph.current.on("layoutstop", async () => {
+      /** some layout algos aren't fully done when this event is called */
+      await sleep(10);
+      fit();
+    });
+    graph.current.on("dblclick", fit);
 
     /** indicate hover-ability */
     const over = () => {
@@ -574,22 +584,24 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   /** on resize */
   useResizeObserver(root, () => {
     graph.current?.resize();
-    // graph.current?.fit(undefined, padding);
   });
 
   /** download network */
   const download = useCallback(
     (format: string) => {
       if (!graph.current) return;
+      if (!root.current) return;
 
       if (format === "png")
-        graph.current
-          .png({ output: "blob-promise", scale: 2 })
+        domtoimage
+          // @ts-expect-error non-comprehensive types for dom-to-image-more
+          .toPng(root.current, { scale: 2 })
           .then((blob) => downloadPng(blob, "network"));
 
       if (format === "jpg")
-        graph.current
-          .jpeg({ output: "blob-promise", scale: 2 })
+        domtoimage
+          // @ts-expect-error non-comprehensive types for dom-to-image-more
+          .toJpeg(root.current, { scale: 2 })
           .then((blob) => downloadJpg(blob, "network"));
 
       if (format === "csv" || format === "tsv") {
@@ -752,7 +764,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                   icon={<FaRegImage />}
                   text="PNG"
                   onClick={() => download("png")}
-                  tooltip="High-resolution image, with transparency"
+                  tooltip="High-resolution image"
                 />
                 <Button
                   icon={<FaRegImage />}
@@ -794,7 +806,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
             icon={<FaCropSimple />}
             design="hollow"
             tooltip="Fit view to contents"
-            onClick={() => graph.current?.fit(undefined, padding)}
+            onClick={fit}
           />
 
           <Button
