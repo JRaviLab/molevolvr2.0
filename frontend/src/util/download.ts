@@ -1,6 +1,6 @@
 import { stringify } from "csv-stringify/browser/esm/sync";
 
-type Filename = string | string[];
+export type Filename = string | string[];
 
 /** download url as file */
 const download = (
@@ -14,21 +14,19 @@ const download = (
   const link = document.createElement("a");
   link.href = url;
   link.download =
-    [filename]
+    [import.meta.env.VITE_TITLE, filename]
       .flat()
-      /** join parts */
+      .map((part) =>
+        part
+          /** make path safe */
+          .replace(/[^A-Za-z0-9]+/g, "-")
+          /** remove leading/trailing dashes */
+          .replace(/(^-+)|(-+$)/g, ""),
+      )
+      .filter(Boolean)
       .join("_")
-      /** make path-safe */
-      .replace(/[^A-Za-z0-9 -]+/g, " ")
-      /** consolidate underscores */
-      .replace(/_+/g, "_")
-      /** consolidate dashes */
-      .replace(/-+/g, "-")
-      /** consolidate spaces */
-      .replace(/\s+/g, " ")
       /** remove extension if already included */
-      .replace(new RegExp("." + ext + "$"), "")
-      .trim() +
+      .replace(new RegExp("." + ext + "$"), "") +
     "." +
     ext;
   link.click();
@@ -46,19 +44,32 @@ export const getUrl = (
     ? data
     : window.URL.createObjectURL(new Blob([data], { type }));
 
+/** csv/tsv data format. array of objects or array of arrays. */
+type CSV = (Record<string, unknown> | unknown[])[];
+
 /** download table data as csv */
-export const downloadCsv = (data: unknown[], filename: Filename) =>
+export const downloadCsv = (data: CSV, filename: Filename) =>
   download(
-    getUrl(stringify(data, { header: true }), "text/csv;charset=utf-8"),
+    getUrl(
+      stringify(data, {
+        /** whether data is array of objects or array of arrays */
+        header: !Array.isArray(data[0]),
+      }),
+      "text/csv;charset=utf-8",
+    ),
     filename,
     "csv",
   );
 
 /** download table data as tsv */
-export const downloadTsv = (data: unknown[], filename: Filename) =>
+export const downloadTsv = (data: CSV, filename: Filename) =>
   download(
     getUrl(
-      stringify(data, { header: true, delimiter: "\t" }),
+      stringify(data, {
+        /** whether data is array of objects or array of arrays */
+        header: !Array.isArray(data[0]),
+        delimiter: "\t",
+      }),
       "text/tab-separated-values",
     ),
     filename,

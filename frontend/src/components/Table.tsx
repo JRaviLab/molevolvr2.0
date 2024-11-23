@@ -46,6 +46,7 @@ import Slider from "@/components/Slider";
 import TextBox from "@/components/TextBox";
 import Tooltip from "@/components/Tooltip";
 import { downloadCsv } from "@/util/download";
+import type { Filename } from "@/util/download";
 import { formatDate, formatNumber } from "@/util/string";
 import classes from "./Table.module.css";
 
@@ -93,6 +94,7 @@ type Props<Datum extends object> = {
   cols: _Col<Datum>[];
   rows: Datum[];
   sort?: SortingState;
+  filename?: Filename;
 };
 
 /** map column definition to multi-select option */
@@ -110,7 +112,12 @@ const colToOption = <Datum extends object>(
  * reference:
  * https://codesandbox.io/p/devbox/tanstack-table-example-kitchen-sink-vv4871
  */
-const Table = <Datum extends object>({ cols, rows, sort }: Props<Datum>) => {
+const Table = <Datum extends object>({
+  cols,
+  rows,
+  sort,
+  filename = "table",
+}: Props<Datum>) => {
   /** expanded state */
   const [expanded, setExpanded] = useLocalStorage("table-expanded", false);
 
@@ -522,7 +529,7 @@ const Table = <Datum extends object>({ cols, rows, sort }: Props<Datum>) => {
                 .rows.map((row) => Object.values(pick(row.original, keys)));
 
               /** download */
-              downloadCsv([names, ...data], ["geneplexus", "table"]);
+              downloadCsv([names, ...data], filename);
             }}
           />
           {/* expand/collapse */}
