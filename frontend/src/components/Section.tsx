@@ -25,7 +25,7 @@ const Section = ({ fill, full, className, ...props }: Props) => (
     direction="column"
     gap="lg"
     vAlign="top"
-    className={clsx(classes.section, className, {
+    className={clsx(className, classes.section, {
       [classes.fill!]: fill,
       [classes.full!]: full,
     })}

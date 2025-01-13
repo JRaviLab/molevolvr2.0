@@ -116,12 +116,12 @@ const SelectMulti = <O extends Option>({
                         style={{ opacity: selected ? 1 : 0 }}
                       />
                       <span className={classes.primary}>{option.primary}</span>
-                      <span className={clsx(classes.secondary, "secondary")}>
+                      <span className={clsx("secondary", classes.secondary)}>
                         {option.secondary}
                       </span>
                       {option.icon &&
                         cloneElement(option.icon, {
-                          className: clsx(classes.icon, "secondary"),
+                          className: clsx("secondary", classes.icon),
                         })}
                     </li>
                   )}

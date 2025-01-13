@@ -47,7 +47,7 @@ const Link = forwardRef(
         ref={ref}
         href={to}
         target={target}
-        className={clsx(classes.link, className)}
+        className={clsx(className, classes.link)}
         {...props}
       >
         {children}
@@ -58,7 +58,7 @@ const Link = forwardRef(
         ref={ref}
         to={to}
         target={target}
-        className={clsx(classes.link, className)}
+        className={clsx(className, classes.link)}
         /** preserve state */
         state={state}
         {...props}

@@ -16,8 +16,8 @@ type Props = {
 /** card with title, badge, and text/image */
 const FeatureCard = ({ title, badge, content }: Props) => {
   return (
-    <Flex direction="column" className={clsx(classes.card, "card")}>
-      <Flex wrap={false} gap="sm" className={clsx(classes.title, "full")}>
+    <Flex direction="column" className={clsx("card", classes.card)}>
+      <Flex wrap={false} gap="sm" className={clsx("full", classes.title)}>
         <span className="primary">{title}</span>
         {badge && <Badge className={classes.badge}>{badge}</Badge>}
       </Flex>

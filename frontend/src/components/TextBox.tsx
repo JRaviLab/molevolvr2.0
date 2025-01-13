@@ -139,7 +139,7 @@ const TextBox = ({
   );
 
   return (
-    <div className={clsx(classes.container, classes[layout], className)}>
+    <div className={clsx(className, classes.container, classes[layout])}>
       {(label || props.required) && (
         <label className={classes.label} htmlFor={id}>
           {label}

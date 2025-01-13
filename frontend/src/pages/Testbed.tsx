@@ -6,6 +6,7 @@ import {
   FaBrush,
   FaCat,
   FaChampagneGlasses,
+  FaChartPie,
   FaCircleInfo,
   FaClipboardList,
   FaFont,
@@ -26,7 +27,7 @@ import {
   FaStop,
   FaTableCells,
 } from "react-icons/fa6";
-import { sample, uniqueId } from "lodash";
+import { random, sample, uniqueId } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -46,6 +47,7 @@ import Section from "@/components/Section";
 import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
+import Sunburst, { type Layer } from "@/components/Sunburst";
 import Table from "@/components/Table";
 import Tabs, { Tab } from "@/components/Tabs";
 import TextBox from "@/components/TextBox";
@@ -56,35 +58,62 @@ import { useTheme } from "@/util/hooks";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
 
-/** util func to log change to components for testing */
-const logChange = (...args: unknown[]) => {
-  console.debug(...args);
-};
+/** random words of varying length */
+const words =
+  "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum".split(
+    " ",
+  );
+
+/** random phrases of varying length */
+const phrases = Array(10)
+  .fill("")
+  .map((_, index) =>
+    Array(index + 1)
+      .fill("")
+      .map(() => sample(words)!)
+      .join(" "),
+  );
+
+/** generate fake label */
+const label = () => sample([...phrases, undefined]);
+
+/** generate fake "type" */
+const type = () =>
+  sample([
+    "gene",
+    "disease",
+    "compound",
+    "anatomy",
+    "phenotype",
+    "symptom",
+    "genotype",
+    "variant",
+    "pathway",
+    undefined,
+  ]);
+
+/** generate fake sunburst layer data */
+const layer = (depth: number): Layer => ({
+  label: label(),
+  type: type(),
+  value: random(10, 100),
+  ...(depth < 3 && {
+    children: Array(random(1, 3))
+      .fill({})
+      .map(() => layer(depth + 1)),
+  }),
+});
+
+/** generate fake sunburst data */
+const sunburst = [layer(1), layer(1), layer(1)];
 
 /** generate fake node data */
 const nodes = Array(200)
   .fill(null)
   .map(() => ({
     id: uniqueId(),
-    label: sample([
-      "Lbl.",
-      "Label",
-      "Long Label",
-      "Really Long Label",
-      undefined,
-    ]),
-    type: sample([
-      "gene",
-      "disease",
-      "compound",
-      "anatomy",
-      "phenotype",
-      "symptom",
-      "genotype",
-      "variant",
-      "pathway",
-      undefined,
-    ]),
+    label: label(),
+    type: type(),
     strength: sample([0, 0.1, 0.02, 0.003, 0.0004, 0.00005, undefined]),
     extra: sample(["cat", "dog", "bird"]),
   }));
@@ -94,13 +123,7 @@ const edges = Array(500)
   .fill(null)
   .map(() => ({
     id: uniqueId(),
-    label: sample([
-      "Lbl.",
-      "Label",
-      "Long Label",
-      "Really Long Label",
-      undefined,
-    ]),
+    label: label(),
     source: sample(ids)!,
     target: sample(ids)!,
     type: sample([
@@ -134,6 +157,14 @@ const TestbedPage = () => {
 
       <Section>
         <Heading level={1}>Testbed</Heading>
+      </Section>
+
+      <Section>
+        <Heading level={2} icon={<FaChartPie />}>
+          Sunburst
+        </Heading>
+
+        <Sunburst data={sunburst} />
       </Section>
 
       <Section>
@@ -818,3 +849,8 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
 };
 
 export default TestbedPage;
+
+/** util func to log change to components for testing */
+const logChange = (...args: unknown[]) => {
+  console.debug(...args);
+};

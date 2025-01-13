@@ -2,7 +2,6 @@
   display: grid;
   grid-template-columns: max-content auto;
   width: 100%;
-  box-shadow: var(--box-shadow);
 }
 
 .expanded {

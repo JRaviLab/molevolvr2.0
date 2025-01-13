@@ -56,7 +56,7 @@ const Toasts = () => {
       {getToasts.map((toast, index) => (
         <div
           key={index}
-          className={clsx(classes.toast, "card")}
+          className={clsx("card", classes.toast)}
           style={{ "--color": types[toast.type].color } as CSSProperties}
         >
           {types[toast.type].icon}

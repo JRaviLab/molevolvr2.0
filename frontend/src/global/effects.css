@@ -1,7 +1,6 @@
 /** card with depth */
 
 .card {
-  padding: 20px;
   border-radius: var(--rounded);
   background: var(--white);
   box-shadow: var(--box-shadow);

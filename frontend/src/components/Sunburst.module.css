@@ -1,0 +1,10 @@
+.chart {
+  width: 100%;
+  max-width: 75vh;
+}
+
+.chart > div > div {
+  aspect-ratio: 1 / 1;
+  width: 100% !important;
+  height: unset !important;
+}

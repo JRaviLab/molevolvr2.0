@@ -346,7 +346,6 @@ export const getColorMap = <Value extends string>(
       /** add value to color map (if not already defined) */
       map[value] ??= palette[hue][shade];
     }
-  console.log(map);
   return map;
 };
 

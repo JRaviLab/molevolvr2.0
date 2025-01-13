@@ -153,13 +153,13 @@ const SelectSingle = <O extends Option>({
                 />
                 {/* text */}
                 <span className={classes.primary}>{option.primary}</span>
-                <span className={clsx(classes.secondary, "secondary")}>
+                <span className={clsx("secondary", classes.secondary)}>
                   {option.secondary}
                 </span>
                 {/* icon */}
                 {option.icon &&
                   cloneElement(option.icon, {
-                    className: clsx(classes.icon, "secondary"),
+                    className: clsx("secondary", classes.icon),
                   })}
               </li>
             )}

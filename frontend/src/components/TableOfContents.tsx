@@ -103,7 +103,7 @@ const TableOfContents = () => {
       <div className={classes.heading}>
         {/* top text */}
         {open && (
-          <span className={clsx(classes.title, "primary")}>
+          <span className={clsx("primary", classes.title)}>
             Table Of Contents
           </span>
         )}

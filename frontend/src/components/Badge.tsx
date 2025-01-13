@@ -14,7 +14,7 @@ type Props = {
  * directly.
  */
 const Badge = ({ className, children }: Props) => (
-  <span className={clsx(classes.badge, className)} aria-hidden="true">
+  <span className={clsx(className, classes.badge)} aria-hidden="true">
     {children}
   </span>
 );

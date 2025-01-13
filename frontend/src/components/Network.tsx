@@ -636,7 +636,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     <Flex direction="column" full>
       <div
         ref={root}
-        className={clsx(classes.network, expanded && classes.expanded)}
+        className={clsx("card", classes.network, expanded && classes.expanded)}
         style={{ aspectRatio }}
       >
         {/* legend */}
