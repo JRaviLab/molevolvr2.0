@@ -300,7 +300,11 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
 
   /** map of node types to colors */
   const nodeColors = useMemo(
-    () => getColorMap(_nodes.map((node) => node.type ?? "")),
+    () =>
+      getColorMap(
+        _nodes.map((node) => node.type ?? ""),
+        "light",
+      ),
     [_nodes],
   );
   /** map of node types to shapes */
@@ -347,7 +351,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
 
   /** map of edge types to colors */
   const edgeColors = useMemo(
-    () => getColorMap(_edges.map((edge) => edge.type ?? "")),
+    () => getColorMap(_edges.map((edge) => edge.type ?? "", "light")),
     [_edges],
   );
   /** range of edge strengths */
