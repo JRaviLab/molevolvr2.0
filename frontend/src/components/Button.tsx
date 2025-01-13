@@ -26,11 +26,12 @@ type Description =
   /** require text and/or tooltip for accessibility */
   { text: string; tooltip?: ReactNode } | { text?: string; tooltip: ReactNode };
 
-type _Link = Pick<ComponentProps<typeof Link>, "to">;
+type _Link = Pick<ComponentProps<typeof Link>, "to" | "style">;
 
 type _Button = Pick<
   ComponentProps<"button">,
   | "type"
+  | "style"
   | "onClick"
   | "onDrag"
   | "onDragEnter"

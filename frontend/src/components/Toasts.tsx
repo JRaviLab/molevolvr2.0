@@ -1,4 +1,5 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { onlyText } from "react-children-utilities";
 import {
   FaCircleCheck,
   FaCircleExclamation,
@@ -35,7 +36,7 @@ type Toast = {
   /** determines icon and style */
   type: keyof typeof types;
   /** content */
-  text: string;
+  content: ReactNode;
   /** close timer */
   timer: number;
 };
@@ -60,7 +61,7 @@ const Toasts = () => {
         >
           {types[toast.type].icon}
           <div role={toast.type === "error" ? "alert" : "status"}>
-            {toast.text}
+            {toast.content}
           </div>
           <button onClick={() => removeToast(toast.id)}>
             <FaXmark />
@@ -97,7 +98,7 @@ const removeToast = (id: Toast["id"]) => {
 
 /** add toast to global queue */
 const toast = async (
-  text: Toast["text"],
+  content: Toast["content"],
   type: Toast["type"] = "info",
   id?: Toast["id"],
 ) => {
@@ -105,12 +106,12 @@ const toast = async (
   await sleep();
 
   /** timeout before close, in ms */
-  const timeout = types[type].timeout * 1000 + text.length * 20;
+  const timeout = types[type].timeout * 1000 + onlyText(content).length * 10;
 
   const newToast = {
     id: id ?? uniqueId(),
     type: type ?? "info",
-    text,
+    content,
     timer: window.setTimeout(() => removeToast(newToast.id), timeout),
   };
   addToast(newToast);
