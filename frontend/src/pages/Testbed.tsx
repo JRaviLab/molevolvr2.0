@@ -27,7 +27,7 @@ import {
   FaStop,
   FaTableCells,
 } from "react-icons/fa6";
-import { random, sample, uniqueId } from "lodash";
+import { random, sample, uniq, uniqueId } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -54,6 +54,7 @@ import TextBox from "@/components/TextBox";
 import Tile from "@/components/Tile";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
+import { getColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
@@ -181,7 +182,7 @@ const TestbedPage = () => {
           Elements
         </Heading>
 
-        {/* color palette */}
+        {/* main color palette */}
         <Flex gap="none">
           {Object.entries(useTheme())
             .filter(
@@ -200,6 +201,25 @@ const TestbedPage = () => {
               </Tooltip>
             ))}
         </Flex>
+
+        {/* color maps */}
+        {(["light", "dark"] as const).map((shadeLevel, index) => (
+          <Flex key={index} gap="none">
+            {uniq(Object.values(getColorMap(words, shadeLevel))).map(
+              (color, index) => (
+                <div
+                  key={index}
+                  aria-hidden
+                  style={{
+                    width: 50,
+                    height: 50,
+                    background: color,
+                  }}
+                />
+              ),
+            )}
+          </Flex>
+        ))}
 
         <p>
           Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod

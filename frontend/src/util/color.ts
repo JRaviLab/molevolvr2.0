@@ -320,9 +320,8 @@ const hueOrder: Hue[] = [
 ] as const;
 
 const shadeLevels = {
-  light: "200",
-  mid: "500",
-  dark: "700",
+  light: "300",
+  dark: "600",
 } as const;
 
 type ShadeLevel = keyof typeof shadeLevels;
@@ -330,7 +329,7 @@ type ShadeLevel = keyof typeof shadeLevels;
 /** map enumerated values to colors */
 export const getColorMap = <Value extends string>(
   values: Value[],
-  shadeLevel: ShadeLevel = "mid",
+  shadeLevel: ShadeLevel = "light",
 ) => {
   /** get shade */
   const shade = shadeLevels[shadeLevel]!;
