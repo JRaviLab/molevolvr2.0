@@ -30,7 +30,9 @@ const Tooltip = forwardRef<HTMLButtonElement, Props>(
     if (content)
       return (
         <Provider delayDuration={100} disableHoverableContent>
-          <Root>
+          <Root
+          // open
+          >
             {/* allows nesting tooltip within popover https://github.com/radix-ui/primitives/discussions/560#discussioncomment-5325935 */}
             <Trigger
               asChild
@@ -49,6 +51,7 @@ const Tooltip = forwardRef<HTMLButtonElement, Props>(
                 }}
                 className={classes.content}
                 side="top"
+                data-dark="true"
               >
                 {content}
                 <Arrow className={classes.arrow} />

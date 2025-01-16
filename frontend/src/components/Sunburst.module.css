@@ -1,5 +1,41 @@
+.container {
+  width: 100%;
+  padding: 50px;
+}
+
 .chart {
   aspect-ratio: 1 / 1;
   width: 100%;
   max-width: 75vh;
+}
+
+.breadcrumb {
+  --inset: 5px;
+  --padding: 5px;
+  padding: var(--padding) calc(3 * var(--padding));
+  clip-path: polygon(
+    0% 0%,
+    var(--inset) 50%,
+    0% 100%,
+    calc(100% - var(--inset)) 100%,
+    100% 50%,
+    calc(100% - var(--inset)) 0%
+  );
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 100px);
+  justify-items: flex-start;
+  width: 100%;
+  gap: 20px;
+}
+
+.legend-color {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.legend-text {
 }

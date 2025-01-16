@@ -320,7 +320,7 @@ const hueOrder: Hue[] = [
 ] as const;
 
 const shadeLevels = {
-  light: "300",
+  light: "200",
   dark: "600",
 } as const;
 

@@ -1,4 +1,4 @@
-:root[data-dark="false"] {
+[data-dark="false"] {
   /* accent */
   --accent: hsl(180, 55%, 35%);
 
@@ -25,7 +25,7 @@
   --error: #e53935;
 }
 
-:root[data-dark="true"] {
+[data-dark="true"] {
   /* accent */
   --accent: hsl(180, 50%, 60%);
 
