@@ -46,7 +46,7 @@ type ItemDerived = {
 };
 
 const ringSize = 20;
-const gapSize = 3;
+const gapSize = 1;
 const fontSize = 5;
 
 const Sunburst = ({ title, data }: Props) => {

@@ -152,6 +152,10 @@ for (let times = 0; times < 10; times++) {
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
+  /** palettes for color maps */
+  const lightColorMap = uniq(Object.values(useColorMap(words, "mode")));
+  const darkColorMap = uniq(Object.values(useColorMap(words, "invert")));
+
   return (
     <>
       <Meta title="Testbed" />
@@ -203,19 +207,21 @@ const TestbedPage = () => {
         </Flex>
 
         {/* color maps */}
-        <Flex gap="none">
-          {uniq(Object.values(useColorMap(words))).map((color, index) => (
-            <div
-              key={index}
-              aria-hidden
-              style={{
-                width: 50,
-                height: 50,
-                background: color,
-              }}
-            />
-          ))}
-        </Flex>
+        {[lightColorMap, darkColorMap].map((colors, index) => (
+          <Flex key={index} gap="none">
+            {colors.map((color, index) => (
+              <div
+                key={index}
+                aria-hidden
+                style={{
+                  width: 50,
+                  height: 50,
+                  background: color,
+                }}
+              />
+            ))}
+          </Flex>
+        ))}
 
         <p>
           Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod

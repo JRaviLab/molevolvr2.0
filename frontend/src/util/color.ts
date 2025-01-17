@@ -355,17 +355,14 @@ export const getColorMap = <Value extends string>(
 /** reactive color map */
 export const useColorMap = <Value extends string>(
   values: Value[],
-  dark: true | false | "mode" | "invert" = false,
+  shade: "dark" | "light" | "mode" | "invert" = "mode",
 ) => {
   /** dark mode state */
   const darkMode = useAtomValue(darkModeAtom);
 
   /** should use dark or light */
-  let darkShade = true;
-  if (dark === "mode") darkShade = darkMode;
-  else if (dark === "invert") darkShade = !darkMode;
-  else darkShade = dark;
-  const shade = darkShade ? "dark" : "light";
+  if (shade === "mode") shade = darkMode ? "dark" : "light";
+  else if (shade === "invert") shade = darkMode ? "light" : "dark";
 
   /** map state */
   const [map, setMap] = useState(getColorMap(values, shade));
