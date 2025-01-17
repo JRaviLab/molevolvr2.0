@@ -9,6 +9,7 @@ import {
   Trigger,
 } from "@radix-ui/react-tooltip";
 import { renderText, shrinkWrap } from "@/util/dom";
+import { sleep } from "@/util/misc";
 import classes from "./Tooltip.module.css";
 
 type Props = {
@@ -30,9 +31,7 @@ const Tooltip = forwardRef<HTMLButtonElement, Props>(
     if (content)
       return (
         <Provider delayDuration={100} disableHoverableContent>
-          <Root
-          // open
-          >
+          <Root>
             {/* allows nesting tooltip within popover https://github.com/radix-ui/primitives/discussions/560#discussioncomment-5325935 */}
             <Trigger
               asChild
@@ -46,7 +45,7 @@ const Tooltip = forwardRef<HTMLButtonElement, Props>(
             <Portal>
               <Content
                 ref={(element) => {
-                  window.setTimeout(() => shrinkWrap(element));
+                  sleep().then(() => shrinkWrap(element));
                   return element;
                 }}
                 className={classes.content}

@@ -51,7 +51,7 @@ import Popover from "@/components/Popover";
 import type { Option } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
-import { getColorMap, mixColors } from "@/util/color";
+import { useColorMap } from "@/util/color";
 import {
   downloadCsv,
   downloadJpg,
@@ -297,15 +297,12 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   /** full width */
   const [expanded, setExpanded] = useLocalStorage("network-expanded", false);
 
-  /** map of node types to colors */
-  const nodeColors = useMemo(
-    () =>
-      getColorMap(
-        _nodes.map((node) => node.type ?? ""),
-        "light",
-      ),
+  const nodeTypes = useMemo(
+    () => _nodes.map((node) => node.type ?? ""),
     [_nodes],
   );
+  /** map of node types to colors */
+  const nodeColors = useColorMap(nodeTypes, "mode");
   /** map of node types to shapes */
   const nodeShapes = useMemo(
     () => getShapeMap(_nodes.map((node) => node.type ?? "")),
@@ -332,8 +329,8 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
             minNodeSize,
             maxNodeSize,
           ),
-          color: nodeColors[node.type ?? ""]!,
-          shape: nodeShapes[node.type ?? ""]!,
+          color: nodeColors[node.type ?? ""] ?? "",
+          shape: nodeShapes[node.type ?? ""] ?? "",
         })),
     [
       _nodes,
@@ -348,11 +345,12 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   type Node = (typeof nodes)[number];
   type Edge = (typeof edges)[number];
 
-  /** map of edge types to colors */
-  const edgeColors = useMemo(
-    () => getColorMap(_edges.map((edge) => edge.type ?? "", "light")),
+  const edgeTypes = useMemo(
+    () => _edges.map((edge) => edge.type ?? ""),
     [_edges],
   );
+  /** map of edge types to colors */
+  const edgeColors = useColorMap(edgeTypes, "mode");
   /** range of edge strengths */
   const [minEdgeStrength = 0, maxEdgeStrength = 1] = useMemo(
     () => extent(_edges.flatMap((edge) => edge.strength ?? [])),
@@ -373,7 +371,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
             minEdgeSize,
             maxEdgeSize,
           ),
-          color: edgeColors[edge.type ?? ""]!,
+          color: edgeColors[edge.type ?? ""] ?? "",
         }))
         /** remove edges whose source/target nodes have been filtered out */
         .filter(
@@ -475,10 +473,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     const getNodeLabel = (node: NodeSingular) => node.data().label;
     const getNodeSize = (node: NodeSingular) => node.data().size;
     const getNodeColor = (node: NodeSingular) =>
-      mixColors(
-        node.selected() ? (theme["--black"] ?? "") : node.data().color,
-        theme["--white"] ?? "",
-      );
+      node.selected() ? (theme["--black"] ?? "") : node.data().color;
     const getNodeShape = (node: NodeSingular) => node.data().shape;
     const getNodeOpacity = (node: NodeSingular) => (node.active() ? 0.1 : 0);
     const getEdgeLabel = (edge: EdgeSingular) =>
@@ -486,10 +481,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     const getEdgeSize = (edge: EdgeSingular) => edge.data().size;
     const getEdgeArrowSize = () => 1;
     const getEdgeColor = (edge: EdgeSingular) =>
-      mixColors(
-        edge.selected() ? (theme["--black"] ?? "") : edge.data().color,
-        theme["--white"] ?? "",
-      );
+      edge.selected() ? (theme["--black"] ?? "") : edge.data().color;
     const getEdgeArrow =
       (directions: Edge["direction"][]) => (edge: EdgeSingular) =>
         directions.includes(edge.data().direction) ? "triangle" : "none";
@@ -549,13 +541,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   useEffect(() => {
     if (!graph.current) return;
 
-    /** quick lookups for existing (old) and incoming (new) nodes/edges */
-    const oldNodes = Object.fromEntries(
-      graph.current.nodes().map((node) => [node.id, true]),
-    );
-    const oldEdges = Object.fromEntries(
-      graph.current.edges().map((edge) => [edge.id, true]),
-    );
+    /** quick lookups for nodes/edges */
     const newNodes = Object.fromEntries(nodes.map((node) => [node.id, true]));
     const newEdges = Object.fromEntries(edges.map((edge) => [edge.id, true]));
 
@@ -566,16 +552,13 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     graph.current.remove(
       graph.current.edges().filter((oldEdge) => !newEdges[oldEdge.id()]),
     );
+
     /** add new nodes/edges */
     graph.current.add(
-      nodes
-        .filter((newNode) => !oldNodes[newNode.id])
-        .map((newNode) => ({ group: "nodes", data: newNode })),
+      nodes.map((newNode) => ({ group: "nodes", data: newNode })),
     );
     graph.current.add(
-      edges
-        .filter((newEdge) => !oldEdges[newEdge.id])
-        .map((newEdge) => ({ group: "edges", data: newEdge })),
+      edges.map((newEdge) => ({ group: "edges", data: newEdge })),
     );
 
     /** update layout */

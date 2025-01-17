@@ -88,20 +88,20 @@ const domOptions: Options = {
 };
 
 /** download element as png */
-export const downloadPng = async (element: Element, filename: Filename) =>
-  download(
-    getUrl(await toPng(element, domOptions), "image/png"),
-    filename,
-    "png",
-  );
+export const downloadPng = async (element: Element, filename: Filename) => {
+  try {
+    const blob = await toPng(element, domOptions);
+    download(getUrl(blob, "image/png"), filename, "png");
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 /** download blob as jpg */
-export const downloadJpg = async (element: Element, filename: Filename) =>
-  download(
-    getUrl(await toJpeg(element, domOptions), "image/jpeg"),
-    filename,
-    "jpg",
-  );
+export const downloadJpg = async (element: Element, filename: Filename) => {
+  const blob = await toJpeg(element, domOptions);
+  download(getUrl(blob, "image/jpeg"), filename, "jpg");
+};
 
 /** download svg element source code */
 export const downloadSvg = (

@@ -24,6 +24,23 @@
   width: 100%;
 }
 
+.segment {
+  cursor: pointer;
+  transition: opacity var(--fast);
+}
+
+.shape {
+  transition: filter var(--fast);
+}
+
+.shape:hover {
+  filter: brightness(1.1);
+}
+
+.label {
+  pointer-events: none;
+}
+
 .breadcrumbs {
   width: 0;
   min-width: 100%;
@@ -41,13 +58,4 @@
     100% 50%,
     calc(100% - var(--inset)) 0%
   );
-}
-
-.tooltip {
-  max-width: 300px !important;
-  white-space: unset !important;
-  border: none !important;
-  border-radius: var(--rounded) !important;
-  box-shadow: var(--box-shadow) !important;
-  font: inherit !important;
 }

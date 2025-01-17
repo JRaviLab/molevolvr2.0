@@ -163,3 +163,20 @@ export const getViewBox = (svg: SVGSVGElement, filter = "", padding = 0) => {
 
   return { original, fitted };
 };
+
+/** fit view box to contents of svg */
+export const fitViewbox = (svg?: SVGSVGElement, paddingPercent = 0) => {
+  if (!svg) return;
+  const { x, y, width, height } = svg.getBBox();
+  const padding = Math.min(width, height) * paddingPercent;
+  const viewBox = [
+    x - padding,
+    y - padding,
+    width + padding * 2,
+    height + padding * 2,
+  ]
+    .map((v) => Math.round(v))
+    .join(" ");
+  svg.setAttribute("viewBox", viewBox);
+  return viewBox;
+};

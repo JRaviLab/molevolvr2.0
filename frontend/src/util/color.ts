@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+import { useAtomValue } from "jotai";
+import { darkModeAtom } from "@/components/DarkMode";
+
 /**
  * https://www.materialpalette.com/colors
  * https://gist.github.com/kawanet/a880c83f06d6baf742e45ac9ac52af96?permalink_comment_id=5387840#gistcomment-5387840
@@ -321,7 +325,7 @@ const hueOrder: Hue[] = [
 
 const shadeLevels = {
   light: "200",
-  dark: "600",
+  dark: "500",
 } as const;
 
 type ShadeLevel = keyof typeof shadeLevels;
@@ -348,30 +352,28 @@ export const getColorMap = <Value extends string>(
   return map;
 };
 
-/**
- * mix colors by particular amount in desired color space
- * https://stackoverflow.com/a/56348573/2180570
- */
-export const mixColors = (
-  colorA: string,
-  colorB: string,
-  mix = 0.5,
-  space = "srgb",
+/** reactive color map */
+export const useColorMap = <Value extends string>(
+  values: Value[],
+  dark: true | false | "mode" | "invert" = false,
 ) => {
-  const style = `color-mix(in ${space}, ${colorA}, ${colorB} ${100 * mix}%)`;
-  const div = document.createElement("div");
-  if (!window.matchMedia(`@supports (color: ${style}`)) return colorA;
-  div.style.color = style;
-  document.body.append(div);
-  const [r = 0, g = 0, b = 0] = window
-    .getComputedStyle(div)
-    .color.split(/\s/)
-    .map(parseFloat)
-    .filter((value) => !Number.isNaN(value));
-  div.remove();
-  const floatToHex = (value: number) =>
-    Math.round(255 * value)
-      .toString(16)
-      .padStart(2, "0");
-  return "#" + [r, g, b].map(floatToHex).join("");
+  /** dark mode state */
+  const darkMode = useAtomValue(darkModeAtom);
+
+  /** should use dark or light */
+  let darkShade = true;
+  if (dark === "mode") darkShade = darkMode;
+  else if (dark === "invert") darkShade = !darkMode;
+  else darkShade = dark;
+  const shade = darkShade ? "dark" : "light";
+
+  /** map state */
+  const [map, setMap] = useState(getColorMap(values, shade));
+
+  /** update map */
+  useEffect(() => {
+    setMap(getColorMap(values, shade));
+  }, [values, shade]);
+
+  return map;
 };

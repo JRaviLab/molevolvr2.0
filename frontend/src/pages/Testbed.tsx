@@ -47,14 +47,14 @@ import Section from "@/components/Section";
 import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
-import Sunburst, { type Layer } from "@/components/Sunburst";
+import Sunburst, { type Item } from "@/components/Sunburst";
 import Table from "@/components/Table";
 import Tabs, { Tab } from "@/components/Tabs";
 import TextBox from "@/components/TextBox";
 import Tile from "@/components/Tile";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
-import { getColorMap } from "@/util/color";
+import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
@@ -93,24 +93,20 @@ const type = () =>
     undefined,
   ]);
 
-/** generate fake sunburst layer data */
-const layer = (depth: number): Layer => ({
+/** generate fake sunburst item data */
+const item = (depth: number): Item => ({
   label: label(),
   type: type(),
   value: random(10, 100),
   ...(depth > 0 && {
     children: Array(random(1, 2))
       .fill({})
-      .map(() => layer(depth - 1)),
+      .map(() => item(depth - 1)),
   }),
 });
 
 /** generate fake sunburst data */
-const sunburst = [
-  layer(random(1, 3)),
-  layer(random(1, 3)),
-  layer(random(1, 3)),
-];
+const sunburst = [item(random(1, 3)), item(random(1, 3)), item(random(1, 3))];
 
 /** generate fake node data */
 const nodes = Array(200)
@@ -207,23 +203,19 @@ const TestbedPage = () => {
         </Flex>
 
         {/* color maps */}
-        {(["light", "dark"] as const).map((shadeLevel, index) => (
-          <Flex key={index} gap="none">
-            {uniq(Object.values(getColorMap(words, shadeLevel))).map(
-              (color, index) => (
-                <div
-                  key={index}
-                  aria-hidden
-                  style={{
-                    width: 50,
-                    height: 50,
-                    background: color,
-                  }}
-                />
-              ),
-            )}
-          </Flex>
-        ))}
+        <Flex gap="none">
+          {uniq(Object.values(useColorMap(words))).map((color, index) => (
+            <div
+              key={index}
+              aria-hidden
+              style={{
+                width: 50,
+                height: 50,
+                background: color,
+              }}
+            />
+          ))}
+        </Flex>
 
         <p>
           Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
