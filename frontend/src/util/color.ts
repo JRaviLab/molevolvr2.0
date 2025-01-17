@@ -7,9 +7,9 @@ import { darkModeAtom } from "@/components/DarkMode";
  * references:
  *
  * https://tailwindcss.com/docs/customizing-colors
+ * https://github.com/tailwindlabs/tailwindcss/blob/main/src/public/colors.js
  * https://www.materialpalette.com/colors
  * https://gist.github.com/kawanet/a880c83f06d6baf742e45ac9ac52af96?permalink_comment_id=5387840#gistcomment-5387840
- * https://github.com/tailwindlabs/tailwindcss/blob/main/src/public/colors.js
  */
 
 /** stagger hues to provide more contrast/distinction between successive colors */

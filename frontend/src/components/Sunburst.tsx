@@ -323,6 +323,8 @@ const Segment = ({
                 event.stopPropagation();
                 selectItem(item);
               }}
+              tabIndex={0}
+              role="button"
             />
           </ItemTooltip>
           {/* text path */}
