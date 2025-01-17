@@ -130,3 +130,36 @@ export const isCovering = (
 
   return false;
 };
+
+/** get svg view box */
+export const getViewBox = (svg: SVGSVGElement, filter = "", padding = 0) => {
+  /** make clone of node to work with and mutate */
+  const clone = svg.cloneNode(true) as SVGSVGElement;
+
+  /** remove specific elements for bbox calc */
+  if (filter)
+    for (const element of clone.querySelectorAll("*"))
+      if (element.matches(filter)) element.remove();
+
+  /** get fitted view box */
+  document.body.append(clone);
+  const fitted = clone.getBBox();
+  clone.remove();
+
+  /** add padding */
+  fitted.x -= padding;
+  fitted.y -= padding;
+  fitted.width += 2 * padding;
+  fitted.height += 2 * padding;
+
+  /** get raw/original view box */
+  const original = svg.viewBox.baseVal ?? {};
+
+  /** fallbacks */
+  original.x ||= 0;
+  original.y ||= 0;
+  original.width ||= svg.width.baseVal.value;
+  original.height ||= svg.height.baseVal.value;
+
+  return { original, fitted };
+};

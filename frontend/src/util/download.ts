@@ -1,4 +1,6 @@
 import { stringify } from "csv-stringify/browser/esm/sync";
+import type { Options } from "dom-to-image";
+import { toJpeg, toPng } from "dom-to-image-more";
 
 export type Filename = string | string[];
 
@@ -80,13 +82,26 @@ export const downloadTsv = (data: CSV, filename: Filename) =>
 export const downloadJson = (data: unknown, filename: Filename) =>
   download(getUrl(JSON.stringify(data), "application/json"), filename, "json");
 
-/** download blob as png */
-export const downloadPng = (data: BlobPart, filename: Filename) =>
-  download(getUrl(data, "image/png"), filename, "png");
+const domOptions: Options = {
+  // @ts-expect-error non-comprehensive types for dom-to-image-more
+  scale: 2,
+};
+
+/** download element as png */
+export const downloadPng = async (element: Element, filename: Filename) =>
+  download(
+    getUrl(await toPng(element, domOptions), "image/png"),
+    filename,
+    "png",
+  );
 
 /** download blob as jpg */
-export const downloadJpg = (data: BlobPart, filename: Filename) =>
-  download(getUrl(data, "image/jpeg"), filename, "jpg");
+export const downloadJpg = async (element: Element, filename: Filename) =>
+  download(
+    getUrl(await toJpeg(element, domOptions), "image/jpeg"),
+    filename,
+    "jpg",
+  );
 
 /** download svg element source code */
 export const downloadSvg = (
@@ -94,7 +109,7 @@ export const downloadSvg = (
   element: SVGSVGElement,
   filename: Filename,
   /** html attributes to add to root svg element */
-  addAttrs: Record<string, string> = {},
+  addAttrs: Record<string, string> = { style: "font-family: sans-serif;" },
   /** html attributes to remove from any element */
   removeAttrs: RegExp[] = [/^class$/, /^data-.*/, /^aria-.*/],
 ) => {

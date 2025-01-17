@@ -98,15 +98,19 @@ const layer = (depth: number): Layer => ({
   label: label(),
   type: type(),
   value: random(10, 100),
-  ...(depth < 3 && {
-    children: Array(random(1, 3))
+  ...(depth > 0 && {
+    children: Array(random(1, 2))
       .fill({})
-      .map(() => layer(depth + 1)),
+      .map(() => layer(depth - 1)),
   }),
 });
 
 /** generate fake sunburst data */
-const sunburst = [layer(1), layer(1), layer(1)];
+const sunburst = [
+  layer(random(1, 3)),
+  layer(random(1, 3)),
+  layer(random(1, 3)),
+];
 
 /** generate fake node data */
 const nodes = Array(200)

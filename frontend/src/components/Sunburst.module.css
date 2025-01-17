@@ -1,12 +1,32 @@
 .container {
-  width: 100%;
-  padding: 50px;
+  width: 600px;
+  max-width: 100%;
+  padding: 20px;
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100px, 100%), auto));
+  justify-content: center;
+  width: 0;
+  min-width: 100%;
+  gap: 10px 20px;
+}
+
+.legend-color {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
 }
 
 .chart {
   aspect-ratio: 1 / 1;
   width: 100%;
-  max-width: 75vh;
+}
+
+.breadcrumbs {
+  width: 0;
+  min-width: 100%;
 }
 
 .breadcrumb {
@@ -23,19 +43,11 @@
   );
 }
 
-.legend {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, 100px);
-  justify-items: flex-start;
-  width: 100%;
-  gap: 20px;
-}
-
-.legend-color {
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-}
-
-.legend-text {
+.tooltip {
+  max-width: 300px !important;
+  white-space: unset !important;
+  border: none !important;
+  border-radius: var(--rounded) !important;
+  box-shadow: var(--box-shadow) !important;
+  font: inherit !important;
 }

@@ -37,7 +37,6 @@ import fcose, { type FcoseLayoutOptions } from "cytoscape-fcose";
 import klay, { type KlayLayoutOptions } from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
-import domtoimage from "dom-to-image-more";
 import { omit, orderBy, startCase, truncate } from "lodash";
 import {
   useFullscreen,
@@ -596,17 +595,8 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       if (!graph.current) return;
       if (!root.current) return;
 
-      if (format === "png")
-        domtoimage
-          // @ts-expect-error non-comprehensive types for dom-to-image-more
-          .toPng(root.current, { scale: 2 })
-          .then((blob) => downloadPng(blob, "network"));
-
-      if (format === "jpg")
-        domtoimage
-          // @ts-expect-error non-comprehensive types for dom-to-image-more
-          .toJpeg(root.current, { scale: 2 })
-          .then((blob) => downloadJpg(blob, "network"));
+      if (format === "png") downloadPng(root.current, "network");
+      if (format === "jpg") downloadJpg(root.current, "network");
 
       if (format === "csv" || format === "tsv") {
         const download = format === "csv" ? downloadCsv : downloadTsv;
