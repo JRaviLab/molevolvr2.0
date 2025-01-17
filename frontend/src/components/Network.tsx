@@ -470,14 +470,13 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     if (!graph.current) return;
 
     /** style accessors, extracted to avoid repetition */
-    const getNodeLabel = (node: NodeSingular) => node.data().label;
+    const getNodeLabel = (node: NodeSingular) => node.data().shortLabel;
     const getNodeSize = (node: NodeSingular) => node.data().size;
     const getNodeColor = (node: NodeSingular) =>
       node.selected() ? (theme["--black"] ?? "") : node.data().color;
     const getNodeShape = (node: NodeSingular) => node.data().shape;
     const getNodeOpacity = (node: NodeSingular) => (node.active() ? 0.1 : 0);
-    const getEdgeLabel = (edge: EdgeSingular) =>
-      truncate(edge.data().label, { length: 10 });
+    const getEdgeLabel = (edge: EdgeSingular) => edge.data().shortLabel;
     const getEdgeSize = (edge: EdgeSingular) => edge.data().size;
     const getEdgeArrowSize = () => 1;
     const getEdgeColor = (edge: EdgeSingular) =>
@@ -542,8 +541,8 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     if (!graph.current) return;
 
     /** quick lookups for nodes/edges */
-    const newNodes = Object.fromEntries(nodes.map((node) => [node.id, true]));
-    const newEdges = Object.fromEntries(edges.map((edge) => [edge.id, true]));
+    const newNodes = Object.fromEntries(nodes.map((node) => [node.id, node]));
+    const newEdges = Object.fromEntries(edges.map((edge) => [edge.id, edge]));
 
     /** remove nodes/edges that no longer exist */
     graph.current.remove(
@@ -560,6 +559,33 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     graph.current.add(
       edges.map((newEdge) => ({ group: "edges", data: newEdge })),
     );
+
+    /** update node/edge data */
+    graph.current.nodes().forEach((node) => {
+      const newNode = newNodes[node.id()];
+      /** set node data */
+      node.data(newNode);
+      /** set shorter display label */
+      node.data(
+        "shortLabel",
+        truncate(newNode?.label, { length: 4 * (minNodeSize / fontSize) }),
+      );
+
+      /** when node dragged */
+      node.on("position", () => {
+        node.connectedEdges().forEach((edge) => {
+          /** set truncated label based on edge length */
+          const a = edge.sourceEndpoint();
+          const b = edge.targetEndpoint();
+          const dist = Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+          const label = edge.data("label");
+          edge.data("shortLabel", truncate(label, { length: dist / fontSize }));
+        });
+      });
+    });
+    graph.current.edges().forEach((edge) => {
+      edge.data(newEdges[edge.id()]);
+    });
 
     /** update layout */
     layout.current?.stop();

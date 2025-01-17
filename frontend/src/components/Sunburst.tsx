@@ -47,7 +47,7 @@ type ItemDerived = {
 
 const ringSize = 20;
 const gapSize = 1;
-const fontSize = 5;
+const fontSize = 6;
 
 const Sunburst = ({ title, data }: Props) => {
   const container = useRef<HTMLDivElement>(null);
@@ -157,9 +157,10 @@ const Sunburst = ({ title, data }: Props) => {
 
   /** download chart */
   const download = useCallback((format: string) => {
+    if (!container.current) return;
     if (!svg.current) return;
-    if (format === "png") downloadPng(svg.current, "sunburst");
-    if (format === "jpg") downloadJpg(svg.current, "sunburst");
+    if (format === "png") downloadPng(container.current, "sunburst");
+    if (format === "jpg") downloadJpg(container.current, "sunburst");
     if (format === "svg") downloadSvg(svg.current, "sunburst");
   }, []);
 

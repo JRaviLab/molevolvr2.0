@@ -20,9 +20,9 @@
 
   /** util colors */
   --box-shadow: 0 0 2px var(--shadow), 2px 2px 5px var(--shadow);
-  --success: #43a047;
-  --warning: #ffb300;
-  --error: #e53935;
+  --success: hsl(160, 90%, 40%);
+  --warning: hsl(40, 100%, 50%);
+  --error: hsl(350, 80%, 60%);
 }
 
 [data-dark="true"] {
@@ -47,9 +47,9 @@
 
   /** util colors */
   --box-shadow: 0 0 2px var(--shadow), 2px 2px 5px var(--shadow);
-  --success: #a5d6a7;
-  --warning: #ffe082;
-  --error: #ef9a9a;
+  --success: hsl(160, 90%, 40%);
+  --warning: hsl(40, 100%, 50%);
+  --error: hsl(350, 80%, 60%);
 }
 
 :root {
