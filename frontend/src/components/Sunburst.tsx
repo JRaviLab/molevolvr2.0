@@ -57,11 +57,11 @@ type ItemDerived = {
 /** thickness of rings */
 const ringSize = 20;
 /** "level" (multiple of ring size) of first ring from center */
-const startLevel = 1;
+const startLevel = 3;
 /** gap between rings */
 const gapSize = 2;
 /** font size */
-const fontSize = 6;
+const fontSize = 10;
 
 const Sunburst = ({ title, data }: Props) => {
   const container = useRef<HTMLDivElement>(null);

@@ -473,14 +473,14 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     const getNodeLabel = (node: NodeSingular) => node.data().shortLabel;
     const getNodeSize = (node: NodeSingular) => node.data().size;
     const getNodeColor = (node: NodeSingular) =>
-      node.selected() ? (theme["--black"] ?? "") : node.data().color;
+      node.selected() ? (theme["--light-gray"] ?? "") : node.data().color;
     const getNodeShape = (node: NodeSingular) => node.data().shape;
     const getNodeOpacity = (node: NodeSingular) => (node.active() ? 0.1 : 0);
     const getEdgeLabel = (edge: EdgeSingular) => edge.data().shortLabel;
     const getEdgeSize = (edge: EdgeSingular) => edge.data().size;
     const getEdgeArrowSize = () => 1;
     const getEdgeColor = (edge: EdgeSingular) =>
-      edge.selected() ? (theme["--black"] ?? "") : edge.data().color;
+      edge.selected() ? (theme["--light-gray"] ?? "") : edge.data().color;
     const getEdgeArrow =
       (directions: Edge["direction"][]) => (edge: EdgeSingular) =>
         directions.includes(edge.data().direction) ? "triangle" : "none";
@@ -495,6 +495,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "shape-polygon-points": getNodeShape,
       label: getNodeLabel,
       "font-size": fontSize,
+      "font-family": theme["--sans"],
       color: theme["--black"],
       "text-halign": "center",
       "text-valign": "center",
@@ -520,6 +521,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "arrow-scale": getEdgeArrowSize,
       label: getEdgeLabel,
       "font-size": fontSize,
+      "font-family": theme["--sans"],
       color: theme["--black"],
       "text-rotation": "autorotate",
       // @ts-expect-error no type defs
