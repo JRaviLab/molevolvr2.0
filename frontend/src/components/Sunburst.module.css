@@ -31,11 +31,11 @@
 
 .shape {
   outline: none;
-  transition: filter var(--fast);
+  transition: opacity var(--fast);
 }
 
 .shape:hover {
-  filter: brightness(1.1);
+  opacity: 0.5;
 }
 
 .label {
