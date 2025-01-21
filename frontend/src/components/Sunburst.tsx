@@ -23,20 +23,27 @@ import { formatNumber } from "@/util/string";
 import classes from "./Sunburst.module.css";
 
 export type Item = {
+  /** human-readable label */
   label?: string;
+  /** arbitrary type/category */
   type?: string;
+  /** arbitrary value, normalized to determine segment % */
   value: number;
+  /** children items */
   children?: Item[];
 };
 
 type Props = {
+  /** chart title */
   title?: string;
+  /** chart data */
   data: Item[];
 };
 
 type ItemDerived = {
   label: string;
   value: number;
+  /** value, normalized to % of parent value */
   percent: number;
   type: string;
   color: string;
@@ -45,14 +52,22 @@ type ItemDerived = {
   children: ItemDerived[];
 };
 
+/** options, in svg units (relative): */
+
+/** thickness of rings */
 const ringSize = 20;
-const gapSize = 1;
+/** "level" (multiple of ring size) of first ring from center */
+const startLevel = 1;
+/** gap between rings */
+const gapSize = 2;
+/** font size */
 const fontSize = 6;
 
 const Sunburst = ({ title, data }: Props) => {
   const container = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
 
+  /** fit viewBox after any change */
   useEffect(() => {
     if (svg.current) fitViewbox(svg.current, 0.01);
   });
@@ -65,16 +80,6 @@ const Sunburst = ({ title, data }: Props) => {
 
   /** map datum type to color */
   const colorMap = useColorMap(types, "mode");
-
-  /** is item selected */
-  const isSelected = useCallback(
-    (indexPath: ItemDerived["indexPath"]) =>
-      !!breadcrumbs
-        .at(-1)
-        ?.indexPath?.join("-")
-        ?.startsWith(indexPath.join("-")),
-    [breadcrumbs],
-  );
 
   /** derive props */
   const derive = useCallback(
@@ -89,6 +94,7 @@ const Sunburst = ({ title, data }: Props) => {
         /** total of children's values */
         const total = sumBy(items, "value");
 
+        /** for each (child) item */
         for (let index = 0; index < items.length; index++) {
           const {
             type = "",
@@ -100,12 +106,16 @@ const Sunburst = ({ title, data }: Props) => {
           /** normalize value to percent of full circle that it takes up */
           const percent = parentPercent * (value / total) || 0;
 
-          /** new path of indices to get to this item through tree */
+          /** path of indices to get to this item through tree */
           const indexPath = [...parentIndexPath, index];
 
-          /** selected state */
+          /** are any items selected */
           const anySelected = !!breadcrumbs.length;
-          const selected = isSelected(indexPath);
+          /** is this item selected */
+          const selected = !!breadcrumbs
+            .at(-1)
+            ?.indexPath?.join("-")
+            ?.startsWith(indexPath.join("-"));
 
           /** item color */
           const color = colorMap[type]!;
@@ -119,14 +129,17 @@ const Sunburst = ({ title, data }: Props) => {
             color,
             selected: anySelected ? selected : null,
             indexPath,
+
+            /** do same thing for child items recursively */
             children: derive(children, percent, indexPath),
           });
         }
         return newItems;
       };
+
       return derive(items);
     },
-    [colorMap, breadcrumbs, isSelected],
+    [colorMap, breadcrumbs],
   );
 
   /** derive data */
@@ -134,16 +147,17 @@ const Sunburst = ({ title, data }: Props) => {
 
   /** select item */
   const selectItem = useCallback<SegmentProps["selectItem"]>(
-    ({ indexPath }: Partial<ItemDerived>) => {
+    ({ selected, indexPath }: Partial<ItemDerived>) => {
       /** is already selected */
-      if (isSelected(indexPath ?? [])) {
+      if (selected) {
         /** de-select */
         setBreadcrumbs([]);
       } else {
         /** select */
         const breadcrumbs: ItemDerived[] = [];
+        /** start at root */
         let children = derived;
-        /** traverse tree */
+        /** get list of items from indices */
         for (const index of indexPath ?? []) {
           const breadcrumb = children[index]!;
           breadcrumbs.push(breadcrumb);
@@ -152,7 +166,7 @@ const Sunburst = ({ title, data }: Props) => {
         setBreadcrumbs(breadcrumbs);
       }
     },
-    [isSelected, derived],
+    [derived],
   );
 
   /** download chart */
@@ -261,7 +275,7 @@ type SegmentProps = Partial<ItemDerived> & {
   selectItem: (item: Partial<ItemDerived>) => void;
 };
 
-/** arc segment */
+/** single arc segment */
 const Segment = ({
   level = 0,
   startAngle = 0,
@@ -273,7 +287,7 @@ const Segment = ({
   const id = useId();
 
   /** segment arc radius */
-  const radius = (level + 0.5) * ringSize;
+  const radius = (level + startLevel - 0.5) * ringSize;
 
   /** limit angles */
   startAngle = clamp(startAngle, 0, 0.9999) % 1;
@@ -293,9 +307,9 @@ const Segment = ({
   /** get arc length */
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", stroke);
-  const length = (1.5 * path.getTotalLength()) / fontSize;
+  const length = path.getTotalLength() / (fontSize / 1.5);
 
-  /** track children angle */
+  /** track child angle */
   let offsetAngle = startAngle;
 
   /** reactive CSS vars */
@@ -320,6 +334,7 @@ const Segment = ({
               strokeWidth={gapSize}
               d={fill}
               onClick={(event) => {
+                /** prevent deselect from container onClick */
                 event.stopPropagation();
                 selectItem(item);
               }}
@@ -327,6 +342,7 @@ const Segment = ({
               role="button"
             />
           </ItemTooltip>
+
           {/* text path */}
           <path id={id} fill="none" d={stroke} />
           {/* text */}
@@ -346,7 +362,7 @@ const Segment = ({
         </g>
       )}
 
-      {/* children segments */}
+      {/* recursive children segments */}
       {item.children?.map((item, index) => (
         <Segment
           key={index}
@@ -370,12 +386,14 @@ const point = (r: number, a: number) =>
 const arcStroke = (radius: number, start: number, end: number) => {
   const long = Math.abs(end - start) >= 0.5 ? 1 : 0;
   let cw = 1;
+
   /** flip upside-down text */
   const mid = (end + start) / 2;
   if (mid > 0.25 && mid < 0.75) {
     [start, end] = [end, start];
     cw = 0;
   }
+
   return `
     M ${point(radius, start)}
     A ${radius} ${radius} 0 ${long} ${cw} ${point(radius, end)}
@@ -421,4 +439,5 @@ const ItemTooltip = ({
   </Tooltip>
 );
 
+/** format 0-1 as % */
 const formatPercent = (percent = 0) => `${(percent * 100).toFixed(0)}%`;
