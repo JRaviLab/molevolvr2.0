@@ -51,10 +51,10 @@ export const getColorMap = <Value extends string>(
   /** make blank value a neutral color */
   const map = { "": neutral } as Record<Value, string>;
   for (const value of values)
-    if (value.trim()) {
+    if (value.trim())
       /** add value to color map (if not already defined) */
       map[value] ??= hues[hueIndex++ % hues.length]!;
-    }
+
   return map;
 };
 
