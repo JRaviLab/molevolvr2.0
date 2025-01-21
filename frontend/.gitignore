@@ -29,4 +29,3 @@ dist-ssr
 /blob-report/
 /playwright/.cache/
 tsconfig.tsbuildinfo
-/lighthouse-report/
