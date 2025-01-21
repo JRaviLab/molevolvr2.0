@@ -30,8 +30,8 @@
 }
 
 .shape {
-  transition: filter var(--fast);
   outline: none;
+  transition: filter var(--fast);
 }
 
 .shape:hover {
