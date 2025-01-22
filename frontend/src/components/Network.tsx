@@ -600,6 +600,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   /** on resize */
   useResizeObserver(root, () => {
     graph.current?.resize();
+    fit();
   });
 
   /** download network as csv/tsv */

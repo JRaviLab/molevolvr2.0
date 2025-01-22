@@ -12,6 +12,7 @@
 .print-element {
   z-index: 99999 !important;
   position: fixed !important;
+  aspect-ratio: auto !important;
   width: 100vw !important;
   height: 100vh !important;
   inset: 0 !important;
