@@ -154,10 +154,11 @@ export const printElement = async (
   beforePrint?: () => void,
 ) => {
   element.classList.add("print-element");
-  await sleep(100);
+  /** wait for any layout shift */
+  await sleep(10);
   beforePrint?.();
-  await sleep(100);
+  await sleep(10);
   window.print();
-  await sleep(100);
+  await sleep(10);
   element.classList.remove("print-element");
 };
