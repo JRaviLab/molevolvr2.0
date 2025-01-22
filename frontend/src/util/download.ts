@@ -99,8 +99,12 @@ export const downloadPng = async (element: Element, filename: Filename) => {
 
 /** download blob as jpg */
 export const downloadJpg = async (element: Element, filename: Filename) => {
-  const blob = await toJpeg(element, domOptions);
-  download(getUrl(blob, "image/jpeg"), filename, "jpg");
+  try {
+    const blob = await toJpeg(element, domOptions);
+    download(getUrl(blob, "image/jpeg"), filename, "jpg");
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 /** download svg element source code */

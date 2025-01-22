@@ -6,7 +6,12 @@ import {
   useState,
   type ReactElement,
 } from "react";
-import { FaBezierCurve, FaDownload, FaRegImage } from "react-icons/fa6";
+import {
+  FaBezierCurve,
+  FaDownload,
+  FaFilePdf,
+  FaRegImage,
+} from "react-icons/fa6";
 import clsx from "clsx";
 import { clamp, startCase, sumBy, truncate } from "lodash";
 import Button from "@/components/Button";
@@ -14,7 +19,7 @@ import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { fitViewbox } from "@/util/dom";
+import { fitViewbox, printElement } from "@/util/dom";
 import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { cos, sin } from "@/util/math";
@@ -169,15 +174,6 @@ const Sunburst = ({ title, data }: Props) => {
     [derived],
   );
 
-  /** download chart */
-  const download = useCallback((format: string) => {
-    if (!container.current) return;
-    if (!svg.current) return;
-    if (format === "png") downloadPng(container.current, "sunburst");
-    if (format === "jpg") downloadJpg(container.current, "sunburst");
-    if (format === "svg") downloadSvg(svg.current, "sunburst");
-  }, []);
-
   return (
     <Flex direction="column" gap="lg" full>
       <Flex
@@ -193,10 +189,9 @@ const Sunburst = ({ title, data }: Props) => {
         <div className={classes.legend}>
           {Object.entries(colorMap).map(([type, color], index) => (
             <Flex key={index} gap="sm" wrap={false} hAlign="left">
-              <div
-                className={classes["legend-color"]}
-                style={{ background: color }}
-              />
+              <svg className={classes["legend-color"]} viewBox="0 0 1 1">
+                <rect x="0" y="0" width="1" height="1" fill={color} />
+              </svg>
               <div className={clsx("truncate", !type && "secondary")}>
                 {startCase(type) || "none"}
               </div>
@@ -237,20 +232,36 @@ const Sunburst = ({ title, data }: Props) => {
               <Button
                 icon={<FaRegImage />}
                 text="PNG"
-                onClick={() => download("png")}
+                onClick={() =>
+                  container.current &&
+                  downloadPng(container.current, "sunburst")
+                }
                 tooltip="High-resolution image"
               />
               <Button
                 icon={<FaRegImage />}
                 text="JPEG"
-                onClick={() => download("jpg")}
+                onClick={() =>
+                  container.current &&
+                  downloadJpg(container.current, "sunburst")
+                }
                 tooltip="Compressed image"
               />
               <Button
                 icon={<FaBezierCurve />}
                 text="SVG"
-                onClick={() => download("svg")}
+                onClick={() =>
+                  svg.current && downloadSvg(svg.current, "sunburst")
+                }
                 tooltip="Vector image"
+              />
+              <Button
+                icon={<FaFilePdf />}
+                text="PDF"
+                onClick={() =>
+                  container.current && printElement(container.current)
+                }
+                tooltip="Print as pdf"
               />
             </Flex>
           }

@@ -7,6 +7,27 @@
   color: var(--black);
 }
 
+/** make element full view size and only thing on screen */
+
+.print-element {
+  z-index: 99999 !important;
+  position: fixed !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  inset: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: white !important;
+  box-shadow: none !important;
+  isolation: isolate !important;
+}
+
+body:has(.print-element)
+  *:not(:has(.print-element), .print-element, .print-element *) {
+  display: none !important;
+}
+
 /** visually hide something but keep it available to screen-readers */
 /** https://tailwindcss.com/docs/screen-readers */
 

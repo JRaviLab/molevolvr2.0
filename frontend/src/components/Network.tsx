@@ -10,6 +10,7 @@ import {
   FaCropSimple,
   FaDownload,
   FaExpand,
+  FaFilePdf,
   FaRegImage,
   FaShareNodes,
   FaTableCellsLarge,
@@ -52,6 +53,7 @@ import type { Option } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import { useColorMap } from "@/util/color";
+import { printElement } from "@/util/dom";
 import {
   downloadCsv,
   downloadJpg,
@@ -600,32 +602,18 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     graph.current?.resize();
   });
 
-  /** download network */
-  const download = useCallback(
+  /** download network as csv/tsv */
+  const downloadCSV = useCallback(
     (format: string) => {
-      if (!graph.current) return;
-      if (!root.current) return;
-
-      if (format === "png") downloadPng(root.current, "network");
-      if (format === "jpg") downloadJpg(root.current, "network");
-
-      if (format === "csv" || format === "tsv") {
-        const download = format === "csv" ? downloadCsv : downloadTsv;
-        download(
-          nodes.map((node) =>
-            omit(node, ["color", "shape", "size", "strength"]),
-          ),
-          ["network", "nodes"],
-        );
-        download(
-          edges.map((edge) =>
-            omit(edge, ["color", "shape", "size", "strength"]),
-          ),
-          ["network", "edges"],
-        );
-      }
-
-      if (format === "json") downloadJson(graph.current.json(), "network");
+      const download = format === "csv" ? downloadCsv : downloadTsv;
+      download(
+        nodes.map((node) => omit(node, ["color", "shape", "size", "strength"])),
+        ["network", "nodes"],
+      );
+      download(
+        edges.map((edge) => omit(edge, ["color", "shape", "size", "strength"])),
+        ["network", "edges"],
+      );
     },
     [nodes, edges],
   );
@@ -768,33 +756,48 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                 <Button
                   icon={<FaRegImage />}
                   text="PNG"
-                  onClick={() => download("png")}
+                  onClick={() =>
+                    root.current && downloadPng(root.current, "network")
+                  }
                   tooltip="High-resolution image"
                 />
                 <Button
                   icon={<FaRegImage />}
                   text="JPEG"
-                  onClick={() => download("jpg")}
+                  onClick={() =>
+                    root.current && downloadJpg(root.current, "network")
+                  }
                   tooltip="Compressed image"
+                />
+                <Button
+                  icon={<FaFilePdf />}
+                  text="PDF"
+                  onClick={() =>
+                    root.current && printElement(root.current, fit)
+                  }
+                  tooltip="Print as pdf"
                 />
 
                 <Button
                   icon={<FaTableCellsLarge />}
                   text="CSV"
-                  onClick={() => download("csv")}
+                  onClick={() => downloadCSV("csv")}
                   tooltip="Raw node and edge data, comma-separated"
                 />
                 <Button
                   icon={<FaTableCellsLarge />}
                   text="TSV"
-                  onClick={() => download("tsv")}
+                  onClick={() => downloadCSV("tsv")}
                   tooltip="Raw node and edge data, tab-separated"
                 />
 
                 <Button
                   icon={<FaShareNodes />}
                   text="JSON"
-                  onClick={() => download("json")}
+                  onClick={() =>
+                    graph.current &&
+                    downloadJson(graph.current?.json(), "network")
+                  }
                   tooltip="For import into Cytoscape"
                 />
               </Flex>
