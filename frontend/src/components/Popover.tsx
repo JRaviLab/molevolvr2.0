@@ -18,7 +18,14 @@ const Popover = ({ content, children }: Props) => {
     <Root>
       <Trigger asChild>{children}</Trigger>
       <Portal>
-        <Content className={classes.content} side="top">
+        <Content
+          className={classes.content}
+          side="top"
+          onFocusCapture={(event) => {
+            /** https://github.com/radix-ui/primitives/issues/2248 */
+            event.stopPropagation();
+          }}
+        >
           {content}
           <Arrow className={classes.arrow} />
         </Content>
