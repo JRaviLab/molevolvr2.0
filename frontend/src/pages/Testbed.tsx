@@ -1,6 +1,7 @@
 import {
   FaArrowRight,
   FaArrowsUpDown,
+  FaBarcode,
   FaBars,
   FaBeerMugEmpty,
   FaBrush,
@@ -26,7 +27,7 @@ import {
   FaStop,
   FaTableCells,
 } from "react-icons/fa6";
-import { sample, uniqueId } from "lodash";
+import { random, sample, uniqueId } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -36,6 +37,7 @@ import Collapsible from "@/components/Collapsible";
 import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import Heading from "@/components/Heading";
+import IPR from "@/components/IPR";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import Network from "@/components/Network";
@@ -126,6 +128,41 @@ for (let times = 0; times < 10; times++) {
   edges.push({ ...edge, id: uniqueId(), source: id, target: id });
 }
 
+/** generate fake sequence data */
+const sequence = Array(random(10, 100))
+  .fill(null)
+  .map(() => sample(["G", "A", "T", "C"]))
+  .join("");
+
+/** generate fake interproscan track data */
+const tracks = Array(10)
+  .fill(null)
+  .map(() => ({
+    label: sample(["Lbl.", "Label", "Long Label", "Really Long Label"]),
+    features: Array(random(1, 3))
+      .fill(null)
+      .map(() => {
+        const start = random(1, Math.floor(sequence.length / 2));
+        const end = random(
+          start + Math.floor(sequence.length / 4),
+          sequence.length,
+        );
+        return {
+          id: uniqueId(),
+          label: sample([
+            "Lbl.",
+            "Label",
+            "Long Label",
+            "Really Long Label",
+            undefined,
+          ]),
+          type: sample(["cat", "dog", "bird", undefined]),
+          start,
+          end,
+        };
+      }),
+  }));
+
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
   return (
@@ -134,6 +171,15 @@ const TestbedPage = () => {
 
       <Section>
         <Heading level={1}>Testbed</Heading>
+      </Section>
+
+      {/* IPR */}
+      <Section>
+        <Heading level={2} icon={<FaBarcode />}>
+          IPR
+        </Heading>
+
+        <IPR sequence={sequence} tracks={tracks} />
       </Section>
 
       <Section>
