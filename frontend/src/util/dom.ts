@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { onlyText } from "react-children-utilities";
+import { cloneElement, type ReactNode } from "react";
+import { deepMap, onlyText } from "react-children-utilities";
 import { debounce } from "lodash";
 import { sleep } from "@/util/misc";
 
@@ -53,22 +53,41 @@ export const scrollTo = async (
 };
 
 /** get text content of react node */
-export const renderText = (node: ReactNode) => {
-  /**
-   * can't use renderToString because doesn't have access to contexts app needs
-   * (e.g. router), throwing many errors. impractical to work around (have to
-   * provide or fake all contexts).
-   *
-   * https://react.dev/reference/react-dom/server/renderToString#removing-rendertostring-from-the-client-code
-   *
-   * alternative react suggests (createRoot, flushSync, root.render) completely
-   * impractical. has same context issue, and also can't be called during
-   * render/lifecycle (could be worked around by making it async, but then using
-   * this function in situ becomes much more of pain).
-   */
-
-  return onlyText(node);
-};
+export const renderText = (node: ReactNode) =>
+  onlyText(
+    deepMap(node, (child) =>
+      /** check react fiber structure */
+      typeof child === "object" &&
+      child !== null &&
+      "type" in child &&
+      child.type &&
+      typeof child.props.children === "string"
+        ? cloneElement(child, {
+            ...child.props,
+            /**
+             * if children is string, add padding on either side to separate
+             * elements
+             */
+            children: ` ${child.props.children} `,
+          })
+        : child,
+    ),
+  )
+    /** collapse spaces */
+    .replaceAll(/\s+/g, " ")
+    .trim();
+/**
+ * can't use renderToString because doesn't have access to contexts app needs
+ * (e.g. router), throwing many errors. impractical to work around (have to
+ * provide or fake all contexts).
+ *
+ * https://react.dev/reference/react-dom/server/renderToString#removing-rendertostring-from-the-client-code
+ *
+ * alternative react suggests (createRoot, flushSync, root.render) completely
+ * impractical. has same context issue, and also can't be called during
+ * render/lifecycle (could be worked around by making it async, but then using
+ * this function in situ becomes much more of pain).
+ */
 
 /** find index of first element "in view". model behavior off of wikiwand.com. */
 export const firstInView = (elements: HTMLElement[]) => {
@@ -80,18 +99,24 @@ export const firstInView = (elements: HTMLElement[]) => {
 };
 
 /** shrink width to wrapped text https://stackoverflow.com/questions/14596213 */
-export const shrinkWrap = (element: HTMLElement | null) => {
+export const shrinkWrap = (
+  element: HTMLElement | null,
+  startChild = 0,
+  endChild = -1,
+) => {
   if (!element) return;
-  const start = element.childNodes[0];
-  /** radix ui tooltip puts two children at end that aren't part of text content */
-  const end = [...element.childNodes].at(-3);
+  const start = [...element.childNodes].at(startChild);
+  const end = [...element.childNodes].at(endChild);
   if (!start || !end) return;
+  element.style.width = "";
   const range = document.createRange();
   range.setStartBefore(start);
   range.setEndAfter(end);
+  const style = window.getComputedStyle(element);
+  const paddingLeft = parseFloat(style.paddingLeft) || 0;
+  const paddingRight = parseFloat(style.paddingRight) || 0;
   const { width } = range.getBoundingClientRect();
-  element.style.width = width + "px";
-  element.style.boxSizing = "content-box";
+  element.style.width = width + paddingLeft + paddingRight + "px";
 };
 
 /**

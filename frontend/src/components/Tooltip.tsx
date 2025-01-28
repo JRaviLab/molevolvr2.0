@@ -45,7 +45,17 @@ const Tooltip = forwardRef<HTMLButtonElement, Props>(
             <Portal>
               <Content
                 ref={(element) => {
-                  sleep().then(() => shrinkWrap(element));
+                  sleep().then(() =>
+                    shrinkWrap(
+                      element,
+                      0,
+                      /**
+                       * radix ui tooltip puts two children at end that aren't
+                       * part of text content
+                       */
+                      -3,
+                    ),
+                  );
                   return element;
                 }}
                 className={classes.content}

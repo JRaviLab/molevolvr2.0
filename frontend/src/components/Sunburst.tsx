@@ -53,6 +53,7 @@ type ItemDerived = {
   type: string;
   color: string;
   selected: boolean | null;
+  lastSelected: boolean | null;
   indexPath: number[];
   children: ItemDerived[];
 };
@@ -116,11 +117,16 @@ const Sunburst = ({ title, data }: Props) => {
 
           /** are any items selected */
           const anySelected = !!breadcrumbs.length;
+
           /** is this item selected */
           const selected = !!breadcrumbs
             .at(-1)
             ?.indexPath?.join("-")
             ?.startsWith(indexPath.join("-"));
+
+          /** is this item outer-most selected */
+          const lastSelected =
+            breadcrumbs.at(-1)?.indexPath?.join("-") === indexPath?.join("-");
 
           /** item color */
           const color = colorMap[type]!;
@@ -133,6 +139,7 @@ const Sunburst = ({ title, data }: Props) => {
             type,
             color,
             selected: anySelected ? selected : null,
+            lastSelected: anySelected ? lastSelected : null,
             indexPath,
 
             /** do same thing for child items recursively */
@@ -152,9 +159,9 @@ const Sunburst = ({ title, data }: Props) => {
 
   /** select item */
   const selectItem = useCallback<SegmentProps["selectItem"]>(
-    ({ selected, indexPath }: Partial<ItemDerived>) => {
-      /** is already selected */
-      if (selected) {
+    ({ indexPath, lastSelected }: Partial<ItemDerived>) => {
+      /** is outer-most selected */
+      if (lastSelected) {
         /** de-select */
         setBreadcrumbs([]);
       } else {
@@ -176,11 +183,10 @@ const Sunburst = ({ title, data }: Props) => {
 
   return (
     <Flex direction="column" gap="lg" full>
-      <Flex
+      {/* eslint-disable-next-line */}
+      <div
         ref={container}
         className={clsx("card", classes.container)}
-        direction="column"
-        gap="lg"
         onClick={() => setBreadcrumbs([])}
       >
         {title && <strong>{title}</strong>}
@@ -206,7 +212,14 @@ const Sunburst = ({ title, data }: Props) => {
 
         {/* breadcrumbs */}
         {!!breadcrumbs.length && (
-          <Flex gap="sm" gapRatio={1} className={classes.breadcrumbs}>
+          <Flex
+            className={classes.breadcrumbs}
+            gap="sm"
+            gapRatio={1}
+            direction="column"
+            hAlign="stretch"
+            vAlign="top"
+          >
             {breadcrumbs.map((item, index) => (
               <ItemTooltip key={index} {...item}>
                 <div
@@ -215,15 +228,13 @@ const Sunburst = ({ title, data }: Props) => {
                   tabIndex={0}
                   role="button"
                 >
-                  {formatPercent(item.percent)}{" "}
-                  {truncate(item.label, { length: 20 })}
+                  {formatPercent(item.percent)} {item.label}
                 </div>
               </ItemTooltip>
             ))}
           </Flex>
         )}
-      </Flex>
-
+      </div>
       {/* controls */}
       <Flex>
         <Popover
@@ -332,7 +343,7 @@ const Segment = ({
       {level > 0 && (
         <g
           className={classes.segment}
-          opacity={item.selected === false ? 0.5 : 1}
+          opacity={item.selected === false ? 0.35 : 1}
         >
           {/* shape */}
           <ItemTooltip {...item}>
@@ -341,16 +352,23 @@ const Segment = ({
               fill={
                 item.selected === false ? theme["--light-gray"] : item.color
               }
-              stroke={theme["--white"]}
-              strokeWidth={gapSize}
+              stroke={theme["--black"]}
+              strokeWidth={gapSize / 2}
+              strokeOpacity={item.lastSelected === true ? 1 : 0}
               d={fill}
+              tabIndex={0}
+              role="button"
               onClick={(event) => {
                 /** prevent deselect from container onClick */
                 event.stopPropagation();
                 selectItem(item);
               }}
-              tabIndex={0}
-              role="button"
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  selectItem(item);
+                }
+              }}
             />
           </ItemTooltip>
 
@@ -389,37 +407,61 @@ const Segment = ({
   );
 };
 
-/** x/y from radius/angle */
-const point = (r: number, a: number) =>
-  [sin(360 * a) * r, -cos(360 * a) * r].join(" ");
+/** svg path draw command */
+const draw = (
+  command: "M" | "L" | "A",
+  radius: number,
+  angle: number,
+  radiusOffset = 0,
+  angleOffset = 0,
+  long = false,
+  cw = false,
+) => {
+  /** apply offset to radius */
+  radius += radiusOffset;
+  /** convert angle to arc length */
+  angle *= 2 * Math.PI * radius;
+  /** apply offset along arc */
+  angle += angleOffset;
+  /** revert arc length to angle */
+  angle /= 2 * Math.PI * radius;
+
+  const x = sin(360 * angle) * radius;
+  const y = -cos(360 * angle) * radius;
+
+  if (command === "A")
+    return ["A", radius, radius, 0, long ? 1 : 0, cw ? 1 : 0, x, y].join(" ");
+  else return [command, x, y].join(" ");
+};
 
 /** arc segment stroke path */
 const arcStroke = (radius: number, start: number, end: number) => {
-  const long = Math.abs(end - start) >= 0.5 ? 1 : 0;
-  let cw = 1;
+  const long = Math.abs(end - start) >= 0.5;
+  let cw = true;
 
   /** flip upside-down text */
   const mid = (end + start) / 2;
   if (mid > 0.25 && mid < 0.75) {
     [start, end] = [end, start];
-    cw = 0;
+    cw = false;
   }
 
   return `
-    M ${point(radius, start)}
-    A ${radius} ${radius} 0 ${long} ${cw} ${point(radius, end)}
+    ${draw("M", radius, start)}
+    ${draw("A", radius, end, 0, 0, long, cw)}
   `;
 };
 
 /** arc segment fill shape */
 const arcFill = (inner: number, outer: number, start: number, end: number) => {
-  const long = Math.abs(end - start) >= 0.5 ? 1 : 0;
+  const long = Math.abs(end - start) >= 0.5;
+  const offset = gapSize / 2;
   return `
-    M ${point(inner, start)}
-    L ${point(outer, start)}
-    A ${outer} ${outer} 0 ${long} 1 ${point(outer, end)}
-    L ${point(inner, end)}
-    A ${inner} ${inner} 0 ${long} 0 ${point(inner, start)}
+    ${draw("M", inner, start, offset, offset)}
+    ${draw("L", outer, start, -offset, offset)}
+    ${draw("A", outer, end, -offset, -offset, long, true)}
+    ${draw("L", inner, end, offset, -offset)}
+    ${draw("A", inner, start, offset, offset, long, false)}
     z
   `;
 };
