@@ -323,6 +323,9 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
         .map((node) => ({
           ...node,
           label: node.label ?? node.id,
+          shortLabel: truncate(node.label ?? node.id, {
+            length: 4 * (minNodeSize / fontSize),
+          }),
           type: node.type ?? "",
           size: lerp(
             node.strength ?? minNodeStrength,
@@ -365,6 +368,8 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
         .map((edge) => ({
           ...edge,
           label: edge.label ?? edge.id,
+          /** truncated later on node position update */
+          shortLabel: edge.label ?? edge.id,
           type: edge.type ?? "",
           size: lerp(
             edge.strength ?? minEdgeStrength,
@@ -567,13 +572,9 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     /** update node/edge data */
     graph.current.nodes().forEach((node) => {
       const newNode = newNodes[node.id()];
-      /** set node data */
-      node.data(newNode);
-      /** set shorter display label */
-      node.data(
-        "shortLabel",
-        truncate(newNode?.label, { length: 4 * (minNodeSize / fontSize) }),
-      );
+      if (newNode)
+        /** set node data */
+        node.data(newNode);
 
       /** when node dragged */
       node.on("position", () => {
