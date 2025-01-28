@@ -1,77 +1,98 @@
 import { stringify } from "csv-stringify/browser/esm/sync";
 
-/** download blob as file */
-export const download = (
-  /** blob data to download */
-  data: BlobPart,
+export type Filename = string | string[];
+
+/** download url as file */
+const download = (
+  /** url to download */
+  url: string,
   /** single filename string or filename "parts" */
-  filename: string | string[],
-  /** mime type */
-  type: string,
+  filename: Filename,
   /** extension, without dot */
   ext: string,
 ) => {
-  const blob = new Blob([data], { type });
-  const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
   link.download =
-    [filename]
+    [import.meta.env.VITE_TITLE, filename]
       .flat()
-      /** join parts */
+      .map((part) =>
+        part
+          /** make path safe */
+          .replace(/[^A-Za-z0-9]+/g, "-")
+          /** remove leading/trailing dashes */
+          .replace(/(^-+)|(-+$)/g, ""),
+      )
+      .filter(Boolean)
       .join("_")
-      /** make path-safe */
-      .replace(/[^A-Za-z0-9 -]+/g, " ")
-      /** consolidate underscores */
-      .replace(/_+/g, "_")
-      /** consolidate dashes */
-      .replace(/-+/g, "-")
-      /** consolidate spaces */
-      .replace(/\s+/g, " ")
       /** remove extension if already included */
-      .replace(new RegExp("." + ext + "$"), "")
-      .trim() +
+      .replace(new RegExp("." + ext + "$"), "") +
     "." +
     ext;
   link.click();
   window.URL.revokeObjectURL(url);
 };
 
+/** make url from blob */
+export const getUrl = (
+  /** blob data to download */
+  data: BlobPart,
+  /** mime type */
+  type: string,
+) =>
+  typeof data === "string" && data.startsWith("data:")
+    ? data
+    : window.URL.createObjectURL(new Blob([data], { type }));
+
+/** csv/tsv data format. array of objects or array of arrays. */
+type CSV = (Record<string, unknown> | unknown[])[];
+
 /** download table data as csv */
-export const downloadCsv = (data: unknown[], filename: string | string[]) =>
+export const downloadCsv = (data: CSV, filename: Filename) =>
   download(
-    stringify(data, { header: true }),
+    getUrl(
+      stringify(data, {
+        /** whether data is array of objects or array of arrays */
+        header: !Array.isArray(data[0]),
+      }),
+      "text/csv;charset=utf-8",
+    ),
     filename,
-    "text/csv;charset=utf-8",
     "csv",
   );
 
 /** download table data as tsv */
-export const downloadTsv = (data: unknown[], filename: string | string[]) =>
+export const downloadTsv = (data: CSV, filename: Filename) =>
   download(
-    stringify(data, { header: true, delimiter: "\t" }),
+    getUrl(
+      stringify(data, {
+        /** whether data is array of objects or array of arrays */
+        header: !Array.isArray(data[0]),
+        delimiter: "\t",
+      }),
+      "text/tab-separated-values",
+    ),
     filename,
-    "text/tab-separated-values",
     "tsv",
   );
 
 /** download data as json */
-export const downloadJson = (data: unknown, filename: string | string[]) =>
-  download(JSON.stringify(data), filename, "application/json", "json");
+export const downloadJson = (data: unknown, filename: Filename) =>
+  download(getUrl(JSON.stringify(data), "application/json"), filename, "json");
 
 /** download blob as png */
-export const downloadPng = (data: BlobPart, filename: string | string[]) =>
-  download(data, filename, "image/png", "png");
+export const downloadPng = (data: BlobPart, filename: Filename) =>
+  download(getUrl(data, "image/png"), filename, "png");
 
 /** download blob as jpg */
-export const downloadJpg = (data: BlobPart, filename: string | string[]) =>
-  download(data, filename, "image/jpeg", "jpg");
+export const downloadJpg = (data: BlobPart, filename: Filename) =>
+  download(getUrl(data, "image/jpeg"), filename, "jpg");
 
 /** download svg element source code */
 export const downloadSvg = (
   /** root svg element */
   element: SVGSVGElement,
-  filename: string | string[],
+  filename: Filename,
   /** html attributes to add to root svg element */
   addAttrs: Record<string, string> = {},
   /** html attributes to remove from any element */
@@ -94,5 +115,5 @@ export const downloadSvg = (
         if (name.match(removeAttr)) element.removeAttribute(name);
 
   /** download clone source as svg file */
-  download(clone.outerHTML, filename, "image/svg+xml", "svg");
+  download(getUrl(clone.outerHTML, "image/svg+xml"), filename, "svg");
 };

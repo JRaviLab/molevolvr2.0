@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
     "allowSyntheticDefaultImports": true,
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "types": ["axe-playwright"],
+    "types": ["@axe-core/playwright"],
     "paths": {
       "@/*": ["./*"]
     }

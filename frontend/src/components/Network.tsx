@@ -37,6 +37,7 @@ import fcose, { type FcoseLayoutOptions } from "cytoscape-fcose";
 import klay, { type KlayLayoutOptions } from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
+import domtoimage from "dom-to-image-more";
 import { omit, orderBy, startCase, truncate } from "lodash";
 import {
   useFullscreen,
@@ -51,7 +52,7 @@ import Popover from "@/components/Popover";
 import type { Option } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
-import { getColorMap } from "@/util/color";
+import { getColorMap, mixColors } from "@/util/color";
 import {
   downloadCsv,
   downloadJpg,
@@ -59,7 +60,10 @@ import {
   downloadPng,
   downloadTsv,
 } from "@/util/download";
+import { useTheme } from "@/util/hooks";
 import { lerp } from "@/util/math";
+import { sleep } from "@/util/misc";
+import { getShapeMap } from "@/util/shapes";
 import { formatNumber } from "@/util/string";
 import classes from "./Network.module.css";
 
@@ -108,78 +112,14 @@ const maxEdgeSize = 3;
 const edgeLength = maxNodeSize * 1.5;
 const fontSize = 10;
 const padding = 10;
-const selectedColor = "black";
+const minZoom = 0.2;
+const maxZoom = 5;
 const aspectRatio = 16 / 9;
 const boundingBox = {
   x1: 8 * -minNodeSize * aspectRatio,
   y1: 8 * -minNodeSize,
   x2: 8 * minNodeSize * aspectRatio,
   y2: 8 * minNodeSize,
-};
-
-/** style accessors, extracted to avoid repetition */
-const getNodeLabel = (node: NodeSingular) => node.data().label;
-const getNodeSize = (node: NodeSingular) => node.data().size;
-const getNodeColor = (node: NodeSingular) =>
-  node.selected() ? selectedColor : node.data().color;
-const getNodeOpacity = (node: NodeSingular) => (node.active() ? 0.1 : 0);
-const getEdgeLabel = (edge: EdgeSingular) =>
-  truncate(edge.data().label, { length: 10 });
-const getEdgeSize = (edge: EdgeSingular) => edge.data().size;
-const getEdgeArrowSize = () => 1;
-const getEdgeColor = (edge: EdgeSingular) =>
-  edge.selected() ? selectedColor : edge.data().color;
-const getEdgeArrow =
-  (directions: Edge["direction"][]) => (edge: EdgeSingular) =>
-    directions.includes(edge.data().direction) ? "triangle" : "none";
-const getEdgeOpacity = (node: NodeSingular) => (node.active() ? 0.1 : 0);
-
-/** node style options */
-const nodeStyle: Css.Node | Css.Core | Css.Overlay = {
-  width: getNodeSize,
-  height: getNodeSize,
-  backgroundColor: getNodeColor,
-  label: getNodeLabel,
-  "font-size": fontSize,
-  color: "white",
-  "text-outline-color": "black",
-  "text-outline-opacity": 1,
-  "text-outline-width": fontSize / 15,
-  "text-halign": "center",
-  "text-valign": "center",
-  "text-max-width": getNodeSize,
-  "text-wrap": "wrap",
-  // @ts-expect-error no type defs
-  "underlay-padding": minNodeSize / 4,
-  "underlay-opacity": getNodeOpacity,
-  "underlay-shape": "ellipse",
-  "overlay-opacity": 0,
-};
-
-/** edge style options */
-const edgeStyle: Css.Edge | Css.Core | Css.Overlay = {
-  width: getEdgeSize,
-  "curve-style": "bezier",
-  "control-point-step-size": maxNodeSize,
-  "line-color": getEdgeColor,
-  "source-arrow-color": getEdgeColor,
-  "target-arrow-color": getEdgeColor,
-  "source-arrow-shape": getEdgeArrow([0, 1]),
-  "target-arrow-shape": getEdgeArrow([0, -1]),
-  "arrow-scale": getEdgeArrowSize,
-  label: getEdgeLabel,
-  "font-size": fontSize,
-  color: "white",
-  "text-outline-color": "black",
-  "text-outline-opacity": 1,
-  "text-outline-width": fontSize / 15,
-  "text-rotation": "autorotate",
-  // @ts-expect-error no type defs
-  "underlay-padding": minEdgeSize / 2,
-  "underlay-opacity": getEdgeOpacity,
-  "underlay-shape": "ellipse",
-  "overlay-opacity": 0,
-  "loop-direction": "0",
 };
 
 /** import non-built-in layout algorithms */
@@ -332,9 +272,13 @@ const layoutOptions = layouts.map(({ name, label }) => ({
 })) satisfies Option[];
 
 const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
-  const container = useRef(null);
+  const root = useRef<HTMLDivElement | null>(null);
+  const container = useRef<HTMLDivElement | null>(null);
   const graph = useRef<Core | null>(null);
   const layout = useRef<Layouts | null>(null);
+
+  /** reactive CSS vars */
+  const theme = useTheme();
 
   /** selected nodes/edges */
   const [selectedItems, setSelectedItems] = useState<(Node | Edge)[]>([]);
@@ -359,6 +303,11 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     () => getColorMap(_nodes.map((node) => node.type ?? "")),
     [_nodes],
   );
+  /** map of node types to shapes */
+  const nodeShapes = useMemo(
+    () => getShapeMap(_nodes.map((node) => node.type ?? "")),
+    [_nodes],
+  );
   /** range of node strengths */
   const [minNodeStrength = 0, maxNodeStrength = 1] = useMemo(
     () => extent(_nodes.flatMap((node) => node.strength ?? [])),
@@ -381,8 +330,16 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
             maxNodeSize,
           ),
           color: nodeColors[node.type ?? ""]!,
+          shape: nodeShapes[node.type ?? ""]!,
         })),
-    [_nodes, maxNodes, minNodeStrength, maxNodeStrength, nodeColors],
+    [
+      _nodes,
+      maxNodes,
+      minNodeStrength,
+      maxNodeStrength,
+      nodeColors,
+      nodeShapes,
+    ],
   );
 
   type Node = (typeof nodes)[number];
@@ -424,6 +381,10 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     [_edges, nodes, minEdgeStrength, maxEdgeStrength, edgeColors],
   );
 
+  /** fit view to contents */
+  const fit = async () => graph.current?.fit(undefined, padding);
+
+  /** init cytoscape graph and attach event listeners */
   useEffect(() => {
     if (!container.current) return;
     if (graph.current) return;
@@ -431,16 +392,9 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     /** init graph */
     graph.current = cytoscape({
       container: container.current,
-      minZoom: 0.2,
-      maxZoom: 5,
-      style: [
-        { selector: "node", style: nodeStyle },
-        { selector: "edge", style: edgeStyle },
-      ],
+      minZoom,
+      maxZoom,
     });
-
-    /** reset view */
-    graph.current.on("dblclick", () => graph.current?.fit(undefined, padding));
 
     /** select/deselect items */
     graph.current.on("select unselect", "node, edge", () =>
@@ -486,8 +440,109 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       /** adjust pan */
       graph.current.pan(pan);
     });
-  }, [nodes, edges]);
 
+    /** fit view */
+    graph.current.on("layoutstop", async () => {
+      /** some layout algos aren't fully done when this event is called */
+      await sleep(10);
+      fit();
+    });
+    graph.current.on("dblclick", fit);
+
+    /** indicate hover-ability */
+    const over = () => {
+      if (!container.current) return;
+      container.current.style.cursor = "pointer";
+    };
+    const out = () => {
+      if (!container.current) return;
+      container.current.style.cursor = "";
+    };
+    graph.current.on("mouseover", "node", over);
+    graph.current.on("mouseout", "node", out);
+    graph.current.on("mouseover", "edge", over);
+    graph.current.on("mouseout", "edge", out);
+  }, []);
+
+  /** update node/edge styles */
+  useEffect(() => {
+    if (!graph.current) return;
+
+    /** style accessors, extracted to avoid repetition */
+    const getNodeLabel = (node: NodeSingular) => node.data().label;
+    const getNodeSize = (node: NodeSingular) => node.data().size;
+    const getNodeColor = (node: NodeSingular) =>
+      mixColors(
+        node.selected() ? (theme["--black"] ?? "") : node.data().color,
+        theme["--white"] ?? "",
+      );
+    const getNodeShape = (node: NodeSingular) => node.data().shape;
+    const getNodeOpacity = (node: NodeSingular) => (node.active() ? 0.1 : 0);
+    const getEdgeLabel = (edge: EdgeSingular) =>
+      truncate(edge.data().label, { length: 10 });
+    const getEdgeSize = (edge: EdgeSingular) => edge.data().size;
+    const getEdgeArrowSize = () => 1;
+    const getEdgeColor = (edge: EdgeSingular) =>
+      mixColors(
+        edge.selected() ? (theme["--black"] ?? "") : edge.data().color,
+        theme["--white"] ?? "",
+      );
+    const getEdgeArrow =
+      (directions: Edge["direction"][]) => (edge: EdgeSingular) =>
+        directions.includes(edge.data().direction) ? "triangle" : "none";
+    const getEdgeOpacity = (node: NodeSingular) => (node.active() ? 0.1 : 0);
+
+    /** node style options */
+    const nodeStyle: Css.Node | Css.Core | Css.Overlay = {
+      width: getNodeSize,
+      height: getNodeSize,
+      backgroundColor: getNodeColor,
+      shape: "polygon",
+      "shape-polygon-points": getNodeShape,
+      label: getNodeLabel,
+      "font-size": fontSize,
+      color: theme["--black"],
+      "text-halign": "center",
+      "text-valign": "center",
+      "text-max-width": getNodeSize,
+      "text-wrap": "wrap",
+      // @ts-expect-error no type defs
+      "underlay-padding": minNodeSize / 4,
+      "underlay-opacity": getNodeOpacity,
+      "underlay-shape": "ellipse",
+      "overlay-opacity": 0,
+    };
+
+    /** edge style options */
+    const edgeStyle: Css.Edge | Css.Core | Css.Overlay = {
+      width: getEdgeSize,
+      "curve-style": "bezier",
+      "control-point-step-size": maxNodeSize,
+      "line-color": getEdgeColor,
+      "source-arrow-color": getEdgeColor,
+      "target-arrow-color": getEdgeColor,
+      "source-arrow-shape": getEdgeArrow([0, 1]),
+      "target-arrow-shape": getEdgeArrow([0, -1]),
+      "arrow-scale": getEdgeArrowSize,
+      label: getEdgeLabel,
+      "font-size": fontSize,
+      color: theme["--black"],
+      "text-rotation": "autorotate",
+      // @ts-expect-error no type defs
+      "underlay-padding": minEdgeSize / 2,
+      "underlay-opacity": getEdgeOpacity,
+      "underlay-shape": "ellipse",
+      "overlay-opacity": 0,
+      "loop-direction": "0",
+    };
+
+    graph.current.style([
+      { selector: "node", style: nodeStyle },
+      { selector: "edge", style: edgeStyle },
+    ]);
+  }, [theme]);
+
+  /** update nodes/edges and layout */
   useEffect(() => {
     if (!graph.current) return;
 
@@ -527,34 +582,40 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   }, [nodes, edges, layoutParams]);
 
   /** on resize */
-  useResizeObserver(container, () => {
+  useResizeObserver(root, () => {
     graph.current?.resize();
-    graph.current?.fit(undefined, padding);
   });
 
   /** download network */
   const download = useCallback(
     (format: string) => {
       if (!graph.current) return;
+      if (!root.current) return;
 
       if (format === "png")
-        graph.current
-          .png({ output: "blob-promise", scale: 2 })
+        domtoimage
+          // @ts-expect-error non-comprehensive types for dom-to-image-more
+          .toPng(root.current, { scale: 2 })
           .then((blob) => downloadPng(blob, "network"));
 
       if (format === "jpg")
-        graph.current
-          .jpeg({ output: "blob-promise", scale: 2 })
+        domtoimage
+          // @ts-expect-error non-comprehensive types for dom-to-image-more
+          .toJpeg(root.current, { scale: 2 })
           .then((blob) => downloadJpg(blob, "network"));
 
       if (format === "csv" || format === "tsv") {
         const download = format === "csv" ? downloadCsv : downloadTsv;
         download(
-          nodes.map((node) => omit(node, ["color", "size", "strength"])),
+          nodes.map((node) =>
+            omit(node, ["color", "shape", "size", "strength"]),
+          ),
           ["network", "nodes"],
         );
         download(
-          edges.map((edge) => omit(edge, ["color", "size", "strength"])),
+          edges.map((edge) =>
+            omit(edge, ["color", "shape", "size", "strength"]),
+          ),
           ["network", "edges"],
         );
       }
@@ -570,6 +631,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   return (
     <Flex direction="column" full>
       <div
+        ref={root}
         className={clsx(classes.network, expanded && classes.expanded)}
         style={{ aspectRatio }}
       >
@@ -579,6 +641,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
           hAlign="left"
           vAlign="top"
           className={classes.legend}
+          tabIndex={0}
         >
           {selectedItems.length ? (
             /** show info about selected nodes/edges */
@@ -601,6 +664,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                           "strength",
                           "size",
                           "color",
+                          "shape",
                         ]),
                       ).map(([key, value]) => (
                         <Fragment key={key}>
@@ -626,10 +690,16 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
 
                 {Object.entries(nodeColors).map(([key, value]) => (
                   <Flex key={key} gap="sm" wrap={false}>
-                    <div
+                    <svg
+                      viewBox="-1 -1 2 2"
                       className={classes["node-symbol"]}
-                      style={{ background: value }}
-                    />
+                      style={{ color: value }}
+                    >
+                      <polygon
+                        fill="currentColor"
+                        points={nodeShapes[key]?.join(" ")}
+                      />
+                    </svg>
                     <div className={clsx(!key && "secondary")}>
                       {startCase(key) || "none"}
                     </div>
@@ -694,7 +764,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                   icon={<FaRegImage />}
                   text="PNG"
                   onClick={() => download("png")}
-                  tooltip="High-resolution image, with transparency"
+                  tooltip="High-resolution image"
                 />
                 <Button
                   icon={<FaRegImage />}
@@ -736,7 +806,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
             icon={<FaCropSimple />}
             design="hollow"
             tooltip="Fit view to contents"
-            onClick={() => graph.current?.fit(undefined, padding)}
+            onClick={fit}
           />
 
           <Button

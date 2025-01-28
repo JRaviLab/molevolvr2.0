@@ -83,6 +83,11 @@ const SelectSingle = <O extends Option>({
   /** link to parent form component */
   const form = useForm();
 
+  /** full selected option object */
+  const fullSelected = options.find(
+    (option) => option.id === selectedWFallback,
+  );
+
   return (
     <Listbox
       className={clsx(classes.container, classes[layout])}
@@ -104,7 +109,7 @@ const SelectSingle = <O extends Option>({
         onKeyDown={({ key }) => {
           if (!(key === "ArrowLeft" || key === "ArrowRight")) return;
 
-          /** find curent selected index */
+          /** find current selected index */
           let index = options.findIndex(
             (option) => option.id === selectedWFallback,
           );
@@ -121,9 +126,8 @@ const SelectSingle = <O extends Option>({
           setSelected(selected.id);
         }}
       >
-        <span className="truncate">
-          {options.find((option) => option.id === selectedWFallback)?.primary}
-        </span>
+        {fullSelected?.icon}
+        <span className="truncate">{fullSelected?.primary}</span>
         <FaAngleDown />
       </ListboxButton>
 
