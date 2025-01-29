@@ -62,7 +62,7 @@
   align-items: center;
   align-self: flex-start;
   gap: 10px;
-  color: var(--deep);
+  color: var(--gray);
   font-weight: var(--medium);
 }
 

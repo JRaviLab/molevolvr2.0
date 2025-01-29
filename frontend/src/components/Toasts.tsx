@@ -1,4 +1,5 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { onlyText } from "react-children-utilities";
 import {
   FaCircleCheck,
   FaCircleExclamation,
@@ -7,7 +8,7 @@ import {
   FaXmark,
 } from "react-icons/fa6";
 import clsx from "clsx";
-import { atom, getDefaultStore, useAtom } from "jotai";
+import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
 import Flex from "@/components/Flex";
 import { sleep } from "@/util/misc";
@@ -35,14 +36,14 @@ type Toast = {
   /** determines icon and style */
   type: keyof typeof types;
   /** content */
-  text: string;
+  content: ReactNode;
   /** close timer */
   timer: number;
 };
 
 /** list of "toasts" (notifications) in corner of screen. singleton. */
 const Toasts = () => {
-  const [getToasts] = useAtom(toasts);
+  const toasts = useAtomValue(toastsAtom);
 
   return (
     <Flex
@@ -52,15 +53,15 @@ const Toasts = () => {
       role="region"
       aria-label="Notifications"
     >
-      {getToasts.map((toast, index) => (
+      {toasts.map((toast, index) => (
         <div
           key={index}
-          className={clsx(classes.toast, "card")}
+          className={clsx("card", classes.toast)}
           style={{ "--color": types[toast.type].color } as CSSProperties}
         >
           {types[toast.type].icon}
           <div role={toast.type === "error" ? "alert" : "status"}>
-            {toast.text}
+            {toast.content}
           </div>
           <button onClick={() => removeToast(toast.id)}>
             <FaXmark />
@@ -74,30 +75,30 @@ const Toasts = () => {
 export default Toasts;
 
 /** global toasts */
-const toasts = atom<Toast[]>([]);
+const toastsAtom = atom<Toast[]>([]);
 
 /** add toast to end */
 const addToast = (toast: Toast) => {
   removeToast(toast.id);
-  const newToasts = getDefaultStore().get(toasts).concat([toast]);
-  getDefaultStore().set(toasts, newToasts);
+  const newToasts = getDefaultStore().get(toastsAtom).concat([toast]);
+  getDefaultStore().set(toastsAtom, newToasts);
 };
 
 /** remove toast by id */
 const removeToast = (id: Toast["id"]) => {
   const newToasts = getDefaultStore()
-    .get(toasts)
+    .get(toastsAtom)
     .filter((toast) => {
       const existing = toast.id === id;
       if (existing) window.clearTimeout(toast.timer);
       return !existing;
     });
-  getDefaultStore().set(toasts, newToasts);
+  getDefaultStore().set(toastsAtom, newToasts);
 };
 
 /** add toast to global queue */
 const toast = async (
-  text: Toast["text"],
+  content: Toast["content"],
   type: Toast["type"] = "info",
   id?: Toast["id"],
 ) => {
@@ -105,12 +106,12 @@ const toast = async (
   await sleep();
 
   /** timeout before close, in ms */
-  const timeout = types[type].timeout * 1000 + text.length * 20;
+  const timeout = types[type].timeout * 1000 + onlyText(content).length * 10;
 
   const newToast = {
     id: id ?? uniqueId(),
     type: type ?? "info",
-    text,
+    content,
     timer: window.setTimeout(() => removeToast(newToast.id), timeout),
   };
   addToast(newToast);

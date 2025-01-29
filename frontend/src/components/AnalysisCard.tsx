@@ -23,7 +23,7 @@ const AnalysisCard = ({
   return (
     <Link
       to={`/analysis/${id}`}
-      className={clsx(classes.card, "card")}
+      className={clsx("card", classes.card)}
       showArrow={false}
     >
       <div className="bold">{name}</div>

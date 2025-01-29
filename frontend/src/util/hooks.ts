@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { darkModeAtom } from "@/components/DarkMode";
 
 /** https://stackoverflow.com/a/78994961/2180570 */
@@ -27,12 +27,12 @@ export const useTheme = () => {
   const [theme, setTheme] = useState<Record<`--${string}`, string>>({});
 
   /** dark mode state */
-  const [getDarkMode] = useAtom(darkModeAtom);
+  const darkMode = useAtomValue(darkModeAtom);
 
-  /** update theme variables when anything that could affect them changes */
+  /** update theme variables when dark mode changes */
   useEffect(() => {
     setTheme(getTheme());
-  }, [getDarkMode]);
+  }, [darkMode]);
 
   return theme;
 };

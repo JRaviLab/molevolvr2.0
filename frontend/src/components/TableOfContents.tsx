@@ -37,7 +37,6 @@ const debouncedIsCovering = debounce(
  * turned on/off at route level. singleton.
  */
 const TableOfContents = () => {
-  /** elements */
   const root = useRef<HTMLElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const active = useRef<HTMLAnchorElement>(null);
@@ -103,7 +102,7 @@ const TableOfContents = () => {
       <div className={classes.heading}>
         {/* top text */}
         {open && (
-          <span className={clsx(classes.title, "primary")}>
+          <span className={clsx("primary", classes.title)}>
             Table Of Contents
           </span>
         )}

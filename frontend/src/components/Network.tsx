@@ -10,6 +10,7 @@ import {
   FaCropSimple,
   FaDownload,
   FaExpand,
+  FaFilePdf,
   FaRegImage,
   FaShareNodes,
   FaTableCellsLarge,
@@ -37,7 +38,6 @@ import fcose, { type FcoseLayoutOptions } from "cytoscape-fcose";
 import klay, { type KlayLayoutOptions } from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
-import domtoimage from "dom-to-image-more";
 import { omit, orderBy, startCase, truncate } from "lodash";
 import {
   useFullscreen,
@@ -52,7 +52,8 @@ import Popover from "@/components/Popover";
 import type { Option } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
-import { getColorMap, mixColors } from "@/util/color";
+import { useColorMap } from "@/util/color";
+import { printElement } from "@/util/dom";
 import {
   downloadCsv,
   downloadJpg,
@@ -298,11 +299,12 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   /** full width */
   const [expanded, setExpanded] = useLocalStorage("network-expanded", false);
 
-  /** map of node types to colors */
-  const nodeColors = useMemo(
-    () => getColorMap(_nodes.map((node) => node.type ?? "")),
+  const nodeTypes = useMemo(
+    () => _nodes.map((node) => node.type ?? ""),
     [_nodes],
   );
+  /** map of node types to colors */
+  const nodeColors = useColorMap(nodeTypes, "mode");
   /** map of node types to shapes */
   const nodeShapes = useMemo(
     () => getShapeMap(_nodes.map((node) => node.type ?? "")),
@@ -321,6 +323,9 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
         .map((node) => ({
           ...node,
           label: node.label ?? node.id,
+          shortLabel: truncate(node.label ?? node.id, {
+            length: 4 * (minNodeSize / fontSize),
+          }),
           type: node.type ?? "",
           size: lerp(
             node.strength ?? minNodeStrength,
@@ -329,8 +334,8 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
             minNodeSize,
             maxNodeSize,
           ),
-          color: nodeColors[node.type ?? ""]!,
-          shape: nodeShapes[node.type ?? ""]!,
+          color: nodeColors[node.type ?? ""] ?? "",
+          shape: nodeShapes[node.type ?? ""] ?? "",
         })),
     [
       _nodes,
@@ -345,11 +350,12 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   type Node = (typeof nodes)[number];
   type Edge = (typeof edges)[number];
 
-  /** map of edge types to colors */
-  const edgeColors = useMemo(
-    () => getColorMap(_edges.map((edge) => edge.type ?? "")),
+  const edgeTypes = useMemo(
+    () => _edges.map((edge) => edge.type ?? ""),
     [_edges],
   );
+  /** map of edge types to colors */
+  const edgeColors = useColorMap(edgeTypes, "mode");
   /** range of edge strengths */
   const [minEdgeStrength = 0, maxEdgeStrength = 1] = useMemo(
     () => extent(_edges.flatMap((edge) => edge.strength ?? [])),
@@ -362,6 +368,8 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
         .map((edge) => ({
           ...edge,
           label: edge.label ?? edge.id,
+          /** truncated later on node position update */
+          shortLabel: edge.label ?? edge.id,
           type: edge.type ?? "",
           size: lerp(
             edge.strength ?? minEdgeStrength,
@@ -370,7 +378,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
             minEdgeSize,
             maxEdgeSize,
           ),
-          color: edgeColors[edge.type ?? ""]!,
+          color: edgeColors[edge.type ?? ""] ?? "",
         }))
         /** remove edges whose source/target nodes have been filtered out */
         .filter(
@@ -469,24 +477,17 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     if (!graph.current) return;
 
     /** style accessors, extracted to avoid repetition */
-    const getNodeLabel = (node: NodeSingular) => node.data().label;
+    const getNodeLabel = (node: NodeSingular) => node.data().shortLabel;
     const getNodeSize = (node: NodeSingular) => node.data().size;
     const getNodeColor = (node: NodeSingular) =>
-      mixColors(
-        node.selected() ? (theme["--black"] ?? "") : node.data().color,
-        theme["--white"] ?? "",
-      );
+      node.selected() ? (theme["--light-gray"] ?? "") : node.data().color;
     const getNodeShape = (node: NodeSingular) => node.data().shape;
     const getNodeOpacity = (node: NodeSingular) => (node.active() ? 0.1 : 0);
-    const getEdgeLabel = (edge: EdgeSingular) =>
-      truncate(edge.data().label, { length: 10 });
+    const getEdgeLabel = (edge: EdgeSingular) => edge.data().shortLabel;
     const getEdgeSize = (edge: EdgeSingular) => edge.data().size;
     const getEdgeArrowSize = () => 1;
     const getEdgeColor = (edge: EdgeSingular) =>
-      mixColors(
-        edge.selected() ? (theme["--black"] ?? "") : edge.data().color,
-        theme["--white"] ?? "",
-      );
+      edge.selected() ? (theme["--light-gray"] ?? "") : edge.data().color;
     const getEdgeArrow =
       (directions: Edge["direction"][]) => (edge: EdgeSingular) =>
         directions.includes(edge.data().direction) ? "triangle" : "none";
@@ -501,6 +502,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "shape-polygon-points": getNodeShape,
       label: getNodeLabel,
       "font-size": fontSize,
+      "font-family": theme["--sans"],
       color: theme["--black"],
       "text-halign": "center",
       "text-valign": "center",
@@ -526,6 +528,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "arrow-scale": getEdgeArrowSize,
       label: getEdgeLabel,
       "font-size": fontSize,
+      "font-family": theme["--sans"],
       color: theme["--black"],
       "text-rotation": "autorotate",
       // @ts-expect-error no type defs
@@ -546,15 +549,9 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   useEffect(() => {
     if (!graph.current) return;
 
-    /** quick lookups for existing (old) and incoming (new) nodes/edges */
-    const oldNodes = Object.fromEntries(
-      graph.current.nodes().map((node) => [node.id, true]),
-    );
-    const oldEdges = Object.fromEntries(
-      graph.current.edges().map((edge) => [edge.id, true]),
-    );
-    const newNodes = Object.fromEntries(nodes.map((node) => [node.id, true]));
-    const newEdges = Object.fromEntries(edges.map((edge) => [edge.id, true]));
+    /** quick lookups for nodes/edges */
+    const newNodes = Object.fromEntries(nodes.map((node) => [node.id, node]));
+    const newEdges = Object.fromEntries(edges.map((edge) => [edge.id, edge]));
 
     /** remove nodes/edges that no longer exist */
     graph.current.remove(
@@ -563,17 +560,37 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     graph.current.remove(
       graph.current.edges().filter((oldEdge) => !newEdges[oldEdge.id()]),
     );
+
     /** add new nodes/edges */
     graph.current.add(
-      nodes
-        .filter((newNode) => !oldNodes[newNode.id])
-        .map((newNode) => ({ group: "nodes", data: newNode })),
+      nodes.map((newNode) => ({ group: "nodes", data: newNode })),
     );
     graph.current.add(
-      edges
-        .filter((newEdge) => !oldEdges[newEdge.id])
-        .map((newEdge) => ({ group: "edges", data: newEdge })),
+      edges.map((newEdge) => ({ group: "edges", data: newEdge })),
     );
+
+    /** update node/edge data */
+    graph.current.nodes().forEach((node) => {
+      const newNode = newNodes[node.id()];
+      if (newNode)
+        /** set node data */
+        node.data(newNode);
+
+      /** when node dragged */
+      node.on("position", () => {
+        node.connectedEdges().forEach((edge) => {
+          /** set truncated label based on edge length */
+          const a = edge.sourceEndpoint();
+          const b = edge.targetEndpoint();
+          const dist = Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+          const label = edge.data("label");
+          edge.data("shortLabel", truncate(label, { length: dist / fontSize }));
+        });
+      });
+    });
+    graph.current.edges().forEach((edge) => {
+      edge.data(newEdges[edge.id()]);
+    });
 
     /** update layout */
     layout.current?.stop();
@@ -584,43 +601,21 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   /** on resize */
   useResizeObserver(root, () => {
     graph.current?.resize();
+    fit();
   });
 
-  /** download network */
-  const download = useCallback(
+  /** download network as csv/tsv */
+  const downloadCSV = useCallback(
     (format: string) => {
-      if (!graph.current) return;
-      if (!root.current) return;
-
-      if (format === "png")
-        domtoimage
-          // @ts-expect-error non-comprehensive types for dom-to-image-more
-          .toPng(root.current, { scale: 2 })
-          .then((blob) => downloadPng(blob, "network"));
-
-      if (format === "jpg")
-        domtoimage
-          // @ts-expect-error non-comprehensive types for dom-to-image-more
-          .toJpeg(root.current, { scale: 2 })
-          .then((blob) => downloadJpg(blob, "network"));
-
-      if (format === "csv" || format === "tsv") {
-        const download = format === "csv" ? downloadCsv : downloadTsv;
-        download(
-          nodes.map((node) =>
-            omit(node, ["color", "shape", "size", "strength"]),
-          ),
-          ["network", "nodes"],
-        );
-        download(
-          edges.map((edge) =>
-            omit(edge, ["color", "shape", "size", "strength"]),
-          ),
-          ["network", "edges"],
-        );
-      }
-
-      if (format === "json") downloadJson(graph.current.json(), "network");
+      const download = format === "csv" ? downloadCsv : downloadTsv;
+      download(
+        nodes.map((node) => omit(node, ["color", "shape", "size", "strength"])),
+        ["network", "nodes"],
+      );
+      download(
+        edges.map((edge) => omit(edge, ["color", "shape", "size", "strength"])),
+        ["network", "edges"],
+      );
     },
     [nodes, edges],
   );
@@ -632,7 +627,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     <Flex direction="column" full>
       <div
         ref={root}
-        className={clsx(classes.network, expanded && classes.expanded)}
+        className={clsx("card", classes.network, expanded && classes.expanded)}
         style={{ aspectRatio }}
       >
         {/* legend */}
@@ -763,33 +758,48 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                 <Button
                   icon={<FaRegImage />}
                   text="PNG"
-                  onClick={() => download("png")}
+                  onClick={() =>
+                    root.current && downloadPng(root.current, "network")
+                  }
                   tooltip="High-resolution image"
                 />
                 <Button
                   icon={<FaRegImage />}
                   text="JPEG"
-                  onClick={() => download("jpg")}
+                  onClick={() =>
+                    root.current && downloadJpg(root.current, "network")
+                  }
                   tooltip="Compressed image"
+                />
+                <Button
+                  icon={<FaFilePdf />}
+                  text="PDF"
+                  onClick={() =>
+                    root.current && printElement(root.current, fit)
+                  }
+                  tooltip="Print as pdf"
                 />
 
                 <Button
                   icon={<FaTableCellsLarge />}
                   text="CSV"
-                  onClick={() => download("csv")}
+                  onClick={() => downloadCSV("csv")}
                   tooltip="Raw node and edge data, comma-separated"
                 />
                 <Button
                   icon={<FaTableCellsLarge />}
                   text="TSV"
-                  onClick={() => download("tsv")}
+                  onClick={() => downloadCSV("tsv")}
                   tooltip="Raw node and edge data, tab-separated"
                 />
 
                 <Button
                   icon={<FaShareNodes />}
                   text="JSON"
-                  onClick={() => download("json")}
+                  onClick={() =>
+                    graph.current &&
+                    downloadJson(graph.current?.json(), "network")
+                  }
                   tooltip="For import into Cytoscape"
                 />
               </Flex>

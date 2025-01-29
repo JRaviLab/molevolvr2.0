@@ -18,7 +18,7 @@ const Tile = ({ icon, primary, secondary }: Props) => {
     <Flex direction="column" className={classes.tile}>
       {icon}
       <div>
-        <div className={clsx(classes.primary, "bold")}>{primary}</div>
+        <div className={clsx("bold", classes.primary)}>{primary}</div>
         <div className="secondary">{secondary}</div>
       </div>
     </Flex>

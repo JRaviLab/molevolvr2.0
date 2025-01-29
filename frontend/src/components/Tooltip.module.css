@@ -6,13 +6,13 @@
   padding: 10px 15px;
   gap: 5px;
   border-radius: var(--rounded);
-  background: var(--off-black);
-  color: var(--white);
+  background: var(--off-white);
+  color: var(--black);
   text-wrap: pretty;
 }
 
 .arrow {
-  fill: var(--off-black);
+  fill: var(--off-white);
 }
 
 .content[data-state="delayed-open"] {

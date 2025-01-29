@@ -7,6 +7,7 @@ import {
   FaBrush,
   FaCat,
   FaChampagneGlasses,
+  FaChartPie,
   FaCircleInfo,
   FaClipboardList,
   FaFont,
@@ -27,7 +28,7 @@ import {
   FaStop,
   FaTableCells,
 } from "react-icons/fa6";
-import { random, sample, uniqueId } from "lodash";
+import { random, sample, uniq, uniqueId } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -48,45 +49,74 @@ import Section from "@/components/Section";
 import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
+import Sunburst, { type Item } from "@/components/Sunburst";
 import Table from "@/components/Table";
 import Tabs, { Tab } from "@/components/Tabs";
 import TextBox from "@/components/TextBox";
 import Tile from "@/components/Tile";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
+import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
 
-/** util func to log change to components for testing */
-const logChange = (...args: unknown[]) => {
-  console.debug(...args);
-};
+/** random words of varying length */
+const words =
+  "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum".split(
+    " ",
+  );
+
+/** random phrases of varying length */
+const phrases = Array(10)
+  .fill("")
+  .map((_, index) =>
+    Array(index + 1)
+      .fill("")
+      .map(() => sample(words)!)
+      .join(" "),
+  );
+
+/** generate fake label */
+const label = () => sample([...phrases, undefined]);
+
+/** generate fake "type" */
+const type = () =>
+  sample([
+    "gene",
+    "disease",
+    "compound",
+    "anatomy",
+    "phenotype",
+    "symptom",
+    "genotype",
+    "variant",
+    "pathway",
+    undefined,
+  ]);
+
+/** generate fake sunburst item data */
+const item = (depth: number): Item => ({
+  label: label(),
+  type: type(),
+  value: random(10, 100),
+  ...(depth > 0 && {
+    children: Array(random(1, 2))
+      .fill({})
+      .map(() => item(depth - 1)),
+  }),
+});
+
+/** generate fake sunburst data */
+const sunburst = [item(random(1, 3)), item(random(1, 3)), item(random(1, 3))];
 
 /** generate fake node data */
 const nodes = Array(200)
   .fill(null)
   .map(() => ({
     id: uniqueId(),
-    label: sample([
-      "Lbl.",
-      "Label",
-      "Long Label",
-      "Really Long Label",
-      undefined,
-    ]),
-    type: sample([
-      "gene",
-      "disease",
-      "compound",
-      "anatomy",
-      "phenotype",
-      "symptom",
-      "genotype",
-      "variant",
-      "pathway",
-      undefined,
-    ]),
+    label: label(),
+    type: type(),
     strength: sample([0, 0.1, 0.02, 0.003, 0.0004, 0.00005, undefined]),
     extra: sample(["cat", "dog", "bird"]),
   }));
@@ -96,13 +126,7 @@ const edges = Array(500)
   .fill(null)
   .map(() => ({
     id: uniqueId(),
-    label: sample([
-      "Lbl.",
-      "Label",
-      "Long Label",
-      "Really Long Label",
-      undefined,
-    ]),
+    label: label(),
     source: sample(ids)!,
     target: sample(ids)!,
     type: sample([
@@ -165,6 +189,10 @@ const tracks = Array(10)
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
+  /** palettes for color maps */
+  const lightColorMap = uniq(Object.values(useColorMap(words, "mode")));
+  const darkColorMap = uniq(Object.values(useColorMap(words, "invert")));
+
   return (
     <>
       <Meta title="Testbed" />
@@ -173,7 +201,14 @@ const TestbedPage = () => {
         <Heading level={1}>Testbed</Heading>
       </Section>
 
-      {/* IPR */}
+      <Section>
+        <Heading level={2} icon={<FaChartPie />}>
+          Sunburst
+        </Heading>
+
+        <Sunburst data={sunburst} />
+      </Section>
+
       <Section>
         <Heading level={2} icon={<FaBarcode />}>
           IPR
@@ -196,7 +231,7 @@ const TestbedPage = () => {
           Elements
         </Heading>
 
-        {/* color palette */}
+        {/* main color palette */}
         <Flex gap="none">
           {Object.entries(useTheme())
             .filter(
@@ -215,6 +250,23 @@ const TestbedPage = () => {
               </Tooltip>
             ))}
         </Flex>
+
+        {/* color maps */}
+        {[lightColorMap, darkColorMap].map((colors, index) => (
+          <Flex key={index} gap="none">
+            {colors.map((color, index) => (
+              <div
+                key={index}
+                aria-hidden
+                style={{
+                  width: 50,
+                  height: 50,
+                  background: color,
+                }}
+              />
+            ))}
+          </Flex>
+        ))}
 
         <p>
           Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
@@ -864,3 +916,8 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
 };
 
 export default TestbedPage;
+
+/** util func to log change to components for testing */
+const logChange = (...args: unknown[]) => {
+  console.debug(...args);
+};

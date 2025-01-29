@@ -1,66 +1,82 @@
+import { useState } from "react";
+import { useAtomValue } from "jotai";
+import { useDeepCompareEffect } from "@reactuses/core";
+import { darkModeAtom } from "@/components/DarkMode";
+
 /**
- * https://www.materialpalette.com/colors
- * https://gist.github.com/kawanet/a880c83f06d6baf742e45ac9ac52af96
+ * references:
+ *
  * https://tailwindcss.com/docs/customizing-colors
  * https://github.com/tailwindlabs/tailwindcss/blob/main/src/public/colors.js
+ * https://www.materialpalette.com/colors
+ * https://gist.github.com/kawanet/a880c83f06d6baf742e45ac9ac52af96?permalink_comment_id=5387840#gistcomment-5387840
  */
 
-const palette = [
-  "#90a4ae",
-  "#e57373",
-  "#9575cd",
-  "#4fc3f7",
-  "#81c784",
-  "#ffb74d",
-  "#f06292",
-  "#7986cb",
-  "#4dd0e1",
-  "#aed581",
-  "#ff8a65",
-  "#ba68c8",
-  "#64b5f6",
-  "#4db6ac",
-  "#ffd54f",
-];
+/** stagger hues to provide more contrast/distinction between successive colors */
+export const palette = {
+  light: [
+    "hsl(30, 10%, 80%)",
+    "hsl(180, 50%, 80%)",
+    "hsl(280, 50%, 80%)",
+    "hsl(20, 50%, 80%)",
+    "hsl(100, 50%, 80%)",
+    "hsl(200, 50%, 80%)",
+    "hsl(300, 50%, 80%)",
+    "hsl(140, 50%, 80%)",
+    "hsl(240, 50%, 80%)",
+    "hsl(340, 50%, 80%)",
+  ] as const,
+  dark: [
+    "hsl(30, 5%, 50%)",
+    "hsl(180, 30%, 50%)",
+    "hsl(280, 30%, 50%)",
+    "hsl(20, 30%, 50%)",
+    "hsl(100, 30%, 50%)",
+    "hsl(200, 30%, 50%)",
+    "hsl(300, 30%, 50%)",
+    "hsl(140, 30%, 50%)",
+    "hsl(240, 30%, 50%)",
+    "hsl(340, 30%, 50%)",
+  ] as const,
+};
 
 /** map enumerated values to colors */
-export const getColorMap = <Value extends string>(values: Value[]) => {
-  /** get first (neutral) color and remaining (colorful) colors */
-  const [neutral = "", ...colors] = palette;
-  let colorIndex = 0;
+export const getColorMap = <Value extends string>(
+  values: Value[],
+  level: keyof typeof palette = "light",
+) => {
+  /** get first (neutral) hue and remaining (colorful) hues */
+  const [neutral = "", ...hues] = palette[level];
+  let hueIndex = 0;
   /** make blank value a neutral color */
   const map = { "": neutral } as Record<Value, string>;
   for (const value of values)
     if (value.trim())
       /** add value to color map (if not already defined) */
-      map[value] ??= colors[colorIndex++ % colors.length]!;
+      map[value] ??= hues[hueIndex++ % hues.length]!;
+
   return map;
 };
 
-/**
- * mix colors by particular amount in desired color space
- * https://stackoverflow.com/a/56348573/2180570
- */
-export const mixColors = (
-  colorA: string,
-  colorB: string,
-  mix = 0.5,
-  space = "srgb",
+/** reactive color map */
+export const useColorMap = <Value extends string>(
+  values: Value[],
+  shade: "dark" | "light" | "mode" | "invert" = "mode",
 ) => {
-  const style = `color-mix(in ${space}, ${colorA}, ${colorB} ${100 * mix}%)`;
-  const div = document.createElement("div");
-  if (!window.matchMedia(`@supports (color: ${style}`)) return colorA;
-  div.style.color = style;
-  document.body.append(div);
-  const [r = 0, g = 0, b = 0] = window
-    .getComputedStyle(div)
-    .color.split(/\s/)
-    .map(parseFloat)
-    .filter((value) => !Number.isNaN(value));
-  div.remove();
-  const floatToHex = (value: number) =>
-    Math.round(255 * value)
-      .toString(16)
-      .padStart(2, "0");
-  return "#" + [r, g, b].map(floatToHex).join("");
+  /** dark mode state */
+  const darkMode = useAtomValue(darkModeAtom);
+
+  /** should use dark or light */
+  if (shade === "mode") shade = darkMode ? "dark" : "light";
+  else if (shade === "invert") shade = darkMode ? "light" : "dark";
+
+  /** map state */
+  const [map, setMap] = useState(() => getColorMap(values, shade));
+
+  /** update map */
+  useDeepCompareEffect(() => {
+    setMap(getColorMap(values, shade));
+  }, [values, shade]);
+
+  return map;
 };

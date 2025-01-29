@@ -9,6 +9,7 @@ import {
   Trigger,
 } from "@radix-ui/react-tooltip";
 import { renderText, shrinkWrap } from "@/util/dom";
+import { sleep } from "@/util/misc";
 import classes from "./Tooltip.module.css";
 
 type Props = {
@@ -44,11 +45,22 @@ const Tooltip = forwardRef<HTMLButtonElement, Props>(
             <Portal>
               <Content
                 ref={(element) => {
-                  window.setTimeout(() => shrinkWrap(element));
+                  sleep().then(() =>
+                    shrinkWrap(
+                      element,
+                      0,
+                      /**
+                       * radix ui tooltip puts two children at end that aren't
+                       * part of text content
+                       */
+                      -3,
+                    ),
+                  );
                   return element;
                 }}
                 className={classes.content}
                 side="top"
+                data-dark="true"
               >
                 {content}
                 <Arrow className={classes.arrow} />

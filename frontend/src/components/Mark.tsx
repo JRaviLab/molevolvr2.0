@@ -42,7 +42,7 @@ const Mark = ({ type = "info", icon, className, children }: Props) => (
     display="inline"
     gap="sm"
     wrap={false}
-    className={clsx(classes.mark, className)}
+    className={clsx(className, classes.mark)}
     style={{ "--color": types[type].color } as CSSProperties}
   >
     {icon ?? types[type].icon}

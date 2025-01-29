@@ -1,4 +1,4 @@
-:root[data-dark="false"] {
+[data-dark="false"] {
   /* accent */
   --accent: hsl(180, 55%, 35%);
 
@@ -21,11 +21,11 @@
   /** util colors */
   --box-shadow: 0 0 2px var(--shadow), 2px 2px 5px var(--shadow);
   --success: hsl(160, 90%, 40%);
-  --warning: hsl(40, 90%, 50%);
-  --error: hsl(350, 90%, 60%);
+  --warning: hsl(40, 100%, 50%);
+  --error: hsl(350, 80%, 60%);
 }
 
-:root[data-dark="true"] {
+[data-dark="true"] {
   /* accent */
   --accent: hsl(180, 50%, 60%);
 
@@ -48,8 +48,8 @@
   /** util colors */
   --box-shadow: 0 0 2px var(--shadow), 2px 2px 5px var(--shadow);
   --success: hsl(160, 90%, 40%);
-  --warning: hsl(40, 90%, 50%);
-  --error: hsl(350, 90%, 60%);
+  --warning: hsl(40, 100%, 50%);
+  --error: hsl(350, 80%, 60%);
 }
 
 :root {
