@@ -19,7 +19,6 @@ import {
 import { usePrevious } from "@reactuses/core";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
-import { sleep } from "@/util/misc";
 import classes from "./Select.module.css";
 
 export type Option<ID = string> = {
@@ -72,8 +71,10 @@ const SelectSingle = <O extends Option>({
 
   /** notify parent when selected changes */
   const previousSelected = usePrevious(selectedWFallback);
-  if (previousSelected && previousSelected !== selectedWFallback)
-    sleep().then(() => onChange?.(selectedWFallback));
+  useEffect(() => {
+    if (previousSelected && previousSelected !== selectedWFallback)
+      onChange?.(selectedWFallback);
+  }, [selectedWFallback, previousSelected, onChange]);
 
   /** update local state from controlled value */
   useEffect(() => {

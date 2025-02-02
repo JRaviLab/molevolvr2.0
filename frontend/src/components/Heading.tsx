@@ -41,12 +41,11 @@ const Heading = ({
   const id = kebabCase(anchor ?? renderText(children));
 
   /** icon or badge */
-  const iconElement =
-    typeof icon === "string" ? (
-      <Badge className={classes.badge}>{icon}</Badge>
-    ) : (
-      cloneElement(icon, { className: classes.icon })
-    );
+  let iconElement = <></>;
+  if (typeof icon === "string")
+    iconElement = <Badge className={classes.badge}>{icon}</Badge>;
+  if (typeof icon === "object" && typeof icon.type === "function")
+    iconElement = cloneElement(icon, { className: classes.icon });
 
   return (
     <Tag id={id} ref={ref} className={clsx(className, classes.heading)}>
