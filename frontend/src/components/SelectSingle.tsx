@@ -6,11 +6,11 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
-import { Label } from "react-aria-components";
 import { FaAngleDown } from "react-icons/fa6";
 import { VscCircleFilled } from "react-icons/vsc";
 import clsx from "clsx";
 import {
+  Label,
   Listbox,
   ListboxButton,
   ListboxOption,
