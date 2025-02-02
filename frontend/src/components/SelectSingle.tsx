@@ -30,7 +30,7 @@ export type Option<ID = string> = {
   /** secondary label */
   secondary?: ReactNode;
   /** icon */
-  icon?: ReactElement;
+  icon?: ReactElement<{ className: string }>;
 };
 
 type Props<O extends Option> = {

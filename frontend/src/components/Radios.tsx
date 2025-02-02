@@ -19,7 +19,7 @@ export type Option<ID = string> = {
   /** tertiary content */
   tertiary?: ReactNode;
   /** icon next to content */
-  icon?: ReactElement;
+  icon?: ReactElement<{ className: string }>;
 };
 
 type Props<O extends Option> = {
