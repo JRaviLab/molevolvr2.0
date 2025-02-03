@@ -84,7 +84,12 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
 
       {/* panels */}
       {tabs.map((tab, index) => (
-        <Content key={index} value={tab.id} className={classes.content}>
+        <Content
+          key={index}
+          value={tab.id}
+          className={classes.content}
+          forceMount
+        >
           {tab.children}
         </Content>
       ))}
