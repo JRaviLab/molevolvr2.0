@@ -29,6 +29,10 @@ import {
   FaTableCells,
 } from "react-icons/fa6";
 import { random, sample, uniq, uniqueId } from "lodash";
+import type {
+  Region,
+  SequencesMSA,
+} from "@nightingale-elements/nightingale-msa";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -42,6 +46,7 @@ import IPR from "@/components/IPR";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import Network from "@/components/Network";
+import NightingaleMSAWrapper from "@/components/nightingale-wrapper/NightingaleMSAWrapper";
 import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
 import Radios from "@/components/Radios";
@@ -187,6 +192,41 @@ const tracks = Array(10)
       }),
   }));
 
+type ExtendedRegion = Region & {
+  type: string;
+  start: number;
+  end: number;
+};
+
+const mockSequences: SequencesMSA = [
+  { name: "Seq1", sequence: "ATGCATGCATGC" },
+  { name: "Seq2", sequence: "ATGC-TGCATGC" },
+  { name: "Seq3", sequence: "ATGCATGC-TGC" },
+];
+
+const mockFeatures: ExtendedRegion[] = [
+  {
+    type: "domain",
+    start: 1,
+    end: 6,
+    residues: { from: 1, to: 6 },
+    sequences: { from: 0, to: 2 },
+    mouseOverFillColor: "rgba(255, 0, 0, 0.5)",
+    fillColor: "rgba(255, 0, 0, 0.3)",
+    borderColor: "rgb(255, 0, 0)",
+  },
+  {
+    type: "motif",
+    start: 8,
+    end: 12,
+    residues: { from: 8, to: 12 },
+    sequences: { from: 0, to: 2 },
+    mouseOverFillColor: "rgba(255, 0, 0, 0.5)",
+    fillColor: "rgba(255, 0, 0, 0.3)",
+    borderColor: "rgb(255, 0, 0)",
+  },
+];
+
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
   /** palettes for color maps */
@@ -223,6 +263,16 @@ const TestbedPage = () => {
         </Heading>
 
         <Network nodes={nodes} edges={edges} />
+      </Section>
+
+      <Section>
+        <Heading level={2} icon={<FaBars />}>
+          MSA Visualization
+        </Heading>
+        <NightingaleMSAWrapper
+          sequences={mockSequences}
+          features={mockFeatures}
+        />
       </Section>
 
       {/* regular html elements and css classes for basic formatting */}
