@@ -1,20 +1,27 @@
-import { useEffect } from "react";
 import { FaRegMoon, FaRegSun } from "react-icons/fa6";
-import { useAtom } from "jotai";
+import { getDefaultStore, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import Tooltip from "@/components/Tooltip";
 
 /** dark mode state */
 export const darkModeAtom = atomWithStorage("darkMode", false);
 
+/** update root element data attribute that switches css color vars */
+const update = () => {
+  const darkMode = getDefaultStore().get(darkModeAtom);
+  document.documentElement.setAttribute("data-dark", String(darkMode));
+};
+update();
+
+/**
+ * when dark mode state changes (faster than useEffect in toggle component b/c
+ * have to wait for mount)
+ */
+getDefaultStore().sub(darkModeAtom, update);
+
 /** dark mode toggle */
 export const DarkMode = () => {
   const [darkMode, setDarkMode] = useAtom(darkModeAtom);
-
-  /** update root element data attribute that switches css color vars */
-  useEffect(() => {
-    document.documentElement.setAttribute("data-dark", String(darkMode));
-  });
 
   return (
     <Tooltip content={`Switch to ${darkMode ? "light" : "dark"} mode`}>
