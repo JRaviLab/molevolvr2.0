@@ -13,7 +13,7 @@ import {
   useLocation,
   useMatches,
   useRouteLoaderData,
-} from "react-router-dom";
+} from "react-router";
 import { isEmpty } from "lodash";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Footer from "@/components/Footer";

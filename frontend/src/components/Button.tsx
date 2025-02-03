@@ -1,10 +1,4 @@
-import type {
-  ComponentProps,
-  ForwardedRef,
-  ReactElement,
-  ReactNode,
-} from "react";
-import { forwardRef } from "react";
+import type { ComponentProps, ReactElement, ReactNode, Ref } from "react";
 import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Link from "@/components/Link";
@@ -26,9 +20,12 @@ type Description =
   /** require text and/or tooltip for accessibility */
   { text: string; tooltip?: ReactNode } | { text?: string; tooltip: ReactNode };
 
-type _Link = Pick<ComponentProps<typeof Link>, "to" | "style">;
+type _Link = { ref?: Ref<HTMLAnchorElement> } & Pick<
+  ComponentProps<typeof Link>,
+  "to" | "style"
+>;
 
-type _Button = Pick<
+type _Button = { ref?: Ref<HTMLButtonElement> } & Pick<
   ComponentProps<"button">,
   | "type"
   | "style"
@@ -46,68 +43,64 @@ type Props = Base & Description & (_Link | _Button);
  * looks like a button and either goes somewhere (link) or does something
  * (button)
  */
-const Button = forwardRef(
-  (
-    {
-      text,
-      icon,
-      flip = false,
-      design = "normal",
-      className,
-      tooltip,
-      ...props
-    }: Props,
-    ref,
-  ) => {
-    /** contents of main element */
-    const children = flip ? (
-      <>
-        {icon}
-        {text}
-      </>
-    ) : (
-      <>
-        {text}
-        {icon}
-      </>
+const Button = ({
+  ref,
+  text,
+  icon,
+  flip = false,
+  design = "normal",
+  className,
+  tooltip,
+  ...props
+}: Props) => {
+  /** contents of main element */
+  const children = flip ? (
+    <>
+      {icon}
+      {text}
+    </>
+  ) : (
+    <>
+      {text}
+      {icon}
+    </>
+  );
+
+  /** class name string */
+  const _class = clsx(className, classes.button, classes[design], {
+    [classes.square!]: !text && !!icon,
+  });
+
+  /** link to parent form component */
+  const form = useForm();
+
+  /** if "to", render as link */
+  if ("to" in props)
+    return (
+      <Link
+        ref={ref as Ref<HTMLAnchorElement>}
+        className={_class}
+        tooltip={tooltip}
+        showArrow={false}
+        {...props}
+      >
+        {children}
+      </Link>
     );
-
-    /** class name string */
-    const _class = clsx(className, classes.button, classes[design], {
-      [classes.square!]: !text && !!icon,
-    });
-
-    /** link to parent form component */
-    const form = useForm();
-
-    /** if "to", render as link */
-    if ("to" in props)
-      return (
-        <Link
-          ref={ref as ForwardedRef<HTMLAnchorElement>}
+  /** otherwise, render as button */ else
+    return (
+      <Tooltip content={tooltip}>
+        <button
+          ref={ref as Ref<HTMLButtonElement>}
           className={_class}
-          tooltip={tooltip}
-          showArrow={false}
+          type="button"
+          form={form}
           {...props}
         >
           {children}
-        </Link>
-      );
-    /** otherwise, render as button */ else
-      return (
-        <Tooltip content={tooltip}>
-          <button
-            ref={ref as ForwardedRef<HTMLButtonElement>}
-            className={_class}
-            type="button"
-            form={form}
-            {...props}
-          >
-            {children}
-          </button>
-        </Tooltip>
-      );
-  },
-);
+        </button>
+      </Tooltip>
+    );
+};
 
 export default Button;

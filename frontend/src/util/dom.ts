@@ -1,4 +1,4 @@
-import { cloneElement, type ReactNode } from "react";
+import { cloneElement, type ReactElement, type ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
 import { debounce } from "lodash";
 import { sleep } from "@/util/misc";
@@ -61,8 +61,11 @@ export const renderText = (node: ReactNode) =>
       child !== null &&
       "type" in child &&
       child.type &&
+      typeof child.props === "object" &&
+      child.props !== null &&
+      "children" in child.props &&
       typeof child.props.children === "string"
-        ? cloneElement(child, {
+        ? cloneElement(child as ReactElement<{ children: string }>, {
             ...child.props,
             /**
              * if children is string, add padding on either side to separate

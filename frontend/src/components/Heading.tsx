@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { JSX, ReactElement, ReactNode } from "react";
 import { cloneElement, useRef } from "react";
 import { FaLink } from "react-icons/fa6";
 import clsx from "clsx";
@@ -12,7 +12,7 @@ type Props = {
   /** "indent" level */
   level: 1 | 2 | 3 | 4;
   /** icon element or badge */
-  icon?: ReactElement | string;
+  icon?: ReactElement<{ className: string }> | string;
   /** manually set anchor link instead of automatically from children text */
   anchor?: string;
   /** class on heading */
@@ -41,12 +41,11 @@ const Heading = ({
   const id = kebabCase(anchor ?? renderText(children));
 
   /** icon or badge */
-  const iconElement =
-    typeof icon === "string" ? (
-      <Badge className={classes.badge}>{icon}</Badge>
-    ) : (
-      cloneElement(icon, { className: classes.icon })
-    );
+  let iconElement = <></>;
+  if (typeof icon === "string")
+    iconElement = <Badge className={classes.badge}>{icon}</Badge>;
+  if (typeof icon === "object" && typeof icon.type === "function")
+    iconElement = cloneElement(icon, { className: classes.icon });
 
   return (
     <Tag id={id} ref={ref} className={clsx(className, classes.heading)}>

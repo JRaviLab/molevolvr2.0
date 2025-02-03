@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { Fragment, useEffect, useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import clsx from "clsx";
 import { kebabCase } from "lodash";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
@@ -25,7 +25,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
 
   /** tab props */
   const tabs = (Array.isArray(children) ? children : [children])
-    .filter((child): child is ReactElement => !!child)
+    .filter((child): child is ReactElement<TabProps> => !!child)
     .map((child) => ({
       ...child.props,
       /** make unique tab id from text */

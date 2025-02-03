@@ -1,9 +1,4 @@
-import {
-  forwardRef,
-  type ComponentProps,
-  type CSSProperties,
-  type ForwardedRef,
-} from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import { useMediaQuery } from "@reactuses/core";
 
 type TagNames = keyof HTMLElementTagNameMap;
@@ -53,42 +48,37 @@ const gapMap: Record<NonNullable<Props["gap"]>, number> = {
   xl: 60,
 };
 
-const Flex = forwardRef(
-  <TagName extends TagNames>(
-    {
-      tag: Tag = "div",
-      display = "block",
-      direction = "row",
-      gap = "md",
-      gapRatio = 1,
-      wrap = true,
-      full = false,
-      hAlign = "center",
-      vAlign = "center",
-      breakpoint = 0,
-      style = {},
-      ...props
-    }: Props<TagName>,
-    ref: ForwardedRef<HTMLElementTagNameMap[TagName]>,
-  ) => {
-    const belowBreakpoint = useMediaQuery(`(max-width: ${breakpoint}px)`);
+const Flex = <TagName extends TagNames>({
+  ref,
+  tag: Tag = "div",
+  display = "block",
+  direction = "row",
+  gap = "md",
+  gapRatio = 1,
+  wrap = true,
+  full = false,
+  hAlign = "center",
+  vAlign = "center",
+  breakpoint = 0,
+  style = {},
+  ...props
+}: Props<TagName>) => {
+  const belowBreakpoint = useMediaQuery(`(max-width: ${breakpoint}px)`);
 
-    const flexStyles: CSSProperties = {
-      display: display === "block" ? "flex" : "inline-flex",
-      flexDirection:
-        direction === "column" || belowBreakpoint ? "column" : "row",
-      justifyContent:
-        direction === "column" ? alignMap[vAlign] : alignMap[hAlign],
-      alignItems: direction === "column" ? alignMap[hAlign] : alignMap[vAlign],
-      flexWrap: wrap && direction === "row" ? "wrap" : "nowrap",
-      gap: `${gapMap[gap] * gapRatio}px ${gapMap[gap]}px`,
-      width: full ? "100%" : undefined,
-      ...style,
-    };
+  const flexStyles: CSSProperties = {
+    display: display === "block" ? "flex" : "inline-flex",
+    flexDirection: direction === "column" || belowBreakpoint ? "column" : "row",
+    justifyContent:
+      direction === "column" ? alignMap[vAlign] : alignMap[hAlign],
+    alignItems: direction === "column" ? alignMap[hAlign] : alignMap[vAlign],
+    flexWrap: wrap && direction === "row" ? "wrap" : "nowrap",
+    gap: `${gapMap[gap] * gapRatio}px ${gapMap[gap]}px`,
+    width: full ? "100%" : undefined,
+    ...style,
+  };
 
-    // @ts-expect-error ts not smart enough here
-    return <Tag ref={ref} style={flexStyles} {...props} />;
-  },
-);
+  // @ts-expect-error ts not smart enough here
+  return <Tag ref={ref} style={flexStyles} {...props} />;
+};
 
 export default Flex;
