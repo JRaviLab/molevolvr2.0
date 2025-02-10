@@ -24,7 +24,7 @@ type Props = {
 
 /**
  * popup of minimal, non-interactive help or contextual info when hovering or
- * focusing children. for use in other components, not directly.
+ * focusing children
  */
 const Tooltip = ({ ref, content, children, ...props }: Props) => {
   const contentRef = useRef<HTMLDivElement>(null);

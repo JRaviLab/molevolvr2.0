@@ -9,10 +9,7 @@ type Props = {
   children: ReactElement;
 };
 
-/**
- * popup of interactive content when hovering or focusing children. for use in
- * other components, not directly.
- */
+/** popup of interactive content when hovering or focusing children */
 const Popover = ({ content, children }: Props) => {
   return (
     <Root>

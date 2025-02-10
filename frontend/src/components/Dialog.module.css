@@ -1,0 +1,48 @@
+.fullscreen {
+  display: flex;
+  z-index: 3;
+  position: fixed;
+  align-items: center;
+  justify-content: center;
+  inset: 0;
+  padding: 40px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay);
+}
+
+.content {
+  position: relative;
+  width: var(--content);
+  max-width: 100%;
+  max-height: 100%;
+  padding: 20px;
+  border-radius: var(--rounded);
+  background: var(--white);
+}
+
+.content[data-state="open"] {
+  animation: fade var(--fast);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  color: var(--gray);
+  font-size: 1.2rem;
+}
+
+.scroll {
+  overflow-y: auto;
+}
