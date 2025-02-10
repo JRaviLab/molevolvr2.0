@@ -13,11 +13,9 @@ const update = () => {
 };
 update();
 
-/**
- * when dark mode state changes (faster than useEffect in toggle component b/c
- * have to wait for mount)
- */
+/** when dark mode state changes */
 getDefaultStore().sub(darkModeAtom, update);
+/** using useEffect in toggle component causes FOUC b/c have to wait for render */
 
 /** dark mode toggle */
 export const DarkMode = () => {
