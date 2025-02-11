@@ -19,6 +19,10 @@
   height: 20px;
 }
 
+.chart {
+  justify-self: center;
+}
+
 .segment {
   cursor: pointer;
   transition: opacity var(--fast);
@@ -47,7 +51,7 @@
   padding: 5px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 800px) {
   .container {
     grid-template-columns: 1fr;
   }

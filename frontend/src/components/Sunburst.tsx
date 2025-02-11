@@ -73,10 +73,19 @@ const Sunburst = ({ title, data }: Props) => {
   const container = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
 
-  /** fit viewBox after any change */
+  const [maxHeight, setMaxHeight] = useState(99999);
+
   useEffect(() => {
-    if (svg.current) fitViewbox(svg.current, 0.01);
-  });
+    if (!svg.current) return;
+    /** fit viewBox to contents */
+    const { height } = fitViewbox(svg.current, 0.01);
+
+    /** set max dimensions so svg text isn't bigger than page text */
+    const pageFontSize = parseFloat(
+      window.getComputedStyle(svg.current).fontSize,
+    );
+    setMaxHeight((height / fontSize) * pageFontSize);
+  }, []);
 
   /** "trail" of breadcrumbs through tree of items */
   const [breadcrumbs, setBreadcrumbs] = useState<ItemDerived[]>([]);
@@ -206,7 +215,7 @@ const Sunburst = ({ title, data }: Props) => {
         </div>
 
         {/* chart container */}
-        <svg ref={svg} className={classes.chart}>
+        <svg ref={svg} className={classes.chart} style={{ maxHeight }}>
           <Segment children={derived} selectItem={selectItem} />
         </svg>
 
@@ -217,7 +226,7 @@ const Sunburst = ({ title, data }: Props) => {
             gap="sm"
             gapRatio={1}
             direction="column"
-            hAlign="stretch"
+            hAlign="right"
             vAlign="top"
           >
             {breadcrumbs.map((item, index) => (
@@ -378,7 +387,8 @@ const Segment = ({
           <text
             className={classes.label}
             textAnchor="middle"
-            dominantBaseline="middle"
+            // dominantBaseline="central"
+            dy="0.5ex"
             fontSize={fontSize}
             fill={theme["--black"]}
           >
