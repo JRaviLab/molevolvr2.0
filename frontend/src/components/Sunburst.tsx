@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa6";
 import clsx from "clsx";
 import { clamp, startCase, sumBy, truncate } from "lodash";
+import { useDebounce, useElementSize } from "@reactuses/core";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
@@ -26,6 +27,8 @@ import { cos, sin } from "@/util/math";
 import { flatMap } from "@/util/object";
 import { formatNumber } from "@/util/string";
 import classes from "./Sunburst.module.css";
+
+const docFontSize = parseFloat(window.getComputedStyle(document.body).fontSize);
 
 export type Item = {
   /** human-readable label */
@@ -66,26 +69,26 @@ const ringSize = 20;
 const startLevel = 3;
 /** gap between rings */
 const gapSize = 2;
-/** font size */
-const fontSize = 10;
 
 const Sunburst = ({ title, data }: Props) => {
   const container = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
 
-  const [maxHeight, setMaxHeight] = useState(99999);
+  /** font size, in svg units */
+  const [fontSize, setFontSize] = useState(16);
+
+  /** height of svg, in client units */
+  const clientHeight = useDebounce(useElementSize(svg)[1], 300);
 
   useEffect(() => {
     if (!svg.current) return;
-    /** fit viewBox to contents */
-    const { height } = fitViewbox(svg.current, 0.01);
 
-    /** set max dimensions so svg text isn't bigger than page text */
-    const pageFontSize = parseFloat(
-      window.getComputedStyle(svg.current).fontSize,
-    );
-    setMaxHeight((height / fontSize) * pageFontSize);
-  }, []);
+    /** fit viewBox to contents */
+    const viewbox = fitViewbox(svg.current, 0.01);
+
+    /** scale svg font size to match document font size */
+    setFontSize(viewbox.height * (docFontSize / clientHeight));
+  }, [clientHeight]);
 
   /** "trail" of breadcrumbs through tree of items */
   const [breadcrumbs, setBreadcrumbs] = useState<ItemDerived[]>([]);
@@ -215,8 +218,12 @@ const Sunburst = ({ title, data }: Props) => {
         </div>
 
         {/* chart container */}
-        <svg ref={svg} className={classes.chart} style={{ maxHeight }}>
-          <Segment children={derived} selectItem={selectItem} />
+        <svg ref={svg} className={classes.chart}>
+          <Segment
+            children={derived}
+            selectItem={selectItem}
+            fontSize={fontSize}
+          />
         </svg>
 
         {/* breadcrumbs */}
@@ -300,6 +307,7 @@ const Sunburst = ({ title, data }: Props) => {
 export default Sunburst;
 
 type SegmentProps = Partial<ItemDerived> & {
+  fontSize: number;
   level?: number;
   startAngle?: number;
   endAngle?: number;
@@ -308,6 +316,7 @@ type SegmentProps = Partial<ItemDerived> & {
 
 /** single arc segment */
 const Segment = ({
+  fontSize,
   level = 0,
   startAngle = 0,
   endAngle = 1,
@@ -388,7 +397,7 @@ const Segment = ({
             className={classes.label}
             textAnchor="middle"
             // dominantBaseline="central"
-            dy="0.5ex"
+            dy="0.55ex"
             fontSize={fontSize}
             fill={theme["--black"]}
           >
@@ -406,6 +415,7 @@ const Segment = ({
         <Segment
           key={index}
           {...item}
+          fontSize={fontSize}
           level={level + 1}
           startAngle={offsetAngle}
           endAngle={(offsetAngle = offsetAngle + item.percent)}
