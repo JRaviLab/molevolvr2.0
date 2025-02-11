@@ -844,10 +844,31 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
                     placerat. Maximus fusce volutpat convallis taciti quam nam
                     posuere.
                   </p>
+
+                  <Collapsible text="Collapsible">
+                    <p>
+                      Odio semper orci ante varius porttitor. Ultricies torquent
+                      venenatis cursus praesent vel lacus ligula nostra iaculis.
+                      Parturient mauris id eget metus varius. Nulla suscipit
+                      suspendisse natoque praesent ridiculus nisi molestie.
+                      Taciti suscipit luctus morbi mauris; sem ante id orci.
+                      Venenatis suspendisse dui finibus ipsum mus lorem placerat
+                      vitae. Mattis nullam quisque morbi tempor, ex consectetur
+                      urna odio. Class cras dapibus, augue suspendisse volutpat
+                      justo. Blandit imperdiet conubia penatibus euismod
+                      condimentum maecenas pharetra. Per ad ultricies viverra
+                      erat et massa ante.
+                    </p>
+                  </Collapsible>
+
+                  <Popover content="Odio semper orci ante varius porttitor.">
+                    <Tooltip content="Click to open">
+                      <Button text="Popover" />
+                    </Tooltip>
+                  </Popover>
                 </Tab>
 
                 <Tab text="Two" tooltip="Tooltip">
-                  {" "}
                   <p>
                     Odio semper orci ante varius porttitor. Ultricies torquent
                     venenatis cursus praesent vel lacus ligula nostra iaculis.
