@@ -20,7 +20,7 @@ import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { fitViewbox, printElement } from "@/util/dom";
+import { fitViewBox, printElement } from "@/util/dom";
 import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { cos, sin } from "@/util/math";
@@ -83,11 +83,11 @@ const Sunburst = ({ title, data }: Props) => {
   useEffect(() => {
     if (!svg.current) return;
 
-    /** fit viewBox to contents */
-    const viewbox = fitViewbox(svg.current, 0.01);
+    /** fit view box */
+    const viewBox = fitViewBox(svg.current, 0.01);
 
     /** scale svg font size to match document font size */
-    setFontSize(viewbox.height * (docFontSize / clientHeight));
+    setFontSize(viewBox.height * (docFontSize / clientHeight));
   }, [clientHeight]);
 
   /** "trail" of breadcrumbs through tree of items */

@@ -160,7 +160,7 @@ export const isCovering = (
 };
 
 /** fit view box to contents of svg */
-export const fitViewbox = (svg?: SVGSVGElement, paddingPercent = 0) => {
+export const fitViewBox = (svg?: SVGSVGElement, paddingPercent = 0) => {
   if (!svg) return { x: 0, y: 0, width: 100, height: 100 };
   let { x, y, width, height } = svg.getBBox();
   const padding = Math.min(width, height) * paddingPercent;
