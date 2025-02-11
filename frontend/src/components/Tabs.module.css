@@ -34,3 +34,7 @@
 .content {
   display: contents;
 }
+
+.content[data-state="inactive"] {
+  display: none;
+}

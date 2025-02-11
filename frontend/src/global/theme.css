@@ -70,7 +70,7 @@
   --slow: 0.35s ease;
   --focus: 0 0 5px var(--accent);
   --spacing: 2;
-  --compact: 1.25;
+  --compact: 1.5;
 
   /** sizes */
   --content: 1000px;

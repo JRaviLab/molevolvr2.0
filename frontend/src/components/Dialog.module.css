@@ -8,12 +8,6 @@
   padding: 40px;
 }
 
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: var(--overlay);
-}
-
 .content {
   position: relative;
   width: var(--content);
@@ -22,6 +16,7 @@
   padding: 20px;
   border-radius: var(--rounded);
   background: var(--white);
+  box-shadow: 0 0 0 9999px var(--overlay);
 }
 
 .content[data-state="open"] {

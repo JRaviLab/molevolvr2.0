@@ -826,39 +826,57 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
           title="Lorem ipsum"
           content={
             <>
-              <p>
-                Lorem ipsum odor amet, consectetuer adipiscing elit. Semper
-                taciti viverra ultricies mus aenean ligula. Donec dis torquent
-                orci in odio. Nulla cras ex orci ridiculus augue malesuada.
-                Mattis urna congue imperdiet dolor sapien himenaeos praesent
-                vitae ut. Congue sapien a dapibus bibendum dolor feugiat etiam
-                sodales. Phasellus mattis feugiat augue iaculis; non venenatis
-                dolor. Litora magnis nec fames quam phasellus placerat. Maximus
-                fusce volutpat convallis taciti quam nam posuere.
-              </p>
-              <p>
-                Odio semper orci ante varius porttitor. Ultricies torquent
-                venenatis cursus praesent vel lacus ligula nostra iaculis.
-                Parturient mauris id eget metus varius. Nulla suscipit
-                suspendisse natoque praesent ridiculus nisi molestie. Taciti
-                suscipit luctus morbi mauris; sem ante id orci. Venenatis
-                suspendisse dui finibus ipsum mus lorem placerat vitae. Mattis
-                nullam quisque morbi tempor, ex consectetur urna odio. Class
-                cras dapibus, augue suspendisse volutpat justo. Blandit
-                imperdiet conubia penatibus euismod condimentum maecenas
-                pharetra. Per ad ultricies viverra erat et massa ante.
-              </p>
-              <p>
-                Leo dolor non arcu scelerisque tincidunt cursus suspendisse
-                natoque. Nunc proin iaculis massa mi leo ipsum, mattis libero.
-                Ad malesuada orci luctus urna integer tempor urna. Netus eu
-                sagittis rutrum sagittis viverra vitae posuere. Eros laoreet
-                gravida orci etiam nam nisi vitae ultricies. Litora luctus
-                parturient elementum taciti, facilisis justo.
-              </p>
+              <Tabs>
+                <Tab text="One" tooltip="Tooltip">
+                  <p>
+                    <Tooltip content="Odio semper orci ante varius porttitor. Ultricies torquent venenatis cursus praesent vel lacus ligula nostra iaculis. Parturient mauris id eget metus varius.">
+                      <span className="text-tooltip" tabIndex={0} role="button">
+                        Lorem
+                      </span>
+                    </Tooltip>{" "}
+                    ipsum odor amet, consectetuer adipiscing elit. Semper taciti
+                    viverra ultricies mus aenean ligula. Donec dis torquent orci
+                    in odio. Nulla cras ex orci ridiculus augue malesuada.
+                    Mattis urna congue imperdiet dolor sapien himenaeos praesent
+                    vitae ut. Congue sapien a dapibus bibendum dolor feugiat
+                    etiam sodales. Phasellus mattis feugiat augue iaculis; non
+                    venenatis dolor. Litora magnis nec fames quam phasellus
+                    placerat. Maximus fusce volutpat convallis taciti quam nam
+                    posuere.
+                  </p>
+                </Tab>
+
+                <Tab text="Two" tooltip="Tooltip">
+                  {" "}
+                  <p>
+                    Odio semper orci ante varius porttitor. Ultricies torquent
+                    venenatis cursus praesent vel lacus ligula nostra iaculis.
+                    Parturient mauris id eget metus varius. Nulla suscipit
+                    suspendisse natoque praesent ridiculus nisi molestie. Taciti
+                    suscipit luctus morbi mauris; sem ante id orci. Venenatis
+                    suspendisse dui finibus ipsum mus lorem placerat vitae.
+                    Mattis nullam quisque morbi tempor, ex consectetur urna
+                    odio. Class cras dapibus, augue suspendisse volutpat justo.
+                    Blandit imperdiet conubia penatibus euismod condimentum
+                    maecenas pharetra. Per ad ultricies viverra erat et massa
+                    ante.
+                  </p>
+                </Tab>
+
+                <Tab text="Three" tooltip="Tooltip">
+                  <p>
+                    Leo dolor non arcu scelerisque tincidunt cursus suspendisse
+                    natoque. Nunc proin iaculis massa mi leo ipsum, mattis
+                    libero. Ad malesuada orci luctus urna integer tempor urna.
+                    Netus eu sagittis rutrum sagittis viverra vitae posuere.
+                    Eros laoreet gravida orci etiam nam nisi vitae ultricies.
+                    Litora luctus parturient elementum taciti, facilisis justo.
+                  </p>
+                </Tab>
+              </Tabs>
             </>
           }
-          bottomContent={
+          bottomContent={(close) => (
             <Flex>
               <SelectSingle
                 layout="horizontal"
@@ -872,10 +890,23 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
                 }
                 onChange={logChange}
               />
-              <Button text="Nevermind" />
-              <Button text="Yes, delete" design="critical" />
+              <Button
+                text="Nevermind"
+                onClick={() => {
+                  console.debug("Cancel");
+                  close();
+                }}
+              />
+              <Button
+                text="Yes, delete"
+                design="critical"
+                onClick={() => {
+                  console.debug("Delete");
+                  close();
+                }}
+              />
             </Flex>
-          }
+          )}
         >
           <Tooltip content="Click to open">
             <Button text="Dialog" />
