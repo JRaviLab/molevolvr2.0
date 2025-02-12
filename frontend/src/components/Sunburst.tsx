@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   type ReactElement,
@@ -13,7 +14,8 @@ import {
   FaRegImage,
 } from "react-icons/fa6";
 import clsx from "clsx";
-import { clamp, startCase, sumBy, truncate } from "lodash";
+import { arc } from "d3";
+import { inRange, startCase, sumBy, truncate } from "lodash";
 import { useDebounce, useElementSize } from "@reactuses/core";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
@@ -23,7 +25,6 @@ import { useColorMap } from "@/util/color";
 import { fitViewBox, printElement } from "@/util/dom";
 import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
 import { useTheme } from "@/util/hooks";
-import { cos, sin } from "@/util/math";
 import { flatMap } from "@/util/object";
 import { formatNumber } from "@/util/string";
 import classes from "./Sunburst.module.css";
@@ -329,25 +330,42 @@ const Segment = ({
   /** segment arc radius */
   const radius = (level + startLevel - 0.5) * ringSize;
 
-  /** limit angles */
-  startAngle = clamp(startAngle, 0, 0.9999) % 1;
-  endAngle = clamp(endAngle, 0, 0.9999) % 1;
-
   /** get enclosed shape to fill */
-  const fill = arcFill(
-    radius - ringSize / 2,
-    radius + ringSize / 2,
-    startAngle,
-    endAngle,
+  const fill = useMemo(
+    () =>
+      arc<null>()
+        .innerRadius(radius - ringSize / 2 + gapSize / 2)
+        .outerRadius(radius + ringSize / 2 - gapSize / 2)
+        .startAngle(startAngle * 2 * Math.PI)
+        .endAngle(endAngle * 2 * Math.PI)
+        .padRadius(gapSize)
+        .padAngle(1)(null) ?? "",
+    [radius, startAngle, endAngle],
   );
 
-  /** get stroke path, e.g. center-line of segment */
-  const stroke = arcStroke(radius, startAngle, endAngle);
+  /** get stroke path */
+  const stroke = useMemo(() => {
+    /** if angle midpoint in lower half of circle, flip text so not upside down */
+    const flip = inRange((startAngle + endAngle) / 2, 0.25, 0.75);
 
-  /** get arc length */
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("d", stroke);
-  const length = path.getTotalLength() / (fontSize / 1.5);
+    let stroke =
+      arc<null>()
+        .innerRadius(radius)
+        .outerRadius(radius - Infinity)
+        .startAngle((flip ? endAngle : startAngle) * 2 * Math.PI)
+        .endAngle((flip ? startAngle : endAngle) * 2 * Math.PI)
+        .padRadius(gapSize)
+        .padAngle(1)(null) ?? "";
+
+    /** extract just first part of path, center-line of segment */
+    stroke = stroke.slice(0, stroke.indexOf("L"));
+
+    return stroke;
+  }, [radius, startAngle, endAngle]);
+
+  /** get max text chars based on arc length */
+  const maxChars =
+    (radius * 2 * Math.PI * (endAngle - startAngle)) / (fontSize / 1.5);
 
   /** track child angle */
   let offsetAngle = startAngle;
@@ -403,7 +421,7 @@ const Segment = ({
           >
             <textPath href={`#${id}`} startOffset="50%">
               {truncate(`${formatPercent(item.percent)} ${item.label}`, {
-                length,
+                length: maxChars,
               })}
             </textPath>
           </text>
@@ -425,65 +443,6 @@ const Segment = ({
       ))}
     </>
   );
-};
-
-/** svg path draw command */
-const draw = (
-  command: "M" | "L" | "A",
-  radius: number,
-  angle: number,
-  radiusOffset = 0,
-  angleOffset = 0,
-  long = false,
-  cw = false,
-) => {
-  /** apply offset to radius */
-  radius += radiusOffset;
-  /** convert angle to arc length */
-  angle *= 2 * Math.PI * radius;
-  /** apply offset along arc */
-  angle += angleOffset;
-  /** revert arc length to angle */
-  angle /= 2 * Math.PI * radius;
-
-  const x = sin(360 * angle) * radius;
-  const y = -cos(360 * angle) * radius;
-
-  if (command === "A")
-    return ["A", radius, radius, 0, long ? 1 : 0, cw ? 1 : 0, x, y].join(" ");
-  else return [command, x, y].join(" ");
-};
-
-/** arc segment stroke path */
-const arcStroke = (radius: number, start: number, end: number) => {
-  const long = Math.abs(end - start) >= 0.5;
-  let cw = true;
-
-  /** flip upside-down text */
-  const mid = (end + start) / 2;
-  if (mid > 0.25 && mid < 0.75) {
-    [start, end] = [end, start];
-    cw = false;
-  }
-
-  return `
-    ${draw("M", radius, start)}
-    ${draw("A", radius, end, 0, 0, long, cw)}
-  `;
-};
-
-/** arc segment fill shape */
-const arcFill = (inner: number, outer: number, start: number, end: number) => {
-  const long = Math.abs(end - start) >= 0.5;
-  const offset = gapSize / 2;
-  return `
-    ${draw("M", inner, start, offset, offset)}
-    ${draw("L", outer, start, -offset, offset)}
-    ${draw("A", outer, end, -offset, -offset, long, true)}
-    ${draw("L", inner, end, offset, -offset)}
-    ${draw("A", inner, start, offset, offset, long, false)}
-    z
-  `;
 };
 
 /** tooltip for data item */

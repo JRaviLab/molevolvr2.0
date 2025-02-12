@@ -108,7 +108,9 @@ const item = (depth: number): Item => ({
 });
 
 /** generate fake sunburst data */
-const sunburst = [item(random(1, 3)), item(random(1, 3)), item(random(1, 3))];
+const sunburst = Array(random(1, 3))
+  .fill(null)
+  .map(() => item(random(1, 3)));
 
 /** generate fake node data */
 const nodes = Array(200)
