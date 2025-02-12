@@ -351,13 +351,18 @@ const Segment = ({
     let stroke =
       arc<null>()
         .innerRadius(radius)
+        /**
+         * subtract arbitrary number, because we'll discard latter half of path.
+         * d3 always "draws" (in svg path command) larger radius first, so do
+         * negative.
+         */
         .outerRadius(radius - Infinity)
         .startAngle((flip ? endAngle : startAngle) * 2 * Math.PI)
         .endAngle((flip ? startAngle : endAngle) * 2 * Math.PI)
         .padRadius(gapSize)
         .padAngle(1)(null) ?? "";
 
-    /** extract just first part of path, center-line of segment */
+    /** extract just first half of path, center-line of segment */
     stroke = stroke.slice(0, stroke.indexOf("L"));
 
     return stroke;
