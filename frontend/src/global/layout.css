@@ -53,7 +53,7 @@
   display: grid;
   grid-template-columns: auto auto;
   grid-auto-rows: min-content;
-  gap: 10px 20px;
+  gap: 5px 20px;
   text-align: left;
 }
 
@@ -83,9 +83,8 @@
 /** blank box for dev or loading placeholder */
 
 .placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-content: center;
   aspect-ratio: 4 / 1;
   width: 100%;
   border-radius: var(--rounded);

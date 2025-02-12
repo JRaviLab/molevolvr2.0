@@ -49,13 +49,12 @@
 }
 
 .side {
-  display: flex;
+  display: grid;
   position: absolute;
   top: 2px;
   right: calc(10px + 2px);
   bottom: 2px;
-  align-items: center;
-  justify-content: center;
+  place-content: center;
   height: calc(40px - 2px - 2px);
   gap: 5px;
   background: var(--white);

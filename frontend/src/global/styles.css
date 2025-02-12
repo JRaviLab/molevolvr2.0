@@ -242,6 +242,10 @@ textarea {
 
 /** focus */
 
+:not(:focus-visible) {
+  outline: none;
+}
+
 :focus-visible,
 label:has(input:focus-visible) {
   outline: solid 2px currentColor;

@@ -9,6 +9,7 @@
 
   /** grays */
   --shadow: #00000020;
+  --overlay: #00000080;
   --black: #000000;
   --off-black: #303030;
   --dark-gray: #606060;
@@ -36,6 +37,7 @@
 
   /** grays */
   --shadow: #ffffff40;
+  --overlay: #ffffff80;
   --black: #ffffff;
   --off-black: #f0f0f0;
   --dark-gray: #e0e0e0;
@@ -68,7 +70,7 @@
   --slow: 0.35s ease;
   --focus: 0 0 5px var(--accent);
   --spacing: 2;
-  --compact: 1.25;
+  --compact: 1.5;
 
   /** sizes */
   --content: 1000px;
