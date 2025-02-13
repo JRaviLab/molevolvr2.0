@@ -21,6 +21,7 @@
 
 .chart {
   justify-self: center;
+  max-height: 500px;
 }
 
 .segment {

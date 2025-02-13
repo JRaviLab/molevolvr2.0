@@ -16,7 +16,6 @@ import {
 import clsx from "clsx";
 import { arc, hierarchy, type HierarchyNode } from "d3";
 import { inRange, startCase, sumBy, truncate } from "lodash";
-import { useDebounce, useElementSize } from "@reactuses/core";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
@@ -24,11 +23,9 @@ import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import { fitViewBox, printElement } from "@/util/dom";
 import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
-import { useTheme } from "@/util/hooks";
+import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
 import { formatNumber } from "@/util/string";
 import classes from "./Sunburst.module.css";
-
-const docFontSize = parseFloat(window.getComputedStyle(document.body).fontSize);
 
 export type Item = {
   /** human-readable label */
@@ -72,7 +69,7 @@ type Props = {
 /** thickness of rings, in svg units */
 const ringSize = 20;
 /** gap between rings, in svg units */
-const gapSize = 2;
+const gapSize = 1;
 /** depth/level of first ring from center */
 const startDepth = 1;
 
@@ -81,20 +78,13 @@ const Sunburst = ({ title, data }: Props) => {
   const svg = useRef<SVGSVGElement>(null);
 
   /** font size, in svg units */
-  const [fontSize, setFontSize] = useState(16);
+  const fontSize = useSvgTransform(svg, 1, rootFontSize).h;
 
-  /** height of svg, in client units */
-  const clientHeight = useDebounce(useElementSize(svg)[1], 300);
-
+  /** fit view box */
   useEffect(() => {
     if (!svg.current) return;
-
-    /** fit view box */
-    const viewBox = fitViewBox(svg.current, 0.01);
-
-    /** scale svg font size to match document font size */
-    setFontSize(viewBox.height * (docFontSize / clientHeight));
-  }, [clientHeight]);
+    fitViewBox(svg.current, 0.01);
+  });
 
   /** "breadcrumb trail" of selected nodes */
   const [selected, setSelected] = useState<Node[]>([]);
@@ -108,7 +98,7 @@ const Sunburst = ({ title, data }: Props) => {
 
     /** set fallbacks */
     for (const { data } of tree) {
-      data.label ??= "";
+      data.label ??= "-";
       data.type ??= "-";
       data.value ??= 0;
       data.color ??= "";
@@ -219,20 +209,21 @@ const Sunburst = ({ title, data }: Props) => {
             vAlign="top"
           >
             {selected.map((node, index) => (
-              <NodeTooltip key={index} {...node}>
+              <NodeTooltip key={index} {...node.data}>
                 <div
                   className={classes.breadcrumb}
                   style={{ background: node.data.color }}
                   tabIndex={0}
                   role="button"
                 >
-                  {formatPercent(node.data.percent)} {node.data.label}
+                  {node.data.label}
                 </div>
               </NodeTooltip>
             ))}
           </Flex>
         )}
       </div>
+
       {/* controls */}
       <Flex>
         <Popover
@@ -348,7 +339,7 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
   }, [radius, angle, end]);
 
   /** get max text chars based on arc length */
-  const maxChars = (radius * 2 * Math.PI * percent) / (fontSize / 1.5);
+  const maxChars = (radius * 2 * Math.PI * percent) / (fontSize / 1.75);
 
   /** reactive CSS vars */
   const theme = useTheme();
@@ -361,7 +352,7 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
           className={classes.shape}
           fill={selected === false ? theme["--light-gray"] : color}
           stroke={theme["--black"]}
-          strokeWidth={gapSize / 2}
+          strokeWidth={gapSize}
           strokeOpacity={lastSelected === true ? 1 : 0}
           d={fill}
           tabIndex={0}
@@ -392,7 +383,7 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
         fill={theme["--black"]}
       >
         <textPath href={`#${id}`} startOffset="50%">
-          {truncate(`${formatPercent(percent)} ${label}`, { length: maxChars })}
+          {truncate(label, { length: maxChars })}
         </textPath>
       </text>
     </g>
@@ -406,7 +397,7 @@ const NodeTooltip = ({
   percent,
   type,
   children,
-}: Omit<Partial<Derived>, "children"> & { children: ReactElement }) => (
+}: Omit<Derived, "children"> & { children: ReactElement }) => (
   <Tooltip
     content={
       <div className="mini-table">

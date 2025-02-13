@@ -101,7 +101,7 @@ const item = (depth: number): Item => ({
   type: type(),
   value: random(10, 100),
   ...(depth > 0 && {
-    children: Array(random(1, 2))
+    children: Array(random(1, 3))
       .fill({})
       .map(() => item(depth - 1)),
   }),
