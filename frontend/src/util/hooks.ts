@@ -1,6 +1,16 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type RefObject } from "react";
 import { useAtomValue } from "jotai";
+import {
+  useDebounce,
+  useMutationObserver,
+  useResizeObserver,
+} from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
+
+/** document root font size */
+export const rootFontSize = parseFloat(
+  window.getComputedStyle(document.body).fontSize,
+);
 
 /** https://stackoverflow.com/a/78994961/2180570 */
 export const getTheme = () => {
@@ -35,4 +45,54 @@ export const useTheme = () => {
   }, [darkMode]);
 
   return theme;
+};
+
+/** convert width/height in document units to svg units */
+export const useSvgTransform = (
+  svg: RefObject<SVGSVGElement | null>,
+  w: number,
+  h: number,
+) => {
+  const [scale, setScale] = useState({ w: 1, h: 1 });
+
+  const update = useCallback(() => {
+    if (!svg.current) return;
+
+    /** convert to svg coords */
+    const matrix = (svg.current.getScreenCTM() || new SVGMatrix()).inverse();
+    /** https://www.w3.org/TR/css-transforms-1/#decomposing-a-2d-matrix */
+    setScale({
+      w: Math.sqrt(matrix.a ** 2 + matrix.b ** 2),
+      h: Math.sqrt(matrix.c ** 2 + matrix.d ** 2),
+    });
+  }, [svg]);
+
+  /**
+   * check if view box value has actually changed
+   * https://github.com/whatwg/dom/issues/520
+   */
+  const onViewBoxChange = useCallback<MutationCallback>(
+    (mutations) => {
+      if (
+        mutations.some(
+          ({ oldValue, attributeName, target }) =>
+            attributeName === "viewBox" &&
+            target instanceof HTMLElement &&
+            oldValue !== target.getAttribute("viewBox"),
+        )
+      )
+        update();
+    },
+    [update],
+  );
+
+  /** events that would affect transform */
+  useResizeObserver(svg, update);
+  useMutationObserver(onViewBoxChange, svg, {
+    attributes: true,
+    attributeFilter: ["viewBox"],
+    attributeOldValue: true,
+  });
+
+  return useDebounce({ w: w * scale.w, h: h * scale.h }, 10);
 };

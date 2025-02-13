@@ -160,20 +160,17 @@ export const isCovering = (
 };
 
 /** fit view box to contents of svg */
-export const fitViewbox = (svg?: SVGSVGElement, paddingPercent = 0) => {
-  if (!svg) return;
-  const { x, y, width, height } = svg.getBBox();
+export const fitViewBox = (svg?: SVGSVGElement, paddingPercent = 0) => {
+  if (!svg) return { x: 0, y: 0, width: 100, height: 100 };
+  let { x, y, width, height } = svg.getBBox();
   const padding = Math.min(width, height) * paddingPercent;
-  const viewBox = [
-    x - padding,
-    y - padding,
-    width + padding * 2,
-    height + padding * 2,
-  ]
-    .map((v) => Math.round(v))
-    .join(" ");
+  x -= padding;
+  y -= padding;
+  width += padding * 2;
+  height += padding * 2;
+  const viewBox = [x, y, width, height].map((v) => Math.round(v)).join(" ");
   svg.setAttribute("viewBox", viewBox);
-  return viewBox;
+  return { x, y, width, height };
 };
 
 /** open browser print dialog with just one element shown */
