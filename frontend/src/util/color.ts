@@ -12,31 +12,36 @@ import { darkModeAtom } from "@/components/DarkMode";
  * https://gist.github.com/kawanet/a880c83f06d6baf742e45ac9ac52af96?permalink_comment_id=5387840#gistcomment-5387840
  */
 
-/** stagger hues to provide more contrast/distinction between successive colors */
+/**
+ * stagger hues around color wheel to provide more contrast/distinction between
+ * successive colors
+ */
+const hues = [
+  180 + 0 * 72 + 0 * 120,
+  180 + 0 * 72 + 1 * 120,
+  180 + 0 * 72 + 2 * 120,
+  180 + 1 * 72 + 0 * 120,
+  180 + 1 * 72 + 1 * 120,
+  180 + 1 * 72 + 2 * 120,
+  180 + 2 * 72 + 0 * 120,
+  180 + 2 * 72 + 1 * 120,
+  180 + 2 * 72 + 2 * 120,
+  180 + 3 * 72 + 0 * 120,
+  180 + 3 * 72 + 1 * 120,
+  180 + 3 * 72 + 2 * 120,
+  180 + 4 * 72 + 0 * 120,
+  180 + 4 * 72 + 1 * 120,
+  180 + 4 * 72 + 2 * 120,
+].map((v) => v % 360);
+
 export const palette = {
   light: [
-    "hsl(30, 10%, 80%)",
-    "hsl(180, 50%, 80%)",
-    "hsl(280, 50%, 80%)",
-    "hsl(20, 50%, 80%)",
-    "hsl(100, 50%, 80%)",
-    "hsl(200, 50%, 80%)",
-    "hsl(300, 50%, 80%)",
-    "hsl(140, 50%, 80%)",
-    "hsl(240, 50%, 80%)",
-    "hsl(340, 50%, 80%)",
+    "hsl(30, 10%, 85%)",
+    ...hues.map((hue) => `hsl(${hue}, 50%, 85%)`),
   ] as const,
   dark: [
     "hsl(30, 5%, 50%)",
-    "hsl(180, 30%, 50%)",
-    "hsl(280, 30%, 50%)",
-    "hsl(20, 30%, 50%)",
-    "hsl(100, 30%, 50%)",
-    "hsl(200, 30%, 50%)",
-    "hsl(300, 30%, 50%)",
-    "hsl(140, 30%, 50%)",
-    "hsl(240, 30%, 50%)",
-    "hsl(340, 30%, 50%)",
+    ...hues.map((hue) => `hsl(${hue}, 30%, 50%)`),
   ] as const,
 };
 

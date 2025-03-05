@@ -13,7 +13,7 @@ import "@nightingale-elements/nightingale-interpro-track";
 
 /** track of features */
 type Track = {
-  label: string;
+  label?: string;
   features: Feature[];
 };
 
@@ -84,7 +84,7 @@ const IPR = ({ sequence, tracks }: Props) => {
           <nightingale-sequence {...sequenceProps} />
           {tracks.map((track, index) => (
             <Fragment key={index}>
-              <div>{track.label}</div>
+              <div>{track.label ?? "-"}</div>
               <nightingale-interpro-track
                 ref={(ref: Partial<NightingaleInterproTrack> | null) => {
                   if (!ref) return;

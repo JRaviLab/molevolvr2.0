@@ -29,7 +29,7 @@ import {
   FaStop,
   FaTableCells,
 } from "react-icons/fa6";
-import { random, sample, uniq, uniqueId } from "lodash";
+import { random, range, sample, uniq, uniqueId } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -43,6 +43,7 @@ import Heading from "@/components/Heading";
 import IPR from "@/components/IPR";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
+import MSA from "@/components/MSA";
 import Network from "@/components/Network";
 import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
@@ -69,18 +70,17 @@ const words =
     " ",
   );
 
-/** random phrases of varying length */
-const phrases = Array(10)
-  .fill("")
-  .map((_, index) =>
-    Array(index + 1)
+/** generate random phrases of varying length */
+const phrases = () =>
+  range(1, 10 + 1).map((index) =>
+    Array(index)
       .fill("")
-      .map(() => sample(words)!)
+      .map(() => sample(words))
       .join(" "),
   );
 
 /** generate fake label */
-const label = () => sample([...phrases, undefined]);
+const label = () => sample([...phrases(), undefined]);
 
 /** generate fake "type" */
 const type = () =>
@@ -97,22 +97,37 @@ const type = () =>
     undefined,
   ]);
 
+/** generate fake sequence char */
+const char = (chars?: string) =>
+  sample((chars ?? "ABCDEFGHIJKLMNOPQRSTUVWXYZ ").split(""));
+
+/** generate fake sequence data */
+const sequence = (chars?: string, min = 10, max = 100) =>
+  Array(random(min, max))
+    .fill(null)
+    .map(() => char(chars))
+    .join("");
+
 /** generate fake sunburst item data */
-const item = (depth: number): Item => ({
+const sunburstItem = (depth: number): Item => ({
   label: label(),
   type: type(),
   value: random(10, 100),
   ...(depth > 0 && {
     children: Array(random(1, 2))
       .fill({})
-      .map(() => item(depth - 1)),
+      .map(() => sunburstItem(depth - 1)),
   }),
 });
 
-/** generate fake sunburst data */
-const sunburst = [item(random(1, 3)), item(random(1, 3)), item(random(1, 3))];
+/** fake sunburst data */
+const sunburst = [
+  sunburstItem(random(1, 3)),
+  sunburstItem(random(1, 3)),
+  sunburstItem(random(1, 3)),
+];
 
-/** generate fake node data */
+/** fake node data */
 const nodes = Array(200)
   .fill(null)
   .map(() => ({
@@ -154,39 +169,37 @@ for (let times = 0; times < 10; times++) {
   edges.push({ ...edge, id: uniqueId(), source: id, target: id });
 }
 
-/** generate fake sequence data */
-const sequence = Array(random(10, 100))
-  .fill(null)
-  .map(() => sample(["G", "A", "T", "C"]))
-  .join("");
+/** fake interproscan sequence */
+const iprSequence = sequence("GATC");
 
-/** generate fake interproscan track data */
-const tracks = Array(10)
+/** fake interproscan track data */
+const iprTracks = Array(random(5, 10))
   .fill(null)
   .map(() => ({
-    label: sample(["Lbl.", "Label", "Long Label", "Really Long Label"]),
+    label: label(),
     features: Array(random(1, 3))
       .fill(null)
       .map(() => {
-        const start = random(1, Math.floor(sequence.length / 2));
+        const start = random(1, Math.floor(iprSequence.length / 2));
         const end = random(
-          start + Math.floor(sequence.length / 4),
-          sequence.length,
+          start + Math.floor(iprSequence.length / 4),
+          iprSequence.length,
         );
-        return {
-          id: uniqueId(),
-          label: sample([
-            "Lbl.",
-            "Label",
-            "Long Label",
-            "Really Long Label",
-            undefined,
-          ]),
-          type: sample(["cat", "dog", "bird", undefined]),
-          start,
-          end,
-        };
+        return { id: uniqueId(), label: label(), type: type(), start, end };
       }),
+  }));
+
+/** fake msa sequence */
+const msaSequence = sequence(undefined, 10, 1000);
+
+/** fake msa track data */
+const msaTracks = Array(random(5, 10))
+  .fill(null)
+  .map(() => ({
+    label: label(),
+    sequence: [...msaSequence]
+      .map((c) => (Math.random() > 0.9 ? char() : c))
+      .join(""),
   }));
 
 /** test and example usage of formatting, elements, components, etc. */
@@ -194,6 +207,12 @@ const TestbedPage = () => {
   /** palettes for color maps */
   const lightColorMap = uniq(Object.values(useColorMap(words, "mode")));
   const darkColorMap = uniq(Object.values(useColorMap(words, "invert")));
+
+  return (
+    <Section>
+      <MSA tracks={msaTracks} />
+    </Section>
+  );
 
   return (
     <>
@@ -212,19 +231,27 @@ const TestbedPage = () => {
       </Section>
 
       <Section>
-        <Heading level={2} icon={<FaBarcode />}>
-          IPR
-        </Heading>
-
-        <IPR sequence={sequence} tracks={tracks} />
-      </Section>
-
-      <Section>
         <Heading level={2} icon={<FaShareNodes />}>
           Network
         </Heading>
 
         <Network nodes={nodes} edges={edges} />
+      </Section>
+
+      <Section>
+        <Heading level={2} icon={<FaBarcode />}>
+          IPR
+        </Heading>
+
+        <IPR sequence={iprSequence} tracks={iprTracks} />
+      </Section>
+
+      <Section>
+        <Heading level={2} icon={<FaTableCells />}>
+          MSA
+        </Heading>
+
+        <MSA tracks={msaTracks} />
       </Section>
 
       {/* regular html elements and css classes for basic formatting */}
