@@ -10,23 +10,23 @@
 /** make element full view size and only thing on screen */
 
 .print-element {
-  z-index: 99999 !important;
-  position: fixed !important;
   aspect-ratio: auto !important;
   width: 100vw !important;
-  height: 100vh !important;
-  inset: 0 !important;
+  min-height: 100vh !important;
   padding: 0 !important;
   border: none !important;
   border-radius: 0 !important;
   background: white !important;
   box-shadow: none !important;
-  isolation: isolate !important;
 }
 
 body:has(.print-element)
   *:not(:has(.print-element), .print-element, .print-element *) {
   display: none !important;
+}
+
+:has(.print-element):not(body) {
+  display: contents !important;
 }
 
 /** visually hide something but keep it available to screen-readers */
