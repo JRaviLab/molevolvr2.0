@@ -114,6 +114,8 @@ const MSA = ({ tracks, types: _types }: Props) => {
                         `translate(${x + width / 2}, ${y + height / 2})`,
                         `scale(1, ${(percent * headerHeight) / fontSize})`,
                       ].join(" ")}
+                      // for safari
+                      dominantBaseline="central"
                     >
                       {char && char.trim() ? char : "-"}
                     </text>
@@ -144,7 +146,12 @@ const MSA = ({ tracks, types: _types }: Props) => {
                 const y = cellHeight * 0.5;
                 return (
                   <Fragment key={index}>
-                    <text x={x} y={y}>
+                    <text
+                      x={x}
+                      y={y}
+                      // for safari
+                      dominantBaseline="central"
+                    >
                       {index}
                     </text>
                     <line
@@ -198,6 +205,8 @@ const MSA = ({ tracks, types: _types }: Props) => {
                         key={charIndex}
                         x={(charIndex + 0.5) * cellWidth}
                         y={(trackIndex + 0.5) * cellHeight}
+                        // for safari
+                        dominantBaseline="central"
                       >
                         {char.trim() ? char : "-"}
                       </tspan>
