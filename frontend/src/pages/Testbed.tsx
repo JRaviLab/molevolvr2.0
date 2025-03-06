@@ -29,7 +29,7 @@ import {
   FaStop,
   FaTableCells,
 } from "react-icons/fa6";
-import { random, range, sample, uniq, uniqueId } from "lodash";
+import { sample, uniq } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -52,7 +52,7 @@ import Section from "@/components/Section";
 import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
-import Sunburst, { type Item } from "@/components/Sunburst";
+import Sunburst from "@/components/Sunburst";
 import Table from "@/components/Table";
 import Tabs, { Tab } from "@/components/Tabs";
 import TextBox from "@/components/TextBox";

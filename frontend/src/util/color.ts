@@ -11,7 +11,7 @@ import colors from "./colors.json";
 
 /** stagger hues to provide more contrast/distinction between successive colors */
 const hueOrder = [
-  "emerald",
+  "teal",
   "purple",
   "orange",
   "blue",
@@ -25,7 +25,7 @@ const hueOrder = [
   "cyan",
   "fuchsia",
   "red",
-  "teal",
+  "emerald",
   "indigo",
 ] as const;
 
