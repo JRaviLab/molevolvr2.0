@@ -21,7 +21,8 @@ type Props = {
 const cellWidth = 5;
 const cellHeight = 10;
 const headerHeight = 20;
-const fontSize = 5;
+const fontSize = 7;
+const strokeWidth = 0.25;
 
 const MSA = ({ tracks, types: _types }: Props) => {
   /** map of char to type */
@@ -117,6 +118,41 @@ const MSA = ({ tracks, types: _types }: Props) => {
                 return element;
               });
             })}
+          </g>
+        </svg>
+
+        {/* tick row */}
+        <svg
+          viewBox={[0, 0, length * cellWidth, cellHeight].join(" ")}
+          height="1lh"
+        >
+          <g
+            fill={theme["--black"]}
+            textAnchor="middle"
+            dominantBaseline="central"
+            style={{ fontSize: fontSize / 2 }}
+          >
+            {range(1, length)
+              .filter((index) => index % 5 === 0 || index === length - 1)
+              .map((index) => {
+                const x = (index + 0.5) * cellWidth;
+                const y = cellHeight * 0.5;
+                return (
+                  <Fragment key={index}>
+                    <text x={x} y={y}>
+                      {index}
+                    </text>
+                    <line
+                      x1={x}
+                      x2={x}
+                      y1={0.75 * cellHeight}
+                      y2={cellHeight}
+                      stroke={theme["--black"]}
+                      strokeWidth={strokeWidth}
+                    />
+                  </Fragment>
+                );
+              })}
           </g>
         </svg>
 
