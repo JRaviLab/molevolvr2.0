@@ -38,7 +38,7 @@ import fcose, { type FcoseLayoutOptions } from "cytoscape-fcose";
 import klay, { type KlayLayoutOptions } from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
-import { omit, orderBy, startCase, truncate } from "lodash";
+import { debounce, omit, orderBy, startCase, truncate } from "lodash";
 import {
   useFullscreen,
   useLocalStorage,
@@ -599,10 +599,13 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   }, [nodes, edges, layoutParams]);
 
   /** on resize */
-  useResizeObserver(root, () => {
-    graph.current?.resize();
-    fit();
-  });
+  useResizeObserver(
+    root,
+    debounce(() => {
+      graph.current?.resize();
+      fit();
+    }, 100),
+  );
 
   /** download network as csv/tsv */
   const downloadCSV = useCallback(
