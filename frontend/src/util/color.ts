@@ -33,21 +33,21 @@ const hueOrder = [
 const lightNeutral = "hsl(30, 10%, 80%)";
 const darkNeutral = "hsl(30, 5%, 50%)";
 
-const blend = (a: string, t = 0.5, b = "#808080") =>
-  color(interpolateHsl(a, b)(t))?.formatHex() ?? "#808080";
+const blend = (a: string, b: string, t = 0.5) =>
+  color(interpolateHsl(a, b)(t))?.formatHex() ?? a;
 
 export const palette = {
   light: [
     lightNeutral,
     ...hueOrder
       .map((hue) => colors[hue]["100"])
-      .map((color) => blend(color, 0.2)),
+      .map((color) => blend(color, "#808080", 0.25)),
   ] as const,
   dark: [
     darkNeutral,
     ...hueOrder
       .map((hue) => colors[hue]["900"])
-      .map((color) => blend(color, 0.5)),
+      .map((color) => blend(color, "#808080", 0.65)),
   ] as const,
 };
 

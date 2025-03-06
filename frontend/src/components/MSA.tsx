@@ -66,6 +66,8 @@ const MSA = ({ tracks, types: _types }: Props) => {
 
   return (
     <div className={classes.msa}>
+      <div className={classes.title}></div>
+
       <div className={classes.labels}>
         {tracks.map((track, index) => (
           <div key={index} className={classes.label}>
@@ -73,6 +75,7 @@ const MSA = ({ tracks, types: _types }: Props) => {
           </div>
         ))}
       </div>
+
       <div className={classes.scroll}>
         {/* header row */}
         <svg
@@ -130,7 +133,7 @@ const MSA = ({ tracks, types: _types }: Props) => {
             fill={theme["--black"]}
             textAnchor="middle"
             dominantBaseline="central"
-            style={{ fontSize: fontSize / 2 }}
+            style={{ fontSize: fontSize * 0.75 }}
           >
             {range(1, length)
               .filter((index) => index % 5 === 0 || index === length - 1)
