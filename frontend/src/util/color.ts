@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { color, interpolateHsl } from "d3";
 import { useAtomValue } from "jotai";
 import { useDeepCompareEffect } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
@@ -6,7 +7,7 @@ import colors from "./colors.json";
 
 /**
  * https://tailwindcss.com/docs/customizing-colors
- * https://github.com/tailwindlabs/tailwindcss/blob/9c59b07fb3648a395bb9fb9ea24f3d090964845c/packages/tailwindcss/src/compat/colors.ts
+ * https://github.com/tailwindlabs/tailwindcss.com/blob/5a77fe695f8558de7e59b08881ee9f2405a81736/src/components/color.tsx
  */
 
 /** stagger hues to provide more contrast/distinction between successive colors */
@@ -32,18 +33,21 @@ const hueOrder = [
 const lightNeutral = "hsl(30, 10%, 80%)";
 const darkNeutral = "hsl(30, 5%, 50%)";
 
+const blend = (a: string, t = 0.5, b = "#808080") =>
+  color(interpolateHsl(a, b)(t))?.formatHex() ?? "#808080";
+
 export const palette = {
   light: [
     lightNeutral,
     ...hueOrder
       .map((hue) => colors[hue]["100"])
-      .map((color) => `color-mix(in hsl, ${color}, #808080 20%)`),
+      .map((color) => blend(color, 0.2)),
   ] as const,
   dark: [
     darkNeutral,
     ...hueOrder
       .map((hue) => colors[hue]["900"])
-      .map((color) => `color-mix(in hsl, ${color}, #808080 50%)`),
+      .map((color) => blend(color, 0.5)),
   ] as const,
 };
 
