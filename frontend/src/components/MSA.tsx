@@ -1,4 +1,5 @@
 import { Fragment, useMemo } from "react";
+import clsx from "clsx";
 import { countBy, mapKeys, mapValues, max, orderBy, range, uniq } from "lodash";
 import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
@@ -66,7 +67,8 @@ const MSA = ({ tracks, types: _types }: Props) => {
 
   return (
     <div className={classes.msa}>
-      <div className={classes.title}></div>
+      <div className={clsx("secondary", classes["header-label"])}>Combined</div>
+      <div className={clsx("secondary", classes["tick-label"])}>#</div>
 
       <div className={classes.labels}>
         {tracks.map((track, index) => (

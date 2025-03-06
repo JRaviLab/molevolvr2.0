@@ -2,15 +2,23 @@
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-areas:
-    "title scroll"
-    "title scroll"
+    "header-label scroll"
+    "tick-label scroll"
     "labels scroll";
   max-width: 100%;
   gap: 5px 20px;
 }
 
-.title {
-  grid-area: title;
+.header-label {
+  grid-area: header-label;
+  align-self: center;
+  justify-self: flex-end;
+}
+
+.tick-label {
+  grid-area: tick-label;
+  align-self: center;
+  justify-self: flex-end;
 }
 
 .labels {
