@@ -46,34 +46,29 @@ export const getUrl = (
     ? data
     : window.URL.createObjectURL(new Blob([data], { type }));
 
-/** csv/tsv data format. array of objects or array of arrays. */
-type CSV = (Record<string, unknown> | unknown[])[];
+/** download string as text file */
+export const downloadTxt = (data: string, filename: Filename) =>
+  download(getUrl(data, "text/plain;charset=utf-8"), filename, "txt");
 
-/** download table data as csv */
-export const downloadCsv = (data: CSV, filename: Filename) =>
-  download(
-    getUrl(
-      stringify(data, {
-        /** whether data is array of objects or array of arrays */
-        header: !Array.isArray(data[0]),
-      }),
-      "text/csv;charset=utf-8",
-    ),
-    filename,
-    "csv",
-  );
+/** tabular data format. array of objects or array of arrays. */
+type Tabular = (Record<string, unknown> | unknown[])[];
 
-/** download table data as tsv */
-export const downloadTsv = (data: CSV, filename: Filename) =>
+/** stringify csv/tsv data */
+const getCsv = (data: Tabular, delimiter = ",") =>
+  stringify(data, {
+    /** whether data is array of objects or array of arrays */
+    header: !Array.isArray(data[0]),
+    delimiter,
+  });
+
+/** download tabular data as csv */
+export const downloadCsv = (data: Tabular, filename: Filename) =>
+  download(getUrl(getCsv(data), "text/csv;charset=utf-8"), filename, "csv");
+
+/** download tabular data as tsv */
+export const downloadTsv = (data: Tabular, filename: Filename) =>
   download(
-    getUrl(
-      stringify(data, {
-        /** whether data is array of objects or array of arrays */
-        header: !Array.isArray(data[0]),
-        delimiter: "\t",
-      }),
-      "text/tab-separated-values",
-    ),
+    getUrl(getCsv(data, "\t"), "text/tab-separated-values"),
     filename,
     "tsv",
   );

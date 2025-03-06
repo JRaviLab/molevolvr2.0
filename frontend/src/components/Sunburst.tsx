@@ -264,7 +264,7 @@ const Sunburst = ({ title, data }: Props) => {
                 onClick={() =>
                   svg.current && downloadSvg(svg.current, "sunburst")
                 }
-                tooltip="Vector image"
+                tooltip="Vector image (no legends)"
               />
               <Button
                 icon={<FaFilePdf />}
