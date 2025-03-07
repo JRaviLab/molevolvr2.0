@@ -1,5 +1,10 @@
 import { Fragment, useMemo, useRef, useState } from "react";
-import { FaDownload, FaFilePdf, FaTableCellsLarge } from "react-icons/fa6";
+import {
+  FaDownload,
+  FaFilePdf,
+  FaRegImage,
+  FaTableCellsLarge,
+} from "react-icons/fa6";
 import clsx from "clsx";
 import { pairs } from "d3";
 import {
@@ -21,7 +26,7 @@ import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
 import { useColorMap } from "@/util/color";
 import { printElement } from "@/util/dom";
-import { downloadTsv } from "@/util/download";
+import { downloadJpg, downloadPng, downloadTsv } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import classes from "./MSA.module.css";
 
@@ -137,6 +142,22 @@ const MSA = ({ tracks, types: _types }: Props) => {
           <Popover
             content={
               <Flex direction="column" hAlign="stretch" gap="xs">
+                <Button
+                  icon={<FaRegImage />}
+                  text="PNG"
+                  onClick={() =>
+                    root.current && downloadPng(root.current, "msa")
+                  }
+                  tooltip="High-resolution image"
+                />
+                <Button
+                  icon={<FaRegImage />}
+                  text="JPEG"
+                  onClick={() =>
+                    root.current && downloadJpg(root.current, "msa")
+                  }
+                  tooltip="Compressed image"
+                />
                 <Button
                   icon={<FaTableCellsLarge />}
                   text="TSV"

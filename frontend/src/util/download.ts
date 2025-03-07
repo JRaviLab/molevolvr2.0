@@ -1,6 +1,6 @@
 import { stringify } from "csv-stringify/browser/esm/sync";
 import type { Options } from "dom-to-image";
-import { toJpeg, toPng } from "dom-to-image-more";
+import { toJpeg, toPng } from "html-to-image";
 
 export type Filename = string | string[];
 
@@ -83,7 +83,7 @@ const domOptions: Options = {
 };
 
 /** download element as png */
-export const downloadPng = async (element: Element, filename: Filename) => {
+export const downloadPng = async (element: HTMLElement, filename: Filename) => {
   try {
     const blob = await toPng(element, domOptions);
     download(getUrl(blob, "image/png"), filename, "png");
@@ -93,7 +93,7 @@ export const downloadPng = async (element: Element, filename: Filename) => {
 };
 
 /** download blob as jpg */
-export const downloadJpg = async (element: Element, filename: Filename) => {
+export const downloadJpg = async (element: HTMLElement, filename: Filename) => {
   try {
     const blob = await toJpeg(element, domOptions);
     download(getUrl(blob, "image/jpeg"), filename, "jpg");
