@@ -68,7 +68,7 @@ import {
   nodes,
   sunburst,
   words,
-} from "@/pages/testbed";
+} from "@/pages/testbed-data";
 import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
 import { formatDate, formatNumber } from "@/util/string";
