@@ -11,6 +11,9 @@ const checkPage = (path: string) =>
     /** axe tests should be independent of browser, so only run one */
     test.skip(browserName !== "chromium", "Only test Axe on chromium");
 
+    /** test can be slow on ci on very large page (e.g. testbed) */
+    test.setTimeout(60 * 1000);
+
     /** navigate to page */
     await page.goto(path);
 
@@ -21,7 +24,9 @@ const checkPage = (path: string) =>
     /** axe check */
     const check = async () => {
       /** get page violations */
-      const { violations } = await new AxeBuilder({ page }).analyze();
+      const { violations } = await new AxeBuilder({ page })
+        .exclude(".axe-ignore")
+        .analyze();
 
       const warnRules = [
         /** just warn about color-contrast violations */

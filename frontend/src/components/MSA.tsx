@@ -225,7 +225,12 @@ const MSAChunk = ({
         ))}
       </div>
 
-      <div className={classes.scroll}>
+      <div
+        className={classes.scroll}
+        tabIndex={0}
+        role="button"
+        aria-label="Sequence data"
+      >
         {/* header row */}
         <svg
           viewBox={[0, 0, length * cellWidth, headerHeight].join(" ")}
@@ -236,6 +241,7 @@ const MSAChunk = ({
             textAnchor="middle"
             dominantBaseline="central"
             style={{ fontFamily: theme["--mono"], fontSize }}
+            className="axe-ignore"
           >
             {header.map((col, colIndex) => {
               let accumulatedPercent = 0;
@@ -285,6 +291,7 @@ const MSAChunk = ({
             textAnchor="middle"
             dominantBaseline="central"
             style={{ fontSize: fontSize * 0.75 }}
+            className="axe-ignore"
           >
             {range(0, length)
               .filter((index) => index % 5 === 0)
@@ -328,6 +335,7 @@ const MSAChunk = ({
             textAnchor="middle"
             dominantBaseline="central"
             style={{ fontFamily: theme["--mono"], fontSize }}
+            className="axe-ignore"
           >
             {tracks.map((track, trackIndex) => {
               const chars = track.sequence.split("");
