@@ -1,5 +1,4 @@
 import { stringify } from "csv-stringify/browser/esm/sync";
-import type { Options } from "dom-to-image";
 import { toJpeg, toPng } from "html-to-image";
 
 export type Filename = string | string[];
@@ -77,15 +76,10 @@ export const downloadTsv = (data: Tabular, filename: Filename) =>
 export const downloadJson = (data: unknown, filename: Filename) =>
   download(getUrl(JSON.stringify(data), "application/json"), filename, "json");
 
-const domOptions: Options = {
-  // @ts-expect-error non-comprehensive types for dom-to-image-more
-  scale: 2,
-};
-
 /** download element as png */
 export const downloadPng = async (element: HTMLElement, filename: Filename) => {
   try {
-    const blob = await toPng(element, domOptions);
+    const blob = await toPng(element);
     download(getUrl(blob, "image/png"), filename, "png");
   } catch (error) {
     console.error(error);
@@ -95,7 +89,7 @@ export const downloadPng = async (element: HTMLElement, filename: Filename) => {
 /** download blob as jpg */
 export const downloadJpg = async (element: HTMLElement, filename: Filename) => {
   try {
-    const blob = await toJpeg(element, domOptions);
+    const blob = await toJpeg(element);
     download(getUrl(blob, "image/jpeg"), filename, "jpg");
   } catch (error) {
     console.error(error);
