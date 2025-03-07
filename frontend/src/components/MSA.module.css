@@ -35,12 +35,6 @@
   grid-area: labels;
   flex-direction: column;
   max-width: 200px;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.label {
-  white-space: nowrap;
 }
 
 .scroll {
@@ -48,8 +42,14 @@
   grid-template-rows: subgrid;
   grid-template-columns: subgrid;
   grid-area: scroll;
+  padding: 0 10px;
   overflow-x: auto;
   overflow-y: hidden;
+}
+
+.scroll svg {
+  min-width: 0;
+  overflow: visible;
 }
 
 .scroll > :nth-child(1) {

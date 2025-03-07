@@ -45,6 +45,7 @@ const headerHeight = 20;
 const fontSize = 7;
 const strokeWidth = 0.25;
 
+/** visualization for multiple aligned sequences */
 const MSA = ({ tracks, types: _types }: Props) => {
   const root = useRef<HTMLDivElement | null>(null);
 
@@ -218,7 +219,7 @@ const MSAChunk = ({
 
       <div className={classes.labels}>
         {tracks.map((track, index) => (
-          <div key={index} className={classes.label}>
+          <div key={index} className="truncate">
             {track.label ?? "-"}
           </div>
         ))}
@@ -290,16 +291,10 @@ const MSAChunk = ({
               .map((index) => {
                 const x = (index + 0.5) * cellWidth;
                 const y = cellHeight * 0.5;
-                const nudge =
-                  0.22 * fontSize * ((index + start).toString().length - 1);
                 return (
                   <Fragment key={index}>
                     <text
-                      x={
-                        x +
-                        (index === 0 ? nudge : 0) +
-                        (index === length - 1 ? -nudge : 0)
-                      }
+                      x={x}
                       y={y}
                       // for safari
                       dominantBaseline="central"
