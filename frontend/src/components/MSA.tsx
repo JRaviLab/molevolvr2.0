@@ -28,6 +28,7 @@ import { useColorMap } from "@/util/color";
 import { printElement } from "@/util/dom";
 import { downloadJpg, downloadPng, downloadTsv } from "@/util/download";
 import { useTheme } from "@/util/hooks";
+import { sleep } from "@/util/misc";
 import classes from "./MSA.module.css";
 
 /** track of sequence */
@@ -49,6 +50,10 @@ const cellHeight = 10;
 const headerHeight = 20;
 const fontSize = 7;
 const strokeWidth = 0.25;
+
+/** ROUGHLY tune wrap to match window size */
+/** 1000 px -> 50 chars, 500px -> 10 chars */
+const autoWrap = () => 0.08 * window.innerWidth - 30;
 
 /** visualization for multiple aligned sequences */
 const MSA = ({ tracks, types: _types }: Props) => {
@@ -145,17 +150,29 @@ const MSA = ({ tracks, types: _types }: Props) => {
                 <Button
                   icon={<FaRegImage />}
                   text="PNG"
-                  onClick={() =>
-                    root.current && downloadPng(root.current, "msa")
-                  }
+                  onClick={async () => {
+                    if (!root.current) return;
+                    const oldWrap = wrap;
+                    setWrap(autoWrap());
+                    await sleep(10);
+                    downloadPng(root.current, "msa");
+                    await sleep(10);
+                    setWrap(oldWrap);
+                  }}
                   tooltip="High-resolution image"
                 />
                 <Button
                   icon={<FaRegImage />}
                   text="JPEG"
-                  onClick={() =>
-                    root.current && downloadJpg(root.current, "msa")
-                  }
+                  onClick={async () => {
+                    if (!root.current) return;
+                    const oldWrap = wrap;
+                    setWrap(autoWrap());
+                    await sleep(10);
+                    downloadJpg(root.current, "msa");
+                    await sleep(10);
+                    setWrap(oldWrap);
+                  }}
                   tooltip="Compressed image"
                 />
                 <Button
