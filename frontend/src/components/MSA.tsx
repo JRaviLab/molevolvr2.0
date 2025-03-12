@@ -54,8 +54,10 @@ const fontSize = 7;
 const strokeWidth = 0.25;
 
 /** ROUGHLY tune wrap to match window size */
+/** dependent on page css */
 /** 1000 px -> 50 chars, 500px -> 10 chars */
-const autoWrap = () => clamp(round(0.08 * window.innerWidth - 30, 5), 10, 60);
+const autoWrap = (expanded: boolean) =>
+  clamp(round(0.08 * window.innerWidth - 30, 5), 10, expanded ? 1000 : 60);
 
 /** visualization for multiple aligned sequences */
 const MSA = ({ tracks, types: _types }: Props) => {
@@ -155,7 +157,7 @@ const MSA = ({ tracks, types: _types }: Props) => {
                   onClick={async () => {
                     if (!root.current) return;
                     const oldWrap = wrap;
-                    setWrap(autoWrap());
+                    setWrap(autoWrap(!!expanded));
                     await sleep(10);
                     downloadPng(root.current, "msa");
                     await sleep(10);
@@ -169,7 +171,7 @@ const MSA = ({ tracks, types: _types }: Props) => {
                   onClick={async () => {
                     if (!root.current) return;
                     const oldWrap = wrap;
-                    setWrap(autoWrap());
+                    setWrap(autoWrap(!!expanded));
                     await sleep(10);
                     downloadJpg(root.current, "msa");
                     await sleep(10);
