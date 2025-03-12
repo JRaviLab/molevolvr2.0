@@ -182,10 +182,13 @@ const MSA = ({ tracks, types: _types }: Props) => {
                   text="TSV"
                   onClick={() =>
                     downloadTsv(
-                      tracks.map((track) => [
-                        track.label ?? "-",
-                        track.sequence,
-                      ]),
+                      [
+                        ["Name", "Sequence"],
+                        ...tracks.map((track) => [
+                          track.label ?? "-",
+                          ...track.sequence,
+                        ]),
+                      ],
                       "msa",
                     )
                   }
