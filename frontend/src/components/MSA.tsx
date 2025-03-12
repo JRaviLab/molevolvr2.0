@@ -8,6 +8,7 @@ import {
 import clsx from "clsx";
 import { pairs } from "d3";
 import {
+  clamp,
   countBy,
   inRange,
   mapKeys,
@@ -28,6 +29,7 @@ import { useColorMap } from "@/util/color";
 import { printElement } from "@/util/dom";
 import { downloadJpg, downloadPng, downloadTsv } from "@/util/download";
 import { useTheme } from "@/util/hooks";
+import { round } from "@/util/math";
 import { sleep } from "@/util/misc";
 import classes from "./MSA.module.css";
 
@@ -53,7 +55,7 @@ const strokeWidth = 0.25;
 
 /** ROUGHLY tune wrap to match window size */
 /** 1000 px -> 50 chars, 500px -> 10 chars */
-const autoWrap = () => 0.08 * window.innerWidth - 30;
+const autoWrap = () => clamp(round(0.08 * window.innerWidth - 30, 5), 10, 60);
 
 /** visualization for multiple aligned sequences */
 const MSA = ({ tracks, types: _types }: Props) => {
@@ -137,9 +139,9 @@ const MSA = ({ tracks, types: _types }: Props) => {
           layout="horizontal"
           value={wrap}
           onChange={setWrap}
-          min={50}
+          min={10}
           max={Math.ceil(length / 10) * 10}
-          step={10}
+          step={5}
           tooltip="Wrap to new rows if sequence longer than this many characters"
         />
 
