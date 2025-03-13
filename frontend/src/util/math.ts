@@ -17,5 +17,8 @@ export const lerp = (
     (targetMax - targetMin);
 
 /** round to multiple */
-export const round = (value: number, multiple: number) =>
-  Math.round(value / multiple) * multiple;
+export const round = (
+  value: number,
+  multiple: number,
+  method: "round" | "floor" | "ceil" = "round",
+) => Math[method](value / multiple) * multiple;

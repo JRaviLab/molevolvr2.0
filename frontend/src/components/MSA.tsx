@@ -10,13 +10,11 @@ import { pairs } from "d3";
 import {
   clamp,
   countBy,
-  inRange,
   mapKeys,
   mapValues,
   max,
   orderBy,
   range,
-  uniq,
 } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
 import Collapse from "@/assets/collapse.svg?react";
@@ -25,7 +23,7 @@ import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
-import { useColorMap } from "@/util/color";
+import { useColorMap, type Hue } from "@/util/color";
 import { printElement } from "@/util/dom";
 import { downloadJpg, downloadPng, downloadTsv } from "@/util/download";
 import { useTheme } from "@/util/hooks";
@@ -33,23 +31,31 @@ import { round } from "@/util/math";
 import { sleep } from "@/util/misc";
 import classes from "./MSA.module.css";
 
-/** track of sequence */
+/** track of single sequence */
 type Track = {
   label?: string;
   sequence: string;
 };
 
-type Props = {
+export type Combined = Record<string, number>;
+
+export type Props = {
+  /** tracks of sequences */
   tracks: Track[];
-  /** map of character to arbitrary type/category */
-  types?: Record<string, string | undefined>;
+  /** func to map character to arbitrary type/category */
+  getType?: (char: string, combined: Combined) => string;
+  /** map of arbitrary type to color */
+  colors?: Record<string, Hue>;
 };
+
+const minWrap = 10;
+const maxWrap = 1000;
 
 /** options, in svg units (relative): */
 
 const cellWidth = 5;
 const cellHeight = 10;
-const headerHeight = 20;
+const combinedHeight = 20;
 const fontSize = 7;
 const strokeWidth = 0.25;
 
@@ -57,30 +63,23 @@ const strokeWidth = 0.25;
 /** dependent on page css */
 /** 1000 px -> 50 chars, 500px -> 10 chars */
 const autoWrap = (expanded: boolean) =>
-  clamp(round(0.08 * window.innerWidth - 30, 5), 10, expanded ? 1000 : 60);
+  clamp(
+    round(0.08 * window.innerWidth - 30, 5),
+    minWrap,
+    expanded ? maxWrap : 60,
+  );
 
 /** visualization for multiple aligned sequences */
-const MSA = ({ tracks, types: _types }: Props) => {
+const MSA = ({
+  tracks,
+  getType = (char) => char,
+  colors: manualColors = {},
+}: Props) => {
   const root = useRef<HTMLDivElement | null>(null);
 
   /** full width */
   let [expanded, setExpanded] = useLocalStorage("msa-expanded", false);
   expanded ??= false;
-
-  /** map of char to type */
-  const types = useMemo(
-    () =>
-      _types
-        ? /** use provided types */
-          mapValues(_types, (value) => value ?? "")
-        : /** or auto-generate types */
-          Object.fromEntries(
-            uniq(tracks.flatMap((track) => track.sequence.split(""))).map(
-              (char) => [char, char],
-            ),
-          ),
-    [_types, tracks],
-  );
 
   /** maximum sequence length */
   const length = useMemo(
@@ -91,25 +90,19 @@ const MSA = ({ tracks, types: _types }: Props) => {
   /** wrap sequence to new row if more than this num of chars */
   const [wrap, setWrap] = useState(length);
 
-  /** map of type to color */
-  const colors = useColorMap(Object.values(types), "mode");
+  /** assign types */
+  const { combinedWithTypes, tracksWithTypes, types } = useMemo(
+    () => getDerived(tracks, length, getType),
+    [tracks, length, getType],
+  );
 
-  /** header row */
-  const header = range(0, length).map((index) => {
-    /** get chars in column */
-    const col = tracks.map((track) => track.sequence[index]);
-    /** get percentage breakdown of each unique character in col */
-    let percents = mapValues(countBy(col), (value) => value / col.length);
-    /** catch undefined values */
-    percents = mapKeys(percents, (_, key) => (key === "undefined" ? "" : key));
-    /** put larger percents first */
-    return orderBy(Object.entries(percents), "[1]");
-  });
+  /** map of type to color */
+  const colors = useColorMap(types, "mode", manualColors);
 
   /** split sequence into chunks */
-  const chunks: [number, number][] = inRange(wrap, 10, 1000)
-    ? pairs(range(0, length, wrap).concat([length]))
-    : [[0, length]];
+  const chunks: [number, number][] = pairs(
+    range(0, length, wrap).concat([length]),
+  );
 
   return (
     <Flex direction="column" full>
@@ -122,13 +115,12 @@ const MSA = ({ tracks, types: _types }: Props) => {
         {chunks.map(([start, end], index) => (
           <MSAChunk
             key={index}
-            tracks={tracks.map((track) => ({
+            tracks={tracksWithTypes.map((track) => ({
               ...track,
               sequence: track.sequence.slice(start, end),
             }))}
-            types={types}
             colors={colors}
-            header={header.slice(start, end)}
+            combined={combinedWithTypes.slice(start, end)}
             start={start}
             end={end}
           />
@@ -143,7 +135,7 @@ const MSA = ({ tracks, types: _types }: Props) => {
           value={wrap}
           onChange={setWrap}
           min={10}
-          max={Math.ceil(length / 10) * 10}
+          max={round(length, 10, "ceil")}
           step={5}
           tooltip="Wrap to new rows if sequence longer than this many characters"
         />
@@ -235,23 +227,64 @@ const MSA = ({ tracks, types: _types }: Props) => {
 
 export default MSA;
 
+/** get input data + derived data, e.g. assigning types */
+const getDerived = (
+  tracks: Props["tracks"],
+  length: number,
+  getType: NonNullable<Props["getType"]>,
+) => {
+  /** get top row where each col is combo of chars below it */
+  const combined = range(0, length).map((index) => {
+    /** get chars in column */
+    const col = tracks.map((track) => track.sequence[index]);
+    /** get percentage breakdown of each unique character in col */
+    let percents = mapValues(countBy(col), (value) => value / col.length);
+    /** catch undefined values */
+    percents = mapKeys(percents, (_, key) => (key === "undefined" ? "" : key));
+    /** put larger percents first */
+    return Object.fromEntries(orderBy(Object.entries(percents), "[1]"));
+  });
+
+  /** keep track of unique types */
+  const types = new Set<string>();
+
+  const addType: typeof getType = (char, col) => {
+    /** get type from provided func */
+    const type = getType(char, col);
+    /** add type */
+    types.add(type);
+    return type;
+  };
+
+  /** derive type for each combined row col, just once */
+  const combinedWithTypes = combined.map((col) =>
+    mapValues(col, (percent, char) => ({
+      percent,
+      type: addType(char, col),
+    })),
+  );
+
+  /** derive type for each track sequence char, just once */
+  const tracksWithTypes = tracks.map(({ sequence, ...track }) => ({
+    ...track,
+    sequence: sequence.split("").map((char, charIndex) => ({
+      char,
+      type: addType(char, combined[charIndex] ?? {}),
+    })),
+  }));
+
+  return { combinedWithTypes, tracksWithTypes, types: Array.from(types) };
+};
+
 type ChunkProps = {
-  tracks: Track[];
-  types: Record<string, string>;
+  combined: ReturnType<typeof getDerived>["combinedWithTypes"];
+  tracks: ReturnType<typeof getDerived>["tracksWithTypes"];
   colors: Record<string, string>;
-  header: [string, number][][];
   start: number;
   end: number;
 };
 
-const MSAChunk = ({
-  tracks,
-  types,
-  colors,
-  header,
-  start,
-  end,
-}: ChunkProps) => {
+const MSAChunk = ({ combined, tracks, colors, start, end }: ChunkProps) => {
   /** reactive CSS vars */
   const theme = useTheme();
 
@@ -260,7 +293,9 @@ const MSAChunk = ({
 
   return (
     <div className={classes.msa}>
-      <div className={clsx("secondary", classes["header-label"])}>Combined</div>
+      <div className={clsx("secondary", classes["combined-label"])}>
+        Combined
+      </div>
       <div className={clsx("secondary", classes["tick-label"])}>Pos.</div>
 
       <div className={classes.labels}>
@@ -277,10 +312,10 @@ const MSAChunk = ({
         role="button"
         aria-label="Sequence data"
       >
-        {/* header row */}
+        {/* combined row */}
         <svg
-          viewBox={[0, 0, length * cellWidth, headerHeight].join(" ")}
-          height={`${headerHeight / cellHeight}lh`}
+          viewBox={[0, 0, length * cellWidth, combinedHeight].join(" ")}
+          height={`${combinedHeight / cellHeight}lh`}
         >
           <g
             fill={theme["--black"]}
@@ -289,40 +324,42 @@ const MSAChunk = ({
             style={{ fontFamily: theme["--mono"], fontSize }}
             className="axe-ignore"
           >
-            {header.map((col, colIndex) => {
+            {combined.map((col, colIndex) => {
               let accumulatedPercent = 0;
-              return col.map(([char, percent], charIndex) => {
-                const x = colIndex * cellWidth;
-                const y = accumulatedPercent * headerHeight;
-                const width = cellWidth;
-                const height = percent * headerHeight;
+              return Object.entries(col).map(
+                ([char, { percent, type }], charIndex) => {
+                  const x = colIndex * cellWidth;
+                  const y = accumulatedPercent * combinedHeight;
+                  const width = cellWidth;
+                  const height = percent * combinedHeight;
 
-                const element = (
-                  <Fragment key={charIndex}>
-                    {/* cell */}
-                    <rect
-                      x={x}
-                      y={y}
-                      width={width}
-                      height={height}
-                      fill={colors[types[char || ""] ?? ""] ?? colors[""]}
-                    />
-                    {/* char */}
-                    <text
-                      transform={[
-                        `translate(${x + width / 2}, ${y + height / 2})`,
-                        `scale(1, ${(percent * headerHeight) / fontSize})`,
-                      ].join(" ")}
-                      // for safari
-                      dominantBaseline="central"
-                    >
-                      {char && char.trim() ? char : "-"}
-                    </text>
-                  </Fragment>
-                );
-                accumulatedPercent += percent;
-                return element;
-              });
+                  const element = (
+                    <Fragment key={charIndex}>
+                      {/* cell */}
+                      <rect
+                        x={x}
+                        y={y}
+                        width={width}
+                        height={height}
+                        fill={colors[type] ?? colors[""]}
+                      />
+                      {/* char */}
+                      <text
+                        transform={[
+                          `translate(${x + width / 2}, ${y + height / 2})`,
+                          `scale(1, ${(percent * combinedHeight) / fontSize})`,
+                        ].join(" ")}
+                        // for safari
+                        dominantBaseline="central"
+                      >
+                        {char && char.trim() ? char : "-"}
+                      </text>
+                    </Fragment>
+                  );
+                  accumulatedPercent += percent;
+                  return element;
+                },
+              );
             })}
           </g>
         </svg>
@@ -383,25 +420,23 @@ const MSAChunk = ({
             style={{ fontFamily: theme["--mono"], fontSize }}
             className="axe-ignore"
           >
-            {tracks.map((track, trackIndex) => {
-              const chars = track.sequence.split("");
-
+            {tracks.map(({ sequence }, trackIndex) => {
               return (
                 <Fragment key={trackIndex}>
                   {/* cells */}
-                  {chars.map((char, charIndex) => (
+                  {sequence.map(({ type }, charIndex) => (
                     <rect
                       key={trackIndex + "-" + charIndex}
                       x={charIndex * cellWidth}
                       y={trackIndex * cellHeight}
                       width={cellWidth}
                       height={cellHeight}
-                      fill={colors[types[char] ?? ""] ?? colors[""]}
+                      fill={colors[type] ?? colors[""]}
                     />
                   ))}
                   {/* characters */}
                   <text key={trackIndex} className={classes.sequence}>
-                    {chars.map((char, charIndex) => (
+                    {sequence.map(({ char }, charIndex) => (
                       <tspan
                         key={charIndex}
                         x={(charIndex + 0.5) * cellWidth}

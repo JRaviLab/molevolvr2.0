@@ -44,6 +44,7 @@ import IPR from "@/components/IPR";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import MSA from "@/components/MSA";
+import { clustalColors, clustalType } from "@/components/msa-clustal";
 import Network from "@/components/Network";
 import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
@@ -301,7 +302,7 @@ const SectionMSA = () => (
       MSA
     </Heading>
 
-    <MSA tracks={msaTracks} />
+    <MSA tracks={msaTracks} getType={clustalType} colors={clustalColors} />
   </Section>
 );
 

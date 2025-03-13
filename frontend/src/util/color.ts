@@ -3,6 +3,7 @@ import { color, interpolateHsl } from "d3";
 import { useAtomValue } from "jotai";
 import { useDeepCompareEffect } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
+import { getEntries } from "@/util/types";
 import colors from "./colors.json";
 
 /**
@@ -11,7 +12,8 @@ import colors from "./colors.json";
  */
 
 /** stagger hues to provide more contrast/distinction between successive colors */
-const hueOrder = [
+export const hues = [
+  "neutral",
   "teal",
   "purple",
   "orange",
@@ -30,49 +32,76 @@ const hueOrder = [
   "indigo",
 ] as const;
 
-const lightNeutral = "hsl(30, 10%, 80%)";
-const darkNeutral = "hsl(30, 5%, 50%)";
+type HueOrGray = (typeof hues)[number];
+export type Hue = Exclude<HueOrGray, "neutral">;
 
+type Shade = "light" | "dark";
+
+/** get color from hue and shade */
+const getColor = (hue: HueOrGray, shade: Shade) => {
+  if (shade === "dark") return blend(colors[hue]["900"], "#808080", 0.65);
+  else return blend(colors[hue]["100"], "#808080", 0.25);
+};
+
+/** blend two colors together in hsl space */
 const blend = (a: string, b: string, t = 0.5) =>
   color(interpolateHsl(a, b)(t))?.formatHex() ?? a;
-
-export const palette = {
-  light: [
-    lightNeutral,
-    ...hueOrder
-      .map((hue) => colors[hue]["100"])
-      .map((color) => blend(color, "#808080", 0.25)),
-  ] as const,
-  dark: [
-    darkNeutral,
-    ...hueOrder
-      .map((hue) => colors[hue]["900"])
-      .map((color) => blend(color, "#808080", 0.65)),
-  ] as const,
-};
 
 /** map enumerated values to colors */
 export const getColorMap = <Value extends string>(
   values: Value[],
-  level: keyof typeof palette = "light",
+  shade: Shade = "light",
+  /** allow some/all color mappings to be manually defined */
+  manual: Partial<Record<Value, Hue>> = {},
 ) => {
   /** get first (neutral) hue and remaining (colorful) hues */
-  const [neutral = "", ...hues] = palette[level];
+  const [neutral, ...colorful] = hues;
+
+  /** track current hue */
   let hueIndex = 0;
-  /** make blank value a neutral color */
-  const map = { "": neutral } as Record<Value, string>;
-  for (const value of values)
-    if (value.trim())
-      /** add value to color map (if not already defined) */
-      map[value] ??= hues[hueIndex++ % hues.length]!;
+
+  /** start color map to be returned */
+  const map = {
+    /** make blank value a neutral color */
+    "": getColor(neutral, shade),
+  } as Record<Value | "", string>;
+
+  /** add manual colors to map */
+  for (const [value, hue] of getEntries(manual)) {
+    /** if already defined, skip */
+    if (map[value]) continue;
+    /** add color to map */
+    map[value] = getColor(hue, shade);
+    /** so any following mapping continues from current place */
+    hueIndex = colorful.indexOf(hue);
+  }
+
+  /** auto-map rest of values */
+  for (const value of values) {
+    /** if blank value, skip */
+    if (!value.trim()) continue;
+    /** if already defined, skip */
+    if (map[value]) continue;
+    /** add color to map */
+    const hue = colorful[hueIndex]!;
+    map[value] = getColor(hue, shade);
+    /** move to next color in line */
+    hueIndex++;
+    /** loop back to start of list if needed */
+    hueIndex %= colorful.length;
+  }
 
   return map;
 };
 
+type ReactiveShade = Shade | "mode" | "invert";
+
 /** reactive color map */
 export const useColorMap = <Value extends string>(
   values: Value[],
-  shade: "dark" | "light" | "mode" | "invert" = "mode",
+  shade: ReactiveShade = "mode",
+  /** allow some/all color mappings to be manually defined */
+  manual: Partial<Record<Value, Hue>> = {},
 ) => {
   /** dark mode state */
   const darkMode = useAtomValue(darkModeAtom);
@@ -82,11 +111,11 @@ export const useColorMap = <Value extends string>(
   else if (shade === "invert") shade = darkMode ? "light" : "dark";
 
   /** map state */
-  const [map, setMap] = useState(() => getColorMap(values, shade));
+  const [map, setMap] = useState(() => getColorMap(values, shade, manual));
 
   /** update map */
   useDeepCompareEffect(() => {
-    setMap(getColorMap(values, shade));
+    setMap(getColorMap(values, shade, manual));
   }, [values, shade]);
 
   return map;
