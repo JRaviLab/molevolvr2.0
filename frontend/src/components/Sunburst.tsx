@@ -98,8 +98,8 @@ const Sunburst = ({ title, data }: Props) => {
 
     /** set fallbacks */
     for (const { data } of tree) {
-      data.label ??= "-";
-      data.type ??= "-";
+      data.label ??= "";
+      data.type ??= "";
       data.value ??= 0;
       data.color ??= "";
       data.percent ??= 1;
@@ -172,7 +172,7 @@ const Sunburst = ({ title, data }: Props) => {
                 <rect x="0" y="0" width="1" height="1" fill={color} />
               </svg>
               <div className={clsx("truncate", !type && "secondary")}>
-                {startCase(type) || "none"}
+                {startCase(type) || "-"}
               </div>
             </Flex>
           ))}
@@ -216,7 +216,7 @@ const Sunburst = ({ title, data }: Props) => {
                   tabIndex={0}
                   role="button"
                 >
-                  {node.data.label}
+                  {node.data.label || "-"}
                 </div>
               </NodeTooltip>
             ))}
@@ -383,7 +383,7 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
         fill={theme["--black"]}
       >
         <textPath href={`#${id}`} startOffset="50%">
-          {truncate(label, { length: maxChars })}
+          {truncate(label || "-", { length: maxChars })}
         </textPath>
       </text>
     </g>
@@ -402,13 +402,13 @@ const NodeTooltip = ({
     content={
       <div className="mini-table">
         <div>Name</div>
-        <div>{label}</div>
+        <div>{label || "-"}</div>
         <div>Value</div>
         <div>{formatNumber(value)}</div>
         <div>Percent</div>
         <div>{formatPercent(percent)}</div>
         <div>Type</div>
-        <div>{type}</div>
+        <div>{type || "-"}</div>
       </div>
     }
   >

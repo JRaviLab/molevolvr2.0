@@ -64,7 +64,8 @@ const MSA = ({ tracks, types: _types }: Props) => {
   const root = useRef<HTMLDivElement | null>(null);
 
   /** full width */
-  const [expanded, setExpanded] = useLocalStorage("msa-expanded", false);
+  let [expanded, setExpanded] = useLocalStorage("msa-expanded", false);
+  expanded ??= false;
 
   /** map of char to type */
   const types = useMemo(
@@ -157,7 +158,7 @@ const MSA = ({ tracks, types: _types }: Props) => {
                   onClick={async () => {
                     if (!root.current) return;
                     const oldWrap = wrap;
-                    setWrap(autoWrap(!!expanded));
+                    setWrap(autoWrap(expanded));
                     await sleep(10);
                     downloadPng(root.current, "msa");
                     await sleep(10);
@@ -171,7 +172,7 @@ const MSA = ({ tracks, types: _types }: Props) => {
                   onClick={async () => {
                     if (!root.current) return;
                     const oldWrap = wrap;
-                    setWrap(autoWrap(!!expanded));
+                    setWrap(autoWrap(expanded));
                     await sleep(10);
                     downloadJpg(root.current, "msa");
                     await sleep(10);

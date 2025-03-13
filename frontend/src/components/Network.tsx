@@ -699,7 +699,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                       />
                     </svg>
                     <div className={clsx(!key && "secondary")}>
-                      {startCase(key) || "none"}
+                      {startCase(key) || "-"}
                     </div>
                   </Flex>
                 ))}
@@ -720,7 +720,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                       style={{ background: value }}
                     />
                     <div className={clsx(!key && "secondary")}>
-                      {startCase(key) || "none"}
+                      {startCase(key) || "-"}
                     </div>
                   </Flex>
                 ))}
