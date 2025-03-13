@@ -11,9 +11,11 @@ import colors from "./colors.json";
  * https://github.com/tailwindlabs/tailwindcss.com/blob/5a77fe695f8558de7e59b08881ee9f2405a81736/src/components/color.tsx
  */
 
+/** neutral hue */
+const neutral = "slate";
+
 /** stagger hues to provide more contrast/distinction between successive colors */
 export const hues = [
-  "neutral",
   "teal",
   "purple",
   "orange",
@@ -32,13 +34,18 @@ export const hues = [
   "indigo",
 ] as const;
 
-type HueOrGray = (typeof hues)[number];
-export type Hue = Exclude<HueOrGray, "neutral">;
+export type Hue = (typeof hues)[number];
 
 type Shade = "light" | "dark";
 
-/** get color from hue and shade */
-const getColor = (hue: HueOrGray, shade: Shade) => {
+/** get neutral color from shade */
+const getNeutral = (shade: Shade) => {
+  if (shade === "dark") return colors[neutral]["800"];
+  else return colors[neutral]["200"];
+};
+
+/** get (colorful) color from hue and shade */
+const getColor = (hue: Hue, shade: Shade) => {
   if (shade === "dark") return blend(colors[hue]["900"], "#808080", 0.65);
   else return blend(colors[hue]["100"], "#808080", 0.25);
 };
@@ -54,16 +61,13 @@ export const getColorMap = <Value extends string>(
   /** allow some/all color mappings to be manually defined */
   manual: Partial<Record<Value, Hue>> = {},
 ) => {
-  /** get first (neutral) hue and remaining (colorful) hues */
-  const [neutral, ...colorful] = hues;
-
   /** track current hue */
   let hueIndex = 0;
 
   /** start color map to be returned */
   const map = {
-    /** make blank value a neutral color */
-    "": getColor(neutral, shade),
+    /** make blank value neutral color */
+    "": getNeutral(shade),
   } as Record<Value | "", string>;
 
   /** add manual colors to map */
@@ -73,7 +77,7 @@ export const getColorMap = <Value extends string>(
     /** add color to map */
     map[value] = getColor(hue, shade);
     /** so any following mapping continues from current place */
-    hueIndex = colorful.indexOf(hue);
+    hueIndex = hues.indexOf(hue);
   }
 
   /** auto-map rest of values */
@@ -83,12 +87,12 @@ export const getColorMap = <Value extends string>(
     /** if already defined, skip */
     if (map[value]) continue;
     /** add color to map */
-    const hue = colorful[hueIndex]!;
+    const hue = hues[hueIndex]!;
     map[value] = getColor(hue, shade);
     /** move to next color in line */
     hueIndex++;
     /** loop back to start of list if needed */
-    hueIndex %= colorful.length;
+    hueIndex %= hues.length;
   }
 
   return map;
