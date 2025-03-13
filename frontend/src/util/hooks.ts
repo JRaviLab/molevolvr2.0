@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type RefObject } from "react";
 import { useAtomValue } from "jotai";
 import {
-  useDebounce,
+  useDebounceFn,
   useMutationObserver,
   useResizeObserver,
 } from "@reactuses/core";
@@ -67,6 +67,8 @@ export const useSvgTransform = (
     });
   }, [svg]);
 
+  const { run } = useDebounceFn(update, 100);
+
   /**
    * check if view box value has actually changed
    * https://github.com/whatwg/dom/issues/520
@@ -81,18 +83,18 @@ export const useSvgTransform = (
             oldValue !== target.getAttribute("viewBox"),
         )
       )
-        update();
+        run();
     },
-    [update],
+    [run],
   );
 
   /** events that would affect transform */
-  useResizeObserver(svg, update);
+  useResizeObserver(svg, run);
   useMutationObserver(onViewBoxChange, svg, {
     attributes: true,
     attributeFilter: ["viewBox"],
     attributeOldValue: true,
   });
 
-  return useDebounce({ w: w * scale.w, h: h * scale.h }, 10);
+  return { w: w * scale.w, h: h * scale.h };
 };
