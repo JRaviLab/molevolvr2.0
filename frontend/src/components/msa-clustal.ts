@@ -65,6 +65,6 @@ export const clustalColors: Record<(typeof table)[number][0], Hue> = {
   Polar: "green",
   Cysteines: "pink",
   Glycines: "orange",
-  Prolines: "amber",
+  Prolines: "lime",
   Aromatic: "cyan",
 };

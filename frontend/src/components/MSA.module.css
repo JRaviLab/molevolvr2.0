@@ -9,17 +9,17 @@
 
 .msa {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: minmax(100px, min(25%, 200px)) 1fr;
   grid-template-areas:
-    "header-label scroll"
+    "combined-label scroll"
     "tick-label scroll"
     "labels scroll";
   align-content: flex-start;
   gap: 5px 20px;
 }
 
-.header-label {
-  grid-area: header-label;
+.combined-label {
+  grid-area: combined-label;
   align-self: center;
   justify-self: flex-end;
 }
@@ -34,7 +34,6 @@
   display: flex;
   grid-area: labels;
   flex-direction: column;
-  max-width: 200px;
 }
 
 .scroll {

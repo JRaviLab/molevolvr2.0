@@ -12,7 +12,7 @@ import colors from "./colors.json";
  */
 
 /** neutral hue */
-const neutral = "slate";
+const neutral = "zinc";
 
 /** stagger hues to provide more contrast/distinction between successive colors */
 export const hues = [
@@ -32,6 +32,7 @@ export const hues = [
   "red",
   "emerald",
   "indigo",
+  "yellow",
 ] as const;
 
 export type Hue = (typeof hues)[number];
@@ -46,11 +47,11 @@ const getNeutral = (shade: Shade) => {
 
 /** get (colorful) color from hue and shade */
 const getColor = (hue: Hue, shade: Shade) => {
-  if (shade === "dark") return blend(colors[hue]["900"], "#808080", 0.65);
+  if (shade === "dark") return blend(colors[hue]["900"], "#808080", 0.5);
   else return blend(colors[hue]["100"], "#808080", 0.25);
 };
 
-/** blend two colors together in hsl space */
+/** blend two colors together in color space */
 const blend = (a: string, b: string, t = 0.5) =>
   color(interpolateHsl(a, b)(t))?.formatHex() ?? a;
 

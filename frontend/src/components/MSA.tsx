@@ -21,6 +21,7 @@ import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
+import Legend from "@/components/Legend";
 import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
 import { useColorMap, type Hue } from "@/util/color";
@@ -112,6 +113,7 @@ const MSA = ({
         hAlign="left"
         className={clsx("card", classes.root, expanded && classes.expanded)}
       >
+        {/* chunks */}
         {chunks.map(([start, end], index) => (
           <MSAChunk
             key={index}
@@ -125,6 +127,9 @@ const MSA = ({
             end={end}
           />
         ))}
+
+        {/* legend */}
+        <Legend entries={mapValues(colors, (color) => ({ color }))} />
       </Flex>
 
       {/* controls */}
@@ -296,7 +301,7 @@ const MSAChunk = ({ combined, tracks, colors, start, end }: ChunkProps) => {
       <div className={clsx("secondary", classes["combined-label"])}>
         Combined
       </div>
-      <div className={clsx("secondary", classes["tick-label"])}>Pos.</div>
+      <div className={clsx("secondary", classes["tick-label"])}>Position</div>
 
       <div className={classes.labels}>
         {tracks.map((track, index) => (

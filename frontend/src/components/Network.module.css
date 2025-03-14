@@ -21,11 +21,6 @@
   overflow-wrap: anywhere;
 }
 
-.node-symbol {
-  width: 20px;
-  height: 20px;
-}
-
 .edge-symbol {
   width: 20px;
   height: 3px;

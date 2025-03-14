@@ -15,9 +15,10 @@ import {
 } from "react-icons/fa6";
 import clsx from "clsx";
 import { arc, hierarchy, type HierarchyNode } from "d3";
-import { inRange, startCase, sumBy, truncate } from "lodash";
+import { inRange, mapValues, sumBy, truncate } from "lodash";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
+import Legend from "@/components/Legend";
 import Popover from "@/components/Popover";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
@@ -164,19 +165,7 @@ const Sunburst = ({ title, data }: Props) => {
       >
         {title && <strong>{title}</strong>}
 
-        {/* legend */}
-        <div className={classes.legend}>
-          {Object.entries(colorMap).map(([type, color], index) => (
-            <Flex key={index} gap="sm" wrap={false} hAlign="left">
-              <svg className={classes["legend-color"]} viewBox="0 0 1 1">
-                <rect x="0" y="0" width="1" height="1" fill={color} />
-              </svg>
-              <div className={clsx("truncate", !type && "secondary")}>
-                {startCase(type) || "-"}
-              </div>
-            </Flex>
-          ))}
-        </div>
+        <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
         {/* chart container */}
         <svg ref={svg} className={classes.chart}>
