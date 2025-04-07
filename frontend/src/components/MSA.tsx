@@ -15,6 +15,7 @@ import {
   max,
   orderBy,
   range,
+  startCase,
 } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
 import Collapse from "@/assets/collapse.svg?react";
@@ -183,14 +184,9 @@ const MSA = ({
                   text="TSV"
                   onClick={() =>
                     downloadTsv(
-                      [
-                        ["Name", "Sequence"],
-                        ...tracks.map((track) => [
-                          track.label ?? "-",
-                          ...(track.info ? [track.info] : []),
-                          track.sequence,
-                        ]),
-                      ],
+                      tracks.map((track) =>
+                        mapKeys(track, (value, key) => startCase(key)),
+                      ),
                       "msa",
                     )
                   }

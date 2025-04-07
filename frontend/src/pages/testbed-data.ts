@@ -141,6 +141,7 @@ export const msaTracks = Array(random(5, 10))
   .fill(null)
   .map(() => ({
     label: label(),
+    extraField: label(),
     sequence: [...msaSequence]
       .map((c) => (Math.random() > 0.9 ? char() : c))
       .join(""),
