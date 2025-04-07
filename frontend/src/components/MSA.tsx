@@ -5,6 +5,7 @@ import {
   FaRegImage,
   FaTableCellsLarge,
 } from "react-icons/fa6";
+import { TbPrompt } from "react-icons/tb";
 import clsx from "clsx";
 import { pairs } from "d3";
 import {
@@ -27,7 +28,12 @@ import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
 import { useColorMap, type Hue } from "@/util/color";
 import { printElement } from "@/util/dom";
-import { downloadJpg, downloadPng, downloadTsv } from "@/util/download";
+import {
+  downloadJpg,
+  downloadPng,
+  downloadTsv,
+  downloadTxt,
+} from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
 import { sleep } from "@/util/misc";
@@ -191,6 +197,19 @@ const MSA = ({
                     )
                   }
                   tooltip="Raw sequence data, tab-separated"
+                />
+                <Button
+                  icon={<TbPrompt />}
+                  text="FASTA"
+                  onClick={() =>
+                    downloadTxt(
+                      tracks
+                        .map((track) => `> ${track.label}\n${track.sequence}`)
+                        .join("\n\n"),
+                      "msa",
+                    )
+                  }
+                  tooltip="Raw sequence data, FASTA format"
                 />
                 <Button
                   icon={<FaFilePdf />}
