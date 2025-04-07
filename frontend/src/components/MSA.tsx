@@ -35,6 +35,7 @@ import classes from "./MSA.module.css";
 /** track of single sequence */
 type Track = {
   label?: string;
+  info?: string;
   sequence: string;
 };
 
@@ -186,6 +187,7 @@ const MSA = ({
                         ["Name", "Sequence"],
                         ...tracks.map((track) => [
                           track.label ?? "-",
+                          ...(track.info ? [track.info] : []),
                           track.sequence,
                         ]),
                       ],
