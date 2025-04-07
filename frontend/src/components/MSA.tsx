@@ -186,7 +186,7 @@ const MSA = ({
                         ["Name", "Sequence"],
                         ...tracks.map((track) => [
                           track.label ?? "-",
-                          ...track.sequence,
+                          track.sequence,
                         ]),
                       ],
                       "msa",
