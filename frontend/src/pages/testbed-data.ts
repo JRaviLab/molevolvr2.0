@@ -41,7 +41,7 @@ export const type = () =>
 
 /** generate fake sequence char */
 export const char = (chars?: string) =>
-  sample((chars ?? "ABCDEFGHIJKLMNOPQRSTUVWXYZ ").split(""));
+  sample((chars ?? "ABCDEFGHIJKLMNOPQRSTUVWXYZ-").split(""));
 
 /** generate fake sequence data */
 export const sequence = (chars?: string, min = 10, max = 100) =>
