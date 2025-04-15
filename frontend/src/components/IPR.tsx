@@ -1,9 +1,10 @@
 import { Fragment, useMemo } from "react";
+import { mapValues } from "lodash";
 import type NightingaleInterproTrack from "@nightingale-elements/nightingale-interpro-track";
 import type NightingaleManager from "@nightingale-elements/nightingale-manager";
 import type NightingaleNavigation from "@nightingale-elements/nightingale-navigation";
 import type NightingaleSequence from "@nightingale-elements/nightingale-sequence";
-import Flex from "@/components/Flex";
+import Legend from "@/components/Legend";
 import { getColorMap } from "@/util/color";
 import classes from "./IPR.module.css";
 import "@nightingale-elements/nightingale-manager";
@@ -13,7 +14,7 @@ import "@nightingale-elements/nightingale-interpro-track";
 
 /** track of features */
 type Track = {
-  label: string;
+  label?: string;
   features: Feature[];
 };
 
@@ -84,7 +85,7 @@ const IPR = ({ sequence, tracks }: Props) => {
           <nightingale-sequence {...sequenceProps} />
           {tracks.map((track, index) => (
             <Fragment key={index}>
-              <div>{track.label}</div>
+              <div>{track.label ?? "-"}</div>
               <nightingale-interpro-track
                 ref={(ref: Partial<NightingaleInterproTrack> | null) => {
                   if (!ref) return;
@@ -109,18 +110,7 @@ const IPR = ({ sequence, tracks }: Props) => {
         </div>
       </nightingale-manager>
 
-      {/* legend */}
-      <div className={classes.legend}>
-        {Object.entries(featureColors).map(([type, color]) => (
-          <Flex key={color} gap="sm" hAlign="left" wrap={false}>
-            <span
-              className={classes["legend-entry"]}
-              style={{ background: color }}
-            />
-            <span>{type || "-"}</span>
-          </Flex>
-        ))}
-      </div>
+      <Legend entries={mapValues(featureColors, (color) => ({ color }))} />
     </>
   );
 };

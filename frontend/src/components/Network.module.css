@@ -6,8 +6,8 @@
 
 .expanded {
   aspect-ratio: unset !important;
-  width: calc(100vw - 100px);
-  height: calc(100vh - 200px);
+  width: calc(100vw - 40px);
+  height: calc(100vh - 100px);
 }
 
 .legend {
@@ -19,11 +19,6 @@
   overflow-y: auto;
   background: var(--white);
   overflow-wrap: anywhere;
-}
-
-.node-symbol {
-  width: 20px;
-  height: 20px;
 }
 
 .edge-symbol {

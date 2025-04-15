@@ -14,8 +14,3 @@ namespace React.JSX {
     "nightingale-interpro-track": JSX.HTMLAttributes<CustomElement>;
   }
 }
-
-declare module "dom-to-image-more" {
-  import domToImage from "dom-to-image";
-  export = domToImage;
-}

@@ -11,12 +11,6 @@
   width: 100%;
 }
 
-/** expanded width */
-
-.expanded {
-  width: calc(100vw - 80px);
-}
-
 /** basic auto-filled grid with max number of columns */
 
 .grid {

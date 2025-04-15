@@ -1,6 +1,5 @@
 import { stringify } from "csv-stringify/browser/esm/sync";
-import type { Options } from "dom-to-image";
-import { toJpeg, toPng } from "dom-to-image-more";
+import { toJpeg, toPng } from "html-to-image";
 
 export type Filename = string | string[];
 
@@ -46,34 +45,29 @@ export const getUrl = (
     ? data
     : window.URL.createObjectURL(new Blob([data], { type }));
 
-/** csv/tsv data format. array of objects or array of arrays. */
-type CSV = (Record<string, unknown> | unknown[])[];
+/** download string as text file */
+export const downloadTxt = (data: string, filename: Filename) =>
+  download(getUrl(data, "text/plain;charset=utf-8"), filename, "txt");
 
-/** download table data as csv */
-export const downloadCsv = (data: CSV, filename: Filename) =>
-  download(
-    getUrl(
-      stringify(data, {
-        /** whether data is array of objects or array of arrays */
-        header: !Array.isArray(data[0]),
-      }),
-      "text/csv;charset=utf-8",
-    ),
-    filename,
-    "csv",
-  );
+/** tabular data format. array of objects or array of arrays. */
+type Tabular = (Record<string, unknown> | unknown[])[];
 
-/** download table data as tsv */
-export const downloadTsv = (data: CSV, filename: Filename) =>
+/** stringify csv/tsv data */
+const getCsv = (data: Tabular, delimiter = ",") =>
+  stringify(data, {
+    /** whether data is array of objects or array of arrays */
+    header: !Array.isArray(data[0]),
+    delimiter,
+  });
+
+/** download tabular data as csv */
+export const downloadCsv = (data: Tabular, filename: Filename) =>
+  download(getUrl(getCsv(data), "text/csv;charset=utf-8"), filename, "csv");
+
+/** download tabular data as tsv */
+export const downloadTsv = (data: Tabular, filename: Filename) =>
   download(
-    getUrl(
-      stringify(data, {
-        /** whether data is array of objects or array of arrays */
-        header: !Array.isArray(data[0]),
-        delimiter: "\t",
-      }),
-      "text/tab-separated-values",
-    ),
+    getUrl(getCsv(data, "\t"), "text/tab-separated-values"),
     filename,
     "tsv",
   );
@@ -82,15 +76,10 @@ export const downloadTsv = (data: CSV, filename: Filename) =>
 export const downloadJson = (data: unknown, filename: Filename) =>
   download(getUrl(JSON.stringify(data), "application/json"), filename, "json");
 
-const domOptions: Options = {
-  // @ts-expect-error non-comprehensive types for dom-to-image-more
-  scale: 2,
-};
-
 /** download element as png */
-export const downloadPng = async (element: Element, filename: Filename) => {
+export const downloadPng = async (element: HTMLElement, filename: Filename) => {
   try {
-    const blob = await toPng(element, domOptions);
+    const blob = await toPng(element);
     download(getUrl(blob, "image/png"), filename, "png");
   } catch (error) {
     console.error(error);
@@ -98,9 +87,9 @@ export const downloadPng = async (element: Element, filename: Filename) => {
 };
 
 /** download blob as jpg */
-export const downloadJpg = async (element: Element, filename: Filename) => {
+export const downloadJpg = async (element: HTMLElement, filename: Filename) => {
   try {
-    const blob = await toJpeg(element, domOptions);
+    const blob = await toJpeg(element);
     download(getUrl(blob, "image/jpeg"), filename, "jpg");
   } catch (error) {
     console.error(error);

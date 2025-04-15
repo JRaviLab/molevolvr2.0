@@ -6,19 +6,6 @@
   gap: 20px;
 }
 
-.legend {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100px, 100%), auto));
-  place-content: flex-start;
-  gap: 10px 20px;
-}
-
-.legend-color {
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-}
-
 .chart {
   justify-self: center;
   max-height: 500px;

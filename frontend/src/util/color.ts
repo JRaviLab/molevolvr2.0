@@ -1,67 +1,112 @@
 import { useState } from "react";
+import { color, interpolateHsl } from "d3";
 import { useAtomValue } from "jotai";
 import { useDeepCompareEffect } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
+import { getEntries } from "@/util/types";
+import colors from "./colors.json";
 
 /**
- * references:
- *
  * https://tailwindcss.com/docs/customizing-colors
- * https://github.com/tailwindlabs/tailwindcss/blob/main/src/public/colors.js
- * https://www.materialpalette.com/colors
- * https://gist.github.com/kawanet/a880c83f06d6baf742e45ac9ac52af96?permalink_comment_id=5387840#gistcomment-5387840
+ * https://github.com/tailwindlabs/tailwindcss.com/blob/5a77fe695f8558de7e59b08881ee9f2405a81736/src/components/color.tsx
  */
 
+/** neutral hue */
+const neutral = "zinc";
+
 /** stagger hues to provide more contrast/distinction between successive colors */
-export const palette = {
-  light: [
-    "hsl(30, 10%, 80%)",
-    "hsl(180, 50%, 80%)",
-    "hsl(280, 50%, 80%)",
-    "hsl(20, 50%, 80%)",
-    "hsl(100, 50%, 80%)",
-    "hsl(200, 50%, 80%)",
-    "hsl(300, 50%, 80%)",
-    "hsl(140, 50%, 80%)",
-    "hsl(240, 50%, 80%)",
-    "hsl(340, 50%, 80%)",
-  ] as const,
-  dark: [
-    "hsl(30, 5%, 50%)",
-    "hsl(180, 30%, 50%)",
-    "hsl(280, 30%, 50%)",
-    "hsl(20, 30%, 50%)",
-    "hsl(100, 30%, 50%)",
-    "hsl(200, 30%, 50%)",
-    "hsl(300, 30%, 50%)",
-    "hsl(140, 30%, 50%)",
-    "hsl(240, 30%, 50%)",
-    "hsl(340, 30%, 50%)",
-  ] as const,
+export const hues = [
+  "teal",
+  "purple",
+  "orange",
+  "blue",
+  "rose",
+  "green",
+  "amber",
+  "sky",
+  "violet",
+  "pink",
+  "lime",
+  "cyan",
+  "fuchsia",
+  "red",
+  "emerald",
+  "indigo",
+  "yellow",
+] as const;
+
+export type Hue = (typeof hues)[number];
+
+type Shade = "light" | "dark";
+
+/** get neutral color from shade */
+const getNeutral = (shade: Shade) => {
+  if (shade === "dark") return colors[neutral]["800"];
+  else return colors[neutral]["200"];
 };
+
+/** get (colorful) color from hue and shade */
+const getColor = (hue: Hue, shade: Shade) => {
+  if (shade === "dark") return blend(colors[hue]["900"], "#808080", 0.5);
+  else return blend(colors[hue]["100"], "#808080", 0.25);
+};
+
+/** blend two colors together in color space */
+const blend = (a: string, b: string, t = 0.5) =>
+  color(interpolateHsl(a, b)(t))?.formatHex() ?? a;
 
 /** map enumerated values to colors */
 export const getColorMap = <Value extends string>(
   values: Value[],
-  level: keyof typeof palette = "light",
+  shade: Shade = "light",
+  /** allow some/all color mappings to be manually defined */
+  manual: Partial<Record<Value, Hue>> = {},
 ) => {
-  /** get first (neutral) hue and remaining (colorful) hues */
-  const [neutral = "", ...hues] = palette[level];
+  /** track current hue */
   let hueIndex = 0;
-  /** make blank value a neutral color */
-  const map = { "": neutral } as Record<Value, string>;
-  for (const value of values)
-    if (value.trim())
-      /** add value to color map (if not already defined) */
-      map[value] ??= hues[hueIndex++ % hues.length]!;
+
+  /** start color map to be returned */
+  const map = {
+    /** make blank value neutral color */
+    "": getNeutral(shade),
+  } as Record<Value | "", string>;
+
+  /** add manual colors to map */
+  for (const [value, hue] of getEntries(manual)) {
+    /** if already defined, skip */
+    if (map[value]) continue;
+    /** add color to map */
+    map[value] = getColor(hue, shade);
+    /** so any following mapping continues from current place */
+    hueIndex = hues.indexOf(hue);
+  }
+
+  /** auto-map rest of values */
+  for (const value of values) {
+    /** if blank value, skip */
+    if (!value.trim()) continue;
+    /** if already defined, skip */
+    if (map[value]) continue;
+    /** add color to map */
+    const hue = hues[hueIndex]!;
+    map[value] = getColor(hue, shade);
+    /** move to next color in line */
+    hueIndex++;
+    /** loop back to start of list if needed */
+    hueIndex %= hues.length;
+  }
 
   return map;
 };
 
+type ReactiveShade = Shade | "mode" | "invert";
+
 /** reactive color map */
 export const useColorMap = <Value extends string>(
   values: Value[],
-  shade: "dark" | "light" | "mode" | "invert" = "mode",
+  shade: ReactiveShade = "mode",
+  /** allow some/all color mappings to be manually defined */
+  manual: Partial<Record<Value, Hue>> = {},
 ) => {
   /** dark mode state */
   const darkMode = useAtomValue(darkModeAtom);
@@ -71,11 +116,11 @@ export const useColorMap = <Value extends string>(
   else if (shade === "invert") shade = darkMode ? "light" : "dark";
 
   /** map state */
-  const [map, setMap] = useState(() => getColorMap(values, shade));
+  const [map, setMap] = useState(() => getColorMap(values, shade, manual));
 
   /** update map */
   useDeepCompareEffect(() => {
-    setMap(getColorMap(values, shade));
+    setMap(getColorMap(values, shade, manual));
   }, [values, shade]);
 
   return map;

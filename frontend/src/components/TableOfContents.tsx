@@ -66,11 +66,13 @@ const TableOfContents = () => {
     if (open) {
       /** if covering something important, close */
       debouncedIsCovering(root.current, () => setOpen(false));
-      /** scroll active toc item into view */
-      scrollTo(active.current ?? list.current?.firstElementChild, {
-        behavior: "instant",
-        block: "center",
-      });
+      /** prevent jitter when pinch-zoomed in */
+      if (window.visualViewport?.scale === 1)
+        /** scroll active toc item into view */
+        scrollTo(active.current ?? list.current?.firstElementChild, {
+          behavior: "instant",
+          block: "center",
+        });
     }
   });
 

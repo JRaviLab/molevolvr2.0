@@ -57,8 +57,8 @@ const checkPage = (path: string) =>
   _test(`Lighthouse check ${path}`, async ({ browserName, page, port }) => {
     test.skip(browserName !== "chromium", "Lighthouse only works in Chromium");
 
-    /** test can be slow on ci on very large page (eg testbed) */
-    test.setTimeout(60 * 1000);
+    /** test can be slow on ci on very large page (e.g. testbed) */
+    test.setTimeout(2 * 60 * 1000);
 
     /** navigate to page */
     await page.goto(path);

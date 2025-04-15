@@ -38,7 +38,14 @@ import fcose, { type FcoseLayoutOptions } from "cytoscape-fcose";
 import klay, { type KlayLayoutOptions } from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
-import { omit, orderBy, startCase, truncate } from "lodash";
+import {
+  debounce,
+  mapValues,
+  omit,
+  orderBy,
+  startCase,
+  truncate,
+} from "lodash";
 import {
   useFullscreen,
   useLocalStorage,
@@ -48,6 +55,7 @@ import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
+import Legend from "@/components/Legend";
 import Popover from "@/components/Popover";
 import type { Option } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
@@ -501,6 +509,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       shape: "polygon",
       "shape-polygon-points": getNodeShape,
       label: getNodeLabel,
+
       "font-size": fontSize,
       "font-family": theme["--sans"],
       color: theme["--black"],
@@ -509,6 +518,8 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "text-max-width": getNodeSize,
       "text-wrap": "wrap",
       // @ts-expect-error no type defs
+      // "outline-width": 1,
+      // "outline-color": theme["--black"],
       "underlay-padding": minNodeSize / 4,
       "underlay-opacity": getNodeOpacity,
       "underlay-shape": "ellipse",
@@ -599,10 +610,13 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   }, [nodes, edges, layoutParams]);
 
   /** on resize */
-  useResizeObserver(root, () => {
-    graph.current?.resize();
-    fit();
-  });
+  useResizeObserver(
+    root,
+    debounce(() => {
+      graph.current?.resize();
+      fit();
+    }, 100),
+  );
 
   /** download network as csv/tsv */
   const downloadCSV = useCallback(
@@ -683,23 +697,12 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                   </span>
                 </div>
 
-                {Object.entries(nodeColors).map(([key, value]) => (
-                  <Flex key={key} gap="sm" wrap={false}>
-                    <svg
-                      viewBox="-1 -1 2 2"
-                      className={classes["node-symbol"]}
-                      style={{ color: value }}
-                    >
-                      <polygon
-                        fill="currentColor"
-                        points={nodeShapes[key]?.join(" ")}
-                      />
-                    </svg>
-                    <div className={clsx(!key && "secondary")}>
-                      {startCase(key) || "none"}
-                    </div>
-                  </Flex>
-                ))}
+                <Legend
+                  entries={mapValues(nodeColors, (color, type) => ({
+                    color,
+                    shape: nodeShapes[type],
+                  }))}
+                />
               </Flex>
 
               <Flex direction="column" hAlign="left" gap="sm">
@@ -710,17 +713,13 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                   </span>
                 </div>
 
-                {Object.entries(edgeColors).map(([key, value]) => (
-                  <Flex key={key} gap="sm" wrap={false}>
-                    <div
-                      className={classes["edge-symbol"]}
-                      style={{ background: value }}
-                    />
-                    <div className={clsx(!key && "secondary")}>
-                      {startCase(key) || "none"}
-                    </div>
-                  </Flex>
-                ))}
+                <Legend
+                  entries={mapValues(edgeColors, (color) => ({
+                    color,
+                    shape: [-0.75, 0.5, 0.75, -0.5],
+                    stroke: true,
+                  }))}
+                />
               </Flex>
             </>
           )}

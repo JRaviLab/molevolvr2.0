@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import {
   Button,
   Group,
@@ -10,6 +10,7 @@ import { FaMinus, FaPlus } from "react-icons/fa6";
 import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
+import { preserveScroll } from "@/util/dom";
 import classes from "./NumberBox.module.css";
 
 type Props = {
@@ -48,22 +49,26 @@ const NumberBox = ({
   onChange,
   name,
 }: Props) => {
+  const ref = useRef<HTMLDivElement>(null);
+
   /** link to parent form component */
   const form = useForm();
 
   return (
     <NumberField
+      ref={ref}
       className={clsx(classes.container, classes[layout])}
       minValue={min}
       maxValue={max}
       step={step}
       defaultValue={defaultValue ?? min}
       value={value}
-      onChange={onChange}
-      name={name}
-      formatOptions={{
-        maximumFractionDigits: 10,
+      onChange={(value) => {
+        onChange?.(value);
+        if (ref.current) preserveScroll(ref.current);
       }}
+      name={name}
+      formatOptions={{ maximumFractionDigits: 10 }}
     >
       {({ state }) => (
         <>
@@ -84,6 +89,7 @@ const NumberBox = ({
                 if (!event.currentTarget.value.trim())
                   state.setInputValue(String(min));
               }}
+              style={{ minWidth: 10 * (value?.toString()?.length ?? 5) + "px" }}
             />
             <Button slot="increment" className={classes.button}>
               <FaPlus />
