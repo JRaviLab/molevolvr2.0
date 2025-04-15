@@ -16,7 +16,7 @@
   padding: 0 !important;
   border: none !important;
   border-radius: 0 !important;
-  background: white !important;
+  background: var(--white) !important;
   box-shadow: none !important;
 }
 

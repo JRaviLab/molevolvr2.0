@@ -79,7 +79,7 @@ const Sunburst = ({ title, data }: Props) => {
   const svg = useRef<SVGSVGElement>(null);
 
   /** font size, in svg units */
-  const fontSize = useSvgTransform(svg, 1, rootFontSize).h;
+  const fontSize = useSvgTransform(svg, 1, rootFontSize()).h;
 
   /** fit view box */
   useEffect(() => {

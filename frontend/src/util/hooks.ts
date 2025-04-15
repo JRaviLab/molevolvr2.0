@@ -7,10 +7,9 @@ import {
 } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
 
-/** document root font size */
-export const rootFontSize = parseFloat(
-  window.getComputedStyle(document.body).fontSize,
-);
+/** get document root font size */
+export const rootFontSize = () =>
+  parseFloat(window.getComputedStyle(document.body).fontSize);
 
 /** https://stackoverflow.com/a/78994961/2180570 */
 export const getTheme = () => {
