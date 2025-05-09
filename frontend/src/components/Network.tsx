@@ -281,10 +281,10 @@ const layoutOptions = layouts.map(({ name, label }) => ({
 })) satisfies Option[];
 
 const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
-  const root = useRef<HTMLDivElement | null>(null);
-  const container = useRef<HTMLDivElement | null>(null);
-  const graph = useRef<Core | null>(null);
-  const layout = useRef<Layouts | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const graphRef = useRef<Core | null>(null);
+  const layoutRef = useRef<Layouts | null>(null);
 
   /** reactive CSS vars */
   const theme = useTheme();
@@ -398,24 +398,24 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   );
 
   /** fit view to contents */
-  const fit = async () => graph.current?.fit(undefined, padding);
+  const fit = async () => graphRef.current?.fit(undefined, padding);
 
   /** init cytoscape graph and attach event listeners */
   useEffect(() => {
-    if (!container.current) return;
-    if (graph.current) return;
+    if (!containerRef.current) return;
+    if (graphRef.current) return;
 
     /** init graph */
-    graph.current = cytoscape({
-      container: container.current,
+    graphRef.current = cytoscape({
+      container: containerRef.current,
       minZoom,
       maxZoom,
     });
 
     /** select/deselect items */
-    graph.current.on("select unselect", "node, edge", () =>
+    graphRef.current.on("select unselect", "node, edge", () =>
       setSelectedItems(
-        graph.current
+        graphRef.current
           ?.elements(":selected")
           .map((element) => element.data() as Node | Edge) ?? [],
       ),
@@ -425,22 +425,22 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     let justPanned = false;
 
     /** when panning, limit pan */
-    graph.current.on("viewport", () => {
-      if (!graph.current) return;
+    graphRef.current.on("viewport", () => {
+      if (!graphRef.current) return;
 
       if (justPanned) return (justPanned = false);
       justPanned = true;
 
       /** get current graph props */
-      const zoom = graph.current.zoom();
-      const pan = graph.current.pan();
-      const width = graph.current.width();
-      const height = graph.current.height();
+      const zoom = graphRef.current.zoom();
+      const pan = graphRef.current.pan();
+      const width = graphRef.current.width();
+      const height = graphRef.current.height();
       const paddingH = width / 2;
       const paddingV = height / 2;
 
       /** get bounding box of graph elements */
-      const { x1, y1, x2, y2 } = graph.current.elements().boundingBox();
+      const { x1, y1, x2, y2 } = graphRef.current.elements().boundingBox();
 
       /** limit left pan */
       if (x2 * zoom + pan.x < paddingH) pan.x = paddingH - x2 * zoom;
@@ -454,35 +454,35 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
         pan.y = height - paddingV - y1 * zoom;
 
       /** adjust pan */
-      graph.current.pan(pan);
+      graphRef.current.pan(pan);
     });
 
     /** fit view */
-    graph.current.on("layoutstop", async () => {
+    graphRef.current.on("layoutstop", async () => {
       /** some layout algos aren't fully done when this event is called */
       await sleep(10);
       fit();
     });
-    graph.current.on("dblclick", fit);
+    graphRef.current.on("dblclick", fit);
 
     /** indicate hover-ability */
     const over = () => {
-      if (!container.current) return;
-      container.current.style.cursor = "pointer";
+      if (!containerRef.current) return;
+      containerRef.current.style.cursor = "pointer";
     };
     const out = () => {
-      if (!container.current) return;
-      container.current.style.cursor = "";
+      if (!containerRef.current) return;
+      containerRef.current.style.cursor = "";
     };
-    graph.current.on("mouseover", "node", over);
-    graph.current.on("mouseout", "node", out);
-    graph.current.on("mouseover", "edge", over);
-    graph.current.on("mouseout", "edge", out);
+    graphRef.current.on("mouseover", "node", over);
+    graphRef.current.on("mouseout", "node", out);
+    graphRef.current.on("mouseover", "edge", over);
+    graphRef.current.on("mouseout", "edge", out);
   }, []);
 
   /** update node/edge styles */
   useEffect(() => {
-    if (!graph.current) return;
+    if (!graphRef.current) return;
 
     /** style accessors, extracted to avoid repetition */
     const getNodeLabel = (node: NodeSingular) => node.data().shortLabel;
@@ -550,7 +550,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "loop-direction": "0",
     };
 
-    graph.current.style([
+    graphRef.current.style([
       { selector: "node", style: nodeStyle },
       { selector: "edge", style: edgeStyle },
     ]);
@@ -558,30 +558,30 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
 
   /** update nodes/edges and layout */
   useEffect(() => {
-    if (!graph.current) return;
+    if (!graphRef.current) return;
 
     /** quick lookups for nodes/edges */
     const newNodes = Object.fromEntries(nodes.map((node) => [node.id, node]));
     const newEdges = Object.fromEntries(edges.map((edge) => [edge.id, edge]));
 
     /** remove nodes/edges that no longer exist */
-    graph.current.remove(
-      graph.current.nodes().filter((oldNode) => !newNodes[oldNode.id()]),
+    graphRef.current.remove(
+      graphRef.current.nodes().filter((oldNode) => !newNodes[oldNode.id()]),
     );
-    graph.current.remove(
-      graph.current.edges().filter((oldEdge) => !newEdges[oldEdge.id()]),
+    graphRef.current.remove(
+      graphRef.current.edges().filter((oldEdge) => !newEdges[oldEdge.id()]),
     );
 
     /** add new nodes/edges */
-    graph.current.add(
+    graphRef.current.add(
       nodes.map((newNode) => ({ group: "nodes", data: newNode })),
     );
-    graph.current.add(
+    graphRef.current.add(
       edges.map((newEdge) => ({ group: "edges", data: newEdge })),
     );
 
     /** update node/edge data */
-    graph.current.nodes().forEach((node) => {
+    graphRef.current.nodes().forEach((node) => {
       const newNode = newNodes[node.id()];
       if (newNode)
         /** set node data */
@@ -599,21 +599,21 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
         });
       });
     });
-    graph.current.edges().forEach((edge) => {
+    graphRef.current.edges().forEach((edge) => {
       edge.data(newEdges[edge.id()]);
     });
 
     /** update layout */
-    layout.current?.stop();
-    layout.current = graph.current.layout(layoutParams);
-    layout.current.start();
+    layoutRef.current?.stop();
+    layoutRef.current = graphRef.current.layout(layoutParams);
+    layoutRef.current.start();
   }, [nodes, edges, layoutParams]);
 
   /** on resize */
   useResizeObserver(
-    root,
+    ref,
     debounce(() => {
-      graph.current?.resize();
+      graphRef.current?.resize();
       fit();
     }, 100),
   );
@@ -635,12 +635,12 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
   );
 
   /** fullscreen viz */
-  const [, { toggleFullscreen }] = useFullscreen(container);
+  const [, { toggleFullscreen }] = useFullscreen(containerRef);
 
   return (
     <Flex direction="column" full>
       <div
-        ref={root}
+        ref={ref}
         className={clsx("card", classes.network, expanded && classes.expanded)}
         style={{ aspectRatio }}
       >
@@ -726,7 +726,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
         </Flex>
 
         {/* cytoscape mount container */}
-        <div ref={container} className={classes.container}></div>
+        <div ref={containerRef} className={classes.container}></div>
       </div>
 
       {/* controls */}
@@ -758,7 +758,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                   icon={<FaRegImage />}
                   text="PNG"
                   onClick={() =>
-                    root.current && downloadPng(root.current, "network")
+                    ref.current && downloadPng(ref.current, "network")
                   }
                   tooltip="High-resolution image"
                 />
@@ -766,16 +766,14 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                   icon={<FaRegImage />}
                   text="JPEG"
                   onClick={() =>
-                    root.current && downloadJpg(root.current, "network")
+                    ref.current && downloadJpg(ref.current, "network")
                   }
                   tooltip="Compressed image"
                 />
                 <Button
                   icon={<FaFilePdf />}
                   text="PDF"
-                  onClick={() =>
-                    root.current && printElement(root.current, fit)
-                  }
+                  onClick={() => ref.current && printElement(ref.current, fit)}
                   tooltip="Print as pdf"
                 />
 
@@ -796,8 +794,8 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                   icon={<FaShareNodes />}
                   text="JSON"
                   onClick={() =>
-                    graph.current &&
-                    downloadJson(graph.current?.json(), "network")
+                    graphRef.current &&
+                    downloadJson(graphRef.current?.json(), "network")
                   }
                   tooltip="For import into Cytoscape"
                 />

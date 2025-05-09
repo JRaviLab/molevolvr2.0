@@ -58,7 +58,7 @@ const TextBox = ({
   ...props
 }: Props) => {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
-  const side = useRef<HTMLDivElement>(null);
+  const sideRef = useRef<HTMLDivElement>(null);
 
   /** local text state */
   const [text, setText] = useState(value ?? "");
@@ -70,7 +70,7 @@ const TextBox = ({
   let sideElement: ReactNode = "";
   if (text || value)
     sideElement = (
-      <div ref={side} className={classes.side}>
+      <div ref={sideRef} className={classes.side}>
         <button
           type="button"
           onClick={async () => {
@@ -96,13 +96,13 @@ const TextBox = ({
     );
   else if (icon)
     sideElement = (
-      <div ref={side} className={classes.side}>
+      <div ref={sideRef} className={classes.side}>
         {icon}
       </div>
     );
 
   /** extra padding needed for side element */
-  const sidePadding = useElementBounding(side).width;
+  const sidePadding = useElementBounding(sideRef).width;
 
   /** link to parent form component */
   const form = useForm();

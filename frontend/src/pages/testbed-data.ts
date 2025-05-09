@@ -50,6 +50,28 @@ export const sequence = (chars?: string, min = 10, max = 100) =>
     .map(() => char(chars))
     .join("");
 
+/** fake heatmap data */
+const heatmapCols = random(5, 20);
+const heatmapRows = random(5, 20);
+export const heatmap = {
+  legend: "Count",
+  x: {
+    label: "Lorem",
+    labels: Array(heatmapCols).fill("").map(label),
+  },
+  y: {
+    label: "Ipsum",
+    labels: Array(heatmapRows).fill("").map(label),
+  },
+  data: Array(heatmapRows)
+    .fill({})
+    .map(() =>
+      Array(heatmapCols)
+        .fill({})
+        .map(() => (Math.random() > 0.1 ? random(1, 100) : undefined)),
+    ),
+};
+
 /** generate fake sunburst item data */
 export const sunburstItem = (depth: number): Item => ({
   label: label(),

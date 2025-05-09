@@ -37,9 +37,9 @@ const debouncedIsCovering = debounce(
  * turned on/off at route level. singleton.
  */
 const TableOfContents = () => {
-  const root = useRef<HTMLElement>(null);
-  const list = useRef<HTMLDivElement>(null);
-  const active = useRef<HTMLAnchorElement>(null);
+  const ref = useRef<HTMLElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const activeRef = useRef<HTMLAnchorElement>(null);
 
   /** open/closed state */
   const [open, setOpen] = useState(window.innerWidth > 1500);
@@ -53,10 +53,10 @@ const TableOfContents = () => {
   const [activeId, setActiveId] = useState("");
 
   /** click off to close */
-  useClickOutside(root, async () => {
+  useClickOutside(ref, async () => {
     /** wait for any element inside toc to lose focus */
     await sleep();
-    if (isCovering(root.current) || window.innerWidth < 1000) setOpen(false);
+    if (isCovering(ref.current) || window.innerWidth < 1000) setOpen(false);
   });
 
   /** on window scroll */
@@ -65,11 +65,11 @@ const TableOfContents = () => {
     setActiveId(firstInView(getHeadings())?.id || "");
     if (open) {
       /** if covering something important, close */
-      debouncedIsCovering(root.current, () => setOpen(false));
+      debouncedIsCovering(ref.current, () => setOpen(false));
       /** prevent jitter when pinch-zoomed in */
       if (window.visualViewport?.scale === 1)
         /** scroll active toc item into view */
-        scrollTo(active.current ?? list.current?.firstElementChild, {
+        scrollTo(activeRef.current ?? listRef.current?.firstElementChild, {
           behavior: "instant",
           block: "center",
         });
@@ -100,7 +100,7 @@ const TableOfContents = () => {
   if (headings.length <= 1) return <></>;
 
   return (
-    <aside ref={root} className={classes.table} aria-label="Table of contents">
+    <aside ref={ref} className={classes.table} aria-label="Table of contents">
       <div className={classes.heading}>
         {/* top text */}
         {open && (
@@ -124,11 +124,11 @@ const TableOfContents = () => {
 
       {/* links */}
       {open && (
-        <div ref={list} className={classes.list}>
+        <div ref={listRef} className={classes.list}>
           {headings.map((heading, index) => (
             <Link
               key={index}
-              ref={heading.id === activeId ? active : undefined}
+              ref={heading.id === activeId ? activeRef : undefined}
               data-active={heading.id === activeId ? "" : undefined}
               className={classes.link}
               to={{ hash: "#" + heading.id }}
