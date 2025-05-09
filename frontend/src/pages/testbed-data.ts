@@ -54,7 +54,6 @@ export const sequence = (chars?: string, min = 10, max = 100) =>
 const heatmapCols = random(5, 20);
 const heatmapRows = random(5, 20);
 export const heatmap = {
-  legend: "Count",
   x: {
     label: "Lorem",
     labels: Array(heatmapCols).fill("").map(label),
@@ -70,6 +69,7 @@ export const heatmap = {
         .fill({})
         .map(() => (Math.random() > 0.1 ? random(1, 100) : undefined)),
     ),
+  legend: "Dolor",
 };
 
 /** generate fake sunburst item data */
