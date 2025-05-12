@@ -10,9 +10,13 @@
 /** make element full view size and only thing on screen */
 
 .print-element {
-  aspect-ratio: auto !important;
-  width: 100vw !important;
-  min-height: 100vh !important;
+  aspect-ratio: unset !important;
+  width: unset !important;
+  min-width: unset !important;
+  max-width: unset !important;
+  height: 100vh !important;
+  min-height: unset !important;
+  max-height: unset !important;
   padding: 0 !important;
   border: none !important;
   border-radius: 0 !important;

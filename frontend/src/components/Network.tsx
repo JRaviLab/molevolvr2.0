@@ -773,7 +773,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                 <Button
                   icon={<FaFilePdf />}
                   text="PDF"
-                  onClick={() => ref.current && printElement(ref.current, fit)}
+                  onClick={() => ref.current && printElement(ref.current)}
                   tooltip="Print as pdf"
                 />
 

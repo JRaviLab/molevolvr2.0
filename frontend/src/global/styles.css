@@ -15,15 +15,16 @@ html {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   margin: 0;
   background: var(--white);
   color: var(--black);
 }
 
 #app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  display: contents;
 }
 
 main {

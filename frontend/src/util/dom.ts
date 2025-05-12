@@ -183,18 +183,20 @@ export const printElement = async (
   const oldY = element.getBoundingClientRect().top;
   /** make element fullscreen/print ready */
   element.classList.add("print-element");
+  if (beforePrint) {
+    await sleep(100);
+    beforePrint();
+  }
   /** wait for any layout shift */
-  await sleep(10);
-  beforePrint?.();
-  await sleep(10);
+  await sleep(100);
   /** trigger print dialog */
   window.print();
-  await sleep(10);
+  await sleep(100);
   afterPrint?.();
   /** restore element styles */
   element.classList.remove("print-element");
   /** restore scroll */
-  await sleep(10);
+  await sleep(100);
   const newY = element.getBoundingClientRect().top;
   window.scrollBy({ top: newY - oldY, behavior: "instant" });
 };
