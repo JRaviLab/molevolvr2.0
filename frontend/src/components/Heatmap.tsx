@@ -291,7 +291,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
                 icon={<FaRegImage />}
                 text="PNG"
                 onClick={() =>
-                  svgRef.current && downloadPng(svgRef.current, "sunburst")
+                  svgRef.current && downloadPng(svgRef.current, "heatmap")
                 }
                 tooltip="High-resolution image"
               />
@@ -299,7 +299,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
                 icon={<FaRegImage />}
                 text="JPEG"
                 onClick={() =>
-                  svgRef.current && downloadJpg(svgRef.current, "sunburst")
+                  svgRef.current && downloadJpg(svgRef.current, "heatmap")
                 }
                 tooltip="Compressed image"
               />
@@ -307,7 +307,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
                 icon={<FaBezierCurve />}
                 text="SVG"
                 onClick={() =>
-                  svgRef.current && downloadSvg(svgRef.current, "sunburst")
+                  svgRef.current && downloadSvg(svgRef.current, "heatmap")
                 }
                 tooltip="Vector image (no legends)"
               />
