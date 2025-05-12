@@ -120,6 +120,7 @@ const Heatmap = ({ x, y, data, legend }: Props) => {
                 height={yScale.bandwidth() ?? 0}
                 fill={col ? colorScale(valueScale(col)) : theme["--light-gray"]}
                 tabIndex={0}
+                role="button"
               />
             </Tooltip>
           )),
