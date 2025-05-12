@@ -1,13 +1,21 @@
 import { useEffect, useId, useRef, useState } from "react";
+import {
+  FaBezierCurve,
+  FaDownload,
+  FaFilePdf,
+  FaRegImage,
+} from "react-icons/fa6";
 import { extent, scaleBand, scaleLinear } from "d3";
-import * as d3 from "d3";
 import { range, truncate } from "lodash";
+import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
 import Flex from "@/components/Flex";
-import { gradientOptions } from "@/components/gradient";
+import { gradientFunc, gradientOptions } from "@/components/gradient";
+import Popover from "@/components/Popover";
 import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
-import { fitViewBox } from "@/util/dom";
+import { fitViewBox, printElement } from "@/util/dom";
+import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
 import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
 import classes from "./Heatmap.module.css";
 
@@ -34,17 +42,11 @@ const labelTruncate = 10;
 const Heatmap = ({ x, y, data, legend }: Props) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
-  /** selected/highlighted cell */
-  const [selected, setSelected] = useState<[number, number]>();
-
   /** selected gradient */
-  const [gradient, setGradient] = useState(gradientOptions[0]!.id);
+  const [gradient, setGradient] = useState(gradientOptions(false)[0]!.id);
 
   /** flip gradient */
   const [flip, setFlip] = useState(false);
-
-  /** deselect cell */
-  const deselect = () => setSelected(undefined);
 
   /** reactive CSS vars */
   const theme = useTheme();
@@ -69,7 +71,7 @@ const Heatmap = ({ x, y, data, legend }: Props) => {
   /** value to % */
   const valueScale = scaleLinear([min, max], [0, 1]);
   /** % to color */
-  const colorScale = (value: number) => d3[gradient](flip ? 1 - value : value);
+  const colorScale = (value: number) => gradientFunc(gradient, flip, value);
 
   /** fit view box */
   useEffect(() => {
@@ -96,46 +98,31 @@ const Heatmap = ({ x, y, data, legend }: Props) => {
       <svg ref={svgRef} className={classes.chart} style={{ fontSize }}>
         {/* cells */}
         {data.map((row, rowIndex) =>
-          row.map((col, colIndex) => {
-            const cell: [number, number] = [colIndex, rowIndex];
-            const select = () => setSelected(cell);
-            const thisSelected =
-              selected?.[0] === colIndex || selected?.[1] === rowIndex;
-
-            return (
-              <Tooltip
-                key={cell.join("-")}
-                content={
-                  <div className="mini-table">
-                    <span>Value</span>
-                    <span>{col}</span>
-                    <span>{x.label ?? "-"}</span>
-                    <span>{x.labels[colIndex]}</span>
-                    <span>{y.label ?? "-"}</span>
-                    <span>{y.labels[colIndex]}</span>
-                  </div>
-                }
-              >
-                <rect
-                  x={xScale(colIndex) ?? 0}
-                  y={yScale(rowIndex) ?? 0}
-                  width={xScale.bandwidth() ?? 0}
-                  height={yScale.bandwidth() ?? 0}
-                  fill={
-                    col ? colorScale(valueScale(col)) : theme["--light-gray"]
-                  }
-                  opacity={
-                    thisSelected === true || selected === undefined ? 1 : 0.25
-                  }
-                  tabIndex={0}
-                  onFocus={select}
-                  onBlur={deselect}
-                  onMouseEnter={select}
-                  onMouseLeave={deselect}
-                />
-              </Tooltip>
-            );
-          }),
+          row.map((col, colIndex) => (
+            <Tooltip
+              key={[colIndex, rowIndex].join("-")}
+              content={
+                <div className="mini-table">
+                  <span>Value</span>
+                  <span>{col}</span>
+                  <span>{x.label ?? "-"}</span>
+                  <span>{x.labels[colIndex]}</span>
+                  <span>{y.label ?? "-"}</span>
+                  <span>{y.labels[colIndex]}</span>
+                </div>
+              }
+            >
+              <rect
+                className={classes.cell}
+                x={xScale(colIndex) ?? 0}
+                y={yScale(rowIndex) ?? 0}
+                width={xScale.bandwidth() ?? 0}
+                height={yScale.bandwidth() ?? 0}
+                fill={col ? colorScale(valueScale(col)) : theme["--light-gray"]}
+                tabIndex={0}
+              />
+            </Tooltip>
+          )),
         )}
 
         {/* axis lines */}
@@ -265,7 +252,7 @@ const Heatmap = ({ x, y, data, legend }: Props) => {
       <Flex>
         <SelectSingle
           label="Gradient"
-          options={gradientOptions}
+          options={gradientOptions(flip)}
           layout="horizontal"
           value={gradient}
           onChange={setGradient}
@@ -277,6 +264,48 @@ const Heatmap = ({ x, y, data, legend }: Props) => {
           value={flip}
           onChange={setFlip}
         />
+        <Popover
+          content={
+            <Flex direction="column" hAlign="stretch" gap="xs">
+              <Button
+                icon={<FaRegImage />}
+                text="PNG"
+                onClick={() =>
+                  svgRef.current && downloadPng(svgRef.current, "sunburst")
+                }
+                tooltip="High-resolution image"
+              />
+              <Button
+                icon={<FaRegImage />}
+                text="JPEG"
+                onClick={() =>
+                  svgRef.current && downloadJpg(svgRef.current, "sunburst")
+                }
+                tooltip="Compressed image"
+              />
+              <Button
+                icon={<FaBezierCurve />}
+                text="SVG"
+                onClick={() =>
+                  svgRef.current && downloadSvg(svgRef.current, "sunburst")
+                }
+                tooltip="Vector image (no legends)"
+              />
+              <Button
+                icon={<FaFilePdf />}
+                text="PDF"
+                onClick={() => svgRef.current && printElement(svgRef.current)}
+                tooltip="Print as pdf"
+              />
+            </Flex>
+          }
+        >
+          <Button
+            icon={<FaDownload />}
+            design="hollow"
+            tooltip="Download chart"
+          />
+        </Popover>
       </Flex>
     </Flex>
   );

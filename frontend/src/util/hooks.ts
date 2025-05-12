@@ -66,7 +66,7 @@ export const useSvgTransform = (
     });
   }, [svg]);
 
-  const { run } = useDebounceFn(update, 100);
+  const { run } = useDebounceFn(update, 20);
 
   /**
    * check if view box value has actually changed

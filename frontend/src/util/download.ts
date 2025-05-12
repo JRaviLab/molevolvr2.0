@@ -1,5 +1,6 @@
 import { stringify } from "csv-stringify/browser/esm/sync";
 import { toJpeg, toPng } from "html-to-image";
+import { getTheme } from "@/util/hooks";
 
 export type Filename = string | string[];
 
@@ -77,8 +78,9 @@ export const downloadJson = (data: unknown, filename: Filename) =>
   download(getUrl(JSON.stringify(data), "application/json"), filename, "json");
 
 /** download element as png */
-export const downloadPng = async (element: HTMLElement, filename: Filename) => {
+export const downloadPng = async (element: Element, filename: Filename) => {
   try {
+    // @ts-expect-error typing says lib funcs don't support svg elements, but in practice it does
     const blob = await toPng(element);
     download(getUrl(blob, "image/png"), filename, "png");
   } catch (error) {
@@ -87,9 +89,12 @@ export const downloadPng = async (element: HTMLElement, filename: Filename) => {
 };
 
 /** download blob as jpg */
-export const downloadJpg = async (element: HTMLElement, filename: Filename) => {
+export const downloadJpg = async (element: Element, filename: Filename) => {
   try {
-    const blob = await toJpeg(element);
+    // @ts-expect-error typing says lib funcs don't support svg elements, but in practice it does
+    const blob = await toJpeg(element, {
+      backgroundColor: getTheme()["--white"],
+    });
     download(getUrl(blob, "image/jpeg"), filename, "jpg");
   } catch (error) {
     console.error(error);

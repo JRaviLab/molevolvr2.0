@@ -3,9 +3,14 @@ import * as d3 from "d3";
 import { range } from "lodash";
 import type { Option } from "@/components/SelectSingle";
 
+type Props = {
+  id: Id;
+  flip?: boolean;
+};
+
 /** gradient preview thumbnail */
-export const GradientThumb = ({ gradient }: Props) => {
-  const id = useId();
+export const GradientThumb = ({ id, flip = false }: Props) => {
+  const filter = useId();
 
   return (
     <svg
@@ -15,19 +20,19 @@ export const GradientThumb = ({ gradient }: Props) => {
       preserveAspectRatio="none"
     >
       <defs>
-        <linearGradient id={id}>
+        <linearGradient id={filter}>
           {range(0, 1, 0.1)
             .concat([1])
             .map((percent, index) => (
               <stop
                 key={index}
                 offset={`${100 * percent}%`}
-                stopColor={gradient ? d3[gradient](percent) : ""}
+                stopColor={gradientFunc(id, flip, percent)}
               />
             ))}
         </linearGradient>
       </defs>
-      <rect x={0} y={0} width={10} height={10} fill={`url(#${id})`} />
+      <rect x={0} y={0} width={10} height={10} fill={`url(#${filter})`} />
     </svg>
   );
 };
@@ -67,14 +72,15 @@ export const gradients = [
   "interpolatePRGn",
 ] satisfies Extract<keyof typeof d3, `interpolate${string}`>[];
 
-type Gradient = (typeof gradients)[number];
+type Id = (typeof gradients)[number];
 
-export const gradientOptions = gradients.map((id) => ({
-  id,
-  primary: id.replace("interpolate", ""),
-  icon: <GradientThumb gradient={id} />,
-})) satisfies Option[];
+export const gradientFunc = (id: Id, flip: boolean, value: number) =>
+  d3[id](flip ? 1 - value : value);
 
-type Props = {
-  gradient: Gradient;
-};
+/** list of gradient options for select */
+export const gradientOptions = (flip: boolean) =>
+  gradients.map((id) => ({
+    id,
+    primary: id.replace("interpolate", ""),
+    icon: <GradientThumb id={id} flip={flip} />,
+  })) satisfies Option[];

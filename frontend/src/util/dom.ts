@@ -175,7 +175,7 @@ export const fitViewBox = (svg?: SVGSVGElement, paddingPercent = 0) => {
 
 /** open browser print dialog with just one element shown */
 export const printElement = async (
-  element: HTMLElement,
+  element: Element,
   beforePrint?: () => void,
   afterPrint?: () => void,
 ) => {

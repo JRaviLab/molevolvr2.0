@@ -53,6 +53,8 @@ export const sequence = (chars?: string, min = 10, max = 100) =>
 /** fake heatmap data */
 const heatmapCols = random(5, 20);
 const heatmapRows = random(5, 20);
+const heatmapMin = random(-100, 0);
+const heatmapMax = random(0, 100);
 export const heatmap = {
   x: {
     label: "Lorem",
@@ -67,7 +69,9 @@ export const heatmap = {
     .map(() =>
       Array(heatmapCols)
         .fill({})
-        .map(() => (Math.random() > 0.1 ? random(1, 100) : undefined)),
+        .map(() =>
+          Math.random() > 0.1 ? random(heatmapMin, heatmapMax) : undefined,
+        ),
     ),
   legend: "Dolor",
 };
