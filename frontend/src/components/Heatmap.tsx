@@ -5,7 +5,7 @@ import {
   FaFilePdf,
   FaRegImage,
 } from "react-icons/fa6";
-import { extent, scaleBand, scaleLinear } from "d3";
+import { transpose as _transpose, extent, scaleBand, scaleLinear } from "d3";
 import { range, truncate } from "lodash";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
@@ -59,6 +59,15 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
 
   /** flip gradient */
   const [flip, setFlip] = useState(false);
+
+  /** transpose */
+  const [transpose, setTranspose] = useState(false);
+
+  /** swap rows/cols */
+  if (transpose) {
+    [x, y] = [y, x];
+    data = _transpose(data);
+  }
 
   /** reactive CSS vars */
   const theme = useTheme();
@@ -267,6 +276,14 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           value={flip}
           onChange={setFlip}
         />
+
+        <CheckBox
+          label="Transpose"
+          tooltip="Swap rows & cols"
+          value={transpose}
+          onChange={setTranspose}
+        />
+
         <Popover
           content={
             <Flex direction="column" hAlign="stretch" gap="xs">
