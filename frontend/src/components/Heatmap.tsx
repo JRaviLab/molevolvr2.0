@@ -20,16 +20,28 @@ import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
 import classes from "./Heatmap.module.css";
 
 type Props = {
+  /** x-axis data */
   x: {
+    /** axis label */
     label?: string;
+    /** column labels */
     labels: (string | undefined)[];
   };
+  /** y-axis data */
   y: {
+    /** axis label */
     label?: string;
+    /** row labels */
     labels: (string | undefined)[];
   };
+  /** cell values */
   data: (number | undefined)[][];
+  /** legend label */
   legend?: string;
+  /** manual min value */
+  min?: number;
+  /** manual max value */
+  max?: number;
 };
 
 /** options, in svg units (relative): */
@@ -39,7 +51,7 @@ const legendHeight = 300;
 
 const labelTruncate = 10;
 
-const Heatmap = ({ x, y, data, legend }: Props) => {
+const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   /** selected gradient */
@@ -66,7 +78,11 @@ const Heatmap = ({ x, y, data, legend }: Props) => {
   ]);
 
   /** value range */
-  const [min = 0, max = 1] = extent(data.flat().map((value) => value ?? 0));
+  {
+    const range = extent(data.flat().map((value) => value ?? 0));
+    min ??= range[0] ?? 0;
+    max ??= range[1] ?? 1;
+  }
 
   /** value to % */
   const valueScale = scaleLinear([min, max], [0, 1]);
