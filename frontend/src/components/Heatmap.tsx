@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FaBezierCurve,
   FaDownload,
@@ -10,7 +10,7 @@ import { range, truncate } from "lodash";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
 import Flex from "@/components/Flex";
-import { gradientFunc, gradientOptions } from "@/components/gradient";
+import { Gradient, gradientFunc, gradientOptions } from "@/components/gradient";
 import Popover from "@/components/Popover";
 import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
@@ -105,9 +105,6 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
     percent: index / (array.length - 1),
     color: colorScale(valueScale(tick)),
   }));
-
-  /** color gradient id */
-  const gradientId = useId();
 
   return (
     <Flex direction="column" gap="lg" full>
@@ -229,26 +226,15 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
             {legend ?? "-"}
           </text>
 
-          {/* gradient def */}
-          <defs>
-            <linearGradient id={gradientId} gradientTransform="rotate(90)">
-              {legendScale.map(({ percent, color }, index) => (
-                <stop
-                  key={index}
-                  offset={`${100 * percent}%`}
-                  stopColor={color}
-                />
-              ))}
-            </linearGradient>
-          </defs>
-
           {/* gradient rect */}
-          <rect
+          <Gradient
+            id={gradient}
+            flip={flip}
+            direction="vertical"
             x={-fontSize * 0.5}
             y={0}
             width={fontSize}
             height={legendHeight}
-            fill={`url(#${gradientId})`}
           />
 
           {/* labels */}

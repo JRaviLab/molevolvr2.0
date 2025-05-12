@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type ComponentProps } from "react";
 import * as d3 from "d3";
 import { range } from "lodash";
 import type { Option } from "@/components/SelectSingle";
@@ -6,21 +6,25 @@ import type { Option } from "@/components/SelectSingle";
 type Props = {
   id: Id;
   flip?: boolean;
-};
+  direction?: "horizontal" | "vertical";
+} & ComponentProps<"svg">;
 
-/** gradient preview thumbnail */
-export const GradientThumb = ({ id, flip = false }: Props) => {
-  const filter = useId();
+/** gradient */
+export const Gradient = ({
+  id,
+  flip = false,
+  direction = "horizontal",
+  ...props
+}: Props) => {
+  const gradientId = useId();
 
   return (
-    <svg
-      viewBox="0 0 10 10"
-      width="3em"
-      height="1em"
-      preserveAspectRatio="none"
-    >
+    <svg viewBox="0 0 10 10" preserveAspectRatio="none" {...props}>
       <defs>
-        <linearGradient id={filter}>
+        <linearGradient
+          id={gradientId}
+          gradientTransform={direction === "vertical" ? "rotate(90)" : ""}
+        >
           {range(0, 1, 0.1)
             .concat([1])
             .map((percent, index) => (
@@ -32,7 +36,7 @@ export const GradientThumb = ({ id, flip = false }: Props) => {
             ))}
         </linearGradient>
       </defs>
-      <rect x={0} y={0} width={10} height={10} fill={`url(#${filter})`} />
+      <rect x={0} y={0} width={10} height={10} fill={`url(#${gradientId})`} />
     </svg>
   );
 };
@@ -82,5 +86,5 @@ export const gradientOptions = (flip: boolean) =>
   gradients.map((id) => ({
     id,
     primary: id.replace("interpolate", ""),
-    icon: <GradientThumb id={id} flip={flip} />,
+    icon: <Gradient id={id} flip={flip} width="3em" height="1em" />,
   })) satisfies Option[];
