@@ -10,7 +10,7 @@ import { range, truncate } from "lodash";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
 import Flex from "@/components/Flex";
-import { Gradient, gradientFunc, gradientOptions } from "@/components/gradient";
+import { Gradient, gradientFunc, gradientOptions } from "@/components/Gradient";
 import Popover from "@/components/Popover";
 import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
