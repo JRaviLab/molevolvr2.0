@@ -8,11 +8,11 @@ import {
 } from "react";
 import clsx from "clsx";
 import { scaleLinear, select, zoom, zoomIdentity, type D3ZoomEvent } from "d3";
-import { clamp, mapValues, range } from "lodash";
+import { clamp, mapValues, range, truncate } from "lodash";
 import { useElementSize } from "@reactuses/core";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
-import { getColorMap } from "@/util/color";
+import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
 import classes from "./IPR.module.css";
 
@@ -45,14 +45,11 @@ const IPR = ({ sequence, tracks }: Props) => {
   const [transform, setTransform] = useState(zoomIdentity);
 
   /** map of feature types to colors */
-  const featureColors = useMemo(
-    () =>
-      getColorMap(
-        tracks
-          .map((track) => track.features.map((feature) => feature.type ?? ""))
-          .flat(),
-      ),
-    [tracks],
+  const colorMap = useColorMap(
+    tracks
+      .map((track) => track.features.map((feature) => feature.type ?? ""))
+      .flat(),
+    "mode",
   );
 
   /** dimensions of first svg (all widths should be same) */
@@ -61,6 +58,8 @@ const IPR = ({ sequence, tracks }: Props) => {
   /** set min value to avoid temporary divide by 0 errors */
   width ||= 10;
   height ||= 10;
+
+  const fontSize = height / 2;
 
   /** transform sequence index to svg x position */
   const scaleX = transform.rescaleX(
@@ -164,11 +163,15 @@ const IPR = ({ sequence, tracks }: Props) => {
           <g
             textAnchor="middle"
             dominantBaseline="central"
-            style={{ fontSize: height / 2 }}
+            style={{ fontSize }}
           >
             {range(0, sequence.length, skip).map((index) => (
               <Fragment key={index}>
-                <text x={scaleX(index + 0.5)} y={height / 2}>
+                <text
+                  x={scaleX(index + 0.5)}
+                  y={height / 2}
+                  fill={theme["--black"]}
+                >
                   {index + 1}
                 </text>
               </Fragment>
@@ -186,7 +189,7 @@ const IPR = ({ sequence, tracks }: Props) => {
           <g
             textAnchor="middle"
             dominantBaseline="central"
-            style={{ fontSize: height / 2 }}
+            style={{ fontSize }}
           >
             {sequence.split("").map((char, index) => (
               <g
@@ -205,7 +208,8 @@ const IPR = ({ sequence, tracks }: Props) => {
                 <text
                   x={0}
                   y={0}
-                  transform={`scale(${clamp((cellSize / height) * 2, 0, 1)})`}
+                  fill={theme["--black"]}
+                  transform={`scale(${clamp(cellSize / fontSize, 0, 1)})`}
                 >
                   {char}
                 </text>
@@ -226,12 +230,67 @@ const IPR = ({ sequence, tracks }: Props) => {
                 {track.label ?? "-"}
               </div>
             </Tooltip>
-            <div />
+
+            <svg
+              ref={svgRef}
+              viewBox={[0, 0, width, height].join(" ")}
+              className={classes.row}
+            >
+              <g
+                textAnchor="middle"
+                dominantBaseline="central"
+                style={{ fontSize: height / 2 }}
+              >
+                {track.features.map(
+                  ({ id, label, type, start, end }, index) => (
+                    <Tooltip
+                      key={index}
+                      content={
+                        <div className="mini-table">
+                          <span>Name</span>
+                          <span>{label ?? id}</span>
+                          <span>Type</span>
+                          <span>{type}</span>
+                          <span>Range</span>
+                          <span>
+                            {start}-{end}
+                          </span>
+                        </div>
+                      }
+                    >
+                      <g
+                        className={classes.track}
+                        transform={`translate(${scaleX(start + 0.5)}, ${height / 2})`}
+                        tabIndex={0}
+                        role="button"
+                      >
+                        <rect
+                          x={-cellSize / 2}
+                          y={-height / 2}
+                          width={cellSize * (end - start)}
+                          height={height}
+                          fill={colorMap[type ?? ""]}
+                        />
+                        <text
+                          x={(cellSize * (end - start)) / 2}
+                          y={0}
+                          fill={theme["--black"]}
+                        >
+                          {truncate(label ?? id, {
+                            length: ((cellSize * (end - start)) / height) * 3,
+                          })}
+                        </text>
+                      </g>
+                    </Tooltip>
+                  ),
+                )}
+              </g>
+            </svg>
           </Fragment>
         ))}
       </div>
 
-      <Legend entries={mapValues(featureColors, (color) => ({ color }))} />
+      <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
     </>
   );
 };
