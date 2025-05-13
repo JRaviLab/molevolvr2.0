@@ -1,5 +1,4 @@
 import type { ReactElement, ReactNode, Ref } from "react";
-import { useEffect, useRef } from "react";
 import {
   Arrow,
   Content,
@@ -27,49 +26,36 @@ type Props = {
  * focusing children
  */
 const Tooltip = ({ ref, content, children, ...props }: Props) => {
-  const contentRef = useRef<HTMLDivElement>(null);
+  if (!content) return children;
 
-  useEffect(() => {
-    shrinkWrap(
-      contentRef.current,
-      0,
-      /**
-       * radix ui tooltip puts two children at end that aren't part of text
-       * content
-       */
-      -3,
-    );
-  });
+  return (
+    <Provider delayDuration={100} disableHoverableContent>
+      <Root>
+        {/* allows nesting tooltip within popover https://github.com/radix-ui/primitives/discussions/560#discussioncomment-5325935 */}
+        <Trigger asChild ref={ref} {...props} aria-label={renderText(content)}>
+          {children}
+        </Trigger>
 
-  if (content)
-    return (
-      <Provider delayDuration={100} disableHoverableContent>
-        <Root>
-          {/* allows nesting tooltip within popover https://github.com/radix-ui/primitives/discussions/560#discussioncomment-5325935 */}
-          <Trigger
-            asChild
-            ref={ref}
-            {...props}
-            aria-label={renderText(content)}
+        <Portal>
+          <Content
+            ref={(el) => {
+              /**
+               * radix ui tooltip puts two children at end that aren't part of
+               * text content
+               */
+              shrinkWrap(el, 0, -3);
+            }}
+            className={classes.content}
+            side="top"
+            data-dark="true"
           >
-            {children}
-          </Trigger>
-
-          <Portal>
-            <Content
-              ref={contentRef}
-              className={classes.content}
-              side="top"
-              data-dark="true"
-            >
-              {content}
-              <Arrow className={classes.arrow} />
-            </Content>
-          </Portal>
-        </Root>
-      </Provider>
-    );
-  else return children;
+            {content}
+            <Arrow className={classes.arrow} />
+          </Content>
+        </Portal>
+      </Root>
+    </Provider>
+  );
 };
 
 export default Tooltip;

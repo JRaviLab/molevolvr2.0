@@ -31,7 +31,7 @@
 
 /** single line truncate to width */
 
-.truncate:not(:focus) {
+.truncate {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -40,7 +40,7 @@
 
 /** multi-line truncate */
 
-:is(.truncate-2, .truncate-3, .truncate-4, .truncate-5):not(:focus) {
+:is(.truncate-2, .truncate-3, .truncate-4, .truncate-5) {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: var(--lines);
   display: -webkit-box;

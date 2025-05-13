@@ -26,6 +26,7 @@ import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
 import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
+import Tooltip from "@/components/Tooltip";
 import { useColorMap, type Hue } from "@/util/color";
 import { printElement } from "@/util/dom";
 import {
@@ -322,9 +323,11 @@ const MSAChunk = ({ combined, tracks, colors, start, end }: ChunkProps) => {
 
       <div className={classes.labels}>
         {tracks.map((track, index) => (
-          <div key={index} className="truncate">
-            {track.label ?? "-"}
-          </div>
+          <Tooltip key={index} content={track.label}>
+            <div className="truncate" tabIndex={0} role="button">
+              {track.label ?? "-"}
+            </div>
+          </Tooltip>
         ))}
       </div>
 
