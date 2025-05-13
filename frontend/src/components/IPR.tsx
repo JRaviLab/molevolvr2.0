@@ -1,11 +1,19 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import clsx from "clsx";
 import { scaleLinear, select, zoom, zoomIdentity, type D3ZoomEvent } from "d3";
-import { mapValues } from "lodash";
+import { clamp, mapValues, range } from "lodash";
 import { useElementSize } from "@reactuses/core";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
 import { getColorMap } from "@/util/color";
+import { useTheme } from "@/util/hooks";
 import classes from "./IPR.module.css";
 
 /** track of features */
@@ -105,13 +113,15 @@ const IPR = ({ sequence, tracks }: Props) => {
       zoomHandler.transform(select(el), transform);
   }, [zoomHandler, transform]);
 
-  /**
-   * on first render, zoom out as much as possible, fitting to contents. must
-   * come after transform update.
-   */
-  useEffect(() => {
+  /** zoom out as much as possible, fitting to contents */
+  const reset = useCallback(() => {
     for (const el of [...svgRefs.current]) zoomHandler.scaleTo(select(el), 0);
-  }, [zoomHandler, extent, translateExtent, scaleExtent]);
+  }, [zoomHandler]);
+
+  /** must come after transform update */
+  useEffect(() => {
+    reset();
+  }, [reset, extent, translateExtent, scaleExtent]);
 
   /** ref func for each svg */
   const svgRef = (el: SVGSVGElement | null) => {
@@ -121,6 +131,9 @@ const IPR = ({ sequence, tracks }: Props) => {
       zoomHandler(select(el));
       /** add to ref collection */
       svgRefs.current.add(el);
+      /** add non-passive listeners */
+      el.addEventListener("wheel", (event) => event.preventDefault());
+      el.addEventListener("dblclick", reset);
     }
     return () => {
       /** remove from ref collection on unmount/cleanup */
@@ -128,9 +141,20 @@ const IPR = ({ sequence, tracks }: Props) => {
     };
   };
 
+  /** reactive CSS vars */
+  const theme = useTheme();
+
+  /** width of cells in svg units */
+  const cellSize = scaleX(1) - scaleX(0);
+
+  /** skip position labels based on zoom */
+  const skip =
+    [1, 5, 10, 20, 50, 100].find((skip) => skip * cellSize > height * 1.5) ?? 1;
+
   return (
     <>
       <div className={classes.grid}>
+        {/* position */}
         <div className={classes["top-label"]}>Position</div>
         <svg
           ref={svgRef}
@@ -140,9 +164,9 @@ const IPR = ({ sequence, tracks }: Props) => {
           <g
             textAnchor="middle"
             dominantBaseline="central"
-            style={{ fontSize: height }}
+            style={{ fontSize: height / 2 }}
           >
-            {sequence.split("").map((char, index) => (
+            {range(0, sequence.length, skip).map((index) => (
               <Fragment key={index}>
                 <text x={scaleX(index + 0.5)} y={height / 2}>
                   {index + 1}
@@ -151,6 +175,8 @@ const IPR = ({ sequence, tracks }: Props) => {
             ))}
           </g>
         </svg>
+
+        {/* sequence */}
         <div className={classes["top-label"]}>Sequence</div>
         <svg
           ref={svgRef}
@@ -160,17 +186,35 @@ const IPR = ({ sequence, tracks }: Props) => {
           <g
             textAnchor="middle"
             dominantBaseline="central"
-            style={{ fontSize: height }}
+            style={{ fontSize: height / 2 }}
           >
             {sequence.split("").map((char, index) => (
-              <Fragment key={index}>
-                <text x={scaleX(index + 0.5)} y={height / 2}>
+              <g
+                key={index}
+                transform={`translate(${scaleX(index + 0.5)},
+                  ${height / 2})`}
+              >
+                <rect
+                  x={-cellSize / 2}
+                  y={-height / 2}
+                  width={cellSize}
+                  height={height}
+                  fill={theme["--deep"]}
+                  opacity={index % 2 === 0 ? 0.1 : 0.2}
+                />
+                <text
+                  x={0}
+                  y={0}
+                  transform={`scale(${clamp((cellSize / height) * 2, 0, 1)})`}
+                >
                   {char}
                 </text>
-              </Fragment>
+              </g>
             ))}
           </g>
         </svg>
+
+        {/* tracks */}
         {tracks.map((track, index) => (
           <Fragment key={index}>
             <Tooltip content={track.label}>

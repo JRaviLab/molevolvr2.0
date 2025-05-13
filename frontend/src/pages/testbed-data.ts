@@ -140,7 +140,7 @@ for (let times = 0; times < 10; times++) {
 }
 
 /** fake interproscan sequence */
-export const iprSequence = sequence("GATC");
+export const iprSequence = sequence("GATC", 100, 200);
 
 /** fake interproscan track data */
 export const iprTracks = Array(random(5, 10))
