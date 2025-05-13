@@ -66,7 +66,7 @@ export const useSvgTransform = (
     });
   }, [svg]);
 
-  const { run } = useDebounceFn(update, 100);
+  const { run } = useDebounceFn(update, 20);
 
   /**
    * check if view box value has actually changed
@@ -95,5 +95,5 @@ export const useSvgTransform = (
     attributeOldValue: true,
   });
 
-  return { w: w * scale.w, h: h * scale.h };
+  return { w: Math.round(w * scale.w), h: Math.round(h * scale.h) };
 };

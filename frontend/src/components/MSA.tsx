@@ -84,7 +84,7 @@ const MSA = ({
   getType = (char) => char,
   colors: manualColors = {},
 }: Props) => {
-  const root = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   /** full width */
   let [expanded, setExpanded] = useLocalStorage("msa-expanded", false);
@@ -116,7 +116,7 @@ const MSA = ({
   return (
     <Flex direction="column" full>
       <Flex
-        ref={root}
+        ref={ref}
         direction="column"
         hAlign="left"
         className={clsx("card", classes.root, expanded && classes.expanded)}
@@ -161,11 +161,11 @@ const MSA = ({
                   icon={<FaRegImage />}
                   text="PNG"
                   onClick={async () => {
-                    if (!root.current) return;
+                    if (!ref.current) return;
                     const oldWrap = wrap;
                     setWrap(autoWrap(expanded));
                     await sleep(10);
-                    downloadPng(root.current, "msa");
+                    downloadPng(ref.current, "msa");
                     await sleep(10);
                     setWrap(oldWrap);
                   }}
@@ -175,11 +175,11 @@ const MSA = ({
                   icon={<FaRegImage />}
                   text="JPEG"
                   onClick={async () => {
-                    if (!root.current) return;
+                    if (!ref.current) return;
                     const oldWrap = wrap;
                     setWrap(autoWrap(expanded));
                     await sleep(10);
-                    downloadJpg(root.current, "msa");
+                    downloadJpg(ref.current, "msa");
                     await sleep(10);
                     setWrap(oldWrap);
                   }}
@@ -215,10 +215,10 @@ const MSA = ({
                   icon={<FaFilePdf />}
                   text="PDF"
                   onClick={() => {
-                    if (!root.current) return;
+                    if (!ref.current) return;
                     const oldWrap = wrap;
                     printElement(
-                      root.current,
+                      ref.current,
                       () => setWrap(50),
                       () => setWrap(oldWrap),
                     );

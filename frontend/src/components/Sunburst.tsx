@@ -75,16 +75,16 @@ const gapSize = 1;
 const startDepth = 1;
 
 const Sunburst = ({ title, data }: Props) => {
-  const container = useRef<HTMLDivElement>(null);
-  const svg = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
 
   /** font size, in svg units */
-  const fontSize = useSvgTransform(svg, 1, rootFontSize()).h;
+  const fontSize = useSvgTransform(svgRef, 1, rootFontSize()).h;
 
   /** fit view box */
   useEffect(() => {
-    if (!svg.current) return;
-    fitViewBox(svg.current, 0.01);
+    if (!svgRef.current) return;
+    fitViewBox(svgRef.current, 0.01);
   });
 
   /** "breadcrumb trail" of selected nodes */
@@ -158,7 +158,7 @@ const Sunburst = ({ title, data }: Props) => {
       {/* keyboard listener not necessary here because we have one below */}
       {/* eslint-disable-next-line */}
       <div
-        ref={container}
+        ref={containerRef}
         className={clsx("card", classes.container)}
         /** deselect */
         onClick={() => setSelected([])}
@@ -168,7 +168,7 @@ const Sunburst = ({ title, data }: Props) => {
         <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
         {/* chart container */}
-        <svg ref={svg} className={classes.chart}>
+        <svg ref={svgRef} className={classes.chart} style={{ fontSize }}>
           {nodes.map((node, index) => (
             <Fragment key={index}>
               {node.parent && (
@@ -222,8 +222,8 @@ const Sunburst = ({ title, data }: Props) => {
                 icon={<FaRegImage />}
                 text="PNG"
                 onClick={() =>
-                  container.current &&
-                  downloadPng(container.current, "sunburst")
+                  containerRef.current &&
+                  downloadPng(containerRef.current, "sunburst")
                 }
                 tooltip="High-resolution image"
               />
@@ -231,8 +231,8 @@ const Sunburst = ({ title, data }: Props) => {
                 icon={<FaRegImage />}
                 text="JPEG"
                 onClick={() =>
-                  container.current &&
-                  downloadJpg(container.current, "sunburst")
+                  containerRef.current &&
+                  downloadJpg(containerRef.current, "sunburst")
                 }
                 tooltip="Compressed image"
               />
@@ -240,7 +240,7 @@ const Sunburst = ({ title, data }: Props) => {
                 icon={<FaBezierCurve />}
                 text="SVG"
                 onClick={() =>
-                  svg.current && downloadSvg(svg.current, "sunburst")
+                  svgRef.current && downloadSvg(svgRef.current, "sunburst")
                 }
                 tooltip="Vector image (no legends)"
               />
@@ -248,7 +248,7 @@ const Sunburst = ({ title, data }: Props) => {
                 icon={<FaFilePdf />}
                 text="PDF"
                 onClick={() =>
-                  container.current && printElement(container.current)
+                  containerRef.current && printElement(containerRef.current)
                 }
                 tooltip="Print as pdf"
               />
@@ -368,7 +368,6 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
         className={classes.label}
         textAnchor="middle"
         dy="0.55ex"
-        fontSize={fontSize}
         fill={theme["--black"]}
       >
         <textPath href={`#${id}`} startOffset="50%">

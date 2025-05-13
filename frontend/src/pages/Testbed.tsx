@@ -29,6 +29,7 @@ import {
   FaStop,
   FaTableCells,
 } from "react-icons/fa6";
+import { PiSquaresFourFill } from "react-icons/pi";
 import { sample, uniq } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
@@ -40,6 +41,7 @@ import Dialog from "@/components/Dialog";
 import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import Heading from "@/components/Heading";
+import Heatmap from "@/components/Heatmap";
 import IPR from "@/components/IPR";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
@@ -62,6 +64,7 @@ import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
 import {
   edges,
+  heatmap,
   iprSequence,
   iprTracks,
   logChange,
@@ -86,6 +89,7 @@ const TestbedPage = () => (
 
     {/* complex components */}
 
+    <SectionHeatmap />
     <SectionSunburst />
     <SectionMSA />
     <SectionNetwork />
@@ -263,6 +267,16 @@ const SectionHeading = () => (
     <Heading level={4} icon="Z">
       Heading 4
     </Heading>
+  </Section>
+);
+
+const SectionHeatmap = () => (
+  <Section>
+    <Heading level={2} icon={<PiSquaresFourFill />}>
+      Heatmap
+    </Heading>
+
+    <Heatmap {...heatmap} />
   </Section>
 );
 

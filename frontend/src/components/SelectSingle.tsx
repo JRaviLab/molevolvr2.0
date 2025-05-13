@@ -135,7 +135,7 @@ const SelectSingle = <O extends Option>({
       {/* dropdown */}
       <ListboxOptions
         className={classes.options}
-        anchor="bottom start"
+        anchor={{ to: "bottom start", padding: 10 }}
         modal={false}
       >
         {options.map((option) => (

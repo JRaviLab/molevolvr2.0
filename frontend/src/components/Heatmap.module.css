@@ -1,0 +1,12 @@
+.chart {
+  max-height: 500px;
+}
+
+.cell:hover {
+  stroke: var(--black);
+  stroke-width: 5;
+}
+
+.chart:has(.cell:hover) .cell:not(:hover) {
+  opacity: 0.25;
+}
