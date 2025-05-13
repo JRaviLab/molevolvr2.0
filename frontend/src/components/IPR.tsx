@@ -7,8 +7,16 @@ import {
   useState,
 } from "react";
 import clsx from "clsx";
-import { scaleLinear, select, zoom, zoomIdentity, type D3ZoomEvent } from "d3";
-import { clamp, mapValues, range, truncate } from "lodash";
+import {
+  drag,
+  scaleLinear,
+  select,
+  zoom,
+  zoomIdentity,
+  type D3DragEvent,
+  type D3ZoomEvent,
+} from "d3";
+import { clamp, inRange, mapValues, range, truncate } from "lodash";
 import { useElementSize } from "@reactuses/core";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
@@ -92,7 +100,7 @@ const IPR = ({ sequence, tracks }: Props) => {
     [width, sequence.length],
   );
 
-  /** func to attach pan/zoom handlers to elements */
+  /** svg pan/zoom behavior */
   const zoomHandler = useMemo(
     () =>
       zoom<SVGSVGElement, unknown>()
@@ -150,16 +158,32 @@ const IPR = ({ sequence, tracks }: Props) => {
   const skip =
     [1, 5, 10, 20, 50, 100].find((skip) => skip * cellSize > height * 1.5) ?? 1;
 
+  /** viewbox for all svgs */
+  const viewBox = [0, 0, width, height].join(" ");
+
+  /** scroll bar props */
+  const scrollRatio = width / sequence.length;
+  const scrollLeft = scrollRatio * transform.invertX(0);
+  const scrollRight = scrollRatio * transform.invertX(width);
+  const scrollHeight = height / 2;
+  const scrollPadding = height / 10;
+
+  /** scrollbar drag behavior */
+  const dragBehavior = drag<SVGSVGElement, unknown>().on(
+    "drag",
+    ({ dx }: D3DragEvent<SVGSVGElement, unknown, unknown>) => {
+      /** update all transforms */
+      for (const el of [...svgRefs.current])
+        zoomHandler.translateBy(select(el), -dx / scrollRatio, 0);
+    },
+  );
+
   return (
     <>
       <div className={classes.grid}>
         {/* position */}
         <div className={classes["top-label"]}>Position</div>
-        <svg
-          ref={svgRef}
-          viewBox={[0, 0, width, height].join(" ")}
-          className={classes.row}
-        >
+        <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
           <g
             textAnchor="middle"
             dominantBaseline="central"
@@ -178,14 +202,9 @@ const IPR = ({ sequence, tracks }: Props) => {
             ))}
           </g>
         </svg>
-
         {/* sequence */}
         <div className={classes["top-label"]}>Sequence</div>
-        <svg
-          ref={svgRef}
-          viewBox={[0, 0, width, height].join(" ")}
-          className={classes.row}
-        >
+        <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
           <g
             textAnchor="middle"
             dominantBaseline="central"
@@ -217,7 +236,6 @@ const IPR = ({ sequence, tracks }: Props) => {
             ))}
           </g>
         </svg>
-
         {/* tracks */}
         {tracks.map((track, index) => (
           <Fragment key={index}>
@@ -231,11 +249,7 @@ const IPR = ({ sequence, tracks }: Props) => {
               </div>
             </Tooltip>
 
-            <svg
-              ref={svgRef}
-              viewBox={[0, 0, width, height].join(" ")}
-              className={classes.row}
-            >
+            <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
               <g
                 textAnchor="middle"
                 dominantBaseline="central"
@@ -249,6 +263,8 @@ const IPR = ({ sequence, tracks }: Props) => {
                     const drawWidth =
                       clamp(scaleX(end), 0, width) -
                       clamp(scaleX(start - 1), 0, width);
+                    /** mid in view */
+                    const drawMidX = drawX + drawWidth / 2;
 
                     return (
                       <Tooltip
@@ -274,15 +290,17 @@ const IPR = ({ sequence, tracks }: Props) => {
                             height={height}
                             fill={colorMap[type ?? ""]}
                           />
-                          <text
-                            x={drawX + drawWidth / 2}
-                            y={height / 2}
-                            fill={theme["--black"]}
-                          >
-                            {truncate(label ?? id, {
-                              length: (drawWidth / height) * 3,
-                            })}
-                          </text>
+                          {inRange(drawMidX, fontSize, width - fontSize) && (
+                            <text
+                              x={drawMidX}
+                              y={height / 2}
+                              fill={theme["--black"]}
+                            >
+                              {truncate(label ?? id, {
+                                length: (drawWidth / height) * 3,
+                              })}
+                            </text>
+                          )}
                         </g>
                       </Tooltip>
                     );
@@ -292,6 +310,32 @@ const IPR = ({ sequence, tracks }: Props) => {
             </svg>
           </Fragment>
         ))}
+        {/* scrollbar */}
+        <div></div>
+        <svg
+          ref={(el) => {
+            if (el) dragBehavior(select(el));
+          }}
+          className={classes.scrollbar}
+          viewBox={[0, 0, width, scrollHeight].join(" ")}
+        >
+          <rect
+            x={0}
+            y={0}
+            width={width}
+            height={scrollHeight}
+            fill={theme["--off-white"]}
+          />
+          <rect
+            x={scrollLeft + scrollPadding}
+            y={scrollPadding}
+            width={scrollRight - scrollLeft - 2 * scrollPadding}
+            height={scrollHeight - 2 * scrollPadding}
+            rx={scrollHeight / 2 - scrollPadding}
+            ry={scrollHeight / 2 - scrollPadding}
+            fill={theme["--gray"]}
+          />
+        </svg>
       </div>
 
       <Legend entries={mapValues(colorMap, (color) => ({ color }))} />

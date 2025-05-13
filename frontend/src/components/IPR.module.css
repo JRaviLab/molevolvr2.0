@@ -24,3 +24,7 @@
   height: 2em;
   cursor: grab;
 }
+
+.scrollbar {
+  cursor: ew-resize;
+}
