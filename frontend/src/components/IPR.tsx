@@ -1,16 +1,12 @@
-import { Fragment, useMemo } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import clsx from "clsx";
+import { scaleLinear, select, zoom, zoomIdentity, type D3ZoomEvent } from "d3";
 import { mapValues } from "lodash";
-import type NightingaleInterproTrack from "@nightingale-elements/nightingale-interpro-track";
-import type NightingaleManager from "@nightingale-elements/nightingale-manager";
-import type NightingaleNavigation from "@nightingale-elements/nightingale-navigation";
-import type NightingaleSequence from "@nightingale-elements/nightingale-sequence";
+import { useElementSize } from "@reactuses/core";
 import Legend from "@/components/Legend";
+import Tooltip from "@/components/Tooltip";
 import { getColorMap } from "@/util/color";
 import classes from "./IPR.module.css";
-import "@nightingale-elements/nightingale-manager";
-import "@nightingale-elements/nightingale-navigation";
-import "@nightingale-elements/nightingale-sequence";
-import "@nightingale-elements/nightingale-interpro-track";
 
 /** track of features */
 type Track = {
@@ -34,35 +30,11 @@ type Feature = {
 type Props = { sequence: string; tracks: Track[] };
 
 const IPR = ({ sequence, tracks }: Props) => {
-  /** props for all nightingale components */
-  const commonProps = {
-    length: sequence.length,
-    height: 50,
-    "display-start": 1,
-    "display-end": -1,
-    "margin-top": 0,
-    "margin-bottom": 0,
-    "margin-left": 0,
-    "margin-right": 0,
-  };
+  /** collection of svg refs */
+  const svgRefs = useRef(new Set<SVGSVGElement>());
 
-  const managerProps: Partial<NightingaleManager> = {};
-
-  const navigationProps: Partial<NightingaleNavigation> = {
-    ...commonProps,
-  };
-
-  const sequenceProps: Partial<NightingaleSequence> = {
-    sequence,
-    ...commonProps,
-  };
-
-  const interproProps: Partial<NightingaleInterproTrack> = {
-    ...commonProps,
-    label: ".feature.label",
-    "show-label": true,
-    expanded: true,
-  };
+  /** common pan/zoom */
+  const [transform, setTransform] = useState(zoomIdentity);
 
   /** map of feature types to colors */
   const featureColors = useMemo(
@@ -75,40 +47,145 @@ const IPR = ({ sequence, tracks }: Props) => {
     [tracks],
   );
 
+  /** dimensions of first svg (all widths should be same) */
+  let [width, height] = useElementSize([...svgRefs.current.values()][0]);
+
+  /** set min value to avoid temporary divide by 0 errors */
+  width ||= 10;
+  height ||= 10;
+
+  /** transform sequence index to svg x position */
+  const scaleX = transform.rescaleX(
+    scaleLinear([0, sequence.length]).range([0, 1]),
+  );
+
+  type Extent = [[number, number], [number, number]];
+
+  /** range */
+  const extent: Extent = useMemo(
+    () => [
+      [0, 0],
+      [width, height],
+    ],
+    [width, height],
+  );
+
+  /** translate limit */
+  const translateExtent: Extent = useMemo(
+    () => [
+      [0, 0],
+      [sequence.length, 0],
+    ],
+    [sequence.length],
+  );
+
+  /** scale limit */
+  const scaleExtent: [number, number] = useMemo(
+    () => [width / sequence.length, width / 2],
+    [width, sequence.length],
+  );
+
+  /** func to attach pan/zoom handlers to elements */
+  const zoomHandler = useMemo(
+    () =>
+      zoom<SVGSVGElement, unknown>()
+        .extent(extent)
+        .translateExtent(translateExtent)
+        .scaleExtent(scaleExtent)
+        .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
+          setTransform(event.transform);
+        }),
+    [extent, translateExtent, scaleExtent],
+  );
+
+  /** when common transform changes */
+  useEffect(() => {
+    /** update each zoom handler's transform */
+    for (const el of [...svgRefs.current])
+      zoomHandler.transform(select(el), transform);
+  }, [zoomHandler, transform]);
+
+  /**
+   * on first render, zoom out as much as possible, fitting to contents. must
+   * come after transform update.
+   */
+  useEffect(() => {
+    for (const el of [...svgRefs.current]) zoomHandler.scaleTo(select(el), 0);
+  }, [zoomHandler, extent, translateExtent, scaleExtent]);
+
+  /** ref func for each svg */
+  const svgRef = (el: SVGSVGElement | null) => {
+    /** on mount */
+    if (el) {
+      /** attach zoom handler to this element */
+      zoomHandler(select(el));
+      /** add to ref collection */
+      svgRefs.current.add(el);
+    }
+    return () => {
+      /** remove from ref collection on unmount/cleanup */
+      if (el) svgRefs.current.delete(el);
+    };
+  };
+
   return (
     <>
-      <nightingale-manager {...managerProps} class={classes.manager}>
-        <div className={classes.grid}>
-          <div>Navigator</div>
-          <nightingale-navigation {...navigationProps} />
-          <div>Sequence</div>
-          <nightingale-sequence {...sequenceProps} />
-          {tracks.map((track, index) => (
-            <Fragment key={index}>
-              <div>{track.label ?? "-"}</div>
-              <nightingale-interpro-track
-                ref={(ref: Partial<NightingaleInterproTrack> | null) => {
-                  if (!ref) return;
-
-                  ref.data = track.features.map(
-                    ({ id, label, type, start, end }) => ({
-                      accession: id,
-                      label: label ?? id,
-                      locations: [{ fragments: [{ start, end }] }],
-                      residues: [],
-                      color: featureColors[type ?? ""],
-                    }),
-                  );
-
-                  return ref;
-                }}
-                {...interproProps}
-                height={50}
-              />
-            </Fragment>
-          ))}
-        </div>
-      </nightingale-manager>
+      <div className={classes.grid}>
+        <div className={classes["top-label"]}>Position</div>
+        <svg
+          ref={svgRef}
+          viewBox={[0, 0, width, height].join(" ")}
+          className={classes.row}
+        >
+          <g
+            textAnchor="middle"
+            dominantBaseline="central"
+            style={{ fontSize: height }}
+          >
+            {sequence.split("").map((char, index) => (
+              <Fragment key={index}>
+                <text x={scaleX(index + 0.5)} y={height / 2}>
+                  {index + 1}
+                </text>
+              </Fragment>
+            ))}
+          </g>
+        </svg>
+        <div className={classes["top-label"]}>Sequence</div>
+        <svg
+          ref={svgRef}
+          viewBox={[0, 0, width, height].join(" ")}
+          className={classes.row}
+        >
+          <g
+            textAnchor="middle"
+            dominantBaseline="central"
+            style={{ fontSize: height }}
+          >
+            {sequence.split("").map((char, index) => (
+              <Fragment key={index}>
+                <text x={scaleX(index + 0.5)} y={height / 2}>
+                  {char}
+                </text>
+              </Fragment>
+            ))}
+          </g>
+        </svg>
+        {tracks.map((track, index) => (
+          <Fragment key={index}>
+            <Tooltip content={track.label}>
+              <div
+                className={clsx("truncate", classes["track-label"])}
+                tabIndex={0}
+                role="button"
+              >
+                {track.label ?? "-"}
+              </div>
+            </Tooltip>
+            <div />
+          </Fragment>
+        ))}
+      </div>
 
       <Legend entries={mapValues(featureColors, (color) => ({ color }))} />
     </>
