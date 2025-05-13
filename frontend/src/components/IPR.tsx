@@ -242,47 +242,51 @@ const IPR = ({ sequence, tracks }: Props) => {
                 style={{ fontSize: height / 2 }}
               >
                 {track.features.map(
-                  ({ id, label, type, start, end }, index) => (
-                    <Tooltip
-                      key={index}
-                      content={
-                        <div className="mini-table">
-                          <span>Name</span>
-                          <span>{label ?? id}</span>
-                          <span>Type</span>
-                          <span>{type}</span>
-                          <span>Range</span>
-                          <span>
-                            {start}-{end}
-                          </span>
-                        </div>
-                      }
-                    >
-                      <g
-                        className={classes.track}
-                        transform={`translate(${scaleX(start + 0.5)}, ${height / 2})`}
-                        tabIndex={0}
-                        role="button"
+                  ({ id, label, type, start, end }, index) => {
+                    /** x in view */
+                    const drawX = clamp(scaleX(start - 1), 0, width);
+                    /** width in view */
+                    const drawWidth =
+                      clamp(scaleX(end), 0, width) -
+                      clamp(scaleX(start - 1), 0, width);
+
+                    return (
+                      <Tooltip
+                        key={index}
+                        content={
+                          <div className="mini-table">
+                            <span>Name</span>
+                            <span>{label ?? id}</span>
+                            <span>Type</span>
+                            <span>{type}</span>
+                            <span>Range</span>
+                            <span>
+                              {start}-{end}
+                            </span>
+                          </div>
+                        }
                       >
-                        <rect
-                          x={-cellSize / 2}
-                          y={-height / 2}
-                          width={cellSize * (end - start)}
-                          height={height}
-                          fill={colorMap[type ?? ""]}
-                        />
-                        <text
-                          x={(cellSize * (end - start)) / 2}
-                          y={0}
-                          fill={theme["--black"]}
-                        >
-                          {truncate(label ?? id, {
-                            length: ((cellSize * (end - start)) / height) * 3,
-                          })}
-                        </text>
-                      </g>
-                    </Tooltip>
-                  ),
+                        <g className={classes.track} tabIndex={0} role="button">
+                          <rect
+                            x={drawX}
+                            y={0}
+                            width={drawWidth}
+                            height={height}
+                            fill={colorMap[type ?? ""]}
+                          />
+                          <text
+                            x={drawX + drawWidth / 2}
+                            y={height / 2}
+                            fill={theme["--black"]}
+                          >
+                            {truncate(label ?? id, {
+                              length: (drawWidth / height) * 3,
+                            })}
+                          </text>
+                        </g>
+                      </Tooltip>
+                    );
+                  },
                 )}
               </g>
             </svg>
