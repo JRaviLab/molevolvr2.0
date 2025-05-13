@@ -282,7 +282,12 @@ const IPR = ({ sequence, tracks }: Props) => {
                           </div>
                         }
                       >
-                        <g className={classes.track} tabIndex={0} role="button">
+                        <g
+                          className={classes.track}
+                          tabIndex={0}
+                          role="button"
+                          onFocus={reset}
+                        >
                           <rect
                             x={drawX}
                             y={0}
