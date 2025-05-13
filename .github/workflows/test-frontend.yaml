@@ -88,7 +88,7 @@ jobs:
         uses: mxschmitt/action-tmate@v3
 
       - name: Install Playwright
-        uses: ./.github/actions/install-playwright
+        uses: bun run install-playwright-ci
         with:
           working-directory: ./frontend
 
