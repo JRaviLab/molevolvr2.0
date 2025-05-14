@@ -93,7 +93,7 @@ const TestbedPage = () => (
     <SectionSunburst />
     <SectionMSA />
     <SectionNetwork />
-    {/* <SectionIPR /> */}
+    <SectionIPR />
 
     {/* formatting */}
 
