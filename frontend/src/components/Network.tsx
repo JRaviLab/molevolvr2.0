@@ -517,7 +517,6 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "text-valign": "center",
       "text-max-width": getNodeSize,
       "text-wrap": "wrap",
-      // @ts-expect-error no type defs
       // "outline-width": 1,
       // "outline-color": theme["--black"],
       "underlay-padding": minNodeSize / 4,
@@ -542,7 +541,6 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "font-family": theme["--sans"],
       color: theme["--black"],
       "text-rotation": "autorotate",
-      // @ts-expect-error no type defs
       "underlay-padding": minEdgeSize / 2,
       "underlay-opacity": getEdgeOpacity,
       "underlay-shape": "ellipse",
