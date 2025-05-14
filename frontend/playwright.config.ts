@@ -14,8 +14,8 @@ export default defineConfig({
 
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    CI && { name: "webkit", use: { ...devices["Desktop Safari"] } },
-    CI && { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+    !CI && { name: "webkit", use: { ...devices["Desktop Safari"] } },
+    !CI && { name: "firefox", use: { ...devices["Desktop Firefox"] } },
   ].filter(Boolean),
 
   webServer: {
