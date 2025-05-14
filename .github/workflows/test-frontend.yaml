@@ -88,9 +88,7 @@ jobs:
         uses: mxschmitt/action-tmate@v3
 
       - name: Install Playwright
-        uses: bun run install-playwright-ci
-        with:
-          working-directory: ./frontend
+        run: bun run install-playwright-ci
 
       - name: Run test
         run: bun run test:e2e
