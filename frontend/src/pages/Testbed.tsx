@@ -90,19 +90,19 @@ const TestbedPage = () => (
     {/* complex components */}
 
     <SectionIPR />
-    {/* <SectionHeatmap /> */}
-    {/* <SectionSunburst /> */}
-    {/* <SectionMSA /> */}
-    {/* <SectionNetwork /> */}
+    <SectionHeatmap />
+    <SectionSunburst />
+    <SectionMSA />
+    <SectionNetwork />
 
     {/* formatting */}
 
-    {/* <SectionElements /> */}
-    {/* <SectionHeading /> */}
+    <SectionElements />
+    <SectionHeading />
 
     {/* generic components */}
 
-    {/* <SectionLink />
+    <SectionLink />
     <SectionButton />
     <SectionTextBox />
     <SectionSelect />
@@ -119,12 +119,12 @@ const TestbedPage = () => (
     <SectionTable />
     <SectionTooltip />
     <SectionPopover />
-    <SectionDialog /> */}
+    <SectionDialog />
 
     {/* misc */}
 
-    {/* <SectionForm />
-    <SectionCSS /> */}
+    <SectionForm />
+    <SectionCSS />
   </>
 );
 

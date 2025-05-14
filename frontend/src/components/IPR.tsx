@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { FaDownload, FaFilePdf, FaRegImage } from "react-icons/fa6";
 import clsx from "clsx";
 import {
   drag,
@@ -18,9 +19,14 @@ import {
 } from "d3";
 import { clamp, inRange, mapValues, range, truncate } from "lodash";
 import { useElementSize } from "@reactuses/core";
+import Button from "@/components/Button";
+import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
+import Popover from "@/components/Popover";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
+import { printElement } from "@/util/dom";
+import { downloadJpg, downloadPng } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import classes from "./IPR.module.css";
 
@@ -46,6 +52,7 @@ type Feature = {
 type Props = { sequence: string; tracks: Track[] };
 
 const IPR = ({ sequence, tracks }: Props) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   /** collection of svg refs */
   const svgRefs = useRef(new Set<SVGSVGElement>());
 
@@ -138,8 +145,7 @@ const IPR = ({ sequence, tracks }: Props) => {
       zoomHandler(select(el));
       /** add to ref collection */
       svgRefs.current.add(el);
-      /** add non-passive listeners */
-      el.addEventListener("wheel", (event) => event.preventDefault());
+      /** add listeners */
       el.addEventListener("dblclick", reset);
     }
     return () => {
@@ -179,172 +185,216 @@ const IPR = ({ sequence, tracks }: Props) => {
   );
 
   return (
-    <>
-      <div className={classes.grid}>
-        {/* position */}
-        <div className={classes["top-label"]}>Position</div>
-        <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-          <g
-            textAnchor="middle"
-            dominantBaseline="central"
-            style={{ fontSize }}
-          >
-            {range(0, sequence.length, skip).map((index) => (
-              <Fragment key={index}>
-                <text
-                  x={scaleX(index + 0.5)}
-                  y={height / 2}
-                  fill={theme["--black"]}
-                >
-                  {index + 1}
-                </text>
-              </Fragment>
-            ))}
-          </g>
-        </svg>
-        {/* sequence */}
-        <div className={classes["top-label"]}>Sequence</div>
-        <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-          <g
-            textAnchor="middle"
-            dominantBaseline="central"
-            style={{ fontSize }}
-          >
-            {sequence.split("").map((char, index) => (
-              <g
-                key={index}
-                transform={`translate(${scaleX(index + 0.5)},
+    <Flex direction="column" gap="lg" full>
+      <Flex ref={containerRef} direction="column" full>
+        <div className={classes.grid}>
+          {/* position */}
+          <div className={classes["top-label"]}>Position</div>
+          <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
+            <g
+              textAnchor="middle"
+              dominantBaseline="central"
+              style={{ fontSize }}
+            >
+              {range(0, sequence.length, skip).map((index) => (
+                <Fragment key={index}>
+                  <text
+                    x={scaleX(index + 0.5)}
+                    y={height / 2}
+                    fill={theme["--black"]}
+                  >
+                    {index + 1}
+                  </text>
+                </Fragment>
+              ))}
+            </g>
+          </svg>
+          {/* sequence */}
+          <div className={classes["top-label"]}>Sequence</div>
+          <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
+            <g
+              textAnchor="middle"
+              dominantBaseline="central"
+              style={{ fontSize }}
+            >
+              {sequence.split("").map((char, index) => (
+                <g
+                  key={index}
+                  transform={`translate(${scaleX(index + 0.5)},
                   ${height / 2})`}
-              >
-                <rect
-                  x={-cellSize / 2}
-                  y={-height / 2}
-                  width={cellSize}
-                  height={height}
-                  fill={theme["--deep"]}
-                  opacity={index % 2 === 0 ? 0.1 : 0.2}
-                />
-                <text
-                  x={0}
-                  y={0}
-                  fill={theme["--black"]}
-                  transform={`scale(${clamp(cellSize / fontSize, 0, 1)})`}
                 >
-                  {char}
-                </text>
-              </g>
-            ))}
-          </g>
-        </svg>
-        {/* tracks */}
-        {tracks.map((track, index) => (
-          <Fragment key={index}>
-            <Tooltip content={track.label}>
-              <div
-                className={clsx("truncate", classes["track-label"])}
-                tabIndex={0}
-                role="button"
-              >
-                {track.label ?? "-"}
-              </div>
-            </Tooltip>
+                  <rect
+                    x={-cellSize / 2}
+                    y={-height / 2}
+                    width={cellSize}
+                    height={height}
+                    fill={theme["--deep"]}
+                    opacity={index % 2 === 0 ? 0.1 : 0.2}
+                  />
+                  <text
+                    x={0}
+                    y={0}
+                    fill={theme["--black"]}
+                    transform={`scale(${clamp(cellSize / fontSize, 0, 1)})`}
+                  >
+                    {char}
+                  </text>
+                </g>
+              ))}
+            </g>
+          </svg>
+          {/* tracks */}
+          {tracks.map((track, index) => (
+            <Fragment key={index}>
+              <Tooltip content={track.label}>
+                <div
+                  className={clsx("truncate", classes["track-label"])}
+                  tabIndex={0}
+                  role="button"
+                >
+                  {track.label ?? "-"}
+                </div>
+              </Tooltip>
 
-            <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-              <g
-                textAnchor="middle"
-                dominantBaseline="central"
-                style={{ fontSize: height / 2 }}
-              >
-                {track.features.map(
-                  ({ id, label, type, start, end }, index) => {
-                    /** x in view */
-                    const drawX = clamp(scaleX(start - 1), 0, width);
-                    /** width in view */
-                    const drawWidth =
-                      clamp(scaleX(end), 0, width) -
-                      clamp(scaleX(start - 1), 0, width);
-                    /** mid in view */
-                    const drawMidX = drawX + drawWidth / 2;
+              <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
+                <g
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  style={{ fontSize: height / 2 }}
+                >
+                  {track.features.map(
+                    ({ id, label, type, start, end }, index) => {
+                      /** x in view */
+                      const drawX = clamp(scaleX(start - 1), 0, width);
+                      /** width in view */
+                      const drawWidth =
+                        clamp(scaleX(end), 0, width) -
+                        clamp(scaleX(start - 1), 0, width);
+                      /** mid in view */
+                      const drawMidX = drawX + drawWidth / 2;
 
-                    return (
-                      <Tooltip
-                        key={index}
-                        content={
-                          <div className="mini-table">
-                            <span>Name</span>
-                            <span>{label ?? id}</span>
-                            <span>Type</span>
-                            <span>{type}</span>
-                            <span>Range</span>
-                            <span>
-                              {start}-{end}
-                            </span>
-                          </div>
-                        }
-                      >
-                        <g
-                          className={classes.track}
-                          tabIndex={0}
-                          role="button"
-                          onFocus={reset}
+                      return (
+                        <Tooltip
+                          key={index}
+                          content={
+                            <div className="mini-table">
+                              <span>Name</span>
+                              <span>{label ?? id}</span>
+                              <span>Type</span>
+                              <span>{type}</span>
+                              <span>Range</span>
+                              <span>
+                                {start}-{end}
+                              </span>
+                            </div>
+                          }
                         >
-                          <rect
-                            x={drawX}
-                            y={0}
-                            width={drawWidth}
-                            height={height}
-                            fill={colorMap[type ?? ""]}
-                          />
-                          {inRange(drawMidX, fontSize, width - fontSize) && (
-                            <text
-                              x={drawMidX}
-                              y={height / 2}
-                              fill={theme["--black"]}
-                            >
-                              {truncate(label ?? id, {
-                                length: (drawWidth / height) * 3,
-                              })}
-                            </text>
-                          )}
-                        </g>
-                      </Tooltip>
-                    );
-                  },
-                )}
-              </g>
-            </svg>
-          </Fragment>
-        ))}
-        {/* scrollbar */}
-        <div></div>
-        <svg
-          ref={(el) => {
-            if (el) dragBehavior(select(el));
-          }}
-          className={classes.scrollbar}
-          viewBox={[0, 0, width, scrollHeight].join(" ")}
-        >
-          <rect
-            x={0}
-            y={0}
-            width={width}
-            height={scrollHeight}
-            fill={theme["--off-white"]}
-          />
-          <rect
-            x={scrollLeft + scrollPadding}
-            y={scrollPadding}
-            width={scrollRight - scrollLeft - 2 * scrollPadding}
-            height={scrollHeight - 2 * scrollPadding}
-            rx={scrollHeight / 2 - scrollPadding}
-            ry={scrollHeight / 2 - scrollPadding}
-            fill={theme["--gray"]}
-          />
-        </svg>
-      </div>
+                          <g
+                            className={classes.track}
+                            tabIndex={0}
+                            role="button"
+                            onFocus={reset}
+                          >
+                            <rect
+                              x={drawX}
+                              y={0}
+                              width={drawWidth}
+                              height={height}
+                              fill={colorMap[type ?? ""]}
+                            />
+                            {inRange(drawMidX, fontSize, width - fontSize) && (
+                              <text
+                                x={drawMidX}
+                                y={height / 2}
+                                fill={theme["--black"]}
+                              >
+                                {truncate(label ?? id, {
+                                  length: (drawWidth / height) * 3,
+                                })}
+                              </text>
+                            )}
+                          </g>
+                        </Tooltip>
+                      );
+                    },
+                  )}
+                </g>
+              </svg>
+            </Fragment>
+          ))}
+          {/* scrollbar */}
+          <div></div>
+          <svg
+            ref={(el) => {
+              if (el) dragBehavior(select(el));
+            }}
+            className={classes.scrollbar}
+            viewBox={[0, 0, width, scrollHeight].join(" ")}
+          >
+            <rect
+              x={0}
+              y={0}
+              width={width}
+              height={scrollHeight}
+              fill={theme["--off-white"]}
+            />
+            <rect
+              x={scrollLeft + scrollPadding}
+              y={scrollPadding}
+              width={scrollRight - scrollLeft - 2 * scrollPadding}
+              height={scrollHeight - 2 * scrollPadding}
+              rx={scrollHeight / 2 - scrollPadding}
+              ry={scrollHeight / 2 - scrollPadding}
+              fill={theme["--gray"]}
+            />
+          </svg>
+        </div>
 
-      <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
-    </>
+        <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
+      </Flex>
+
+      {/* controls */}
+      <Flex>
+        <Popover
+          content={
+            <Flex direction="column" hAlign="stretch" gap="xs">
+              <Button
+                icon={<FaRegImage />}
+                text="PNG"
+                onClick={() =>
+                  containerRef.current &&
+                  downloadPng(containerRef.current, "heatmap")
+                }
+                tooltip="High-resolution image"
+              />
+              <Button
+                icon={<FaRegImage />}
+                text="JPEG"
+                onClick={() =>
+                  containerRef.current &&
+                  downloadJpg(containerRef.current, "heatmap")
+                }
+                tooltip="Compressed image"
+              />
+              <Button
+                icon={<FaFilePdf />}
+                text="PDF"
+                onClick={() =>
+                  containerRef.current && printElement(containerRef.current)
+                }
+                tooltip="Print as pdf"
+              />
+            </Flex>
+          }
+        >
+          <Button
+            icon={<FaDownload />}
+            design="hollow"
+            tooltip="Download chart"
+          />
+        </Popover>
+      </Flex>
+    </Flex>
   );
 };
 

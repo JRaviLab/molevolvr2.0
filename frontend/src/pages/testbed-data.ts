@@ -160,10 +160,10 @@ export const iprTracks = Array(random(5, 10))
   }));
 
 /** fake msa sequence */
-export const msaSequence = sequence(undefined, 10, 1000);
+export const msaSequence = sequence(undefined, 10, 500);
 
 /** fake msa track data */
-export const msaTracks = Array(random(5, 10))
+export const msaTracks = Array(random(2, 5))
   .fill(null)
   .map(() => ({
     label: label(),

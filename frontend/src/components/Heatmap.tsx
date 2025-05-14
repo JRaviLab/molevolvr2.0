@@ -309,7 +309,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
                 onClick={() =>
                   svgRef.current && downloadSvg(svgRef.current, "heatmap")
                 }
-                tooltip="Vector image (no legends)"
+                tooltip="Vector image"
               />
               <Button
                 icon={<FaFilePdf />}
