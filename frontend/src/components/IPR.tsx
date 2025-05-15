@@ -14,6 +14,7 @@ import {
   select,
   zoom,
   zoomIdentity,
+  zoomTransform,
   type D3DragEvent,
   type D3ZoomEvent,
 } from "d3";
@@ -56,8 +57,11 @@ const IPR = ({ sequence, tracks }: Props) => {
   /** collection of svg refs */
   const svgRefs = useRef(new Set<SVGSVGElement>());
 
-  /** common pan/zoom */
-  const [transform, setTransform] = useState(zoomIdentity);
+  /** first svg ref */
+  const firstSvg = [...svgRefs.current][0];
+
+  /** reactive CSS vars */
+  const theme = useTheme();
 
   /** map of feature types to colors */
   const colorMap = useColorMap(
@@ -67,8 +71,11 @@ const IPR = ({ sequence, tracks }: Props) => {
     "mode",
   );
 
+  /** common pan/zoom */
+  const [transform, setTransform] = useState(zoomIdentity);
+
   /** dimensions of first svg (all widths should be same) */
-  let [width, height] = useElementSize([...svgRefs.current.values()][0]);
+  let [width, height] = useElementSize(firstSvg);
 
   /** set min value to avoid temporary divide by 0 errors */
   width ||= 10;
@@ -76,10 +83,20 @@ const IPR = ({ sequence, tracks }: Props) => {
 
   const fontSize = height / 2;
 
+  /** view box for all svgs */
+  const viewBox = [0, 0, width, height].join(" ");
+
   /** transform sequence index to svg x position */
   const scaleX = transform.rescaleX(
     scaleLinear([0, sequence.length]).range([0, 1]),
   );
+
+  /** width of cells in svg units */
+  const cellSize = scaleX(1) - scaleX(0);
+
+  /** skip position labels based on zoom */
+  const skip =
+    [1, 5, 10, 20, 50, 100].find((skip) => skip * cellSize > height * 1.5) ?? 1;
 
   type Extent = [[number, number], [number, number]];
 
@@ -103,7 +120,12 @@ const IPR = ({ sequence, tracks }: Props) => {
 
   /** scale limit */
   const scaleExtent: [number, number] = useMemo(
-    () => [width / sequence.length, width / 2],
+    () => [
+      /** min zoom out, chars fill width */
+      width / sequence.length,
+      /** max zoom in, by # of chars in view */
+      width / 3,
+    ],
     [width, sequence.length],
   );
 
@@ -115,24 +137,28 @@ const IPR = ({ sequence, tracks }: Props) => {
         .translateExtent(translateExtent)
         .scaleExtent(scaleExtent)
         .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
-          setTransform(event.transform);
+          /** update all transforms */
+          for (const el of [...svgRefs.current])
+            if (zoomTransform(el).toString() !== event.transform.toString())
+              /** check if not already equal to avoid infinite recursion */
+              zoomHandler.transform(select(el), event.transform);
+          /** update common transform */
+          setTransform((transform) =>
+            event.transform.toString() === transform.toString()
+              ? transform
+              : event.transform,
+          );
         }),
     [extent, translateExtent, scaleExtent],
   );
 
-  /** when common transform changes */
-  useEffect(() => {
-    /** update each zoom handler's transform */
-    for (const el of [...svgRefs.current])
-      zoomHandler.transform(select(el), transform);
-  }, [zoomHandler, transform]);
-
   /** zoom out as much as possible, fitting to contents */
   const reset = useCallback(() => {
+    /** update all transforms */
     for (const el of [...svgRefs.current]) zoomHandler.scaleTo(select(el), 0);
   }, [zoomHandler]);
 
-  /** must come after transform update */
+  /** reset on init */
   useEffect(() => {
     reset();
   }, [reset, extent, translateExtent, scaleExtent]);
@@ -154,19 +180,6 @@ const IPR = ({ sequence, tracks }: Props) => {
     };
   };
 
-  /** reactive CSS vars */
-  const theme = useTheme();
-
-  /** width of cells in svg units */
-  const cellSize = scaleX(1) - scaleX(0);
-
-  /** skip position labels based on zoom */
-  const skip =
-    [1, 5, 10, 20, 50, 100].find((skip) => skip * cellSize > height * 1.5) ?? 1;
-
-  /** viewbox for all svgs */
-  const viewBox = [0, 0, width, height].join(" ");
-
   /** scroll bar props */
   const scrollRatio = width / sequence.length;
   const scrollLeft = scrollRatio * transform.invertX(0);
@@ -175,13 +188,18 @@ const IPR = ({ sequence, tracks }: Props) => {
   const scrollPadding = height / 10;
 
   /** scrollbar drag behavior */
-  const dragBehavior = drag<SVGSVGElement, unknown>().on(
-    "drag",
-    ({ dx }: D3DragEvent<SVGSVGElement, unknown, unknown>) => {
-      /** update all transforms */
-      for (const el of [...svgRefs.current])
-        zoomHandler.translateBy(select(el), -dx / scrollRatio, 0);
-    },
+  const dragBehavior = useMemo(
+    () =>
+      drag<SVGSVGElement, unknown>()
+        .container(function () {
+          return this;
+        })
+        .on("drag", ({ x }: D3DragEvent<SVGSVGElement, unknown, unknown>) => {
+          /** update all transforms */
+          for (const el of [...svgRefs.current])
+            zoomHandler.translateTo(select(el), x / scrollRatio, 0);
+        }),
+    [zoomHandler, scrollRatio],
   );
 
   return (
@@ -293,7 +311,6 @@ const IPR = ({ sequence, tracks }: Props) => {
                             className={classes.track}
                             tabIndex={0}
                             role="button"
-                            onFocus={reset}
                           >
                             <rect
                               x={drawX}
