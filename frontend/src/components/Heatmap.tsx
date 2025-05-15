@@ -5,7 +5,7 @@ import {
   FaFilePdf,
   FaRegImage,
 } from "react-icons/fa6";
-import { transpose as _transpose, extent, scaleBand, scaleLinear } from "d3";
+import { extent, scaleBand, scaleLinear, transpose } from "d3";
 import { range, truncate } from "lodash";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
@@ -57,16 +57,15 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   /** selected gradient */
   const [gradient, setGradient] = useState(gradientOptions(false)[0]!.id);
 
-  /** flip gradient */
-  const [flip, setFlip] = useState(false);
-
-  /** transpose */
-  const [transpose, setTranspose] = useState(false);
+  /** reverse gradient */
+  const [reverse, setReverse] = useState(false);
 
   /** swap rows/cols */
-  if (transpose) {
+  const [swap, setTranspose] = useState(false);
+
+  if (swap) {
     [x, y] = [y, x];
-    data = _transpose(data);
+    data = transpose(data);
   }
 
   /** reactive CSS vars */
@@ -96,7 +95,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   /** value to % */
   const valueScale = scaleLinear([min, max], [0, 1]);
   /** % to color */
-  const colorScale = (value: number) => gradientFunc(gradient, flip, value);
+  const colorScale = (value: number) => gradientFunc(gradient, reverse, value);
 
   /** fit view box */
   useEffect(() => {
@@ -238,7 +237,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           {/* gradient rect */}
           <Gradient
             id={gradient}
-            flip={flip}
+            reverse={reverse}
             direction="vertical"
             x={-fontSize * 0.5}
             y={0}
@@ -264,23 +263,23 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
       <Flex>
         <SelectSingle
           label="Gradient"
-          options={gradientOptions(flip)}
+          options={gradientOptions(reverse)}
           layout="horizontal"
           value={gradient}
           onChange={setGradient}
         />
 
         <CheckBox
-          label="Flip"
-          tooltip="Flip gradient direction"
-          value={flip}
-          onChange={setFlip}
+          label="Reverse"
+          tooltip="Reverse gradient direction"
+          value={reverse}
+          onChange={setReverse}
         />
 
         <CheckBox
-          label="Transpose"
-          tooltip="Swap rows & cols"
-          value={transpose}
+          label="Swap"
+          tooltip="Swap rows & cols (transpose)"
+          value={swap}
           onChange={setTranspose}
         />
 
