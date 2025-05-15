@@ -61,8 +61,6 @@ type Derived = {
 type Node = HierarchyNode<Derived>;
 
 type Props = {
-  /** chart title */
-  title?: string;
   /** chart data */
   data: Item[];
 };
@@ -74,7 +72,7 @@ const gapSize = 1;
 /** depth/level of first ring from center */
 const startDepth = 1;
 
-const Sunburst = ({ title, data }: Props) => {
+const Sunburst = ({ data }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -163,8 +161,6 @@ const Sunburst = ({ title, data }: Props) => {
         /** deselect */
         onClick={() => setSelected([])}
       >
-        {title && <strong>{title}</strong>}
-
         <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
         {/* chart container */}
