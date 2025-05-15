@@ -172,6 +172,7 @@ const IPR = ({ sequence, tracks }: Props) => {
       /** add to ref collection */
       svgRefs.current.add(el);
       /** add listeners */
+      el.addEventListener("wheel", (event) => event.preventDefault());
       el.addEventListener("dblclick", reset);
     }
     return () => {
@@ -184,8 +185,10 @@ const IPR = ({ sequence, tracks }: Props) => {
   const scrollRatio = width / sequence.length;
   const scrollLeft = scrollRatio * transform.invertX(0);
   const scrollRight = scrollRatio * transform.invertX(width);
-  const scrollHeight = height / 2;
-  const scrollPadding = height / 10;
+  const scrollX = (scrollRight + scrollLeft) / 2;
+  let scrollWidth = scrollRight - scrollLeft;
+  const scrollHeight = height / 4;
+  scrollWidth = clamp(scrollWidth, scrollHeight, Infinity);
 
   /** scrollbar drag behavior */
   const dragBehavior = useMemo(
@@ -356,12 +359,12 @@ const IPR = ({ sequence, tracks }: Props) => {
               fill={theme["--off-white"]}
             />
             <rect
-              x={scrollLeft + scrollPadding}
-              y={scrollPadding}
-              width={scrollRight - scrollLeft - 2 * scrollPadding}
-              height={scrollHeight - 2 * scrollPadding}
-              rx={scrollHeight / 2 - scrollPadding}
-              ry={scrollHeight / 2 - scrollPadding}
+              x={scrollX - scrollWidth / 2}
+              y={0}
+              width={scrollWidth}
+              height={scrollHeight}
+              rx={scrollHeight / 2}
+              ry={scrollHeight / 2}
               fill={theme["--gray"]}
             />
           </svg>
