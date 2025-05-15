@@ -72,6 +72,7 @@ const TextBox = ({
     sideElement = (
       <div ref={sideRef} className={classes.side}>
         <button
+          className={classes["side-button"]}
           type="button"
           onClick={async () => {
             await window.navigator.clipboard.writeText(text);
@@ -82,6 +83,7 @@ const TextBox = ({
           <FaRegCopy />
         </button>
         <button
+          className={classes["side-button"]}
           type="button"
           onClick={() => {
             if (ref.current) ref.current.value = "";
@@ -97,7 +99,7 @@ const TextBox = ({
   else if (icon)
     sideElement = (
       <div ref={sideRef} className={classes.side}>
-        {icon}
+        <div className={classes["side-button"]}>{icon}</div>
       </div>
     );
 
@@ -113,7 +115,7 @@ const TextBox = ({
       ref={ref}
       id={id}
       className={classes.textarea}
-      style={{ paddingRight: sidePadding ? sidePadding + 10 : "" }}
+      style={{ paddingRight: sidePadding ? sidePadding : "" }}
       value={value}
       onChange={(event) => {
         onChange?.(event.target.value);
@@ -127,7 +129,7 @@ const TextBox = ({
       ref={ref}
       id={id}
       className={clsx(classes.input, sideElement && classes["input-side"])}
-      style={{ paddingRight: sidePadding ? sidePadding + 10 : "" }}
+      style={{ paddingRight: sidePadding ? sidePadding : "" }}
       value={value}
       onChange={(event) => {
         onChange?.(event.target.value);

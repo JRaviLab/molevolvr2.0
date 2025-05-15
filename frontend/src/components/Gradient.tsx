@@ -5,14 +5,14 @@ import type { Option } from "@/components/SelectSingle";
 
 type Props = {
   id: Id;
-  flip?: boolean;
+  reverse?: boolean;
   direction?: "horizontal" | "vertical";
 } & ComponentProps<"svg">;
 
 /** gradient */
 export const Gradient = ({
   id,
-  flip = false,
+  reverse = false,
   direction = "horizontal",
   ...props
 }: Props) => {
@@ -31,7 +31,7 @@ export const Gradient = ({
               <stop
                 key={index}
                 offset={`${100 * percent}%`}
-                stopColor={gradientFunc(id, flip, percent)}
+                stopColor={gradientFunc(id, reverse, percent)}
               />
             ))}
         </linearGradient>
@@ -78,13 +78,13 @@ export const gradients = [
 
 type Id = (typeof gradients)[number];
 
-export const gradientFunc = (id: Id, flip: boolean, value: number) =>
-  d3[id](flip ? 1 - value : value);
+export const gradientFunc = (id: Id, reverse: boolean, value: number) =>
+  d3[id](reverse ? 1 - value : value);
 
 /** list of gradient options for select */
-export const gradientOptions = (flip: boolean) =>
+export const gradientOptions = (reverse: boolean) =>
   gradients.map((id) => ({
     id,
     primary: id.replace("interpolate", ""),
-    icon: <Gradient id={id} flip={flip} width="3em" height="1em" />,
+    icon: <Gradient id={id} reverse={reverse} width="3em" height="1em" />,
   })) satisfies Option[];

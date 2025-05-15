@@ -1,16 +1,35 @@
-import { Fragment, useMemo } from "react";
-import { mapValues } from "lodash";
-import type NightingaleInterproTrack from "@nightingale-elements/nightingale-interpro-track";
-import type NightingaleManager from "@nightingale-elements/nightingale-manager";
-import type NightingaleNavigation from "@nightingale-elements/nightingale-navigation";
-import type NightingaleSequence from "@nightingale-elements/nightingale-sequence";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { FaDownload, FaFilePdf, FaRegImage } from "react-icons/fa6";
+import clsx from "clsx";
+import {
+  drag,
+  scaleLinear,
+  select,
+  zoom,
+  zoomIdentity,
+  zoomTransform,
+  type D3DragEvent,
+  type D3ZoomEvent,
+} from "d3";
+import { clamp, inRange, mapValues, range, truncate } from "lodash";
+import { useElementSize } from "@reactuses/core";
+import Button from "@/components/Button";
+import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
-import { getColorMap } from "@/util/color";
+import Popover from "@/components/Popover";
+import Tooltip from "@/components/Tooltip";
+import { useColorMap } from "@/util/color";
+import { printElement } from "@/util/dom";
+import { downloadJpg, downloadPng } from "@/util/download";
+import { useTheme } from "@/util/hooks";
 import classes from "./IPR.module.css";
-import "@nightingale-elements/nightingale-manager";
-import "@nightingale-elements/nightingale-navigation";
-import "@nightingale-elements/nightingale-sequence";
-import "@nightingale-elements/nightingale-interpro-track";
 
 /** track of features */
 type Track = {
@@ -34,84 +53,369 @@ type Feature = {
 type Props = { sequence: string; tracks: Track[] };
 
 const IPR = ({ sequence, tracks }: Props) => {
-  /** props for all nightingale components */
-  const commonProps = {
-    length: sequence.length,
-    height: 50,
-    "display-start": 1,
-    "display-end": -1,
-    "margin-top": 0,
-    "margin-bottom": 0,
-    "margin-left": 0,
-    "margin-right": 0,
-  };
+  const containerRef = useRef<HTMLDivElement>(null);
+  /** collection of svg refs */
+  const svgRefs = useRef(new Set<SVGSVGElement>());
 
-  const managerProps: Partial<NightingaleManager> = {};
+  /** first svg ref */
+  const firstSvg = [...svgRefs.current][0];
 
-  const navigationProps: Partial<NightingaleNavigation> = {
-    ...commonProps,
-  };
-
-  const sequenceProps: Partial<NightingaleSequence> = {
-    sequence,
-    ...commonProps,
-  };
-
-  const interproProps: Partial<NightingaleInterproTrack> = {
-    ...commonProps,
-    label: ".feature.label",
-    "show-label": true,
-    expanded: true,
-  };
+  /** reactive CSS vars */
+  const theme = useTheme();
 
   /** map of feature types to colors */
-  const featureColors = useMemo(
+  const colorMap = useColorMap(
+    tracks
+      .map((track) => track.features.map((feature) => feature.type ?? ""))
+      .flat(),
+    "mode",
+  );
+
+  /** common pan/zoom */
+  const [transform, setTransform] = useState(zoomIdentity);
+
+  /** dimensions of first svg (all widths should be same) */
+  let [width, height] = useElementSize(firstSvg);
+
+  /** set min value to avoid temporary divide by 0 errors */
+  width ||= 10;
+  height ||= 10;
+
+  const fontSize = height / 2;
+
+  /** view box for all svgs */
+  const viewBox = [0, 0, width, height].join(" ");
+
+  /** transform sequence index to svg x position */
+  const scaleX = transform.rescaleX(
+    scaleLinear([0, sequence.length]).range([0, 1]),
+  );
+
+  /** width of cells in svg units */
+  const cellSize = scaleX(1) - scaleX(0);
+
+  /** skip position labels based on zoom */
+  const skip =
+    [1, 5, 10, 20, 50, 100].find((skip) => skip * cellSize > height * 1.5) ?? 1;
+
+  type Extent = [[number, number], [number, number]];
+
+  /** range */
+  const extent: Extent = useMemo(
+    () => [
+      [0, 0],
+      [width, height],
+    ],
+    [width, height],
+  );
+
+  /** translate limit */
+  const translateExtent: Extent = useMemo(
+    () => [
+      [0, 0],
+      [sequence.length, 0],
+    ],
+    [sequence.length],
+  );
+
+  /** scale limit */
+  const scaleExtent: [number, number] = useMemo(
+    () => [
+      /** min zoom out, chars fill width */
+      width / sequence.length,
+      /** max zoom in, by # of chars in view */
+      width / 3,
+    ],
+    [width, sequence.length],
+  );
+
+  /** svg pan/zoom behavior */
+  const zoomBehavior = useMemo(
     () =>
-      getColorMap(
-        tracks
-          .map((track) => track.features.map((feature) => feature.type ?? ""))
-          .flat(),
-      ),
-    [tracks],
+      zoom<SVGSVGElement, unknown>()
+        .extent(extent)
+        .translateExtent(translateExtent)
+        .scaleExtent(scaleExtent)
+        .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
+          /** update all transforms */
+          for (const el of [...svgRefs.current])
+            if (zoomTransform(el).toString() !== event.transform.toString())
+              /** check if not already equal to avoid infinite recursion */
+              event.target.transform(select(el), event.transform);
+
+          /** update common transform */
+          setTransform((transform) =>
+            event.transform.toString() === transform.toString()
+              ? transform
+              : event.transform,
+          );
+        }),
+    [extent, translateExtent, scaleExtent],
+  );
+
+  /** zoom out as much as possible, fitting to contents */
+  const reset = useCallback(() => {
+    /** update all transforms */
+    for (const el of [...svgRefs.current]) zoomBehavior.scaleTo(select(el), 0);
+  }, [zoomBehavior]);
+
+  /** reset on init */
+  useEffect(() => {
+    reset();
+  }, [reset, extent, translateExtent, scaleExtent]);
+
+  /** ref func for each svg */
+  const svgRef = (el: SVGSVGElement | null) => {
+    /** on mount */
+    if (el) {
+      /** attach zoom handler to this element */
+      zoomBehavior(select(el));
+      /** add to ref collection */
+      svgRefs.current.add(el);
+      /** add listeners */
+      el.addEventListener("wheel", (event) => event.preventDefault());
+      el.addEventListener("dblclick", reset);
+    }
+    return () => {
+      /** remove from ref collection on unmount/cleanup */
+      if (el) svgRefs.current.delete(el);
+    };
+  };
+
+  /** scroll bar props */
+  const scrollRatio = width / sequence.length;
+  const scrollLeft = scrollRatio * transform.invertX(0);
+  const scrollRight = scrollRatio * transform.invertX(width);
+  const scrollX = (scrollRight + scrollLeft) / 2;
+  let scrollWidth = scrollRight - scrollLeft;
+  const scrollHeight = height / 4;
+  scrollWidth = clamp(scrollWidth, scrollHeight, Infinity);
+
+  /** scrollbar drag behavior */
+  const dragBehavior = useMemo(
+    () =>
+      drag<SVGSVGElement, unknown>()
+        .container(function () {
+          return this;
+        })
+        .on("drag", ({ x }: D3DragEvent<SVGSVGElement, unknown, unknown>) => {
+          /** update all transforms */
+          for (const el of [...svgRefs.current])
+            zoomBehavior.translateTo(select(el), x / scrollRatio, 0);
+        }),
+    [zoomBehavior, scrollRatio],
   );
 
   return (
-    <>
-      <nightingale-manager {...managerProps} class={classes.manager}>
+    <Flex direction="column" gap="lg" full>
+      <Flex ref={containerRef} direction="column" full>
         <div className={classes.grid}>
-          <div>Navigator</div>
-          <nightingale-navigation {...navigationProps} />
-          <div>Sequence</div>
-          <nightingale-sequence {...sequenceProps} />
+          {/* position */}
+          <div className={classes["top-label"]}>Position</div>
+          <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
+            <g
+              textAnchor="middle"
+              dominantBaseline="central"
+              style={{ fontSize }}
+            >
+              {range(0, sequence.length, skip).map((index) => (
+                <Fragment key={index}>
+                  <text
+                    x={scaleX(index + 0.5)}
+                    y={height / 2}
+                    fill={theme["--black"]}
+                  >
+                    {index + 1}
+                  </text>
+                </Fragment>
+              ))}
+            </g>
+          </svg>
+          {/* sequence */}
+          <div className={classes["top-label"]}>Sequence</div>
+          <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
+            <g
+              textAnchor="middle"
+              dominantBaseline="central"
+              style={{ fontSize }}
+            >
+              {sequence.split("").map((char, index) => (
+                <g
+                  key={index}
+                  transform={`translate(${scaleX(index + 0.5)},
+                  ${height / 2})`}
+                >
+                  <rect
+                    x={-cellSize / 2}
+                    y={-height / 2}
+                    width={cellSize}
+                    height={height}
+                    fill={theme["--deep"]}
+                    opacity={index % 2 === 0 ? 0.1 : 0.2}
+                  />
+                  <text
+                    x={0}
+                    y={0}
+                    fill={theme["--black"]}
+                    transform={`scale(${clamp(cellSize / fontSize, 0, 1)})`}
+                  >
+                    {char}
+                  </text>
+                </g>
+              ))}
+            </g>
+          </svg>
+          {/* tracks */}
           {tracks.map((track, index) => (
             <Fragment key={index}>
-              <div>{track.label ?? "-"}</div>
-              <nightingale-interpro-track
-                ref={(ref: Partial<NightingaleInterproTrack> | null) => {
-                  if (!ref) return;
+              <Tooltip content={track.label}>
+                <div
+                  className={clsx("truncate", classes["track-label"])}
+                  tabIndex={0}
+                  role="button"
+                >
+                  {track.label ?? "-"}
+                </div>
+              </Tooltip>
 
-                  ref.data = track.features.map(
-                    ({ id, label, type, start, end }) => ({
-                      accession: id,
-                      label: label ?? id,
-                      locations: [{ fragments: [{ start, end }] }],
-                      residues: [],
-                      color: featureColors[type ?? ""],
-                    }),
-                  );
+              <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
+                <g
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  style={{ fontSize: height / 2 }}
+                >
+                  {track.features.map(
+                    ({ id, label, type, start, end }, index) => {
+                      /** x in view */
+                      const drawX = clamp(scaleX(start - 1), 0, width);
+                      /** width in view */
+                      const drawWidth =
+                        clamp(scaleX(end), 0, width) -
+                        clamp(scaleX(start - 1), 0, width);
+                      /** mid in view */
+                      const drawMidX = drawX + drawWidth / 2;
 
-                  return ref;
-                }}
-                {...interproProps}
-                height={50}
-              />
+                      return (
+                        <Tooltip
+                          key={index}
+                          content={
+                            <div className="mini-table">
+                              <span>Name</span>
+                              <span>{label ?? id}</span>
+                              <span>Type</span>
+                              <span>{type}</span>
+                              <span>Range</span>
+                              <span>
+                                {start}-{end}
+                              </span>
+                            </div>
+                          }
+                        >
+                          <g
+                            className={classes.track}
+                            tabIndex={0}
+                            role="button"
+                          >
+                            <rect
+                              x={drawX}
+                              y={0}
+                              width={drawWidth}
+                              height={height}
+                              fill={colorMap[type ?? ""]}
+                            />
+                            {inRange(drawMidX, fontSize, width - fontSize) && (
+                              <text
+                                x={drawMidX}
+                                y={height / 2}
+                                fill={theme["--black"]}
+                              >
+                                {truncate(label ?? id, {
+                                  length: (drawWidth / height) * 3,
+                                })}
+                              </text>
+                            )}
+                          </g>
+                        </Tooltip>
+                      );
+                    },
+                  )}
+                </g>
+              </svg>
             </Fragment>
           ))}
+          {/* scrollbar */}
+          <div></div>
+          <svg
+            ref={(el) => {
+              if (el) dragBehavior(select(el));
+            }}
+            className={classes.scrollbar}
+            viewBox={[0, 0, width, scrollHeight].join(" ")}
+          >
+            <rect
+              x={0}
+              y={0}
+              width={width}
+              height={scrollHeight}
+              fill={theme["--off-white"]}
+            />
+            <rect
+              x={scrollX - scrollWidth / 2}
+              y={0}
+              width={scrollWidth}
+              height={scrollHeight}
+              rx={scrollHeight / 2}
+              ry={scrollHeight / 2}
+              fill={theme["--gray"]}
+            />
+          </svg>
         </div>
-      </nightingale-manager>
 
-      <Legend entries={mapValues(featureColors, (color) => ({ color }))} />
-    </>
+        <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
+      </Flex>
+
+      {/* controls */}
+      <Flex>
+        <Popover
+          content={
+            <Flex direction="column" hAlign="stretch" gap="xs">
+              <Button
+                icon={<FaRegImage />}
+                text="PNG"
+                onClick={() =>
+                  containerRef.current &&
+                  downloadPng(containerRef.current, "heatmap")
+                }
+                tooltip="High-resolution image"
+              />
+              <Button
+                icon={<FaRegImage />}
+                text="JPEG"
+                onClick={() =>
+                  containerRef.current &&
+                  downloadJpg(containerRef.current, "heatmap")
+                }
+                tooltip="Compressed image"
+              />
+              <Button
+                icon={<FaFilePdf />}
+                text="PDF"
+                onClick={() =>
+                  containerRef.current && printElement(containerRef.current)
+                }
+                tooltip="Print as pdf"
+              />
+            </Flex>
+          }
+        >
+          <Button
+            icon={<FaDownload />}
+            design="hollow"
+            tooltip="Download chart"
+          />
+        </Popover>
+      </Flex>
+    </Flex>
   );
 };
 

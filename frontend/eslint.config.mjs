@@ -1,42 +1,34 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import prettier from "eslint-plugin-prettier";
-import reactRefresh from "eslint-plugin-react-refresh";
+import eslintPluginJsxA11y from "eslint-plugin-jsx-a11y";
+import eslintPluginPrettier from "eslint-plugin-prettier";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import eslintPluginReactHooks from "eslint-plugin-react-hooks";
+import eslintPluginReactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
-import { fixupConfigRules } from "@eslint/compat";
-import { FlatCompat } from "@eslint/eslintrc";
+import typescriptEslint from "typescript-eslint";
 import js from "@eslint/js";
-import tsParser from "@typescript-eslint/parser";
 
-const compat = new FlatCompat({
-  baseDirectory: path.dirname(fileURLToPath(import.meta.url)),
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
-
-export default [
+export default typescriptEslint.config(
   {
-    ignores: ["dist", "**/mockServiceWorker.js"],
+    ignores: ["dist", "dist", "**/mockServiceWorker.js"],
   },
-  ...fixupConfigRules(
-    compat.extends(
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:@typescript-eslint/stylistic",
-      "plugin:react-hooks/recommended",
-      "plugin:jsx-a11y/recommended",
-    ),
-  ),
   {
-    plugins: {
-      "react-refresh": reactRefresh,
-      prettier,
-    },
+    extends: [
+      js.configs.recommended,
+      ...typescriptEslint.configs.recommended,
+      eslintPluginPrettierRecommended,
+      eslintPluginJsxA11y.flatConfigs.recommended,
+    ],
+    files: ["**/*.{ts,tsx}"],
     languageOptions: {
       globals: globals.browser,
-      parser: tsParser,
+    },
+    plugins: {
+      "react-hooks": eslintPluginReactHooks,
+      "react-refresh": eslintPluginReactRefresh,
+      prettier: eslintPluginPrettier,
     },
     rules: {
+      ...eslintPluginReactHooks.configs.recommended.rules,
       "prettier/prettier": "warn",
       "prefer-const": ["error", { destructuring: "all" }],
       "@typescript-eslint/no-unused-vars": ["warn", { caughtErrors: "none" }],
@@ -46,4 +38,4 @@ export default [
       "jsx-a11y/no-noninteractive-tabindex": ["error", { tags: ["pre"] }],
     },
   },
-];
+);

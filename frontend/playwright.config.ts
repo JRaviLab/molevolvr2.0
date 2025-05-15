@@ -3,6 +3,8 @@ import { defineConfig, devices } from "@playwright/test";
 const port = 1234;
 const url = `http://localhost:${port}`;
 
+const { CI } = process.env;
+
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
@@ -12,9 +14,9 @@ export default defineConfig({
 
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "webkit", use: { ...devices["Desktop Safari"] } },
-    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
-  ],
+    !CI && { name: "webkit", use: { ...devices["Desktop Safari"] } },
+    !CI && { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+  ].filter(Boolean),
 
   webServer: {
     /** dev mode penalizes lighthouse performance checks */
