@@ -1,6 +1,6 @@
 .grid {
   display: grid !important;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: minmax(100px, min(25%, 200px)) 1fr;
   align-items: center;
   justify-items: stretch;
   width: 100%;
