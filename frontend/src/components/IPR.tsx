@@ -130,7 +130,7 @@ const IPR = ({ sequence, tracks }: Props) => {
   );
 
   /** svg pan/zoom behavior */
-  const zoomHandler = useMemo(
+  const zoomBehavior = useMemo(
     () =>
       zoom<SVGSVGElement, unknown>()
         .extent(extent)
@@ -141,7 +141,8 @@ const IPR = ({ sequence, tracks }: Props) => {
           for (const el of [...svgRefs.current])
             if (zoomTransform(el).toString() !== event.transform.toString())
               /** check if not already equal to avoid infinite recursion */
-              zoomHandler.transform(select(el), event.transform);
+              event.target.transform(select(el), event.transform);
+
           /** update common transform */
           setTransform((transform) =>
             event.transform.toString() === transform.toString()
@@ -155,8 +156,8 @@ const IPR = ({ sequence, tracks }: Props) => {
   /** zoom out as much as possible, fitting to contents */
   const reset = useCallback(() => {
     /** update all transforms */
-    for (const el of [...svgRefs.current]) zoomHandler.scaleTo(select(el), 0);
-  }, [zoomHandler]);
+    for (const el of [...svgRefs.current]) zoomBehavior.scaleTo(select(el), 0);
+  }, [zoomBehavior]);
 
   /** reset on init */
   useEffect(() => {
@@ -168,7 +169,7 @@ const IPR = ({ sequence, tracks }: Props) => {
     /** on mount */
     if (el) {
       /** attach zoom handler to this element */
-      zoomHandler(select(el));
+      zoomBehavior(select(el));
       /** add to ref collection */
       svgRefs.current.add(el);
       /** add listeners */
@@ -200,9 +201,9 @@ const IPR = ({ sequence, tracks }: Props) => {
         .on("drag", ({ x }: D3DragEvent<SVGSVGElement, unknown, unknown>) => {
           /** update all transforms */
           for (const el of [...svgRefs.current])
-            zoomHandler.translateTo(select(el), x / scrollRatio, 0);
+            zoomBehavior.translateTo(select(el), x / scrollRatio, 0);
         }),
-    [zoomHandler, scrollRatio],
+    [zoomBehavior, scrollRatio],
   );
 
   return (
