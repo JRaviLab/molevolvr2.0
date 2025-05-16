@@ -81,7 +81,6 @@ const Sunburst = ({ data }: Props) => {
 
   /** fit view box */
   useEffect(() => {
-    if (!svgRef.current) return;
     fitViewBox(svgRef.current, 0.01);
   });
 

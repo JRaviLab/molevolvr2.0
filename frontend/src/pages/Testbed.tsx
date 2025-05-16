@@ -93,42 +93,14 @@ const TestbedPage = () => (
     {/* complex components */}
 
     <SectionTree />
-    <SectionSunburst />
-    <SectionHeatmap />
-    <SectionNetwork />
-    <SectionMSA />
-    <SectionIPR />
 
     {/* formatting */}
 
-    <SectionElements />
-    <SectionHeading />
-
     {/* generic components */}
 
-    <SectionLink />
-    <SectionButton />
-    <SectionTextBox />
-    <SectionSelect />
-    <SectionCheckBox />
-    <SectionSlider />
-    <SectionNumberBox />
-    <SectionRadios />
-    <SectionAgo />
-    <SectionAlert />
-    <SectionTabs />
-    <SectionToast />
-    <SectionCollapsible />
-    <SectionTile />
-    <SectionTable />
-    <SectionTooltip />
-    <SectionPopover />
-    <SectionDialog />
 
     {/* misc */}
 
-    <SectionForm />
-    <SectionCSS />
   </>
 );
 
