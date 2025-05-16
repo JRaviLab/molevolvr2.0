@@ -56,14 +56,14 @@ export const treeItem = (depth: number): TreeItem => ({
   label: label(),
   type: type(),
   ...(depth > 0 && {
-    children: Array(random(1, 4))
+    children: Array(random(1, 3))
       .fill({})
       .map(() => treeItem(depth - 1)),
   }),
 });
 
 /** fake sunburst data */
-export const tree = [treeItem(random(1, 5)), treeItem(random(1, 5))];
+export const tree = [treeItem(random(1, 3)), treeItem(random(1, 3))];
 
 /** fake heatmap data */
 const heatmapCols = random(5, 20);

@@ -6,6 +6,7 @@ import {
   useResizeObserver,
 } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
+import { round } from "@/util/math";
 
 /** get document root font size */
 export const rootFontSize = () =>
@@ -66,7 +67,7 @@ export const useSvgTransform = (
     });
   }, [svg]);
 
-  const { run } = useDebounceFn(update, 20);
+  const { run } = useDebounceFn(update, 10);
 
   /**
    * check if view box value has actually changed
@@ -95,5 +96,5 @@ export const useSvgTransform = (
     attributeOldValue: true,
   });
 
-  return { w: Math.round(w * scale.w), h: Math.round(h * scale.h) };
+  return { w: round(w * scale.w, 0.01), h: round(h * scale.h, 0.01) };
 };

@@ -1,9 +1,19 @@
 import { Fragment, useEffect, useMemo, useRef } from "react";
+import {
+  FaBezierCurve,
+  FaDownload,
+  FaFilePdf,
+  FaRegImage,
+} from "react-icons/fa6";
 import { curveStepBefore, hierarchy, line } from "d3";
 import { map, max, min, orderBy, truncate } from "lodash";
+import Button from "@/components/Button";
+import Flex from "@/components/Flex";
+import Popover from "@/components/Popover";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { fitViewBox } from "@/util/dom";
+import { fitViewBox, printElement } from "@/util/dom";
+import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
 import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
 import classes from "./Tree.module.css";
@@ -38,21 +48,22 @@ const Tree = ({ data }: Props) => {
     /** make leaves evenly spaced breadth-wise */
     tree.leaves().forEach((node, index) => (node.x = index * size));
 
-    /** position leaf depths */
+    /** set leaf depths */
     tree.leaves().forEach((node) => (node.data.depth = tree.height));
 
     /** push nodes down */
     tree.leaves().forEach((leaf) =>
       leaf.ancestors().forEach((node) => {
         if (node.children?.length)
-          node.data.depth = (min(map(node.children, "data.depth")) ?? 0) - 1;
+          node.data.depth =
+            (min(map(node.children, "data.depth")) ?? node.data.depth) - 1;
       }),
     );
 
     /** position depths */
     tree
       .descendants()
-      .forEach((node) => (node.y ??= ((node.data.depth ?? 0) * size) / 1.5));
+      .forEach((node) => (node.y ??= (node.data.depth ?? 0) * size));
 
     /** go up tree */
     orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
@@ -84,63 +95,118 @@ const Tree = ({ data }: Props) => {
     "mode",
   );
 
+  const strokeWidth = fontSize / 15;
+
   return (
-    <svg ref={svgRef} className={classes.chart}>
-      {tree.links().map(({ source, target }, index) => (
-        <path
-          key={index}
-          className={classes.line}
-          fill="none"
-          stroke={theme["--black"]}
-          strokeWidth={fontSize / 10}
-          d={
-            link([
-              [source.y ?? 0, source.x ?? 0],
-              [target.y ?? 0, target.x ?? 0],
-            ]) ?? ""
-          }
-        />
-      ))}
-
-      {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => (
-        <Fragment key={index}>
-          <Tooltip
-            content={
-              <div className="mini-table">
-                <span>Name</span>
-                <span>{node.data.label}</span>
-                <span>Type</span>
-                <span>{node.data.type}</span>
-              </div>
+    <Flex direction="column" gap="lg" full>
+      {/* chart */}
+      <svg
+        ref={svgRef}
+        className={classes.chart}
+        style={{ height: 2 * rootFontSize() * tree.leaves().length + "px" }}
+      >
+        {tree.links().map(({ source, target }, index) => (
+          <path
+            key={index}
+            className={classes.line}
+            fill="none"
+            stroke={theme["--black"]}
+            strokeWidth={strokeWidth}
+            d={
+              link([
+                [source.y ?? 0, source.x ?? 0],
+                [target.y ?? 0, target.x ?? 0],
+              ]) ?? ""
             }
-          >
-            <circle
-              className={classes.node}
-              cx={node.y ?? 0}
-              cy={node.x ?? 0}
-              r={fontSize / 2}
-              fill={colorMap[node.data.type ?? ""]}
-              stroke={theme["--black"]}
-              strokeWidth={fontSize / 10}
-              tabIndex={0}
-              role="button"
-            />
-          </Tooltip>
+          />
+        ))}
 
-          {!node.children?.length && (
-            <text
-              x={(node.y ?? 0) + fontSize}
-              y={node.x ?? 0}
-              fill={theme["--black"]}
-              dominantBaseline="central"
-              style={{ fontSize }}
+        {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => (
+          <Fragment key={index}>
+            <Tooltip
+              content={
+                <div className="mini-table">
+                  <span>Name</span>
+                  <span>{node.data.label}</span>
+                  <span>Type</span>
+                  <span>{node.data.type}</span>
+                </div>
+              }
             >
-              {truncate(node.data.label ?? "-", { length: 20 })}
-            </text>
-          )}
-        </Fragment>
-      ))}
-    </svg>
+              <circle
+                className={classes.node}
+                cx={node.y ?? 0}
+                cy={node.x ?? 0}
+                r={fontSize / 3}
+                fill={colorMap[node.data.type ?? ""]}
+                stroke={theme["--black"]}
+                strokeWidth={strokeWidth}
+                tabIndex={0}
+                role="button"
+              />
+            </Tooltip>
+
+            {!node.children && (
+              <text
+                x={(node.y ?? 0) + fontSize}
+                y={node.x ?? 0}
+                fill={theme["--black"]}
+                dominantBaseline="central"
+                style={{ fontSize }}
+              >
+                {truncate(node.data.label ?? "-", { length: 20 })}
+              </text>
+            )}
+          </Fragment>
+        ))}
+      </svg>
+
+      {/* controls */}
+      <Flex>
+        <Popover
+          content={
+            <Flex direction="column" hAlign="stretch" gap="xs">
+              <Button
+                icon={<FaRegImage />}
+                text="PNG"
+                onClick={() =>
+                  svgRef.current && downloadPng(svgRef.current, "tree")
+                }
+                tooltip="High-resolution image"
+              />
+              <Button
+                icon={<FaRegImage />}
+                text="JPEG"
+                onClick={() =>
+                  svgRef.current && downloadJpg(svgRef.current, "tree")
+                }
+                tooltip="Compressed image"
+              />
+              <Button
+                icon={<FaBezierCurve />}
+                text="SVG"
+                onClick={() =>
+                  svgRef.current && downloadSvg(svgRef.current, "tree")
+                }
+                tooltip="Vector image"
+              />
+              <Button
+                icon={<FaFilePdf />}
+                text="PDF"
+                onClick={() => svgRef.current && printElement(svgRef.current)}
+                tooltip="Print as pdf"
+              />
+            </Flex>
+          }
+        >
+          <Button
+            icon={<FaDownload />}
+            design="hollow"
+            tooltip="Download chart"
+          />
+        </Popover>
+      </Flex>
+    </Flex>
   );
 };
 
