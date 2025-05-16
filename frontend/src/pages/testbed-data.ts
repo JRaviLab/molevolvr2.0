@@ -63,7 +63,7 @@ export const treeItem = (depth: number): TreeItem => ({
 });
 
 /** fake sunburst data */
-export const tree = [treeItem(random(1, 3)), treeItem(random(1, 3))];
+export const tree = [treeItem(random(1, 5)), treeItem(random(1, 5))];
 
 /** fake heatmap data */
 const heatmapCols = random(5, 20);

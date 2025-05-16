@@ -17,13 +17,13 @@
 }
 
 .shape {
-  outline: none;
   transition: stroke-opacity var(--fast);
   stroke-opacity: 0;
 }
 
 .shape:hover,
 .shape:focus-visible {
+  outline: none;
   stroke-opacity: 1;
 }
 

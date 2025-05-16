@@ -25,10 +25,10 @@ import {
   FaRegSquareCheck,
   FaRegWindowMaximize,
   FaShareNodes,
+  FaSitemap,
   FaSliders,
   FaStop,
   FaTableCells,
-  FaTree,
 } from "react-icons/fa6";
 import { PiSquaresFourFill } from "react-icons/pi";
 import { sample, uniq } from "lodash";
@@ -93,14 +93,42 @@ const TestbedPage = () => (
     {/* complex components */}
 
     <SectionTree />
+    <SectionSunburst />
+    <SectionHeatmap />
+    <SectionNetwork />
+    <SectionMSA />
+    <SectionIPR />
 
     {/* formatting */}
 
+    <SectionElements />
+    <SectionHeading />
+
     {/* generic components */}
 
+    <SectionLink />
+    <SectionButton />
+    <SectionTextBox />
+    <SectionSelect />
+    <SectionCheckBox />
+    <SectionSlider />
+    <SectionNumberBox />
+    <SectionRadios />
+    <SectionAgo />
+    <SectionAlert />
+    <SectionTabs />
+    <SectionToast />
+    <SectionCollapsible />
+    <SectionTile />
+    <SectionTable />
+    <SectionTooltip />
+    <SectionPopover />
+    <SectionDialog />
 
     {/* misc */}
 
+    <SectionForm />
+    <SectionCSS />
   </>
 );
 
@@ -268,7 +296,7 @@ const SectionHeatmap = () => (
 
 const SectionTree = () => (
   <Section>
-    <Heading level={2} icon={<FaTree />}>
+    <Heading level={2} icon={<FaSitemap />}>
       Tree
     </Heading>
 

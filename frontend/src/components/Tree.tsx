@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useMemo, useRef } from "react";
-import { curveStepBefore, hierarchy, cluster as layout, line } from "d3";
+import { curveStepBefore, hierarchy, line } from "d3";
 import { map, max, min, orderBy, truncate } from "lodash";
+import Tooltip from "@/components/Tooltip";
+import { useColorMap } from "@/util/color";
 import { fitViewBox } from "@/util/dom";
 import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
@@ -21,7 +23,7 @@ type Props = {
 };
 
 /** grid spacing in svg units */
-const size = 100;
+const size = 50;
 
 /** link line generator */
 const link = line().curve(curveStepBefore);
@@ -31,30 +33,35 @@ const Tree = ({ data }: Props) => {
 
   const tree = useMemo(() => {
     /** hierarchical data structure with convenient access methods */
-    const tree = hierarchy<Item>({ children: data });
+    const tree = hierarchy<Item & { depth?: number }>({ children: data });
 
-    /** use default layout */
-    layout<Item>()
-      .nodeSize([size, size])
-      .separation(() => 1)(tree);
+    /** make leaves evenly spaced breadth-wise */
+    tree.leaves().forEach((node, index) => (node.x = index * size));
 
-    /** delete all positions except leaves */
-    tree.each((node) => {
-      if (node.children?.length) delete node.x;
-    });
+    /** position leaf depths */
+    tree.leaves().forEach((node) => (node.data.depth = tree.height));
 
-    /** force all leaves to be evenly spaced */
-    orderBy(tree.leaves(), "x").forEach(
-      (node, index) => (node.x = index * size),
+    /** push nodes down */
+    tree.leaves().forEach((leaf) =>
+      leaf.ancestors().forEach((node) => {
+        if (node.children?.length)
+          node.data.depth = (min(map(node.children, "data.depth")) ?? 0) - 1;
+      }),
     );
+
+    /** position depths */
+    tree
+      .descendants()
+      .forEach((node) => (node.y ??= ((node.data.depth ?? 0) * size) / 1.5));
 
     /** go up tree */
     orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
       if (!node.x) {
         /** position node in middle of children */
-        const _min = min(map(node.children ?? [], "x")) ?? 0;
-        const _max = max(map(node.children ?? [], "x")) ?? 0;
-        node.x = round((_min + _max) / 2, size);
+        const xs = map(node.children ?? [], "x");
+        node.x = ((min(xs) ?? 0) + (max(xs) ?? 0)) / 2;
+        /** snap to grid */
+        node.x = round(node.x, size);
       }
     });
     return tree;
@@ -70,6 +77,12 @@ const Tree = ({ data }: Props) => {
 
   /** font size, in svg units */
   const fontSize = useSvgTransform(svgRef, 1, rootFontSize()).h;
+
+  /** map of node types to colors */
+  const colorMap = useColorMap(
+    map(tree.descendants(), (node) => node.data.type ?? ""),
+    "mode",
+  );
 
   return (
     <svg ref={svgRef} className={classes.chart}>
@@ -89,17 +102,34 @@ const Tree = ({ data }: Props) => {
         />
       ))}
 
-      {tree.descendants().map((node, index) => (
+      {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => (
         <Fragment key={index}>
-          <circle
-            cx={node.y ?? 0}
-            cy={node.x ?? 0}
-            r={fontSize / 5}
-            fill={theme["--black"]}
-          />
+          <Tooltip
+            content={
+              <div className="mini-table">
+                <span>Name</span>
+                <span>{node.data.label}</span>
+                <span>Type</span>
+                <span>{node.data.type}</span>
+              </div>
+            }
+          >
+            <circle
+              className={classes.node}
+              cx={node.y ?? 0}
+              cy={node.x ?? 0}
+              r={fontSize / 2}
+              fill={colorMap[node.data.type ?? ""]}
+              stroke={theme["--black"]}
+              strokeWidth={fontSize / 10}
+              tabIndex={0}
+              role="button"
+            />
+          </Tooltip>
+
           {!node.children?.length && (
             <text
-              x={(node.y ?? 0) + fontSize / 2}
+              x={(node.y ?? 0) + fontSize}
               y={node.x ?? 0}
               fill={theme["--black"]}
               dominantBaseline="central"
