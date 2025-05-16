@@ -78,16 +78,16 @@ const Tree = ({ data }: Props) => {
     return tree;
   }, [data]);
 
-  /** fit view box */
-  useEffect(() => {
-    fitViewBox(svgRef.current, 0.01);
-  });
-
   /** reactive CSS vars */
   const theme = useTheme();
 
   /** font size, in svg units */
   const fontSize = useSvgTransform(svgRef, 1, rootFontSize()).h;
+
+  /** fit view box */
+  useEffect(() => {
+    fitViewBox(svgRef.current, 0.01);
+  });
 
   /** map of node types to colors */
   const colorMap = useColorMap(

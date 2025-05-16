@@ -280,6 +280,9 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
   const { label, color, percent, angle, selected, lastSelected } = data;
   const end = angle + percent;
 
+  /** reactive CSS vars */
+  const theme = useTheme();
+
   /** segment arc radius */
   const radius = (depth + startDepth - 0.5) * ringSize;
 
@@ -324,9 +327,6 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
 
   /** get max text chars based on arc length */
   const maxChars = (radius * 2 * Math.PI * percent) / (fontSize / 1.75);
-
-  /** reactive CSS vars */
-  const theme = useTheme();
 
   return (
     <g className={classes.segment}>

@@ -56,6 +56,9 @@ const IPR = ({ sequence, tracks }: Props) => {
   /** collection of svg refs */
   const svgRefs = useRef(new Set<SVGSVGElement>());
 
+  /** reactive CSS vars */
+  const theme = useTheme();
+
   /** common pan/zoom */
   const [transform, setTransform] = useState(zoomIdentity);
 
@@ -153,9 +156,6 @@ const IPR = ({ sequence, tracks }: Props) => {
       if (el) svgRefs.current.delete(el);
     };
   };
-
-  /** reactive CSS vars */
-  const theme = useTheme();
 
   /** width of cells in svg units */
   const cellSize = scaleX(1) - scaleX(0);
