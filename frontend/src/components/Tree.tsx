@@ -30,6 +30,8 @@ export type Item = {
 type Props = {
   /** chart data */
   data: Item[];
+  /** whether to only show leaf nodes */
+  leavesOnly?: boolean;
 };
 
 /** grid spacing in svg units */
@@ -38,7 +40,7 @@ const size = 50;
 /** link line generator */
 const link = line().curve(curveStepBefore);
 
-const Tree = ({ data }: Props) => {
+const Tree = ({ data, leavesOnly }: Props) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   const tree = useMemo(() => {
@@ -54,7 +56,7 @@ const Tree = ({ data }: Props) => {
     /** push nodes down */
     tree.leaves().forEach((leaf) =>
       leaf.ancestors().forEach((node) => {
-        if (node.children?.length)
+        if (node.children)
           node.data.depth =
             (min(map(node.children, "data.depth")) ?? node.data.depth) - 1;
       }),
@@ -63,7 +65,10 @@ const Tree = ({ data }: Props) => {
     /** position depths */
     tree
       .descendants()
-      .forEach((node) => (node.y ??= (node.data.depth ?? 0) * size));
+      .forEach(
+        (node) =>
+          (node.y ??= (node.data.depth ?? 0) * size * (leavesOnly ? 0.5 : 1)),
+      );
 
     /** go up tree */
     orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
@@ -76,7 +81,7 @@ const Tree = ({ data }: Props) => {
       }
     });
     return tree;
-  }, [data]);
+  }, [data, leavesOnly]);
 
   /** reactive CSS vars */
   const theme = useTheme();
@@ -123,28 +128,39 @@ const Tree = ({ data }: Props) => {
 
         {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => (
           <Fragment key={index}>
-            <Tooltip
-              content={
-                <div className="mini-table">
-                  <span>Name</span>
-                  <span>{node.data.label}</span>
-                  <span>Type</span>
-                  <span>{node.data.type}</span>
-                </div>
-              }
-            >
+            {!node.children || !leavesOnly ? (
+              <Tooltip
+                content={
+                  <div className="mini-table">
+                    <span>Name</span>
+                    <span>{node.data.label}</span>
+                    <span>Type</span>
+                    <span>{node.data.type}</span>
+                  </div>
+                }
+              >
+                <circle
+                  className={classes.node}
+                  cx={node.y ?? 0}
+                  cy={node.x ?? 0}
+                  r={fontSize / 3}
+                  fill={colorMap[node.data.type ?? ""]}
+                  stroke={theme["--black"]}
+                  strokeWidth={strokeWidth}
+                  tabIndex={0}
+                  role="button"
+                />
+              </Tooltip>
+            ) : (
               <circle
-                className={classes.node}
                 cx={node.y ?? 0}
                 cy={node.x ?? 0}
-                r={fontSize / 3}
-                fill={colorMap[node.data.type ?? ""]}
+                r={strokeWidth * 2}
+                fill={theme["--white"]}
                 stroke={theme["--black"]}
                 strokeWidth={strokeWidth}
-                tabIndex={0}
-                role="button"
               />
-            </Tooltip>
+            )}
 
             {!node.children && (
               <text
