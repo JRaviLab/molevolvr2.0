@@ -15,7 +15,6 @@
 }
 
 .track-label {
-  max-width: 200px;
   line-height: var(--compact);
   text-align: right;
 }
