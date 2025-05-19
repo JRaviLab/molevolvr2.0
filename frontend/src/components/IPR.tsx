@@ -191,6 +191,44 @@ const IPR = ({ sequence, tracks }: Props) => {
   const scrollHeight = height / 4;
   scrollWidth = clamp(scrollWidth, scrollHeight, Infinity);
 
+  type Drag = D3DragEvent<SVGSVGElement, unknown, unknown>;
+
+  /** start click position, as % of scroll bar */
+  const dragOffset = useRef(0);
+
+  const onDrag = useCallback(
+    ({ x }: Drag) => {
+      /** update all transforms */
+      for (const el of [...svgRefs.current]) {
+        zoomBehavior.translateTo(
+          select(el),
+          x / scrollRatio,
+          0,
+          /** offset translate based on start click position */
+          [width * dragOffset.current, 0],
+        );
+      }
+    },
+    [zoomBehavior, scrollRatio, width],
+  );
+
+  const onDragStart = useCallback(
+    (event: Drag) => {
+      /** if clicked on track */
+      if (event.sourceEvent.target.matches(":first-child"))
+        /** put bar midpoint at click position */
+        dragOffset.current = 0.5;
+      else
+        /** if clicked on bar */
+        /** scroll based on relative drag */
+        dragOffset.current = (event.x - scrollLeft) / scrollWidth;
+
+      /** immediately update transforms */
+      onDrag(event);
+    },
+    [scrollLeft, scrollWidth, onDrag],
+  );
+
   /** scrollbar drag behavior */
   const dragBehavior = useMemo(
     () =>
@@ -198,12 +236,9 @@ const IPR = ({ sequence, tracks }: Props) => {
         .container(function () {
           return this;
         })
-        .on("drag", ({ x }: D3DragEvent<SVGSVGElement, unknown, unknown>) => {
-          /** update all transforms */
-          for (const el of [...svgRefs.current])
-            zoomBehavior.translateTo(select(el), x / scrollRatio, 0);
-        }),
-    [zoomBehavior, scrollRatio],
+        .on("start", onDragStart)
+        .on("drag", onDrag),
+    [onDragStart, onDrag],
   );
 
   return (
