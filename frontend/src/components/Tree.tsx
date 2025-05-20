@@ -116,7 +116,7 @@ const Tree = ({ data }: Props) => {
         <svg
           ref={svgRef}
           className={classes.chart}
-          style={{ height: 1.5 * rootFontSize() * tree.leaves().length + "px" }}
+          style={{ height: 2 * rootFontSize() * tree.leaves().length }}
         >
           {tree.links().map(({ source, target }, index) => (
             <path

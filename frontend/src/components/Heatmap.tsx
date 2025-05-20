@@ -116,9 +116,16 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   }));
 
   return (
-    <Flex direction="column" gap="lg" full>
+    <Flex direction="column" gap="lg">
       <div ref={containerRef} className={clsx("card", classes.container)}>
-        <svg ref={svgRef} className={classes.chart} style={{ fontSize }}>
+        <svg
+          ref={svgRef}
+          className={classes.chart}
+          style={{
+            fontSize,
+            height: 2 * rootFontSize() * data.length,
+          }}
+        >
           {/* cells */}
           {data.map((row, rowIndex) =>
             row.map((col, colIndex) => (

@@ -7,6 +7,10 @@
   gap: 20px;
 }
 
+.chart {
+  max-width: 100%;
+}
+
 .node {
   cursor: help;
   transition: fill var(--fast);

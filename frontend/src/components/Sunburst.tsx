@@ -163,7 +163,14 @@ const Sunburst = ({ data }: Props) => {
         <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
         {/* chart container */}
-        <svg ref={svgRef} className={classes.chart} style={{ fontSize }}>
+        <svg
+          ref={svgRef}
+          className={classes.chart}
+          style={{
+            fontSize,
+            height: 2 * 2 * rootFontSize() * (tree.height + startDepth),
+          }}
+        >
           {nodes.map((node, index) => (
             <Fragment key={index}>
               {node.parent && (

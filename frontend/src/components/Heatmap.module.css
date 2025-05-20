@@ -1,11 +1,12 @@
 .container {
-  height: 100vh;
-  max-height: 500px;
+  display: grid;
+  grid-template-columns: auto;
   padding: 20px;
+  gap: 20px;
 }
 
 .chart {
-  height: 100%;
+  max-width: 100%;
 }
 
 .cell {
