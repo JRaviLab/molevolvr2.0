@@ -56,7 +56,7 @@ const blend = (a: string, b: string, t = 0.5) =>
   color(interpolateHsl(a, b)(t))?.formatHex() ?? a;
 
 /** map enumerated values to colors */
-export const getColorMap = <Value extends string>(
+const getColorMap = <Value extends string>(
   values: Value[],
   shade: Shade = "light",
   /** allow some/all color mappings to be manually defined */

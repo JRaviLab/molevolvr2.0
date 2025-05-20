@@ -23,12 +23,13 @@
 .wrapper {
   display: flex;
   position: relative;
+  flex-grow: 1;
+  min-width: 0;
 }
 
 .input,
 .textarea {
   flex-grow: 1;
-  min-width: 100px;
   padding: 5px 10px;
   border: solid 2px transparent;
   border-radius: var(--rounded);
@@ -49,25 +50,27 @@
 }
 
 .side {
-  display: grid;
+  display: flex;
   position: absolute;
   top: 2px;
-  right: calc(10px + 2px);
+  right: 2px;
   bottom: 2px;
-  place-content: center;
+  align-items: stretch;
   height: calc(40px - 2px - 2px);
+  padding-right: 5px;
   gap: 5px;
   background: var(--white);
   color: var(--dark-gray);
 }
 
-.side > button {
-  height: 100%;
+.side-button {
+  display: grid;
+  place-items: center;
   padding: 0 5px;
   color: var(--accent);
   transition: color var(--fast);
 }
 
-.side > button:hover {
+.side-button:hover {
   color: var(--deep);
 }

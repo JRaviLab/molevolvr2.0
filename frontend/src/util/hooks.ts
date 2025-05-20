@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type RefObject } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 import {
   useDebounceFn,
@@ -48,17 +48,17 @@ export const useTheme = () => {
 
 /** convert width/height in document units to svg units */
 export const useSvgTransform = (
-  svg: RefObject<SVGSVGElement | null>,
+  svg: SVGSVGElement | null,
   w: number,
   h: number,
 ) => {
   const [scale, setScale] = useState({ w: 1, h: 1 });
 
   const update = useCallback(() => {
-    if (!svg.current) return;
+    if (!svg) return;
 
     /** convert to svg coords */
-    const matrix = (svg.current.getScreenCTM() || new SVGMatrix()).inverse();
+    const matrix = (svg.getScreenCTM() || new SVGMatrix()).inverse();
     /** https://www.w3.org/TR/css-transforms-1/#decomposing-a-2d-matrix */
     setScale({
       w: Math.sqrt(matrix.a ** 2 + matrix.b ** 2),

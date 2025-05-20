@@ -5,7 +5,7 @@ import {
   FaFilePdf,
   FaRegImage,
 } from "react-icons/fa6";
-import { transpose as _transpose, extent, scaleBand, scaleLinear } from "d3";
+import { extent, scaleBand, scaleLinear, transpose } from "d3";
 import { range, truncate } from "lodash";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
@@ -57,23 +57,22 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   /** selected gradient */
   const [gradient, setGradient] = useState(gradientOptions(false)[0]!.id);
 
-  /** flip gradient */
-  const [flip, setFlip] = useState(false);
-
-  /** transpose */
-  const [transpose, setTranspose] = useState(false);
+  /** reverse gradient */
+  const [reverse, setReverse] = useState(false);
 
   /** swap rows/cols */
-  if (transpose) {
+  const [swap, setSwap] = useState(false);
+
+  if (swap) {
     [x, y] = [y, x];
-    data = _transpose(data);
+    data = transpose(data);
   }
 
   /** reactive CSS vars */
   const theme = useTheme();
 
   /** font size, in svg units */
-  const fontSize = useSvgTransform(svgRef, 1, rootFontSize()).h;
+  const fontSize = useSvgTransform(svgRef.current, 1, rootFontSize()).h;
 
   /** col # to svg x coord */
   const xScale = scaleBand(range(0, x.labels.length), [
@@ -96,7 +95,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   /** value to % */
   const valueScale = scaleLinear([min, max], [0, 1]);
   /** % to color */
-  const colorScale = (value: number) => gradientFunc(gradient, flip, value);
+  const colorScale = (value: number) => gradientFunc(gradient, reverse, value);
 
   /** fit view box */
   useEffect(() => {
@@ -238,7 +237,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           {/* gradient rect */}
           <Gradient
             id={gradient}
-            flip={flip}
+            reverse={reverse}
             direction="vertical"
             x={-fontSize * 0.5}
             y={0}
@@ -264,24 +263,24 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
       <Flex>
         <SelectSingle
           label="Gradient"
-          options={gradientOptions(flip)}
+          options={gradientOptions(reverse)}
           layout="horizontal"
           value={gradient}
           onChange={setGradient}
         />
 
         <CheckBox
-          label="Flip"
-          tooltip="Flip gradient direction"
-          value={flip}
-          onChange={setFlip}
+          label="Reverse"
+          tooltip="Reverse gradient direction"
+          value={reverse}
+          onChange={setReverse}
         />
 
         <CheckBox
-          label="Transpose"
-          tooltip="Swap rows & cols"
-          value={transpose}
-          onChange={setTranspose}
+          label="Swap"
+          tooltip="Swap rows & cols (transpose)"
+          value={swap}
+          onChange={setSwap}
         />
 
         <Popover
@@ -309,7 +308,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
                 onClick={() =>
                   svgRef.current && downloadSvg(svgRef.current, "heatmap")
                 }
-                tooltip="Vector image (no legends)"
+                tooltip="Vector image"
               />
               <Button
                 icon={<FaFilePdf />}

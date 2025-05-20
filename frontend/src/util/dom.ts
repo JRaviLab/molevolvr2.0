@@ -177,7 +177,6 @@ export const fitViewBox = (svg?: SVGSVGElement, paddingPercent = 0) => {
 export const printElement = async (
   element: Element,
   beforePrint?: () => void,
-  afterPrint?: () => void,
 ) => {
   /** remember scroll position */
   const oldY = element.getBoundingClientRect().top;
@@ -191,8 +190,6 @@ export const printElement = async (
   await sleep(100);
   /** trigger print dialog */
   window.print();
-  await sleep(100);
-  afterPrint?.();
   /** restore element styles */
   element.classList.remove("print-element");
   /** restore scroll */

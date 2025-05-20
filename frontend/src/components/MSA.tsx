@@ -215,14 +215,11 @@ const MSA = ({
                 <Button
                   icon={<FaFilePdf />}
                   text="PDF"
-                  onClick={() => {
+                  onClick={async () => {
                     if (!ref.current) return;
                     const oldWrap = wrap;
-                    printElement(
-                      ref.current,
-                      () => setWrap(50),
-                      () => setWrap(oldWrap),
-                    );
+                    await printElement(ref.current, () => setWrap(40));
+                    setWrap(oldWrap);
                   }}
                   tooltip="Print as pdf"
                 />

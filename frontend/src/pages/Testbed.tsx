@@ -89,11 +89,11 @@ const TestbedPage = () => (
 
     {/* complex components */}
 
+    <SectionIPR />
     <SectionHeatmap />
     <SectionSunburst />
     <SectionMSA />
     <SectionNetwork />
-    <SectionIPR />
 
     {/* formatting */}
 
