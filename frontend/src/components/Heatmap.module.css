@@ -1,5 +1,11 @@
-.chart {
+.container {
+  height: 100vh;
   max-height: 500px;
+  padding: 20px;
+}
+
+.chart {
+  height: 100%;
 }
 
 .cell {

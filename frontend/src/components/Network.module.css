@@ -17,7 +17,6 @@
   padding: 20px;
   overflow-x: hidden;
   overflow-y: auto;
-  background: var(--white);
   overflow-wrap: anywhere;
 }
 

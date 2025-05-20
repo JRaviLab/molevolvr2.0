@@ -5,10 +5,12 @@ import {
   FaFilePdf,
   FaRegImage,
 } from "react-icons/fa6";
+import clsx from "clsx";
 import { curveStepBefore, hierarchy, line } from "d3";
-import { map, max, min, orderBy, sum, truncate } from "lodash";
+import { map, mapValues, max, min, orderBy, sum, truncate } from "lodash";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
+import Legend from "@/components/Legend";
 import Popover from "@/components/Popover";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
@@ -41,6 +43,7 @@ const size = 50;
 const link = line().curve(curveStepBefore);
 
 const Tree = ({ data }: Props) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const tree = useMemo(() => {
@@ -106,84 +109,88 @@ const Tree = ({ data }: Props) => {
 
   return (
     <Flex direction="column" gap="lg" full>
-      {/* chart */}
-      <svg
-        ref={svgRef}
-        className={classes.chart}
-        style={{ height: 1.5 * rootFontSize() * tree.leaves().length + "px" }}
-      >
-        {tree.links().map(({ source, target }, index) => (
-          <path
-            key={index}
-            className={classes.line}
-            fill="none"
-            stroke={theme["--black"]}
-            strokeWidth={strokeWidth}
-            d={
-              link([
-                [source.y ?? 0, source.x ?? 0],
-                [target.y ?? 0, target.x ?? 0],
-              ]) ?? ""
-            }
-          />
-        ))}
+      <div ref={containerRef} className={clsx("card", classes.container)}>
+        <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
-        {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => (
-          <Fragment key={index}>
-            {!node.children && (
-              <>
-                <line
-                  x1={node.y}
-                  x2={maxY + fontSize * 0.75}
-                  y1={node.x ?? 0}
-                  y2={node.x ?? 0}
-                  stroke={theme["--black"]}
-                  strokeWidth={strokeWidth}
-                  strokeDasharray={[strokeWidth, strokeWidth * 2].join(" ")}
-                />
-                <text
-                  x={maxY + fontSize}
-                  y={node.x ?? 0}
-                  fill={theme["--black"]}
-                  dominantBaseline="central"
-                  style={{ fontSize }}
-                >
-                  {truncate(node.data.label ?? "-", { length: 20 })}
-                </text>
-              </>
-            )}
-
-            <Tooltip
-              content={
-                <div className="mini-table">
-                  <span>Name</span>
-                  <span>{node.data.label}</span>
-                  <span>Type</span>
-                  <span>{node.data.type}</span>
-                  {node.ancestors().length > 1 && (
-                    <>
-                      <span>Dist</span>
-                      <span>{node.data.dist?.toFixed(3)}</span>
-                      <span>From root</span>
-                      <span>{node.data.rootDist?.toFixed(3)}</span>
-                    </>
-                  )}
-                </div>
+        {/* chart */}
+        <svg
+          ref={svgRef}
+          className={classes.chart}
+          style={{ height: 1.5 * rootFontSize() * tree.leaves().length + "px" }}
+        >
+          {tree.links().map(({ source, target }, index) => (
+            <path
+              key={index}
+              className={classes.line}
+              fill="none"
+              stroke={theme["--black"]}
+              strokeWidth={strokeWidth}
+              d={
+                link([
+                  [source.y ?? 0, source.x ?? 0],
+                  [target.y ?? 0, target.x ?? 0],
+                ]) ?? ""
               }
-            >
-              <circle
-                className={classes.node}
-                cx={node.y ?? 0}
-                cy={node.x ?? 0}
-                r={fontSize / 3}
-                fill={colorMap[node.data.type ?? ""]}
-                tabIndex={0}
-                role="button"
-              />
-            </Tooltip>
-          </Fragment>
-        ))}
-      </svg>
+            />
+          ))}
+
+          {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => (
+            <Fragment key={index}>
+              {!node.children && (
+                <>
+                  <line
+                    x1={node.y}
+                    x2={maxY + fontSize * 0.75}
+                    y1={node.x ?? 0}
+                    y2={node.x ?? 0}
+                    stroke={theme["--black"]}
+                    strokeWidth={strokeWidth}
+                    strokeDasharray={[strokeWidth, strokeWidth * 2].join(" ")}
+                  />
+                  <text
+                    x={maxY + fontSize}
+                    y={node.x ?? 0}
+                    fill={theme["--black"]}
+                    dominantBaseline="central"
+                    style={{ fontSize }}
+                  >
+                    {truncate(node.data.label ?? "-", { length: 20 })}
+                  </text>
+                </>
+              )}
+
+              <Tooltip
+                content={
+                  <div className="mini-table">
+                    <span>Name</span>
+                    <span>{node.data.label}</span>
+                    <span>Type</span>
+                    <span>{node.data.type}</span>
+                    {node.ancestors().length > 1 && (
+                      <>
+                        <span>Dist</span>
+                        <span>{node.data.dist?.toFixed(3)}</span>
+                        <span>From root</span>
+                        <span>{node.data.rootDist?.toFixed(3)}</span>
+                      </>
+                    )}
+                  </div>
+                }
+              >
+                <circle
+                  className={classes.node}
+                  cx={node.y ?? 0}
+                  cy={node.x ?? 0}
+                  r={fontSize / 3}
+                  fill={colorMap[node.data.type ?? ""]}
+                  tabIndex={0}
+                  role="button"
+                />
+              </Tooltip>
+            </Fragment>
+          ))}
+        </svg>
+      </div>
 
       {/* controls */}
       <Flex>
@@ -194,7 +201,8 @@ const Tree = ({ data }: Props) => {
                 icon={<FaRegImage />}
                 text="PNG"
                 onClick={() =>
-                  svgRef.current && downloadPng(svgRef.current, "tree")
+                  containerRef.current &&
+                  downloadPng(containerRef.current, "tree")
                 }
                 tooltip="High-resolution image"
               />
@@ -202,7 +210,8 @@ const Tree = ({ data }: Props) => {
                 icon={<FaRegImage />}
                 text="JPEG"
                 onClick={() =>
-                  svgRef.current && downloadJpg(svgRef.current, "tree")
+                  containerRef.current &&
+                  downloadJpg(containerRef.current, "tree")
                 }
                 tooltip="Compressed image"
               />
@@ -212,12 +221,14 @@ const Tree = ({ data }: Props) => {
                 onClick={() =>
                   svgRef.current && downloadSvg(svgRef.current, "tree")
                 }
-                tooltip="Vector image"
+                tooltip="Vector image (no legends)"
               />
               <Button
                 icon={<FaFilePdf />}
                 text="PDF"
-                onClick={() => svgRef.current && printElement(svgRef.current)}
+                onClick={() =>
+                  containerRef.current && printElement(containerRef.current)
+                }
                 tooltip="Print as pdf"
               />
             </Flex>
