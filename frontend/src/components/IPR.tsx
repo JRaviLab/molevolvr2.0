@@ -22,6 +22,7 @@ import { clamp, inRange, mapValues, range, truncate } from "lodash";
 import { useElementSize } from "@reactuses/core";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
+import Help from "@/components/Help";
 import Legend from "@/components/Legend";
 import Popover from "@/components/Popover";
 import Tooltip from "@/components/Tooltip";
@@ -51,8 +52,6 @@ type Feature = {
 };
 
 type Props = { sequence: string; tracks: Track[] };
-
-const controlTooltip = "Scroll/pinch to zoom, drag to pan";
 
 const IPR = ({ sequence, tracks }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -280,79 +279,75 @@ const IPR = ({ sequence, tracks }: Props) => {
         <div className={classes.grid}>
           {/* position */}
           <div className={classes["top-label"]}>Position</div>
-          <Tooltip content={controlTooltip}>
-            <svg
-              ref={svgRef}
-              viewBox={viewBox}
-              className={classes.row}
-              style={{ overflow: "visible" }}
+          <svg
+            ref={svgRef}
+            viewBox={viewBox}
+            className={classes.row}
+            style={{ overflow: "visible" }}
+          >
+            <g
+              textAnchor="middle"
+              dominantBaseline="central"
+              style={{ fontSize }}
+              fill={theme["--black"]}
             >
-              <g
-                textAnchor="middle"
-                dominantBaseline="central"
-                style={{ fontSize }}
-                fill={theme["--black"]}
-              >
-                {ticks.map((position) => (
-                  <text
-                    key={position}
-                    x={clamp(scaleX(position + 0.5), 0, width)}
-                    y={height / 2}
-                  >
-                    {position + 1}
-                  </text>
-                ))}
+              {ticks.map((position) => (
+                <text
+                  key={position}
+                  x={clamp(scaleX(position + 0.5), 0, width)}
+                  y={height / 2}
+                >
+                  {position + 1}
+                </text>
+              ))}
 
-                {skip > 1 && (
-                  <>
-                    <text x={0} y={height / 2}>
-                      {startPosition + 1}
-                    </text>
-                    <text x={width} y={height / 2}>
-                      {endPosition}
-                    </text>
-                  </>
-                )}
-              </g>
-            </svg>
-          </Tooltip>
+              {skip > 1 && (
+                <>
+                  <text x={0} y={height / 2}>
+                    {startPosition + 1}
+                  </text>
+                  <text x={width} y={height / 2}>
+                    {endPosition}
+                  </text>
+                </>
+              )}
+            </g>
+          </svg>
 
           {/* sequence */}
           <div className={classes["top-label"]}>Sequence</div>
-          <Tooltip content={controlTooltip}>
-            <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-              <g
-                textAnchor="middle"
-                dominantBaseline="central"
-                style={{ fontSize }}
-              >
-                {sequence.split("").map((char, index) => (
-                  <g
-                    key={index}
-                    transform={`translate(${scaleX(index + 0.5)},
+          <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
+            <g
+              textAnchor="middle"
+              dominantBaseline="central"
+              style={{ fontSize }}
+            >
+              {sequence.split("").map((char, index) => (
+                <g
+                  key={index}
+                  transform={`translate(${scaleX(index + 0.5)},
                   ${height / 2})`}
+                >
+                  <rect
+                    x={-cellSize / 2}
+                    y={-height / 2}
+                    width={cellSize}
+                    height={height}
+                    fill={theme["--deep"]}
+                    opacity={index % 2 === 0 ? 0.1 : 0.2}
+                  />
+                  <text
+                    x={0}
+                    y={0}
+                    fill={theme["--black"]}
+                    transform={`scale(${clamp(cellSize / fontSize, 0, 1)})`}
                   >
-                    <rect
-                      x={-cellSize / 2}
-                      y={-height / 2}
-                      width={cellSize}
-                      height={height}
-                      fill={theme["--deep"]}
-                      opacity={index % 2 === 0 ? 0.1 : 0.2}
-                    />
-                    <text
-                      x={0}
-                      y={0}
-                      fill={theme["--black"]}
-                      transform={`scale(${clamp(cellSize / fontSize, 0, 1)})`}
-                    >
-                      {char}
-                    </text>
-                  </g>
-                ))}
-              </g>
-            </svg>
-          </Tooltip>
+                    {char}
+                  </text>
+                </g>
+              ))}
+            </g>
+          </svg>
 
           {/* tracks */}
           {tracks.map((track, index) => (
@@ -504,6 +499,10 @@ const IPR = ({ sequence, tracks }: Props) => {
             tooltip="Download chart"
           />
         </Popover>
+
+        <Help tooltip="On main chart area, scroll/pinch to zoom, drag to move">
+          Controls
+        </Help>
       </Flex>
     </Flex>
   );

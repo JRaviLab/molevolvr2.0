@@ -7,13 +7,15 @@ import classes from "./Help.module.css";
 type Props = {
   /** tooltip content */
   tooltip: ReactNode;
+  /** content next to icon */
+  children?: ReactNode;
 };
 
 /**
  * ? button to hover/click for help tooltip. for use in other components, not
  * directly.
  */
-const Help = ({ tooltip }: Props) => (
+const Help = ({ tooltip, children }: Props) => (
   <Tooltip content={tooltip}>
     <button
       type="button"
@@ -26,6 +28,7 @@ const Help = ({ tooltip }: Props) => (
         target.focus();
       }}
     >
+      {children}
       <FaRegCircleQuestion />
     </button>
   </Tooltip>
