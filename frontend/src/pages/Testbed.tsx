@@ -300,7 +300,7 @@ const SectionTree = () => (
       Tree
     </Heading>
 
-    <Tree data={tree} leavesOnly />
+    <Tree data={tree} />
   </Section>
 );
 
