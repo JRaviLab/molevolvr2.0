@@ -6,7 +6,7 @@ import {
   FaRegImage,
 } from "react-icons/fa6";
 import { curveStepBefore, hierarchy, line } from "d3";
-import { map, max, min, orderBy, truncate } from "lodash";
+import { map, max, min, orderBy, sum, truncate } from "lodash";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
@@ -23,6 +23,8 @@ export type Item = {
   label?: string;
   /** arbitrary type/category */
   type?: string;
+  /** distance from parent */
+  dist?: number;
   /** children items */
   children?: Item[];
 };
@@ -30,8 +32,6 @@ export type Item = {
 type Props = {
   /** chart data */
   data: Item[];
-  /** whether to only show leaf nodes */
-  leavesOnly?: boolean;
 };
 
 /** grid spacing in svg units */
@@ -40,35 +40,31 @@ const size = 50;
 /** link line generator */
 const link = line().curve(curveStepBefore);
 
-const Tree = ({ data, leavesOnly }: Props) => {
+const Tree = ({ data }: Props) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   const tree = useMemo(() => {
     /** hierarchical data structure with convenient access methods */
-    const tree = hierarchy<Item & { depth?: number }>({ children: data });
+    const tree = hierarchy<Item & { rootDist?: number }>({
+      children: data,
+    });
 
     /** make leaves evenly spaced breadth-wise */
     tree.leaves().forEach((node, index) => (node.x = index * size));
 
-    /** set leaf depths */
-    tree.leaves().forEach((node) => (node.data.depth = tree.height));
-
-    /** push nodes down */
-    tree.leaves().forEach((leaf) =>
-      leaf.ancestors().forEach((node) => {
-        if (node.children)
-          node.data.depth =
-            (min(map(node.children, "data.depth")) ?? node.data.depth) - 1;
-      }),
-    );
-
-    /** position depths */
+    /** calculate distance from root */
     tree
       .descendants()
       .forEach(
         (node) =>
-          (node.y ??= (node.data.depth ?? 0) * size * (leavesOnly ? 0.5 : 1)),
+          (node.data.rootDist ??=
+            sum(node.ancestors().map((node) => node.data.dist ?? 1)) ?? 0),
       );
+
+    /** position depths */
+    tree
+      .descendants()
+      .forEach((node) => (node.y ??= node.data.rootDist! * size));
 
     /** go up tree */
     orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
@@ -81,7 +77,10 @@ const Tree = ({ data, leavesOnly }: Props) => {
       }
     });
     return tree;
-  }, [data, leavesOnly]);
+  }, [data]);
+
+  /** max node depth */
+  const maxY = max(map(tree.descendants(), "y")) ?? 0;
 
   /** reactive CSS vars */
   const theme = useTheme();
@@ -128,47 +127,53 @@ const Tree = ({ data, leavesOnly }: Props) => {
 
         {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => (
           <Fragment key={index}>
-            {!node.children || !leavesOnly ? (
-              <Tooltip
-                content={
-                  <div className="mini-table">
-                    <span>Name</span>
-                    <span>{node.data.label}</span>
-                    <span>Type</span>
-                    <span>{node.data.type}</span>
-                  </div>
-                }
-              >
-                <circle
-                  className={classes.node}
-                  cx={node.y ?? 0}
-                  cy={node.x ?? 0}
-                  r={fontSize / 3}
-                  fill={colorMap[node.data.type ?? ""]}
-                  tabIndex={0}
-                  role="button"
+            {!node.children && (
+              <>
+                <line
+                  x1={node.y}
+                  x2={maxY + fontSize * 0.75}
+                  y1={node.x ?? 0}
+                  y2={node.x ?? 0}
+                  stroke={theme["--black"]}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={[strokeWidth, strokeWidth * 2].join(" ")}
                 />
-              </Tooltip>
-            ) : (
-              <circle
-                cx={node.y ?? 0}
-                cy={node.x ?? 0}
-                r={strokeWidth * 1.5}
-                fill={theme["--black"]}
-              />
+                <text
+                  x={maxY + fontSize}
+                  y={node.x ?? 0}
+                  fill={theme["--black"]}
+                  dominantBaseline="central"
+                  style={{ fontSize }}
+                >
+                  {truncate(node.data.label ?? "-", { length: 20 })}
+                </text>
+              </>
             )}
 
-            {!node.children && (
-              <text
-                x={(node.y ?? 0) + fontSize}
-                y={node.x ?? 0}
-                fill={theme["--black"]}
-                dominantBaseline="central"
-                style={{ fontSize }}
-              >
-                {truncate(node.data.label ?? "-", { length: 20 })}
-              </text>
-            )}
+            <Tooltip
+              content={
+                <div className="mini-table">
+                  <span>Name</span>
+                  <span>{node.data.label}</span>
+                  <span>Type</span>
+                  <span>{node.data.type}</span>
+                  <span>Dist</span>
+                  <span>{node.data.dist?.toFixed(3)}</span>
+                  <span>From root</span>
+                  <span>{node.data.rootDist?.toFixed(3)}</span>
+                </div>
+              }
+            >
+              <circle
+                className={classes.node}
+                cx={node.y ?? 0}
+                cy={node.x ?? 0}
+                r={fontSize / 3}
+                fill={colorMap[node.data.type ?? ""]}
+                tabIndex={0}
+                role="button"
+              />
+            </Tooltip>
           </Fragment>
         ))}
       </svg>

@@ -55,6 +55,7 @@ export const sequence = (chars?: string, min = 10, max = 100) =>
 export const treeItem = (depth: number): TreeItem => ({
   label: label(),
   type: type(),
+  dist: Math.random() > 0.1 ? random(0.1, 2, true) : undefined,
   ...(depth > 0 && {
     children: Array(random(1, 3))
       .fill({})
