@@ -108,7 +108,7 @@ const Tree = ({ data, leavesOnly }: Props) => {
       <svg
         ref={svgRef}
         className={classes.chart}
-        style={{ height: 2 * rootFontSize() * tree.leaves().length + "px" }}
+        style={{ height: 1.5 * rootFontSize() * tree.leaves().length + "px" }}
       >
         {tree.links().map(({ source, target }, index) => (
           <path
@@ -145,8 +145,6 @@ const Tree = ({ data, leavesOnly }: Props) => {
                   cy={node.x ?? 0}
                   r={fontSize / 3}
                   fill={colorMap[node.data.type ?? ""]}
-                  stroke={theme["--black"]}
-                  strokeWidth={strokeWidth}
                   tabIndex={0}
                   role="button"
                 />
@@ -155,10 +153,8 @@ const Tree = ({ data, leavesOnly }: Props) => {
               <circle
                 cx={node.y ?? 0}
                 cy={node.x ?? 0}
-                r={strokeWidth * 2}
-                fill={theme["--white"]}
-                stroke={theme["--black"]}
-                strokeWidth={strokeWidth}
+                r={strokeWidth * 1.5}
+                fill={theme["--black"]}
               />
             )}
 

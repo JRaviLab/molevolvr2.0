@@ -83,7 +83,7 @@ const IPR = ({ sequence, tracks }: Props) => {
   /** dimensions of scrollbar */
   const [, scrollHeight] = useElementSize(scrollRef);
 
-  /** make svg font size relative to height, which is based on css font size */
+  /** font size, in svg units */
   const fontSize = useSvgTransform(
     [...svgRefs.current][0]!,
     1,

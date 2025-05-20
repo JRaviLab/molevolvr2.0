@@ -68,8 +68,8 @@
 
   /* effects */
   --rounded: 5px;
-  --fast: 0.15s ease;
-  --slow: 0.35s ease;
+  --fast: 0.1s ease;
+  --slow: 0.25s ease;
   --focus: 0 0 5px var(--accent);
   --spacing: 2;
   --compact: 1.5;

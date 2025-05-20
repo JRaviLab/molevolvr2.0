@@ -329,12 +329,12 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
   const maxChars = (radius * 2 * Math.PI * percent) / (fontSize / 1.75);
 
   return (
-    <g className={classes.segment}>
+    <g className={classes.segment} opacity={selected === false ? 0.15 : 1}>
       {/* shape */}
       <NodeTooltip {...data}>
         <path
           className={classes.shape}
-          fill={selected === false ? theme["--light-gray"] : color}
+          fill={color}
           stroke={theme["--black"]}
           strokeWidth={gapSize}
           strokeOpacity={lastSelected === true ? 1 : 0}
