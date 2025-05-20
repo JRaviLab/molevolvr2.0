@@ -196,22 +196,25 @@ const IPR = ({ sequence, tracks }: Props) => {
   }, [reset, extent, translateExtent, scaleExtent]);
 
   /** ref func for each svg */
-  const svgRef = (el: SVGSVGElement | null) => {
-    /** on mount */
-    if (el) {
-      /** attach zoom handler to this element */
-      zoomBehavior(select(el));
-      /** add to ref collection */
-      svgRefs.current.add(el);
-      /** add listeners */
-      el.addEventListener("wheel", (event) => event.preventDefault());
-      el.addEventListener("dblclick", reset);
-    }
-    return () => {
-      /** remove from ref collection on unmount/cleanup */
-      if (el) svgRefs.current.delete(el);
-    };
-  };
+  const svgRef = useCallback(
+    (el: SVGSVGElement | null) => {
+      /** on mount */
+      if (el) {
+        /** attach zoom handler to this element */
+        zoomBehavior(select(el));
+        /** add to ref collection */
+        svgRefs.current.add(el);
+        /** add listeners */
+        el.addEventListener("wheel", (event) => event.preventDefault());
+        el.addEventListener("dblclick", reset);
+      }
+      return () => {
+        /** remove from ref collection on unmount/cleanup */
+        if (el) svgRefs.current.delete(el);
+      };
+    },
+    [zoomBehavior, reset],
+  );
 
   /** scroll bar numbers */
   const scrollRatio = width / sequence.length;
