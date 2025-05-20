@@ -61,7 +61,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   const [reverse, setReverse] = useState(false);
 
   /** swap rows/cols */
-  const [swap, setTranspose] = useState(false);
+  const [swap, setSwap] = useState(false);
 
   if (swap) {
     [x, y] = [y, x];
@@ -72,7 +72,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   const theme = useTheme();
 
   /** font size, in svg units */
-  const fontSize = useSvgTransform(svgRef, 1, rootFontSize()).h;
+  const fontSize = useSvgTransform(svgRef.current, 1, rootFontSize()).h;
 
   /** col # to svg x coord */
   const xScale = scaleBand(range(0, x.labels.length), [
@@ -280,7 +280,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           label="Swap"
           tooltip="Swap rows & cols (transpose)"
           value={swap}
-          onChange={setTranspose}
+          onChange={setSwap}
         />
 
         <Popover

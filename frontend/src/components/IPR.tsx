@@ -28,7 +28,7 @@ import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import { printElement } from "@/util/dom";
 import { downloadJpg, downloadPng } from "@/util/download";
-import { useTheme } from "@/util/hooks";
+import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
 import classes from "./IPR.module.css";
 
 /** track of features */
@@ -52,13 +52,13 @@ type Feature = {
 
 type Props = { sequence: string; tracks: Track[] };
 
+const controlTooltip = "Scroll/pinch to zoom, drag to pan";
+
 const IPR = ({ sequence, tracks }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   /** collection of svg refs */
   const svgRefs = useRef(new Set<SVGSVGElement>());
-
-  /** first svg ref */
-  const firstSvg = [...svgRefs.current][0];
+  const scrollRef = useRef<SVGSVGElement>(null);
 
   /** reactive CSS vars */
   const theme = useTheme();
@@ -75,13 +75,21 @@ const IPR = ({ sequence, tracks }: Props) => {
   const [transform, setTransform] = useState(zoomIdentity);
 
   /** dimensions of first svg (all widths should be same) */
-  let [width, height] = useElementSize(firstSvg);
+  let [width, height] = useElementSize([...svgRefs.current][0]);
 
   /** set min value to avoid temporary divide by 0 errors */
-  width ||= 10;
-  height ||= 10;
+  width ||= 100;
+  height ||= 30;
 
-  const fontSize = height / 2;
+  /** dimensions of scrollbar */
+  const [, scrollHeight] = useElementSize(scrollRef);
+
+  /** make svg font size relative to height, which is based on css font size */
+  const fontSize = useSvgTransform(
+    [...svgRefs.current][0]!,
+    1,
+    rootFontSize(),
+  ).h;
 
   /** view box for all svgs */
   const viewBox = [0, 0, width, height].join(" ");
@@ -97,6 +105,9 @@ const IPR = ({ sequence, tracks }: Props) => {
   /** skip position labels based on zoom */
   const skip =
     [1, 5, 10, 20, 50, 100].find((skip) => skip * cellSize > height * 1.5) ?? 1;
+
+  /** position ticks */
+  const ticks = range(0, sequence.length, skip);
 
   type Extent = [[number, number], [number, number]];
 
@@ -182,14 +193,13 @@ const IPR = ({ sequence, tracks }: Props) => {
     };
   };
 
-  /** scroll bar props */
+  /** scroll bar numbers */
   const scrollRatio = width / sequence.length;
   const scrollLeft = scrollRatio * transform.invertX(0);
   const scrollRight = scrollRatio * transform.invertX(width);
   const scrollX = (scrollRight + scrollLeft) / 2;
-  let scrollWidth = scrollRight - scrollLeft;
-  const scrollHeight = height / 4;
-  scrollWidth = clamp(scrollWidth, scrollHeight, Infinity);
+  let scrollSpan = scrollRight - scrollLeft;
+  scrollSpan = clamp(scrollSpan, scrollHeight, Infinity);
 
   type Drag = D3DragEvent<SVGSVGElement, unknown, unknown>;
 
@@ -221,12 +231,12 @@ const IPR = ({ sequence, tracks }: Props) => {
       else
         /** if clicked on bar */
         /** scroll based on relative drag */
-        dragOffset.current = (event.x - scrollLeft) / scrollWidth;
+        dragOffset.current = (event.x - scrollLeft) / scrollSpan;
 
       /** immediately update transforms */
       onDrag(event);
     },
-    [scrollLeft, scrollWidth, onDrag],
+    [scrollLeft, scrollSpan, onDrag],
   );
 
   /** scrollbar drag behavior */
@@ -247,59 +257,65 @@ const IPR = ({ sequence, tracks }: Props) => {
         <div className={classes.grid}>
           {/* position */}
           <div className={classes["top-label"]}>Position</div>
-          <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-            <g
-              textAnchor="middle"
-              dominantBaseline="central"
-              style={{ fontSize }}
-            >
-              {range(0, sequence.length, skip).map((index) => (
-                <Fragment key={index}>
-                  <text
-                    x={scaleX(index + 0.5)}
-                    y={height / 2}
-                    fill={theme["--black"]}
-                  >
-                    {index + 1}
-                  </text>
-                </Fragment>
-              ))}
-            </g>
-          </svg>
+          <Tooltip content={controlTooltip}>
+            <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
+              <g
+                textAnchor="middle"
+                dominantBaseline="central"
+                style={{ fontSize }}
+              >
+                {ticks.map((index) => (
+                  <Fragment key={index}>
+                    <text
+                      x={scaleX(index + 0.5)}
+                      y={height / 2}
+                      fill={theme["--black"]}
+                    >
+                      {index + 1}
+                    </text>
+                  </Fragment>
+                ))}
+              </g>
+            </svg>
+          </Tooltip>
+
           {/* sequence */}
           <div className={classes["top-label"]}>Sequence</div>
-          <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-            <g
-              textAnchor="middle"
-              dominantBaseline="central"
-              style={{ fontSize }}
-            >
-              {sequence.split("").map((char, index) => (
-                <g
-                  key={index}
-                  transform={`translate(${scaleX(index + 0.5)},
+          <Tooltip content={controlTooltip}>
+            <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
+              <g
+                textAnchor="middle"
+                dominantBaseline="central"
+                style={{ fontSize }}
+              >
+                {sequence.split("").map((char, index) => (
+                  <g
+                    key={index}
+                    transform={`translate(${scaleX(index + 0.5)},
                   ${height / 2})`}
-                >
-                  <rect
-                    x={-cellSize / 2}
-                    y={-height / 2}
-                    width={cellSize}
-                    height={height}
-                    fill={theme["--deep"]}
-                    opacity={index % 2 === 0 ? 0.1 : 0.2}
-                  />
-                  <text
-                    x={0}
-                    y={0}
-                    fill={theme["--black"]}
-                    transform={`scale(${clamp(cellSize / fontSize, 0, 1)})`}
                   >
-                    {char}
-                  </text>
-                </g>
-              ))}
-            </g>
-          </svg>
+                    <rect
+                      x={-cellSize / 2}
+                      y={-height / 2}
+                      width={cellSize}
+                      height={height}
+                      fill={theme["--deep"]}
+                      opacity={index % 2 === 0 ? 0.1 : 0.2}
+                    />
+                    <text
+                      x={0}
+                      y={0}
+                      fill={theme["--black"]}
+                      transform={`scale(${clamp(cellSize / fontSize, 0, 1)})`}
+                    >
+                      {char}
+                    </text>
+                  </g>
+                ))}
+              </g>
+            </svg>
+          </Tooltip>
+
           {/* tracks */}
           {tracks.map((track, index) => (
             <Fragment key={index}>
@@ -383,6 +399,7 @@ const IPR = ({ sequence, tracks }: Props) => {
           <svg
             ref={(el) => {
               if (el) dragBehavior(select(el));
+              scrollRef.current = el;
             }}
             className={classes.scrollbar}
             viewBox={[0, 0, width, scrollHeight].join(" ")}
@@ -395,9 +412,9 @@ const IPR = ({ sequence, tracks }: Props) => {
               fill={theme["--off-white"]}
             />
             <rect
-              x={scrollX - scrollWidth / 2}
+              x={scrollX - scrollSpan / 2}
               y={0}
-              width={scrollWidth}
+              width={scrollSpan}
               height={scrollHeight}
               rx={scrollHeight / 2}
               ry={scrollHeight / 2}
@@ -419,7 +436,7 @@ const IPR = ({ sequence, tracks }: Props) => {
                 text="PNG"
                 onClick={() =>
                   containerRef.current &&
-                  downloadPng(containerRef.current, "heatmap")
+                  downloadPng(containerRef.current, "ipr")
                 }
                 tooltip="High-resolution image"
               />
@@ -428,7 +445,7 @@ const IPR = ({ sequence, tracks }: Props) => {
                 text="JPEG"
                 onClick={() =>
                   containerRef.current &&
-                  downloadJpg(containerRef.current, "heatmap")
+                  downloadJpg(containerRef.current, "ipr")
                 }
                 tooltip="Compressed image"
               />
