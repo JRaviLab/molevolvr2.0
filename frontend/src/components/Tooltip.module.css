@@ -13,6 +13,7 @@
 
 .arrow {
   fill: var(--off-white);
+  scale: 1.1;
 }
 
 .content[data-state="delayed-open"] {
