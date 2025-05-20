@@ -47,7 +47,9 @@ const Tree = ({ data }: Props) => {
     /** hierarchical data structure with convenient access methods */
     const tree = hierarchy<Item & { rootDist?: number }>({
       children: data,
-    });
+    })
+      /** sort breadth by dist */
+      .sort((a, b) => (b.data.dist ?? 1) - (a.data.dist ?? 1));
 
     /** make leaves evenly spaced breadth-wise */
     tree.leaves().forEach((node, index) => (node.x = index * size));
@@ -57,8 +59,9 @@ const Tree = ({ data }: Props) => {
       .descendants()
       .forEach(
         (node) =>
-          (node.data.rootDist ??=
-            sum(node.ancestors().map((node) => node.data.dist ?? 1)) ?? 0),
+          (node.data.rootDist ??= sum(
+            node.ancestors().map((node) => node.data.dist ?? 1),
+          )),
       );
 
     /** position depths */
@@ -157,10 +160,14 @@ const Tree = ({ data }: Props) => {
                   <span>{node.data.label}</span>
                   <span>Type</span>
                   <span>{node.data.type}</span>
-                  <span>Dist</span>
-                  <span>{node.data.dist?.toFixed(3)}</span>
-                  <span>From root</span>
-                  <span>{node.data.rootDist?.toFixed(3)}</span>
+                  {node.ancestors().length > 1 && (
+                    <>
+                      <span>Dist</span>
+                      <span>{node.data.dist?.toFixed(3)}</span>
+                      <span>From root</span>
+                      <span>{node.data.rootDist?.toFixed(3)}</span>
+                    </>
+                  )}
                 </div>
               }
             >
