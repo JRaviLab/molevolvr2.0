@@ -74,6 +74,11 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   /** font size, in svg units */
   const fontSize = useSvgTransform(svgRef.current, 1, rootFontSize()).h;
 
+  /** fit view box */
+  useEffect(() => {
+    fitViewBox(svgRef.current, 0.01);
+  });
+
   /** col # to svg x coord */
   const xScale = scaleBand(range(0, x.labels.length), [
     0,
@@ -96,12 +101,6 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   const valueScale = scaleLinear([min, max], [0, 1]);
   /** % to color */
   const colorScale = (value: number) => gradientFunc(gradient, reverse, value);
-
-  /** fit view box */
-  useEffect(() => {
-    if (!svgRef.current) return;
-    fitViewBox(svgRef.current, 0.01);
-  });
 
   /** main chart area svg units */
   const width = (xScale(x.labels.length - 1) ?? 0) + xScale.bandwidth();

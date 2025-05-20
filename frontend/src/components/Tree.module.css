@@ -1,0 +1,10 @@
+.node {
+  cursor: help;
+  transition: fill var(--fast);
+}
+
+.node:hover,
+.node:focus-visible {
+  outline: none;
+  fill: var(--black);
+}

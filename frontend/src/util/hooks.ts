@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 import { useAtomValue } from "jotai";
 import {
   useDebounceFn,
@@ -6,6 +7,7 @@ import {
   useResizeObserver,
 } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
+import { round } from "@/util/math";
 
 /** get document root font size */
 export const rootFontSize = () =>
@@ -57,16 +59,26 @@ export const useSvgTransform = (
   const update = useCallback(() => {
     if (!svg) return;
 
-    /** convert to svg coords */
-    const matrix = (svg.getScreenCTM() || new SVGMatrix()).inverse();
-    /** https://www.w3.org/TR/css-transforms-1/#decomposing-a-2d-matrix */
-    setScale({
-      w: Math.sqrt(matrix.a ** 2 + matrix.b ** 2),
-      h: Math.sqrt(matrix.c ** 2 + matrix.d ** 2),
-    });
+    /**
+     * higher iterations = faster convergence between this func and fitViewBox,
+     * but longer dom blocking (freeze)
+     */
+    for (let iteration = 1; iteration > 0; iteration--) {
+      /** convert to svg coords */
+      const matrix = (svg.getScreenCTM() || new SVGMatrix()).inverse();
+
+      /** render immediately, i.e. elements sized based on this func */
+      flushSync(() => {
+        /** https://www.w3.org/TR/css-transforms-1/#decomposing-a-2d-matrix */
+        setScale({
+          w: Math.sqrt(matrix.a ** 2 + matrix.b ** 2),
+          h: Math.sqrt(matrix.c ** 2 + matrix.d ** 2),
+        });
+      });
+    }
   }, [svg]);
 
-  const { run } = useDebounceFn(update, 20);
+  const { run } = useDebounceFn(update, 0);
 
   /**
    * check if view box value has actually changed
@@ -95,5 +107,5 @@ export const useSvgTransform = (
     attributeOldValue: true,
   });
 
-  return { w: Math.round(w * scale.w), h: Math.round(h * scale.h) };
+  return { w: round(w * scale.w, 0.01), h: round(h * scale.h, 0.01) };
 };

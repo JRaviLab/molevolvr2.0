@@ -61,8 +61,6 @@ type Derived = {
 type Node = HierarchyNode<Derived>;
 
 type Props = {
-  /** chart title */
-  title?: string;
   /** chart data */
   data: Item[];
 };
@@ -74,7 +72,7 @@ const gapSize = 1;
 /** depth/level of first ring from center */
 const startDepth = 1;
 
-const Sunburst = ({ title, data }: Props) => {
+const Sunburst = ({ data }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -83,7 +81,6 @@ const Sunburst = ({ title, data }: Props) => {
 
   /** fit view box */
   useEffect(() => {
-    if (!svgRef.current) return;
     fitViewBox(svgRef.current, 0.01);
   });
 
@@ -163,8 +160,6 @@ const Sunburst = ({ title, data }: Props) => {
         /** deselect */
         onClick={() => setSelected([])}
       >
-        {title && <strong>{title}</strong>}
-
         <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
         {/* chart container */}
@@ -285,6 +280,9 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
   const { label, color, percent, angle, selected, lastSelected } = data;
   const end = angle + percent;
 
+  /** reactive CSS vars */
+  const theme = useTheme();
+
   /** segment arc radius */
   const radius = (depth + startDepth - 0.5) * ringSize;
 
@@ -329,9 +327,6 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
 
   /** get max text chars based on arc length */
   const maxChars = (radius * 2 * Math.PI * percent) / (fontSize / 1.75);
-
-  /** reactive CSS vars */
-  const theme = useTheme();
 
   return (
     <g className={classes.segment}>
