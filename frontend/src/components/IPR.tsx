@@ -74,8 +74,8 @@ const IPR = ({ sequence, tracks }: Props) => {
   /** common pan/zoom */
   const [transform, setTransform] = useState(zoomIdentity);
 
-  /** dimensions of first svg (all widths should be same) */
-  let [width, height] = useElementSize([...svgRefs.current][0]);
+  /** dimensions of first non-overflow svg (all widths should be same) */
+  let [width, height] = useElementSize([...svgRefs.current][1]);
 
   /** set min value to avoid temporary divide by 0 errors */
   width ||= 100;
@@ -102,12 +102,32 @@ const IPR = ({ sequence, tracks }: Props) => {
   /** width of cells in svg units */
   const cellSize = scaleX(1) - scaleX(0);
 
+  /** start/end positions in view */
+  let startPosition = Math.floor(scaleX.invert(0));
+  let endPosition = Math.ceil(scaleX.invert(width));
+  startPosition = clamp(startPosition, 0, sequence.length);
+  endPosition = clamp(endPosition, 0, sequence.length);
+
   /** skip position labels based on zoom */
   const skip =
     [1, 5, 10, 20, 50, 100].find((skip) => skip * cellSize > height * 1.5) ?? 1;
 
   /** position ticks */
-  const ticks = range(0, sequence.length, skip);
+  const ticks = range(startPosition, endPosition).filter(
+    (position) => position % skip === 0,
+  );
+
+  /** remove ticks if too close to start/end labels */
+  if (skip > 1) {
+    const first = ticks.at(0);
+    const last = ticks.at(-1);
+    if (first !== undefined)
+      if (first === startPosition || scaleX(first + 0.5) < fontSize * 2)
+        ticks.shift();
+    if (last !== undefined)
+      if (last === endPosition || width - scaleX(last + 0.5) < fontSize * 2)
+        ticks.pop();
+  }
 
   type Extent = [[number, number], [number, number]];
 
@@ -258,23 +278,38 @@ const IPR = ({ sequence, tracks }: Props) => {
           {/* position */}
           <div className={classes["top-label"]}>Position</div>
           <Tooltip content={controlTooltip}>
-            <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
+            <svg
+              ref={svgRef}
+              viewBox={viewBox}
+              className={classes.row}
+              style={{ overflow: "visible" }}
+            >
               <g
                 textAnchor="middle"
                 dominantBaseline="central"
                 style={{ fontSize }}
+                fill={theme["--black"]}
               >
-                {ticks.map((index) => (
-                  <Fragment key={index}>
-                    <text
-                      x={scaleX(index + 0.5)}
-                      y={height / 2}
-                      fill={theme["--black"]}
-                    >
-                      {index + 1}
-                    </text>
-                  </Fragment>
+                {ticks.map((position) => (
+                  <text
+                    key={position}
+                    x={clamp(scaleX(position + 0.5), 0, width)}
+                    y={height / 2}
+                  >
+                    {position + 1}
+                  </text>
                 ))}
+
+                {skip > 1 && (
+                  <>
+                    <text x={0} y={height / 2}>
+                      {startPosition + 1}
+                    </text>
+                    <text x={width} y={height / 2}>
+                      {endPosition}
+                    </text>
+                  </>
+                )}
               </g>
             </svg>
           </Tooltip>
@@ -333,7 +368,7 @@ const IPR = ({ sequence, tracks }: Props) => {
                 <g
                   textAnchor="middle"
                   dominantBaseline="central"
-                  style={{ fontSize: height / 2 }}
+                  style={{ fontSize }}
                 >
                   {track.features.map(
                     ({ id, label, type, start, end }, index) => {
