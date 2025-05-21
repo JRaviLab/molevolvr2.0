@@ -61,24 +61,29 @@ const Tree = ({ data }: Props) => {
     /** hierarchical data structure with convenient access methods */
     const tree = hierarchy<Node>({ children: data });
 
-    /** make leaves evenly spaced breadth-wise */
-    tree.leaves().forEach((node, index) => (node.x = index * size));
+    /** set fallbacks */
+    tree
+      .descendants()
+      .forEach((node) => (node.data.dist ??= node.depth > 0 ? 1 : 0));
 
     /** calculate distance from root */
     tree.descendants().forEach((node) => {
       node.data.id = uniqueId();
       node.data.rootDist ??= sum(
-        node.ancestors().map((node) => node.data.dist ?? 1),
+        node.ancestors().map((node) => node.data.dist ?? 0),
       );
     });
 
     /** sort breadth by dist */
-    tree.sort((a, b) => (b.data.rootDist ?? 1) - (a.data.rootDist ?? 1));
+    tree.sort((a, b) => (b.data.rootDist ?? 0) - (a.data.rootDist ?? 0));
 
     /** position depths */
     tree
       .descendants()
-      .forEach((node) => (node.y ??= node.data.rootDist! * size));
+      .forEach((node) => (node.y ??= (node.data.rootDist ?? 0) * size));
+
+    /** make leaves evenly spaced breadth-wise */
+    tree.leaves().forEach((node, index) => (node.x = index * size));
 
     /** go up tree */
     orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
@@ -86,10 +91,14 @@ const Tree = ({ data }: Props) => {
         /** position node in middle of children */
         const xs = map(node.children ?? [], "x");
         node.x = ((min(xs) ?? 0) + (max(xs) ?? 0)) / 2;
-        /** snap to grid */
-        node.x = round(node.x, size);
       }
     });
+
+    /** snap to grid */
+    tree.descendants().forEach((node) => {
+      node.x = round(node.x ?? 0, size);
+    });
+
     return tree;
   }, [data]);
 
@@ -156,17 +165,22 @@ const Tree = ({ data }: Props) => {
           }}
         >
           {tree.links().map(({ source, target }, index) => {
-            const selected =
-              selectedPath.length &&
-              selectedPath.includes(source) &&
-              selectedPath.includes(target);
+            /** is link selected */
+            const isSelected =
+              selected.length > 1
+                ? selectedPath.includes(source) && selectedPath.includes(target)
+                : selected.length === 1
+                  ? false
+                  : null;
+
             return (
               <path
                 key={index}
                 className={classes.line}
                 fill="none"
-                stroke={selected ? theme["--accent"] : theme["--black"]}
-                strokeWidth={selected ? strokeWidth * 2 : strokeWidth}
+                stroke={isSelected ? theme["--accent"] : theme["--black"]}
+                strokeWidth={isSelected ? strokeWidth * 2 : strokeWidth}
+                opacity={isSelected === false ? 0.25 : 1}
                 d={
                   link([
                     [source.y ?? 0, source.x ?? 0],
@@ -177,79 +191,84 @@ const Tree = ({ data }: Props) => {
             );
           })}
 
-          {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => (
-            <Fragment key={index}>
-              {!node.children && (
-                <>
-                  <line
-                    x1={node.y}
-                    x2={maxY + fontSize * 0.75}
-                    y1={node.x ?? 0}
-                    y2={node.x ?? 0}
-                    stroke={theme["--black"]}
-                    strokeWidth={strokeWidth}
-                    strokeDasharray={[strokeWidth, strokeWidth * 2].join(" ")}
-                  />
-                  <text
-                    x={maxY + fontSize}
-                    y={node.x ?? 0}
-                    fill={theme["--black"]}
-                    dominantBaseline="central"
-                    style={{ fontSize }}
-                  >
-                    {truncate(node.data.label ?? "-", { length: 20 })}
-                  </text>
-                </>
-              )}
+          {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => {
+            /** is node selected */
+            const isSelected = selected.length
+              ? selected.includes(node) || selectedPath.includes(node)
+              : null;
 
-              <Tooltip
-                content={
+            return (
+              <Fragment key={index}>
+                {!node.children && (
                   <>
-                    <div className="mini-table">
-                      <span>Name</span>
-                      <span>{node.data.label}</span>
-                      <span>Type</span>
-                      <span>{node.data.type}</span>
-                      {node.ancestors().length > 1 && (
-                        <>
-                          <span>Dist</span>
-                          <span>{node.data.dist?.toFixed(3)}</span>
-                          <span>From root</span>
-                          <span>{node.data.rootDist?.toFixed(3)}</span>
-                        </>
-                      )}
-                    </div>
-                    Click to select
+                    <line
+                      x1={node.y}
+                      x2={maxY + fontSize * 0.75}
+                      y1={node.x ?? 0}
+                      y2={node.x ?? 0}
+                      stroke={theme["--black"]}
+                      strokeWidth={strokeWidth}
+                      strokeDasharray={[strokeWidth, strokeWidth * 2].join(" ")}
+                    />
+                    <text
+                      x={maxY + fontSize}
+                      y={node.x ?? 0}
+                      fill={theme["--black"]}
+                      dominantBaseline="central"
+                      style={{ fontSize }}
+                    >
+                      {truncate(node.data.label ?? "-", { length: 20 })}
+                    </text>
                   </>
-                }
-              >
-                <circle
-                  className={classes.node}
-                  cx={node.y ?? 0}
-                  cy={node.x ?? 0}
-                  r={fontSize / 3}
-                  fill={colorMap[node.data.type ?? ""]}
-                  tabIndex={0}
-                  role="button"
-                  opacity={
-                    selected.length && !selected.includes(node) ? 0.25 : 1
+                )}
+
+                <Tooltip
+                  content={
+                    <>
+                      <div className="mini-table">
+                        <span>Name</span>
+                        <span>{node.data.label}</span>
+                        <span>Type</span>
+                        <span>{node.data.type}</span>
+                        {node.ancestors().length > 1 && (
+                          <>
+                            <span>Dist</span>
+                            <span>{node.data.dist?.toFixed(3)}</span>
+                            <span>From root</span>
+                            <span>{node.data.rootDist?.toFixed(3)}</span>
+                          </>
+                        )}
+                      </div>
+                      Click to select
+                    </>
                   }
-                  onClick={(event) => {
-                    /** prevent deselect from container onClick */
-                    event.stopPropagation();
-                    select(node);
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
+                >
+                  <circle
+                    className={classes.node}
+                    cx={node.y ?? 0}
+                    cy={node.x ?? 0}
+                    r={fontSize / 3}
+                    fill={colorMap[node.data.type ?? ""]}
+                    tabIndex={0}
+                    role="button"
+                    opacity={isSelected === false ? 0.25 : 1}
+                    onClick={(event) => {
+                      /** prevent deselect from container onClick */
+                      event.stopPropagation();
                       select(node);
-                    }
-                    if (event.key === "Escape") deselect();
-                  }}
-                />
-              </Tooltip>
-            </Fragment>
-          ))}
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        select(node);
+                      }
+                      if (event.key === "Escape") deselect();
+                    }}
+                  />
+                </Tooltip>
+              </Fragment>
+            );
+          })}
         </svg>
 
         {/* selected */}
