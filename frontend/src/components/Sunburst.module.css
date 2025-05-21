@@ -6,8 +6,8 @@
 }
 
 .chart {
-  max-width: 100%;
   justify-self: center;
+  max-width: 100%;
 }
 
 .segment {
