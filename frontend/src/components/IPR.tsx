@@ -346,8 +346,8 @@ const IPR = ({ sequence, tracks }: Props) => {
                     y={-height / 2}
                     width={cellSize}
                     height={height}
-                    fill={theme["--deep"]}
-                    opacity={index % 2 === 0 ? 0.1 : 0.2}
+                    fill={theme["--light-gray"]}
+                    opacity={index % 2 === 0 ? 0.25 : 0.5}
                   />
                   <text
                     x={0}
