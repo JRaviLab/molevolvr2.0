@@ -150,6 +150,9 @@ const Sunburst = ({ data }: Props) => {
     [tree, colorMap, selected, anySelected],
   );
 
+  /** clear selection */
+  const deselect = () => setSelected([]);
+
   return (
     <Flex direction="column" gap="lg" full>
       {/* keyboard listener not necessary here because we have one below */}
@@ -157,8 +160,7 @@ const Sunburst = ({ data }: Props) => {
       <div
         ref={containerRef}
         className={clsx("card", classes.container)}
-        /** deselect */
-        onClick={() => setSelected([])}
+        onClick={deselect}
       >
         <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
@@ -168,6 +170,7 @@ const Sunburst = ({ data }: Props) => {
           className={classes.chart}
           style={{
             fontSize,
+            /** size based on number of rings */
             height: 2 * 2 * rootFontSize() * (tree.height + startDepth),
           }}
         >
@@ -178,10 +181,10 @@ const Sunburst = ({ data }: Props) => {
                   fontSize={fontSize}
                   select={() =>
                     node.data.lastSelected
-                      ? setSelected([])
+                      ? deselect()
                       : setSelected(node.ancestors().slice(0, -1).reverse())
                   }
-                  deselect={() => setSelected([])}
+                  deselect={deselect}
                   node={node}
                 />
               )}
@@ -336,7 +339,7 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
   const maxChars = (radius * 2 * Math.PI * percent) / (fontSize / 1.75);
 
   return (
-    <g className={classes.segment} opacity={selected === false ? 0.15 : 1}>
+    <g className={classes.segment} opacity={selected === false ? 0.25 : 1}>
       {/* shape */}
       <NodeTooltip {...data}>
         <path

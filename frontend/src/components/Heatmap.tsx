@@ -123,7 +123,8 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           className={classes.chart}
           style={{
             fontSize,
-            height: 2 * rootFontSize() * data.length,
+            /** size based on number of rows */
+            height: 2 * rootFontSize() * (data.length + 2),
           }}
         >
           {/* cells */}

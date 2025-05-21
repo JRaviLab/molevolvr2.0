@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   FaBezierCurve,
   FaDownload,
@@ -6,8 +6,17 @@ import {
   FaRegImage,
 } from "react-icons/fa6";
 import clsx from "clsx";
-import { curveStepBefore, hierarchy, line } from "d3";
-import { map, mapValues, max, min, orderBy, sum, truncate } from "lodash";
+import { curveStepBefore, hierarchy, line, type HierarchyNode } from "d3";
+import {
+  map,
+  mapValues,
+  max,
+  min,
+  orderBy,
+  sum,
+  truncate,
+  uniqueId,
+} from "lodash";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
@@ -46,26 +55,25 @@ const Tree = ({ data }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
+  type Node = Item & { id?: string; rootDist?: number };
+
   const tree = useMemo(() => {
     /** hierarchical data structure with convenient access methods */
-    const tree = hierarchy<Item & { rootDist?: number }>({
-      children: data,
-    })
-      /** sort breadth by dist */
-      .sort((a, b) => (b.data.dist ?? 1) - (a.data.dist ?? 1));
+    const tree = hierarchy<Node>({ children: data });
 
     /** make leaves evenly spaced breadth-wise */
     tree.leaves().forEach((node, index) => (node.x = index * size));
 
     /** calculate distance from root */
-    tree
-      .descendants()
-      .forEach(
-        (node) =>
-          (node.data.rootDist ??= sum(
-            node.ancestors().map((node) => node.data.dist ?? 1),
-          )),
+    tree.descendants().forEach((node) => {
+      node.data.id = uniqueId();
+      node.data.rootDist ??= sum(
+        node.ancestors().map((node) => node.data.dist ?? 1),
       );
+    });
+
+    /** sort breadth by dist */
+    tree.sort((a, b) => (b.data.rootDist ?? 1) - (a.data.rootDist ?? 1));
 
     /** position depths */
     tree
@@ -84,6 +92,14 @@ const Tree = ({ data }: Props) => {
     });
     return tree;
   }, [data]);
+
+  /** selected nodes */
+  const [selected, setSelected] = useState<HierarchyNode<Node>[]>([]);
+  const selectedA = selected[0];
+  const selectedB = selected[1];
+
+  /** path between selected nodes */
+  const selectedPath = selectedA && selectedB ? selectedA.path(selectedB) : [];
 
   /** max node depth */
   const maxY = max(map(tree.descendants(), "y")) ?? 0;
@@ -105,34 +121,61 @@ const Tree = ({ data }: Props) => {
     "mode",
   );
 
+  /** line thickness, based on font size */
   const strokeWidth = fontSize / 15;
+
+  /** clear selection */
+  const deselect = () => setSelected([]);
+
+  /** select node */
+  const select = (node: HierarchyNode<Node>) =>
+    setSelected(
+      selected.includes(node)
+        ? selected.filter((n) => n !== node)
+        : selected.slice(0, 1).concat([node]),
+    );
 
   return (
     <Flex direction="column" gap="lg" full>
-      <div ref={containerRef} className={clsx("card", classes.container)}>
+      {/* keyboard listener not necessary here because we have one below */}
+      {/* eslint-disable-next-line */}
+      <div
+        ref={containerRef}
+        className={clsx("card", classes.container)}
+        onClick={deselect}
+      >
         <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
         {/* chart */}
         <svg
           ref={svgRef}
           className={classes.chart}
-          style={{ height: 2 * rootFontSize() * tree.leaves().length }}
+          style={{
+            /** size based on tree depth */
+            height: 2 * rootFontSize() * tree.leaves().length,
+          }}
         >
-          {tree.links().map(({ source, target }, index) => (
-            <path
-              key={index}
-              className={classes.line}
-              fill="none"
-              stroke={theme["--black"]}
-              strokeWidth={strokeWidth}
-              d={
-                link([
-                  [source.y ?? 0, source.x ?? 0],
-                  [target.y ?? 0, target.x ?? 0],
-                ]) ?? ""
-              }
-            />
-          ))}
+          {tree.links().map(({ source, target }, index) => {
+            const selected =
+              selectedPath.length &&
+              selectedPath.includes(source) &&
+              selectedPath.includes(target);
+            return (
+              <path
+                key={index}
+                className={classes.line}
+                fill="none"
+                stroke={selected ? theme["--accent"] : theme["--black"]}
+                strokeWidth={selected ? strokeWidth * 2 : strokeWidth}
+                d={
+                  link([
+                    [source.y ?? 0, source.x ?? 0],
+                    [target.y ?? 0, target.x ?? 0],
+                  ]) ?? ""
+                }
+              />
+            );
+          })}
 
           {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => (
             <Fragment key={index}>
@@ -161,20 +204,23 @@ const Tree = ({ data }: Props) => {
 
               <Tooltip
                 content={
-                  <div className="mini-table">
-                    <span>Name</span>
-                    <span>{node.data.label}</span>
-                    <span>Type</span>
-                    <span>{node.data.type}</span>
-                    {node.ancestors().length > 1 && (
-                      <>
-                        <span>Dist</span>
-                        <span>{node.data.dist?.toFixed(3)}</span>
-                        <span>From root</span>
-                        <span>{node.data.rootDist?.toFixed(3)}</span>
-                      </>
-                    )}
-                  </div>
+                  <>
+                    <div className="mini-table">
+                      <span>Name</span>
+                      <span>{node.data.label}</span>
+                      <span>Type</span>
+                      <span>{node.data.type}</span>
+                      {node.ancestors().length > 1 && (
+                        <>
+                          <span>Dist</span>
+                          <span>{node.data.dist?.toFixed(3)}</span>
+                          <span>From root</span>
+                          <span>{node.data.rootDist?.toFixed(3)}</span>
+                        </>
+                      )}
+                    </div>
+                    Click to select
+                  </>
                 }
               >
                 <circle
@@ -185,11 +231,40 @@ const Tree = ({ data }: Props) => {
                   fill={colorMap[node.data.type ?? ""]}
                   tabIndex={0}
                   role="button"
+                  opacity={
+                    selected.length && !selected.includes(node) ? 0.25 : 1
+                  }
+                  onClick={(event) => {
+                    /** prevent deselect from container onClick */
+                    event.stopPropagation();
+                    select(node);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      select(node);
+                    }
+                    if (event.key === "Escape") deselect();
+                  }}
                 />
               </Tooltip>
             </Fragment>
           ))}
         </svg>
+
+        {/* selected */}
+        {selectedPath.length > 1 && (
+          <div className={clsx("mini-table", classes.selected)}>
+            <span>From</span>
+            <span>{selectedA?.data.label}</span>
+            <span>To</span>
+            <span>{selectedB?.data.label}</span>
+            <span>Dist.</span>
+            <span>{sum(map(selectedPath, "data.dist") ?? 0).toFixed(2)}</span>
+            <span>Nodes</span>
+            <span>{selectedPath.length}</span>
+          </div>
+        )}
       </div>
 
       {/* controls */}

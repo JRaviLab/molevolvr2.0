@@ -1,6 +1,6 @@
 .container {
   display: grid;
-  grid-template-columns: max-content auto;
+  grid-template-columns: auto auto;
   place-content: center;
   align-items: center;
   padding: 20px;
@@ -20,6 +20,12 @@
 .node:focus-visible {
   outline: none;
   fill: var(--black);
+}
+
+.selected {
+  grid-column: 1 / -1;
+  width: 0;
+  min-width: 100%;
 }
 
 @media (max-width: 800px) {
