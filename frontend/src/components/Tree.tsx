@@ -248,10 +248,13 @@ const Tree = ({ data }: Props) => {
                     cx={node.y ?? 0}
                     cy={node.x ?? 0}
                     r={fontSize / 3}
-                    fill={colorMap[node.data.type ?? ""]}
+                    fill={
+                      isSelected === false
+                        ? theme["--light-gray"]
+                        : colorMap[node.data.type ?? ""]
+                    }
                     tabIndex={0}
                     role="button"
-                    opacity={isSelected === false ? 0.25 : 1}
                     onClick={(event) => {
                       /** prevent deselect from container onClick */
                       event.stopPropagation();
@@ -279,9 +282,10 @@ const Tree = ({ data }: Props) => {
             <span>To</span>
             <span>{selectedB?.data.label}</span>
             <span>Dist.</span>
-            <span>{sum(map(selectedPath, "data.dist") ?? 0).toFixed(2)}</span>
-            <span>Nodes</span>
-            <span>{selectedPath.length}</span>
+            <span>
+              {sum(map(selectedPath, "data.dist") ?? 0).toFixed(2)} (
+              {selectedPath.length} nodes)
+            </span>
           </div>
         )}
       </div>
