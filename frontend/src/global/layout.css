@@ -47,6 +47,7 @@
   display: grid;
   grid-template-columns: auto auto;
   grid-auto-rows: min-content;
+  justify-content: flex-start;
   gap: 5px 20px;
   text-align: left;
 }

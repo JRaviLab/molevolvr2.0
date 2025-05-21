@@ -12,7 +12,7 @@ import colors from "./colors.json";
  */
 
 /** neutral hue */
-const neutral = "zinc";
+const neutral = "slate";
 
 /** stagger hues to provide more contrast/distinction between successive colors */
 export const hues = [
