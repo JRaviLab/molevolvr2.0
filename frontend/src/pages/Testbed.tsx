@@ -58,6 +58,7 @@ import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import Sunburst from "@/components/Sunburst";
+import Svg from "@/components/Svg";
 import Table from "@/components/Table";
 import Tabs, { Tab } from "@/components/Tabs";
 import TextBox from "@/components/TextBox";
@@ -85,58 +86,100 @@ import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
 
 /** test and example usage of formatting, elements, components, etc. */
-const TestbedPage = () => (
-  <>
-    <Meta title="Testbed" />
+const TestbedPage = () => {
+  return <SvgSection />;
 
-    <Section>
-      <Heading level={1}>Testbed</Heading>
-    </Section>
+  return (
+    <>
+      <Meta title="Testbed" />
 
-    {/* complex components */}
+      <Section>
+        <Heading level={1}>Testbed</Heading>
+      </Section>
 
-    <SectionUpset />
-    <SectionSunburst />
-    <SectionHeatmap />
-    <SectionTree />
-    <SectionNetwork />
-    <SectionMSA />
-    <SectionIPR />
+      {/* complex components */}
 
-    {/* formatting */}
+      <SectionUpset />
+      <SectionSunburst />
+      <SectionHeatmap />
+      <SectionTree />
+      <SectionNetwork />
+      <SectionMSA />
+      <SectionIPR />
 
-    <SectionElements />
-    <SectionHeading />
+      {/* formatting */}
 
-    {/* generic components */}
+      <SectionElements />
+      <SectionHeading />
 
-    <SectionLink />
-    <SectionButton />
-    <SectionTextBox />
-    <SectionSelect />
-    <SectionCheckBox />
-    <SectionSlider />
-    <SectionNumberBox />
-    <SectionRadios />
-    <SectionAgo />
-    <SectionAlert />
-    <SectionTabs />
-    <SectionToast />
-    <SectionCollapsible />
-    <SectionTile />
-    <SectionTable />
-    <SectionTooltip />
-    <SectionPopover />
-    <SectionDialog />
+      {/* generic components */}
 
-    {/* misc */}
+      <SectionLink />
+      <SectionButton />
+      <SectionTextBox />
+      <SectionSelect />
+      <SectionCheckBox />
+      <SectionSlider />
+      <SectionNumberBox />
+      <SectionRadios />
+      <SectionAgo />
+      <SectionAlert />
+      <SectionTabs />
+      <SectionToast />
+      <SectionCollapsible />
+      <SectionTile />
+      <SectionTable />
+      <SectionTooltip />
+      <SectionPopover />
+      <SectionDialog />
 
-    <SectionForm />
-    <SectionCSS />
-  </>
-);
+      {/* misc */}
+
+      <SectionForm />
+      <SectionCSS />
+    </>
+  );
+};
 
 export default TestbedPage;
+
+/** svg wrapper */
+const SvgSection = () => {
+  const elements = [
+    { x: -50, y: -50, width: 100, height: 50, fill: "blue" },
+    { x: 50, y: 50, width: 50, height: 100, fill: "red" },
+    { x: -100, y: 50, width: 50, height: 50, fill: "green" },
+    { x: -100, y: 200, width: "10em", height: "3em", fill: "magenta" },
+  ];
+
+  return (
+    <Section>
+      <Flex>
+        {elements.map(({ width, height, fill }, index) => (
+          <div key={index} style={{ width, height, background: fill }} />
+        ))}
+      </Flex>
+
+      <div
+        className="card"
+        style={{ display: "flex", width: "100%", justifyContent: "center" }}
+      >
+        <Svg>
+          {elements.map((block, index) => (
+            <rect
+              key={index}
+              x={block.x}
+              y={block.y}
+              width={block.width}
+              height={block.height}
+              fill={block.fill}
+            />
+          ))}
+        </Svg>
+      </div>
+    </Section>
+  );
+};
 
 /* regular html elements and css classes for basic formatting */
 const SectionElements = () => {

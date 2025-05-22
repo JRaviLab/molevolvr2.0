@@ -7,7 +7,6 @@ import {
   useResizeObserver,
 } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
-import { round } from "@/util/math";
 
 /** get document root font size */
 export const rootFontSize = () =>
@@ -107,5 +106,5 @@ export const useSvgTransform = (
     attributeOldValue: true,
   });
 
-  return { w: round(w * scale.w, 0.01), h: round(h * scale.h, 0.01) };
+  return { w: w * scale.w, h: h * scale.h };
 };

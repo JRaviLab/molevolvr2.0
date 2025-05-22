@@ -160,20 +160,33 @@ export const isCovering = (
   return false;
 };
 
+/** get scale factor */
+export const getSvgTransform = (svg: SVGSVGElement | null) => {
+  if (!svg) return { w: 1, h: 1 };
+  /** convert to svg coords */
+  const matrix = (svg.getScreenCTM() || new SVGMatrix()).inverse();
+  /** https://www.w3.org/TR/css-transforms-1/#decomposing-a-2d-matrix */
+  return {
+    w: Math.sqrt(matrix.a ** 2 + matrix.b ** 2),
+    h: Math.sqrt(matrix.c ** 2 + matrix.d ** 2),
+  };
+};
+
+/** get view box that fits to contents of svg */
+export const getViewBoxFit = (svg: SVGSVGElement | null) => {
+  if (!svg) return { x: 0, y: 0, w: 10, h: 10 };
+  const bbox = svg.getBBox();
+  return { x: bbox.x, y: bbox.y, w: bbox.width, h: bbox.height };
+};
+
 /** fit view box to contents of svg */
 export const fitViewBox = (svg?: SVGSVGElement | null, paddingPercent = 0) => {
   if (!svg) return { x: 0, y: 0, width: 100, height: 100 };
-  let { x, y, width, height } = svg.getBBox();
-  const padding = Math.min(width, height) * paddingPercent;
-  x -= padding;
-  y -= padding;
-  width += padding * 2;
-  height += padding * 2;
-  const viewBox = [x, y, width, height].map((v) => round(v, 0.01)).join(" ");
+  const { x, y, width, height } = svg.getBBox();
+  const viewBox = [x, y, width, height].join(" ");
   svg.setAttribute("viewBox", viewBox);
   return { x, y, width, height };
 };
-
 /** open browser print dialog with just one element shown */
 export const printElement = async (
   element: Element,
