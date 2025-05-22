@@ -1,0 +1,9 @@
+.container {
+  display: grid;
+  grid-template-columns: auto;
+  padding: 20px;
+}
+
+.chart {
+  max-width: 100%;
+}

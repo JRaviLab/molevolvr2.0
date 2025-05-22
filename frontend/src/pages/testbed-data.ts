@@ -17,7 +17,7 @@ export const words =
 export const phrases = () =>
   range(1, 10 + 1).map((index) =>
     Array(index)
-      .fill("")
+      .fill(null)
       .map(() => sample(words))
       .join(" "),
   );
@@ -51,45 +51,33 @@ export const sequence = (chars?: string, min = 10, max = 100) =>
     .map(() => char(chars))
     .join("");
 
-/** generate fake tree item data */
-export const treeItem = (depth: number): TreeItem => ({
-  label: label(),
-  type: type(),
-  dist: Math.random() > 0.1 ? random(0.1, 2, true) : undefined,
-  ...(depth > 0 && {
-    children: Array(random(1, 3))
-      .fill({})
-      .map(() => treeItem(depth - 1)),
-  }),
-});
-
-/** fake sunburst data */
-export const tree = [treeItem(random(1, 3)), treeItem(random(1, 3))];
-
-/** fake heatmap data */
-const heatmapCols = random(5, 20);
-const heatmapRows = random(5, 20);
-const heatmapMin = random(-100, 0);
-const heatmapMax = random(0, 100);
-export const heatmap = {
+/** fake upset data */
+const upsetCols = random(5, 20);
+const upsetRows = random(5, 20);
+export const upset = {
   x: {
-    label: "Lorem",
-    labels: Array(heatmapCols).fill("").map(label),
+    data: Array(upsetCols)
+      .fill(null)
+      .map(() => ({
+        value: random(0, 100),
+      })),
   },
   y: {
-    label: "Ipsum",
-    labels: Array(heatmapRows).fill("").map(label),
+    label: "Lorem",
+    data: Array(upsetRows)
+      .fill(null)
+      .map(() => ({
+        label: label(),
+        value: random(0, 100),
+      })),
   },
-  data: Array(heatmapRows)
-    .fill({})
+  data: Array(upsetRows)
+    .fill(null)
     .map(() =>
-      Array(heatmapCols)
-        .fill({})
-        .map(() =>
-          Math.random() > 0.1 ? random(heatmapMin, heatmapMax) : undefined,
-        ),
+      Array(upsetCols)
+        .fill(null)
+        .map(() => Math.random() > 0.5),
     ),
-  legend: "Dolor",
 };
 
 /** generate fake sunburst item data */
@@ -99,7 +87,7 @@ export const sunburstItem = (depth: number): SunburstItem => ({
   value: random(10, 100),
   ...(depth > 0 && {
     children: Array(random(1, 2))
-      .fill({})
+      .fill(null)
       .map(() => sunburstItem(depth - 1)),
   }),
 });
@@ -110,6 +98,47 @@ export const sunburst = [
   sunburstItem(random(1, 3)),
   sunburstItem(random(1, 3)),
 ];
+
+/** fake heatmap data */
+const heatmapCols = random(5, 20);
+const heatmapRows = random(5, 20);
+const heatmapMin = random(-100, 0);
+const heatmapMax = random(0, 100);
+export const heatmap = {
+  x: {
+    label: "Lorem",
+    labels: Array(heatmapCols).fill(null).map(label),
+  },
+  y: {
+    label: "Ipsum",
+    labels: Array(heatmapRows).fill(null).map(label),
+  },
+  data: Array(heatmapRows)
+    .fill(null)
+    .map(() =>
+      Array(heatmapCols)
+        .fill(null)
+        .map(() =>
+          Math.random() > 0.1 ? random(heatmapMin, heatmapMax) : undefined,
+        ),
+    ),
+  legend: "Dolor",
+};
+
+/** generate fake tree item data */
+export const treeItem = (depth: number): TreeItem => ({
+  label: label(),
+  type: type(),
+  dist: Math.random() > 0.1 ? random(0.1, 2, true) : undefined,
+  ...(depth > 0 && {
+    children: Array(random(1, 3))
+      .fill(null)
+      .map(() => treeItem(depth - 1)),
+  }),
+});
+
+/** fake sunburst data */
+export const tree = [treeItem(random(1, 3)), treeItem(random(1, 3))];
 
 /** fake node data */
 export const nodes = Array(200)
@@ -155,6 +184,20 @@ for (let times = 0; times < 10; times++) {
   edges.push({ ...edge, id: uniqueId(), source: id, target: id });
 }
 
+/** fake msa sequence */
+export const msaSequence = sequence(undefined, 10, 500);
+
+/** fake msa track data */
+export const msaTracks = Array(random(2, 5))
+  .fill(null)
+  .map(() => ({
+    label: label(),
+    extraField: label(),
+    sequence: [...msaSequence]
+      .map((c) => (Math.random() > 0.9 ? char() : c))
+      .join(""),
+  }));
+
 /** fake interproscan sequence */
 export const iprSequence = sequence("GATC", 50, 200);
 
@@ -173,18 +216,4 @@ export const iprTracks = Array(random(5, 10))
         );
         return { id: uniqueId(), label: label(), type: type(), start, end };
       }),
-  }));
-
-/** fake msa sequence */
-export const msaSequence = sequence(undefined, 10, 500);
-
-/** fake msa track data */
-export const msaTracks = Array(random(2, 5))
-  .fill(null)
-  .map(() => ({
-    label: label(),
-    extraField: label(),
-    sequence: [...msaSequence]
-      .map((c) => (Math.random() > 0.9 ? char() : c))
-      .join(""),
   }));

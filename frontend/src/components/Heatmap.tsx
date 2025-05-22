@@ -21,14 +21,14 @@ import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
 import classes from "./Heatmap.module.css";
 
 type Props = {
-  /** x-axis data */
+  /** x-axis */
   x: {
     /** axis label */
     label?: string;
     /** column labels */
     labels: (string | undefined)[];
   };
-  /** y-axis data */
+  /** y-axis */
   y: {
     /** axis label */
     label?: string;
@@ -45,13 +45,10 @@ type Props = {
   max?: number;
 };
 
-/** options, in svg units (relative): */
-const cellWidth = 50;
-const cellHeight = 50;
-const legendHeight = 300;
-
+/** label char limit */
 const labelTruncate = 10;
 
+/** heatmap plot */
 const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -81,15 +78,22 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
     fitViewBox(svgRef.current, 0.01);
   });
 
+  /** sizes of elements, in svg units */
+  const cellSize = Math.min(50, fontSize * 2);
+  const legendHeight = Math.min(
+    cellSize * Math.max(0, data.length - 2),
+    cellSize * 5,
+  );
+
   /** col # to svg x coord */
   const xScale = scaleBand(range(0, x.labels.length), [
     0,
-    x.labels.length * cellWidth,
+    x.labels.length * cellSize,
   ]);
   /** row # to svg y coord */
   const yScale = scaleBand(range(0, y.labels.length), [
     0,
-    y.labels.length * cellHeight,
+    y.labels.length * cellSize,
   ]);
 
   /** value range */
@@ -123,7 +127,6 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           className={classes.chart}
           style={{
             fontSize,
-            /** size based on number of rows */
             height: 2 * rootFontSize() * (data.length + 2),
           }}
         >
@@ -227,12 +230,12 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           {/* legend */}
           <g
             fill={theme["--black"]}
-            transform={`translate(${width + fontSize * 4}, ${height * 0.5 - legendHeight / 2})`}
+            transform={`translate(${width + cellSize * 2.5}, ${height * 0.5 - legendHeight / 2})`}
           >
             {/* main label */}
             <text
               x={0}
-              y={-fontSize * 2}
+              y={-fontSize * 1.5}
               textAnchor="middle"
               dominantBaseline="central"
               style={{ fontWeight: "500" }}
@@ -247,7 +250,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
               direction="vertical"
               x={-fontSize * 0.5}
               y={0}
-              width={fontSize}
+              width={cellSize / 2}
               height={legendHeight}
             />
 

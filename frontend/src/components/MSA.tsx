@@ -79,7 +79,7 @@ const autoWrap = (expanded: boolean) =>
     expanded ? maxWrap : 60,
   );
 
-/** visualization for multiple aligned sequences */
+/** multiple sequence alignment plot */
 const MSA = ({
   tracks,
   getType = (char) => char,

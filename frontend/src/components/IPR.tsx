@@ -53,6 +53,7 @@ type Feature = {
 
 type Props = { sequence: string; tracks: Track[] };
 
+/** interproscan result visualization */
 const IPR = ({ sequence, tracks }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   /** collection of svg refs */
