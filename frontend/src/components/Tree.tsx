@@ -48,9 +48,13 @@ type Props = {
 /** grid spacing in svg units */
 const size = 50;
 
+/** label char limit */
+const labelTruncate = 20;
+
 /** link line generator */
 const link = line().curve(curveStepBefore);
 
+/** tree/hierarchy plot */
 const Tree = ({ data }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -222,7 +226,9 @@ const Tree = ({ data }: Props) => {
                       dominantBaseline="central"
                       style={{ fontSize }}
                     >
-                      {truncate(node.data.label ?? "-", { length: 20 })}
+                      {truncate(node.data.label ?? "-", {
+                        length: labelTruncate,
+                      })}
                     </text>
                   </>
                 )}

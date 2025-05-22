@@ -10,6 +10,7 @@ import {
   FaChartPie,
   FaCircleInfo,
   FaClipboardList,
+  FaFaceSadCry,
   FaFont,
   FaHashtag,
   FaHorse,
@@ -64,6 +65,7 @@ import Tile from "@/components/Tile";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
 import Tree from "@/components/Tree";
+import Upset from "@/components/Upset";
 import {
   edges,
   heatmap,
@@ -74,6 +76,7 @@ import {
   nodes,
   sunburst,
   tree,
+  upset,
   words,
 } from "@/pages/testbed-data";
 import { useColorMap } from "@/util/color";
@@ -92,9 +95,10 @@ const TestbedPage = () => (
 
     {/* complex components */}
 
-    <SectionTree />
+    <SectionUpset />
     <SectionSunburst />
     <SectionHeatmap />
+    <SectionTree />
     <SectionNetwork />
     <SectionMSA />
     <SectionIPR />
@@ -271,6 +275,16 @@ const SectionHeading = () => (
     <Heading level={4} icon="Z">
       Heading 4
     </Heading>
+  </Section>
+);
+
+const SectionUpset = () => (
+  <Section>
+    <Heading level={2} icon={<FaFaceSadCry />}>
+      Upset
+    </Heading>
+
+    <Upset {...upset} />
   </Section>
 );
 

@@ -19,6 +19,6 @@ export const lerp = (
 /** round to multiple */
 export const round = (
   value: number,
-  multiple: number,
+  multiple = 1,
   method: "round" | "floor" | "ceil" = "round",
 ) => Math[method](value / multiple) * multiple;

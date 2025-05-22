@@ -72,6 +72,7 @@ const gapSize = 1;
 /** depth/level of first ring from center */
 const startDepth = 1;
 
+/** sunburst plot */
 const Sunburst = ({ data }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
