@@ -1,13 +1,8 @@
-import {
-  useLayoutEffect,
-  useRef,
-  type ComponentProps,
-  type ReactNode,
-} from "react";
+import { useEffect, useRef, type ComponentProps, type ReactNode } from "react";
+import { clamp } from "lodash";
 import { useElementSize } from "@reactuses/core";
 import { getSvgTransform, getViewBoxFit } from "@/util/dom";
 import { rootFontSize } from "@/util/hooks";
-import { sleep } from "@/util/misc";
 
 type Props = {
   children: ReactNode;
@@ -24,24 +19,21 @@ type Props = {
  * - when container has no specified size, should expand up to content size or max
  *   container size
  * - size should maintain aspect ratio of content
- * - text should be automatically truncated if it exceeds its specified width
  * - should never result in infinite/multiple renders
+ * - text should be automatically truncated if it exceeds its specified width?
  */
 
 const Svg = ({ children, ...props }: Props) => {
   const ref = useRef<SVGSVGElement>(null);
   console.log("render");
 
-  let [width, height] = useElementSize(ref);
-  width = Math.round(width);
-  height = Math.round(height);
+  const [width, height] = useElementSize(ref);
 
-  useLayoutEffect(() => {
-    (async () => {
+  useEffect(() => {
+    for (let i = 0; i < 10; i++) {
       updateFontSize(ref.current);
-      await sleep();
-      updateViewBox(ref.current);
-    })();
+      if (updateViewBox(ref.current)) break;
+    }
   }, [width, height, children]);
 
   return (
@@ -55,14 +47,19 @@ export default Svg;
 
 const updateFontSize = (svg: SVGSVGElement | null) => {
   if (!svg) return;
-  const fontSize = rootFontSize() * getSvgTransform(svg).h;
+  let scale = getSvgTransform(svg).h;
+  scale = clamp(scale, 1, 3);
+  const fontSize = rootFontSize() * scale;
   svg.style.fontSize = fontSize + "px";
 };
 
 const updateViewBox = (svg: SVGSVGElement | null) => {
   if (!svg) return;
+  const current = svg.getAttribute("viewBox")?.split(" ").map(Number);
   const view = getViewBoxFit(svg);
-  svg.setAttribute("viewBox", [view.x, view.y, view.w, view.h].join(" "));
+  const _new = [view.x, view.y, view.w, view.h];
+  if (current?.every((c, i) => Math.abs(c - _new[i]!) < 0.00001)) return true;
+  svg.setAttribute("viewBox", _new.join(" "));
   svg.style.width = view.w + "px";
   svg.style.aspectRatio = `${view.w} / ${view.h}`;
   svg.style.maxWidth = `min(${view.w}px, 100%)`;

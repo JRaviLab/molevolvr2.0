@@ -175,6 +175,9 @@ const SvgSection = () => {
               fill={block.fill}
             />
           ))}
+          <text x={-50} y={50}>
+            lorem ipsum
+          </text>
         </Svg>
       </div>
     </Section>
