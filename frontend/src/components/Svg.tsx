@@ -1,12 +1,12 @@
 import { useCallback, useLayoutEffect, useRef } from "react";
 import type { ComponentProps, ReactNode } from "react";
-import { clamp } from "lodash";
+import { clamp, truncate } from "lodash";
 import { useElementSize, useEventListener } from "@reactuses/core";
 import { getSvgTransform, getViewBoxFit } from "@/util/dom";
 import { rootFontSize } from "@/util/hooks";
 
 type Props = {
-  children: ReactNode | (({ fontSize }: { fontSize: number }) => ReactNode);
+  children: ReactNode;
 } & ComponentProps<"svg">;
 
 /**
@@ -31,20 +31,51 @@ const Svg = ({ children, ...props }: Props) => {
   const [width, height] = useElementSize(ref);
 
   /** did sizing just update */
-  const justUpdated = useRef(false);
+  const justUpdated = useRef(0);
+
+  /** when children change */
+  useLayoutEffect(() => {
+    if (!ref.current) return;
+    /** remember full text for each full text element */
+    for (const element of getTextElements(ref.current)) {
+      element.dataset.text = element.textContent ?? "";
+    }
+  }, [children]);
 
   /** update sizing */
   const update = useCallback(() => {
+    if (!ref.current) return;
     /** if just ran, don't run again (hard protection against infinite loop) */
-    if (justUpdated.current) justUpdated.current = false;
-    else {
-      justUpdated.current = true;
-      /** iteratively update, which should converge to stable values */
-      for (let i = 0; i < 100; i++) {
-        updateFontSize(ref.current);
-        if (updateViewBox(ref.current))
-          /** if already converged closely, stop iterating */
-          break;
+    if (justUpdated.current) return;
+
+    /** iteratively update, which should converge to stable values */
+    for (let i = 0; i < 100; i++) {
+      updateFontSize(ref.current);
+      if (updateViewBox(ref.current))
+        /** if already converged closely, stop iterating */
+        break;
+    }
+
+    /** prevent consecutive synchronous updates */
+    window.clearTimeout(justUpdated.current);
+    justUpdated.current = window.setTimeout(() => (justUpdated.current = 0), 0);
+
+    /** truncate text */
+    for (const element of getTextElements(ref.current)) {
+      /** get original full text from data attribute */
+      const text = element.dataset.text ?? "";
+      /** reset text content to be possibly limited again */
+      element.textContent = text;
+      /** get width limit */
+      const limit = parseFloat(element.getAttribute("width") ?? "");
+      if (!limit) break;
+      /** reduce string length until text width under width limit */
+      for (let slice = text.length; slice > 0; slice--) {
+        /** get actual text width */
+        const width = element.getBBox().width;
+        if (width < limit) break;
+        /** truncate string */
+        element.textContent = truncate(text, { length: slice });
       }
     }
   }, []);
@@ -67,8 +98,7 @@ const Svg = ({ children, ...props }: Props) => {
 export default Svg;
 
 /** set font size of root svg element to match document font size */
-const updateFontSize = (svg: SVGSVGElement | null) => {
-  if (!svg) return 16;
+const updateFontSize = (svg: SVGSVGElement) => {
   let scale = getSvgTransform(svg).h;
   /** prevent extreme scales */
   scale = clamp(scale, 1, 10);
@@ -78,8 +108,7 @@ const updateFontSize = (svg: SVGSVGElement | null) => {
 };
 
 /** update view box attr of root svg element */
-const updateViewBox = (svg: SVGSVGElement | null) => {
-  if (!svg) return;
+const updateViewBox = (svg: SVGSVGElement) => {
   /** get current view box */
   const current = svg.getAttribute("viewBox")?.split(" ").map(Number);
   /** get view box fitted to svg contents */
@@ -95,3 +124,14 @@ const updateViewBox = (svg: SVGSVGElement | null) => {
   svg.style.maxWidth = `min(${bbox.w}px, 100%)`;
   svg.style.maxHeight = `min(${bbox.h}px, 100%)`;
 };
+
+/** get text children of svg */
+const getTextElements = (svg: SVGSVGElement) =>
+  [
+    ...(svg.querySelectorAll<SVGTextElement | SVGTSpanElement>("text, tspan") ??
+      []),
+  ].filter(
+    (element) =>
+      /** only truncate if element has text child node (no element children) */
+      !element.children.length,
+  );

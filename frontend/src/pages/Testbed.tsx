@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   FaArrowRight,
   FaArrowsUpDown,
@@ -32,7 +33,7 @@ import {
   FaTableCells,
 } from "react-icons/fa6";
 import { PiSquaresFourFill } from "react-icons/pi";
-import { sample, uniq } from "lodash";
+import { random, sample, uniq } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -72,6 +73,7 @@ import {
   heatmap,
   iprSequence,
   iprTracks,
+  label,
   logChange,
   msaTracks,
   nodes,
@@ -145,18 +147,42 @@ export default TestbedPage;
 
 /** svg wrapper */
 const SvgSection = () => {
-  const elements = [
-    { x: -200, y: -50, width: 100, height: 50, fill: "blue" },
-    { x: 200, y: 50, width: 50, height: 100, fill: "red" },
-    { x: -100, y: 50, width: 50, height: 50, fill: "green" },
-    { x: -100, y: 200, width: "10em", height: "3em", fill: "magenta" },
-  ];
+  const randomElements = () =>
+    Array(random(3, 10))
+      .fill(null)
+      .map(() => {
+        let x: number | string = random(-200, 200);
+        let y: number | string = random(-200, 200);
+        let width: number | string = random(50, 200);
+        let height: number | string = random(50, 200);
+        const type = sample(["rect", "text"])!;
+        if (Math.random() > 0.5) x = x / 20 + "em";
+        if (Math.random() > 0.5) y = y / 20 + "em";
+        if (Math.random() > 0.5) width = width / 20 + "em";
+        if (Math.random() > 0.5) height = height / 20 + "em";
+        if (type === "text") height = "";
+        const color = type === "rect" ? sample(["red", "green", "blue"])! : "";
+        const text = type === "text" ? (label() ?? "") : "";
+        return { type, x, y, width, height, color, text };
+      });
+
+  const [elements, setElements] = useState(randomElements());
 
   return (
     <Section>
-      <Flex>
-        {elements.map(({ width, height, fill }, index) => (
-          <div key={index} style={{ width, height, background: fill }} />
+      <button onClick={() => setElements(randomElements())}>Randomize</button>
+
+      <Flex vAlign="center">
+        {elements.map(({ width, height, color, text }, index) => (
+          <div key={index} style={{ width, height, background: color }}>
+            {text ? (
+              text
+            ) : (
+              <>
+                {width} &times; {height}
+              </>
+            )}
+          </div>
         ))}
       </Flex>
 
@@ -165,19 +191,29 @@ const SvgSection = () => {
         style={{ display: "flex", width: "", justifyContent: "center" }}
       >
         <Svg>
-          {elements.map((block, index) => (
-            <rect
-              key={index}
-              x={block.x}
-              y={block.y}
-              width={block.width}
-              height={block.height}
-              fill={block.fill}
-            />
-          ))}
-          <text x={-250} y={50}>
-            lorem ipsum dolor sit amet consectetur adipiscing elit
-          </text>
+          {elements.map(({ type, x, y, width, height, color, text }, index) =>
+            type === "rect" ? (
+              <rect
+                key={index}
+                x={x}
+                y={y}
+                width={width}
+                height={height}
+                fill={color}
+              />
+            ) : (
+              <text
+                key={index}
+                x={x}
+                y={y}
+                width={width}
+                fill={color}
+                textAnchor="middle"
+              >
+                {text}
+              </text>
+            ),
+          )}
         </Svg>
       </div>
     </Section>
