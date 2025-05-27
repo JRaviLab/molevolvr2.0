@@ -160,8 +160,7 @@ export const isCovering = (
 };
 
 /** get svg scale factor */
-export const getSvgTransform = (svg: SVGSVGElement | null) => {
-  if (!svg) return { w: 1, h: 1 };
+export const getSvgTransform = (svg: SVGSVGElement) => {
   /** convert to svg coords */
   const matrix = (svg.getScreenCTM() || new SVGMatrix()).inverse();
   /** https://www.w3.org/TR/css-transforms-1/#decomposing-a-2d-matrix */
@@ -172,8 +171,7 @@ export const getSvgTransform = (svg: SVGSVGElement | null) => {
 };
 
 /** get bounding box of svg contents */
-export const getViewBoxFit = (svg: SVGSVGElement | null) => {
-  if (!svg) return { x: 0, y: 0, w: 10, h: 10 };
+export const getViewBoxFit = (svg: SVGSVGElement) => {
   const { x, y, width, height } = svg.getBBox();
   return { x, y, w: width, h: height };
 };
