@@ -85,11 +85,7 @@ const IPR = ({ sequence, tracks }: Props) => {
   const [, scrollHeight] = useElementSize(scrollRef);
 
   /** font size, in svg units */
-  const fontSize = useSvgTransform(
-    [...svgRefs.current][0]!,
-    1,
-    rootFontSize(),
-  ).h;
+  const fontSize = useSvgTransform([...svgRefs.current][0]!).h * rootFontSize();
 
   /** view box for all svgs */
   const viewBox = [0, 0, width, height].join(" ");
@@ -293,17 +289,14 @@ const IPR = ({ sequence, tracks }: Props) => {
           {/* position */}
           <div className={classes["top-label"]}>Position</div>
           <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-            <g
-              textAnchor="middle"
-              dominantBaseline="central"
-              style={{ fontSize }}
-              fill={theme["--black"]}
-            >
+            <g style={{ fontSize }} fill={theme["--black"]}>
               {ticks.map((position) => (
                 <text
                   key={position}
                   x={clampTick(scaleX(position + 0.5), String(position + 1))}
                   y={height / 2}
+                  textAnchor="middle"
+                  dominantBaseline="central"
                 >
                   {position + 1}
                 </text>
@@ -331,36 +324,33 @@ const IPR = ({ sequence, tracks }: Props) => {
           {/* sequence */}
           <div className={classes["top-label"]}>Sequence</div>
           <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-            <g
-              textAnchor="middle"
-              dominantBaseline="central"
-              style={{ fontSize }}
-            >
-              {sequence.split("").map((char, index) => (
-                <g
-                  key={index}
-                  transform={`translate(${scaleX(index + 0.5)},
+            {sequence.split("").map((char, index) => (
+              <g
+                key={index}
+                transform={`translate(${scaleX(index + 0.5)},
                   ${height / 2})`}
+              >
+                <rect
+                  x={-cellSize / 2}
+                  y={-height / 2}
+                  width={cellSize}
+                  height={height}
+                  fill={theme["--light-gray"]}
+                  opacity={index % 2 === 0 ? 0.25 : 0.5}
+                />
+                <text
+                  x={0}
+                  y={0}
+                  fill={theme["--black"]}
+                  transform={`scale(${clamp(cellSize / fontSize, 0, 1)})`}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  style={{ fontSize }}
                 >
-                  <rect
-                    x={-cellSize / 2}
-                    y={-height / 2}
-                    width={cellSize}
-                    height={height}
-                    fill={theme["--light-gray"]}
-                    opacity={index % 2 === 0 ? 0.25 : 0.5}
-                  />
-                  <text
-                    x={0}
-                    y={0}
-                    fill={theme["--black"]}
-                    transform={`scale(${clamp(cellSize / fontSize, 0, 1)})`}
-                  >
-                    {char}
-                  </text>
-                </g>
-              ))}
-            </g>
+                  {char}
+                </text>
+              </g>
+            ))}
           </svg>
 
           {/* tracks */}
@@ -377,67 +367,60 @@ const IPR = ({ sequence, tracks }: Props) => {
               </Tooltip>
 
               <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-                <g
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  style={{ fontSize }}
-                >
-                  {track.features.map(
-                    ({ id, label, type, start, end }, index) => {
-                      /** x in view */
-                      const drawX = clamp(scaleX(start - 1), 0, width);
-                      /** width in view */
-                      const drawWidth =
-                        clamp(scaleX(end), 0, width) -
-                        clamp(scaleX(start - 1), 0, width);
-                      /** mid in view */
-                      const drawMidX = drawX + drawWidth / 2;
+                {track.features.map(
+                  ({ id, label, type, start, end }, index) => {
+                    /** x in view */
+                    const drawX = clamp(scaleX(start - 1), 0, width);
+                    /** width in view */
+                    const drawWidth =
+                      clamp(scaleX(end), 0, width) -
+                      clamp(scaleX(start - 1), 0, width);
+                    /** mid in view */
+                    const drawMidX = drawX + drawWidth / 2;
 
-                      return (
-                        <Tooltip
-                          key={index}
-                          content={
-                            <div className="mini-table">
-                              <span>Name</span>
-                              <span>{label ?? id}</span>
-                              <span>Type</span>
-                              <span>{type}</span>
-                              <span>Range</span>
-                              <span>
-                                {start}-{end}
-                              </span>
-                            </div>
-                          }
-                        >
-                          <g
-                            className={classes.track}
-                            tabIndex={0}
-                            role="button"
-                          >
-                            <rect
-                              x={drawX}
-                              y={0}
-                              width={drawWidth}
-                              height={height}
-                              fill={colorMap[type ?? ""]}
-                            />
-                            {inRange(drawMidX, fontSize, width - fontSize) && (
-                              <text
-                                x={drawMidX}
-                                y={height / 2}
-                                fill={theme["--black"]}
-                              >
-                                {truncate(label ?? id, {
-                                  length: (drawWidth / height) * 3,
-                                })}
-                              </text>
-                            )}
-                          </g>
-                        </Tooltip>
-                      );
-                    },
-                  )}
-                </g>
+                    return (
+                      <Tooltip
+                        key={index}
+                        content={
+                          <div className="mini-table">
+                            <span>Name</span>
+                            <span>{label ?? id}</span>
+                            <span>Type</span>
+                            <span>{type}</span>
+                            <span>Range</span>
+                            <span>
+                              {start}-{end}
+                            </span>
+                          </div>
+                        }
+                      >
+                        <g className={classes.track} tabIndex={0} role="button">
+                          <rect
+                            x={drawX}
+                            y={0}
+                            width={drawWidth}
+                            height={height}
+                            fill={colorMap[type ?? ""]}
+                          />
+                          {inRange(drawMidX, fontSize, width - fontSize) && (
+                            <text
+                              x={drawMidX}
+                              y={height / 2}
+                              fill={theme["--black"]}
+                              textAnchor="middle"
+                              dominantBaseline="central"
+                              style={{ fontSize }}
+                            >
+                              {truncate(label ?? id, {
+                                length: (drawWidth / height) * 3,
+                              })}
+                            </text>
+                          )}
+                        </g>
+                      </Tooltip>
+                    );
+                  },
+                )}
               </svg>
             </Fragment>
           ))}

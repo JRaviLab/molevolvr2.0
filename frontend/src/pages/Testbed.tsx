@@ -89,8 +89,6 @@ import tableData from "../../fixtures/table.json";
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
-  return <SvgSection />;
-
   return (
     <>
       <Meta title="Testbed" />
@@ -101,7 +99,6 @@ const TestbedPage = () => {
 
       {/* complex components */}
 
-      <SectionUpset />
       <SectionSunburst />
       <SectionHeatmap />
       <SectionTree />

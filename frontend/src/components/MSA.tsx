@@ -342,7 +342,6 @@ const MSAChunk = ({ combined, tracks, colors, start, end }: ChunkProps) => {
           <g
             fill={theme["--black"]}
             textAnchor="middle"
-            dominantBaseline="central"
             style={{ fontFamily: theme["--mono"], fontSize }}
             className="axe-ignore"
           >

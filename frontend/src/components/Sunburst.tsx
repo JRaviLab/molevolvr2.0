@@ -1,6 +1,5 @@
 import {
   Fragment,
-  useEffect,
   useId,
   useMemo,
   useRef,
@@ -15,16 +14,17 @@ import {
 } from "react-icons/fa6";
 import clsx from "clsx";
 import { arc, hierarchy, type HierarchyNode } from "d3";
-import { inRange, mapValues, sumBy, truncate } from "lodash";
+import { inRange, mapValues, sumBy } from "lodash";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
 import Popover from "@/components/Popover";
+import Svg from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { fitViewBox, printElement } from "@/util/dom";
+import { printElement } from "@/util/dom";
 import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
-import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
+import { useTheme } from "@/util/hooks";
 import { formatNumber } from "@/util/string";
 import classes from "./Sunburst.module.css";
 
@@ -65,10 +65,10 @@ type Props = {
   data: Item[];
 };
 
-/** thickness of rings, in svg units */
-const ringSize = 20;
-/** gap between rings, in svg units */
-const gapSize = 1;
+/** thickness of rings */
+const ringSize = 40;
+/** gap between rings */
+const gapSize = 5;
 /** depth/level of first ring from center */
 const startDepth = 1;
 
@@ -76,14 +76,6 @@ const startDepth = 1;
 const Sunburst = ({ data }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-
-  /** font size, in svg units */
-  const fontSize = useSvgTransform(svgRef.current, 1, rootFontSize()).h;
-
-  /** fit view box */
-  useEffect(() => {
-    fitViewBox(svgRef.current, 0.01);
-  });
 
   /** "breadcrumb trail" of selected nodes */
   const [selected, setSelected] = useState<Node[]>([]);
@@ -166,20 +158,11 @@ const Sunburst = ({ data }: Props) => {
         <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
         {/* chart container */}
-        <svg
-          ref={svgRef}
-          className={classes.chart}
-          style={{
-            fontSize,
-            /** size based on number of rings */
-            height: 2 * 2 * rootFontSize() * (tree.height + startDepth),
-          }}
-        >
+        <Svg ref={svgRef} className={classes.chart}>
           {nodes.map((node, index) => (
             <Fragment key={index}>
               {node.parent && (
                 <Segment
-                  fontSize={fontSize}
                   select={() =>
                     node.data.lastSelected
                       ? deselect()
@@ -191,7 +174,7 @@ const Sunburst = ({ data }: Props) => {
               )}
             </Fragment>
           ))}
-        </svg>
+        </Svg>
 
         {/* selected breadcrumbs */}
         {anySelected && (
@@ -275,14 +258,13 @@ const Sunburst = ({ data }: Props) => {
 export default Sunburst;
 
 type SegmentProps = {
-  fontSize: number;
   node: Node;
   select: () => void;
   deselect: () => void;
 };
 
 /** single arc segment */
-const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
+const Segment = ({ node, select, deselect }: SegmentProps) => {
   /** unique segment id */
   const id = useId();
 
@@ -327,7 +309,7 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
         .outerRadius(radius - 999)
         .startAngle((flip ? end : angle) * 2 * Math.PI)
         .endAngle((flip ? angle : end) * 2 * Math.PI)
-        .padRadius(gapSize)
+        .padRadius(gapSize * 3)
         .padAngle(1)(null) ?? "";
 
     /** extract just first half of path, center-line of segment */
@@ -335,9 +317,6 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
 
     return stroke;
   }, [radius, angle, end]);
-
-  /** get max text chars based on arc length */
-  const maxChars = (radius * 2 * Math.PI * percent) / (fontSize / 1.75);
 
   return (
     <g className={classes.segment} opacity={selected === false ? 0.25 : 1}>
@@ -347,7 +326,7 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
           className={classes.shape}
           fill={color}
           stroke={theme["--black"]}
-          strokeWidth={gapSize}
+          strokeWidth={gapSize * 0.5}
           strokeOpacity={lastSelected === true ? 1 : 0}
           d={fill}
           tabIndex={0}
@@ -377,7 +356,7 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
         fill={theme["--black"]}
       >
         <textPath href={`#${id}`} startOffset="50%">
-          {truncate(label || "-", { length: maxChars })}
+          {label || "-"}
         </textPath>
       </text>
     </g>
@@ -396,13 +375,13 @@ const NodeTooltip = ({
     content={
       <div className="mini-table">
         <div>Name</div>
-        <div>{label || "-"}</div>
+        <div>{label}</div>
         <div>Value</div>
         <div>{formatNumber(value)}</div>
         <div>Percent</div>
         <div>{formatPercent(percent)}</div>
         <div>Type</div>
-        <div>{type || "-"}</div>
+        <div>{type}</div>
       </div>
     }
   >

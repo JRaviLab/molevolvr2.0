@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   FaBezierCurve,
   FaDownload,
@@ -7,17 +7,18 @@ import {
 } from "react-icons/fa6";
 import clsx from "clsx";
 import { extent, scaleBand, scaleLinear, transpose } from "d3";
-import { range, truncate } from "lodash";
+import { range } from "lodash";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
 import Flex from "@/components/Flex";
 import { Gradient, gradientFunc, gradientOptions } from "@/components/Gradient";
 import Popover from "@/components/Popover";
 import SelectSingle from "@/components/SelectSingle";
+import Svg from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
-import { fitViewBox, printElement } from "@/util/dom";
+import { printElement } from "@/util/dom";
 import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
-import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
+import { useTheme } from "@/util/hooks";
 import classes from "./Heatmap.module.css";
 
 type Props = {
@@ -45,9 +46,6 @@ type Props = {
   max?: number;
 };
 
-/** label char limit */
-const labelTruncate = 10;
-
 /** heatmap plot */
 const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -70,16 +68,8 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   /** reactive CSS vars */
   const theme = useTheme();
 
-  /** font size, in svg units */
-  const fontSize = useSvgTransform(svgRef.current, 1, rootFontSize()).h;
-
-  /** fit view box */
-  useEffect(() => {
-    fitViewBox(svgRef.current, 0.01);
-  });
-
   /** sizes of elements, in svg units */
-  const cellSize = Math.min(50, fontSize * 2);
+  const cellSize = 30;
   const legendHeight = Math.min(
     cellSize * Math.max(0, data.length - 2),
     cellSize * 5,
@@ -122,14 +112,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   return (
     <Flex direction="column" gap="lg">
       <div ref={containerRef} className={clsx("card", classes.container)}>
-        <svg
-          ref={svgRef}
-          className={classes.chart}
-          style={{
-            fontSize,
-            height: 2 * rootFontSize() * (data.length + 2),
-          }}
-        >
+        <Svg ref={svgRef} className={classes.chart}>
           {/* cells */}
           {data.map((row, rowIndex) =>
             row.map((col, colIndex) => (
@@ -139,9 +122,9 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
                   <div className="mini-table">
                     <span>Value</span>
                     <span>{col}</span>
-                    <span>{x.label ?? "-"}</span>
+                    <span>{x.label}</span>
                     <span>{x.labels[colIndex]}</span>
-                    <span>{y.label ?? "-"}</span>
+                    <span>{y.label}</span>
                     <span>{y.labels[colIndex]}</span>
                   </div>
                 }
@@ -167,14 +150,17 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
             {x.labels.map((label, index) => (
               <Tooltip content={label} key={index}>
                 <text
+                  width={cellSize * 4}
                   transform={[
-                    `translate(0, ${-fontSize / 2})`,
-                    `translate(${(xScale(index) ?? 0) + xScale.bandwidth() / 2}, 0)`,
+                    `translate(0, ${-cellSize * 0.5})`,
+                    `translate(${(xScale(index) ?? 0) + xScale.bandwidth() * 0.5}, 0)`,
                     `rotate(-45)`,
                   ].join("")}
                   tabIndex={0}
+                  // for safari
+                  dominantBaseline="central"
                 >
-                  {truncate(label ?? "-", { length: labelTruncate })}
+                  {label ?? "-"}
                 </text>
               </Tooltip>
             ))}
@@ -189,14 +175,17 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
             {y.labels.map((label, index) => (
               <Tooltip content={label} key={index}>
                 <text
+                  width={cellSize * 4}
                   transform={[
-                    `translate(${-fontSize / 2}, 0)`,
-                    `translate(0, ${(yScale(index) ?? 0) + yScale.bandwidth() / 2})`,
+                    `translate(${-cellSize * 0.5}, 0)`,
+                    `translate(0, ${(yScale(index) ?? 0) + yScale.bandwidth() * 0.5})`,
                     `rotate(-45)`,
                   ].join(" ")}
                   tabIndex={0}
+                  // for safari
+                  dominantBaseline="central"
                 >
-                  {truncate(label ?? "-", { length: labelTruncate })}
+                  {label ?? "-"}
                 </text>
               </Tooltip>
             ))}
@@ -210,16 +199,20 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
             style={{ fontWeight: "500" }}
           >
             <text
-              transform={[`translate(${width / 2}, ${height + fontSize})`].join(
-                " ",
-              )}
+              transform={[
+                `translate(${width * 0.5}, ${height})`,
+                `translate(0, ${cellSize * 0.75})`,
+              ].join(" ")}
+              // for safari
+              dominantBaseline="central"
             >
               {x.label ?? "-"}
             </text>
 
             <text
               transform={[
-                `translate(${width + fontSize}, ${height / 2})`,
+                `translate(${width}, ${height * 0.5})`,
+                `translate(${cellSize * 0.75}, 0)`,
                 `rotate(-90)`,
               ].join(" ")}
             >
@@ -230,12 +223,12 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           {/* legend */}
           <g
             fill={theme["--black"]}
-            transform={`translate(${width + cellSize * 2.5}, ${height * 0.5 - legendHeight / 2})`}
+            transform={`translate(${width + cellSize * 3}, ${height * 0.5 - legendHeight * 0.5})`}
           >
             {/* main label */}
             <text
               x={0}
-              y={-fontSize * 1.5}
+              y={-cellSize}
               textAnchor="middle"
               dominantBaseline="central"
               style={{ fontWeight: "500" }}
@@ -248,9 +241,9 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
               id={gradient}
               reverse={reverse}
               direction="vertical"
-              x={-fontSize * 0.5}
+              x={-cellSize * 0.25}
               y={0}
-              width={cellSize / 2}
+              width={cellSize * 0.5}
               height={legendHeight}
             />
 
@@ -258,7 +251,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
             {legendScale.map(({ label, percent }, index) => (
               <text
                 key={index}
-                x={fontSize}
+                x={cellSize * 0.5}
                 y={percent * legendHeight}
                 dominantBaseline="central"
               >
@@ -266,7 +259,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
               </text>
             ))}
           </g>
-        </svg>
+        </Svg>
       </div>
 
       {/* controls */}

@@ -1,11 +1,12 @@
 import { useCallback, useLayoutEffect, useRef } from "react";
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, ReactNode, RefObject } from "react";
 import { clamp, truncate } from "lodash";
 import { useElementSize, useEventListener } from "@reactuses/core";
-import { getSvgTransform, getViewBoxFit } from "@/util/dom";
+import { getSvgTransform, getTextWidth, getViewBoxFit } from "@/util/dom";
 import { rootFontSize } from "@/util/hooks";
 
 type Props = {
+  ref: RefObject<SVGSVGElement | null>;
   children: ReactNode;
 } & ComponentProps<"svg">;
 
@@ -24,9 +25,7 @@ type Props = {
  * - should never result in infinite/multiple renders
  * - text should be automatically truncated if it exceeds its specified width?
  */
-const Svg = ({ children, ...props }: Props) => {
-  const ref = useRef<SVGSVGElement>(null);
-
+const Svg = ({ ref, children, ...props }: Props) => {
   /** document size of svg */
   const [width, height] = useElementSize(ref);
 
@@ -36,11 +35,8 @@ const Svg = ({ children, ...props }: Props) => {
   /** when children change */
   useLayoutEffect(() => {
     if (!ref.current) return;
-    /** remember full text for each full text element */
-    for (const element of getTextElements(ref.current)) {
-      element.dataset.text = element.textContent ?? "";
-    }
-  }, [children]);
+    rememberText(ref.current);
+  }, [ref, children]);
 
   /** update sizing */
   const update = useCallback(() => {
@@ -50,7 +46,8 @@ const Svg = ({ children, ...props }: Props) => {
 
     /** iteratively update, which should converge to stable values */
     for (let i = 0; i < 100; i++) {
-      updateFontSize(ref.current);
+      const fontSize = updateFontSize(ref.current);
+      truncateText(ref.current, fontSize);
       if (updateViewBox(ref.current))
         /** if already converged closely, stop iterating */
         break;
@@ -59,26 +56,7 @@ const Svg = ({ children, ...props }: Props) => {
     /** prevent consecutive synchronous updates */
     window.clearTimeout(justUpdated.current);
     justUpdated.current = window.setTimeout(() => (justUpdated.current = 0), 0);
-
-    /** truncate text */
-    for (const element of getTextElements(ref.current)) {
-      /** get original full text from data attribute */
-      const text = element.dataset.text ?? "";
-      /** reset text content to be possibly limited again */
-      element.textContent = text;
-      /** get width limit */
-      const limit = parseFloat(element.getAttribute("width") ?? "");
-      if (!limit) break;
-      /** reduce string length until text width under width limit */
-      for (let slice = text.length; slice > 0; slice--) {
-        /** get actual text width */
-        const width = element.getBBox().width;
-        if (width < limit) break;
-        /** truncate string */
-        element.textContent = truncate(text, { length: slice });
-      }
-    }
-  }, []);
+  }, [ref]);
 
   /** when contents or document size of svg change */
   useLayoutEffect(() => {
@@ -89,7 +67,7 @@ const Svg = ({ children, ...props }: Props) => {
   useEventListener("loadingdone", update, document.fonts);
 
   return (
-    <svg ref={ref} {...props}>
+    <svg ref={ref} {...props} style={{ overflow: "visible" }}>
       {children}
     </svg>
   );
@@ -128,10 +106,58 @@ const updateViewBox = (svg: SVGSVGElement) => {
 /** get text children of svg */
 const getTextElements = (svg: SVGSVGElement) =>
   [
-    ...(svg.querySelectorAll<SVGTextElement | SVGTSpanElement>("text, tspan") ??
-      []),
+    ...(svg.querySelectorAll<
+      SVGTextElement | SVGTSpanElement | SVGTextPathElement
+    >("text, tspan,textPath") ?? []),
   ].filter(
     (element) =>
       /** only truncate if element has text child node (no element children) */
       !element.children.length,
   );
+
+/** remember full text of svg text elements */
+const rememberText = (svg: SVGSVGElement) => {
+  for (const element of getTextElements(svg))
+    element.setAttribute("data-text", element.textContent ?? "");
+};
+
+/** truncate text content of svg text elements */
+const truncateText = (svg: SVGSVGElement, fontSize: number) => {
+  for (const element of getTextElements(svg)) {
+    /** get original full text from data attribute */
+    const text = element.getAttribute("data-text") ?? "";
+    /** reset text content to be possibly limited again */
+    element.textContent = text;
+
+    /** text length limit */
+    let limit = 0;
+
+    /** get limit from text path length */
+    const href = element.getAttribute("href");
+    if (element instanceof SVGTextPathElement && href)
+      limit =
+        document.querySelector<SVGPathElement>(href)?.getTotalLength() || 0;
+
+    /** get limit from width attr */
+    const width = element.getAttribute("width");
+    if (width) limit = Number(width);
+
+    if (!limit) break;
+
+    /** reduce string length until text width under width limit */
+    for (let slice = text.length; slice > 0; slice--) {
+      /** truncated string */
+      const truncated = truncate(text, { length: slice });
+      /**
+       * get text length. can't use getComputedTextLength b/c, for textPath, too
+       * slow on chrome, and ff returns length clipped to path.
+       */
+      const length = getTextWidth(truncated, fontSize);
+      if (length < limit) {
+        /** truncate text */
+        element.textContent = truncated;
+        break;
+      }
+    }
+  }
+};
