@@ -287,9 +287,7 @@ const Tree = ({ data }: Props) => {
             <span>To</span>
             <span>{selectedB?.data.label}</span>
             <span>Dist.</span>
-            <span>
-              {selectedDist.toFixed(2)} ({selectedPath.length} nodes)
-            </span>
+            <span>{selectedDist.toFixed(2)}</span>
           </div>
         )}
       </div>
