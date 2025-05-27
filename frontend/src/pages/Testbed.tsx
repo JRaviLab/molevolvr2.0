@@ -146,8 +146,8 @@ export default TestbedPage;
 /** svg wrapper */
 const SvgSection = () => {
   const elements = [
-    { x: -50, y: -50, width: 100, height: 50, fill: "blue" },
-    { x: 50, y: 50, width: 50, height: 100, fill: "red" },
+    { x: -200, y: -50, width: 100, height: 50, fill: "blue" },
+    { x: 200, y: 50, width: 50, height: 100, fill: "red" },
     { x: -100, y: 50, width: 50, height: 50, fill: "green" },
     { x: -100, y: 200, width: "10em", height: "3em", fill: "magenta" },
   ];
@@ -162,7 +162,7 @@ const SvgSection = () => {
 
       <div
         className="card"
-        style={{ display: "flex", width: "100%", justifyContent: "center" }}
+        style={{ display: "flex", width: "", justifyContent: "center" }}
       >
         <Svg>
           {elements.map((block, index) => (
@@ -175,8 +175,8 @@ const SvgSection = () => {
               fill={block.fill}
             />
           ))}
-          <text x={-50} y={50}>
-            lorem ipsum
+          <text x={-250} y={50}>
+            lorem ipsum dolor sit amet consectetur adipiscing elit
           </text>
         </Svg>
       </div>
