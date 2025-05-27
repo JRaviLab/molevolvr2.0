@@ -1,7 +1,6 @@
 import { cloneElement, type ReactElement, type ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
 import { debounce } from "lodash";
-import { round } from "@/util/math";
 import { sleep } from "@/util/misc";
 
 /** wait for element matching selector to appear, checking periodically */
@@ -160,7 +159,7 @@ export const isCovering = (
   return false;
 };
 
-/** get scale factor */
+/** get svg scale factor */
 export const getSvgTransform = (svg: SVGSVGElement | null) => {
   if (!svg) return { w: 1, h: 1 };
   /** convert to svg coords */
@@ -172,15 +171,15 @@ export const getSvgTransform = (svg: SVGSVGElement | null) => {
   };
 };
 
-/** get view box that fits to contents of svg */
+/** get bounding box of svg contents */
 export const getViewBoxFit = (svg: SVGSVGElement | null) => {
   if (!svg) return { x: 0, y: 0, w: 10, h: 10 };
-  const bbox = svg.getBBox();
-  return { x: bbox.x, y: bbox.y, w: bbox.width, h: bbox.height };
+  const { x, y, width, height } = svg.getBBox();
+  return { x, y, w: width, h: height };
 };
 
 /** fit view box to contents of svg */
-export const fitViewBox = (svg?: SVGSVGElement | null, paddingPercent = 0) => {
+export const fitViewBox = (svg?: SVGSVGElement | null) => {
   if (!svg) return { x: 0, y: 0, width: 100, height: 100 };
   const { x, y, width, height } = svg.getBBox();
   const viewBox = [x, y, width, height].join(" ");
