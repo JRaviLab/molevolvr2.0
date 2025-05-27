@@ -216,3 +216,13 @@ export const preserveScroll = async (element: Element) => {
   const newY = element.getBoundingClientRect().top;
   window.scrollBy({ top: newY - oldY, behavior: "instant" });
 };
+
+const canvas = document.createElement("canvas");
+const ctx = canvas.getContext("2d")!;
+const font = window.getComputedStyle(document.body).fontFamily;
+
+/** compute width of text based on font size */
+export const getTextWidth = (text: string, size = 16) => {
+  ctx.font = `${size}px ${font}`;
+  return ctx.measureText(text).width;
+};

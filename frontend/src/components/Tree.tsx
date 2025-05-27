@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import {
   FaBezierCurve,
   FaDownload,
@@ -7,25 +7,17 @@ import {
 } from "react-icons/fa6";
 import clsx from "clsx";
 import { curveStepBefore, hierarchy, line, type HierarchyNode } from "d3";
-import {
-  map,
-  mapValues,
-  max,
-  min,
-  orderBy,
-  sum,
-  truncate,
-  uniqueId,
-} from "lodash";
+import { map, mapValues, max, min, orderBy, sum, uniqueId } from "lodash";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
 import Popover from "@/components/Popover";
+import Svg from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { fitViewBox, printElement } from "@/util/dom";
+import { printElement } from "@/util/dom";
 import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
-import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
+import { useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
 import classes from "./Tree.module.css";
 
@@ -45,11 +37,14 @@ type Props = {
   data: Item[];
 };
 
-/** grid spacing in svg units */
-const size = 50;
+/** grid spacing */
+const size = 30;
 
-/** label char limit */
-const labelTruncate = 20;
+/** circle size */
+const nodeSize = 5;
+
+/** line thickness */
+const strokeWidth = 1;
 
 /** link line generator */
 const link = line().curve(curveStepBefore);
@@ -125,22 +120,11 @@ const Tree = ({ data }: Props) => {
   /** reactive CSS vars */
   const theme = useTheme();
 
-  /** font size, in svg units */
-  const fontSize = useSvgTransform(svgRef.current, 1, rootFontSize()).h;
-
-  /** fit view box */
-  useEffect(() => {
-    fitViewBox(svgRef.current, 0.01);
-  });
-
   /** map of node types to colors */
   const colorMap = useColorMap(
     map(tree.descendants(), (node) => node.data.type ?? ""),
     "mode",
   );
-
-  /** line thickness, based on font size */
-  const strokeWidth = fontSize / 15;
 
   /** clear selection */
   const deselect = () => setSelected([]);
@@ -165,14 +149,7 @@ const Tree = ({ data }: Props) => {
         <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
         {/* chart */}
-        <svg
-          ref={svgRef}
-          className={classes.chart}
-          style={{
-            /** size based on tree depth */
-            height: 2 * rootFontSize() * tree.leaves().length,
-          }}
-        >
+        <Svg ref={svgRef} className={classes.chart}>
           {tree.links().map(({ source, target }, index) => {
             /** is link selected */
             const isSelected =
@@ -212,7 +189,7 @@ const Tree = ({ data }: Props) => {
                   <>
                     <line
                       x1={node.y}
-                      x2={maxY + fontSize * 0.75}
+                      x2={maxY}
                       y1={node.x ?? 0}
                       y2={node.x ?? 0}
                       stroke={theme["--black"]}
@@ -220,15 +197,14 @@ const Tree = ({ data }: Props) => {
                       strokeDasharray={[strokeWidth, strokeWidth * 2].join(" ")}
                     />
                     <text
-                      x={maxY + fontSize}
+                      x={maxY}
                       y={node.x ?? 0}
+                      width={200}
                       fill={theme["--black"]}
+                      transform={`translate(${nodeSize * 2}, 0)`}
                       dominantBaseline="central"
-                      style={{ fontSize }}
                     >
-                      {truncate(node.data.label ?? "-", {
-                        length: labelTruncate,
-                      })}
+                      {node.data.label ?? "-"}
                     </text>
                   </>
                 )}
@@ -258,7 +234,7 @@ const Tree = ({ data }: Props) => {
                     className={classes.node}
                     cx={node.y ?? 0}
                     cy={node.x ?? 0}
-                    r={fontSize / 3}
+                    r={nodeSize}
                     fill={
                       isSelected === false
                         ? theme["--light-gray"]
@@ -283,7 +259,7 @@ const Tree = ({ data }: Props) => {
               </Fragment>
             );
           })}
-        </svg>
+        </Svg>
 
         {/* selected */}
         {selectedPath.length > 1 && (

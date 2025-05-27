@@ -7,6 +7,7 @@ import {
   useResizeObserver,
 } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
+import { getSvgTransform } from "@/util/dom";
 
 /** get document root font size */
 export const rootFontSize = () =>
@@ -47,12 +48,8 @@ export const useTheme = () => {
   return theme;
 };
 
-/** convert width/height in document units to svg units */
-export const useSvgTransform = (
-  svg: SVGSVGElement | null,
-  w: number,
-  h: number,
-) => {
+/** get scale factor to convert document units to svg units */
+export const useSvgTransform = (svg: SVGSVGElement | null) => {
   const [scale, setScale] = useState({ w: 1, h: 1 });
 
   const update = useCallback(() => {
@@ -63,16 +60,10 @@ export const useSvgTransform = (
      * but longer dom blocking (freeze)
      */
     for (let iteration = 1; iteration > 0; iteration--) {
-      /** convert to svg coords */
-      const matrix = (svg.getScreenCTM() || new SVGMatrix()).inverse();
-
       /** render immediately, i.e. elements sized based on this func */
       flushSync(() => {
         /** https://www.w3.org/TR/css-transforms-1/#decomposing-a-2d-matrix */
-        setScale({
-          w: Math.sqrt(matrix.a ** 2 + matrix.b ** 2),
-          h: Math.sqrt(matrix.c ** 2 + matrix.d ** 2),
-        });
+        setScale(getSvgTransform(svg));
       });
     }
   }, [svg]);
@@ -106,5 +97,5 @@ export const useSvgTransform = (
     attributeOldValue: true,
   });
 
-  return { w: w * scale.w, h: h * scale.h };
+  return scale;
 };

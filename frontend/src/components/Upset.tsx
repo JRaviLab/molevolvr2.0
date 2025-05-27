@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import {
   FaBezierCurve,
   FaDownload,
@@ -9,9 +9,9 @@ import clsx from "clsx";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
-import { fitViewBox, printElement } from "@/util/dom";
+import Svg from "@/components/Svg";
+import { printElement } from "@/util/dom";
 import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
-import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
 import classes from "./Upset.module.css";
 
 type Props = {
@@ -41,29 +41,12 @@ const Upset = ({ x, y, data }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
-  /** reactive CSS vars */
-  const theme = useTheme();
-
-  /** font size, in svg units */
-  const fontSize = useSvgTransform(svgRef.current, 1, rootFontSize()).h;
-
-  /** fit view box */
-  useEffect(() => {
-    fitViewBox(svgRef.current, 0.01);
-  });
-
   return (
     <Flex direction="column" gap="lg">
       <div ref={containerRef} className={clsx("card", classes.container)}>
-        <svg
-          ref={svgRef}
-          className={classes.chart}
-          style={{
-            fontSize,
-            /** size based on number of rows */
-            height: 2 * rootFontSize() * (data.length + 2),
-          }}
-        ></svg>
+        <Svg ref={svgRef} className={classes.chart}>
+          hello
+        </Svg>
       </div>
 
       {/* controls */}
