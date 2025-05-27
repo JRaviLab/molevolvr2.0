@@ -110,6 +110,11 @@ const Tree = ({ data }: Props) => {
   /** path between selected nodes */
   const selectedPath = selectedA && selectedB ? selectedA.path(selectedB) : [];
 
+  /** dist between selected nodes */
+  const selectedDist = Math.abs(
+    (selectedA?.data.rootDist ?? 0) - (selectedB?.data.rootDist ?? 0),
+  );
+
   /** max node depth */
   const maxY = max(map(tree.descendants(), "y")) ?? 0;
 
@@ -283,8 +288,7 @@ const Tree = ({ data }: Props) => {
             <span>{selectedB?.data.label}</span>
             <span>Dist.</span>
             <span>
-              {sum(map(selectedPath, "data.dist") ?? 0).toFixed(2)} (
-              {selectedPath.length} nodes)
+              {selectedDist.toFixed(2)} ({selectedPath.length} nodes)
             </span>
           </div>
         )}
