@@ -81,7 +81,7 @@ export const downloadJson = (data: unknown, filename: Filename) =>
 export const downloadPng = async (element: Element, filename: Filename) => {
   try {
     // @ts-expect-error typing says lib funcs don't support svg elements, but in practice it does
-    const blob = await toPng(element);
+    const blob = await toPng(element, { backgroundColor: "transparent" });
     download(getUrl(blob, "image/png"), filename, "png");
   } catch (error) {
     console.error(error);
