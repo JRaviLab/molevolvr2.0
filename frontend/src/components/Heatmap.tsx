@@ -68,23 +68,21 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   /** reactive CSS vars */
   const theme = useTheme();
 
-  /** sizes of elements, in svg units */
+  /** sizes of elements */
   const cellSize = 30;
   const legendHeight = Math.min(
     cellSize * Math.max(0, data.length - 2),
     cellSize * 5,
   );
 
-  /** col # to svg x coord */
-  const xScale = scaleBand(range(0, x.labels.length), [
-    0,
-    x.labels.length * cellSize,
-  ]);
-  /** row # to svg y coord */
-  const yScale = scaleBand(range(0, y.labels.length), [
-    0,
-    y.labels.length * cellSize,
-  ]);
+  /** num of rows/cols */
+  const cols = x.labels.length;
+  const rows = y.labels.length;
+
+  /** col # to x coord */
+  const xScale = scaleBand(range(0, cols), [0, cols * cellSize]).padding(0);
+  /** row # to y coord */
+  const yScale = scaleBand(range(0, rows), [0, rows * cellSize]).padding(0);
 
   /** value range */
   {
@@ -98,9 +96,9 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   /** % to color */
   const colorScale = (value: number) => gradientFunc(gradient, reverse, value);
 
-  /** main chart area svg units */
-  const width = (xScale(x.labels.length - 1) ?? 0) + xScale.bandwidth();
-  const height = (yScale(y.labels.length - 1) ?? 0) + yScale.bandwidth();
+  /** main chart area */
+  const width = (xScale(cols - 1) ?? 0) + xScale.bandwidth();
+  const height = (yScale(rows - 1) ?? 0) + yScale.bandwidth();
 
   /** legend info */
   const legendScale = valueScale.ticks(4).map((tick, index, array) => ({

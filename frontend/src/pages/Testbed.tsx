@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   FaArrowRight,
   FaArrowsUpDown,
@@ -33,7 +32,7 @@ import {
   FaTableCells,
 } from "react-icons/fa6";
 import { PiSquaresFourFill } from "react-icons/pi";
-import { random, sample, uniq } from "lodash";
+import { sample, uniq } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -59,7 +58,6 @@ import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import Sunburst from "@/components/Sunburst";
-import Svg from "@/components/Svg";
 import Table from "@/components/Table";
 import Tabs, { Tab } from "@/components/Tabs";
 import TextBox from "@/components/TextBox";
@@ -73,7 +71,6 @@ import {
   heatmap,
   iprSequence,
   iprTracks,
-  label,
   logChange,
   msaTracks,
   nodes,
@@ -89,6 +86,8 @@ import tableData from "../../fixtures/table.json";
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
+  return <SectionUpset />;
+
   return (
     <>
       <Meta title="Testbed" />
@@ -99,6 +98,7 @@ const TestbedPage = () => {
 
       {/* complex components */}
 
+      <SectionUpset />
       <SectionSunburst />
       <SectionHeatmap />
       <SectionTree />
@@ -141,81 +141,6 @@ const TestbedPage = () => {
 };
 
 export default TestbedPage;
-
-/** svg wrapper */
-const SvgSection = () => {
-  const randomElements = () =>
-    Array(random(3, 10))
-      .fill(null)
-      .map(() => {
-        let x: number | string = random(-200, 200);
-        let y: number | string = random(-200, 200);
-        let width: number | string = random(50, 200);
-        let height: number | string = random(50, 200);
-        const type = sample(["rect", "text"])!;
-        if (Math.random() > 0.5) x = x / 20 + "em";
-        if (Math.random() > 0.5) y = y / 20 + "em";
-        if (Math.random() > 0.5) width = width / 20 + "em";
-        if (Math.random() > 0.5) height = height / 20 + "em";
-        if (type === "text") height = "";
-        const color = type === "rect" ? sample(["red", "green", "blue"])! : "";
-        const text = type === "text" ? (label() ?? "") : "";
-        return { type, x, y, width, height, color, text };
-      });
-
-  const [elements, setElements] = useState(randomElements());
-
-  return (
-    <Section>
-      <button onClick={() => setElements(randomElements())}>Randomize</button>
-
-      <Flex vAlign="center">
-        {elements.map(({ width, height, color, text }, index) => (
-          <div key={index} style={{ width, height, background: color }}>
-            {text ? (
-              text
-            ) : (
-              <>
-                {width} &times; {height}
-              </>
-            )}
-          </div>
-        ))}
-      </Flex>
-
-      <div
-        className="card"
-        style={{ display: "flex", width: "", justifyContent: "center" }}
-      >
-        <Svg>
-          {elements.map(({ type, x, y, width, height, color, text }, index) =>
-            type === "rect" ? (
-              <rect
-                key={index}
-                x={x}
-                y={y}
-                width={width}
-                height={height}
-                fill={color}
-              />
-            ) : (
-              <text
-                key={index}
-                x={x}
-                y={y}
-                width={width}
-                fill={color}
-                textAnchor="middle"
-              >
-                {text}
-              </text>
-            ),
-          )}
-        </Svg>
-      </div>
-    </Section>
-  );
-};
 
 /* regular html elements and css classes for basic formatting */
 const SectionElements = () => {
