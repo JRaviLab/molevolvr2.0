@@ -6,26 +6,30 @@ import { getSvgTransform, getTextWidth, getViewBoxFit } from "@/util/dom";
 import { rootFontSize } from "@/util/hooks";
 
 type Props = {
-  ref: RefObject<SVGSVGElement | null>;
+  ref?: RefObject<SVGSVGElement | null>;
   children: ReactNode;
 } & ComponentProps<"svg">;
 
 /**
  * wrapper to make writing SVGs easier
  *
- * - unitless coordinates should 1:1 match dom px (unless svg has to shrink to fix
- *   inside available space)
- * - should provide a way to size/position text/other elements to match document
- *   root font size, e.g. 1em
- * - view box should always fit to content, to ensure no clipping
  * - should never exceed document container size or svg content size
  * - when container has no specified size, should expand up to content size or max
  *   container size
  * - size should maintain aspect ratio of content
- * - should never result in infinite/multiple renders
- * - text should be automatically truncated if it exceeds its specified width?
+ * - view box should always fit to content, to ensure no clipping
+ * - unitless coordinates should 1:1 match dom px (unless svg has to shrink to fix
+ *   inside available space)
+ * - text size should match document font size (except at extreme scales)
+ * - text should be automatically truncated if it exceeds its specified width
+ * - should never result in infinite/many renders
  */
-const Svg = ({ ref, children, ...props }: Props) => {
+const Svg = ({ ref: _ref, children, ...props }: Props) => {
+  /** internal ref */
+  const ref = useRef<SVGSVGElement>(null);
+  /** external ref */
+  if (_ref?.current) ref.current = _ref.current;
+
   /** document size of svg */
   const [width, height] = useElementSize(ref);
 
@@ -108,7 +112,7 @@ const getTextElements = (svg: SVGSVGElement) =>
   [
     ...(svg.querySelectorAll<
       SVGTextElement | SVGTSpanElement | SVGTextPathElement
-    >("text, tspan,textPath") ?? []),
+    >("text, tspan, textPath") ?? []),
   ].filter(
     (element) =>
       /** only truncate if element has text child node (no element children) */
@@ -139,10 +143,10 @@ const truncateText = (svg: SVGSVGElement, fontSize: number) => {
         document.querySelector<SVGPathElement>(href)?.getTotalLength() || 0;
 
     /** get limit from width attr */
-    const width = element.getAttribute("width");
-    if (width) limit = Number(width);
+    const width = Number(element.getAttribute("width"));
+    if (width) limit = width;
 
-    if (!limit) break;
+    if (!limit) continue;
 
     /** reduce string length until text width under width limit */
     for (let slice = text.length; slice > 0; slice--) {

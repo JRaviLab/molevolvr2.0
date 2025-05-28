@@ -61,8 +61,6 @@ export type Props = {
 const minWrap = 10;
 const maxWrap = 1000;
 
-/** options, in svg units (relative): */
-
 const cellWidth = 5;
 const cellHeight = 10;
 const combinedHeight = 20;

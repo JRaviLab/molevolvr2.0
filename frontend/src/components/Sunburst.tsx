@@ -68,9 +68,11 @@ type Props = {
 /** thickness of rings */
 const ringSize = 40;
 /** gap between rings */
-const gapSize = 5;
+const gapSize = 3;
 /** depth/level of first ring from center */
 const startDepth = 1;
+/** line thickness */
+const strokeWidth = 2;
 
 /** sunburst plot */
 const Sunburst = ({ data }: Props) => {
@@ -326,7 +328,7 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
           className={classes.shape}
           fill={color}
           stroke={theme["--black"]}
-          strokeWidth={gapSize * 0.5}
+          strokeWidth={strokeWidth}
           strokeOpacity={lastSelected === true ? 1 : 0}
           d={fill}
           tabIndex={0}

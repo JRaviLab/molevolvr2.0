@@ -39,12 +39,10 @@ type Props = {
 
 /** grid spacing */
 const size = 30;
-
 /** circle size */
-const nodeSize = 5;
-
+const nodeSize = 6;
 /** line thickness */
-const strokeWidth = 1;
+const strokeWidth = 2;
 
 /** link line generator */
 const link = line().curve(curveStepBefore);

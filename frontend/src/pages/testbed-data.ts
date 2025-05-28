@@ -52,8 +52,8 @@ export const sequence = (chars?: string, min = 10, max = 100) =>
     .join("");
 
 /** fake upset data */
-const upsetCols = random(5, 20);
-const upsetRows = random(5, 20);
+const upsetCols = random(3, 10);
+const upsetRows = random(3, 10);
 export const upset = {
   x: {
     data: Array(upsetCols)
@@ -63,7 +63,6 @@ export const upset = {
       })),
   },
   y: {
-    label: "Lorem",
     data: Array(upsetRows)
       .fill(null)
       .map(() => ({
@@ -76,7 +75,7 @@ export const upset = {
     .map(() =>
       Array(upsetCols)
         .fill(null)
-        .map(() => Math.random() > 0.5),
+        .map(() => Math.random() > 0.75),
     ),
 };
 
