@@ -12,7 +12,7 @@ type Base = {
   flip?: boolean;
   /** look */
   design?: "normal" | "hollow" | "critical";
-  /** class */
+  /** class on button */
   className?: string;
 };
 
