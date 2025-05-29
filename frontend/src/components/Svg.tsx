@@ -67,7 +67,7 @@ const Svg = ({ ref: _ref, children, ...props }: Props) => {
     update();
   }, [update, width, height, children]);
 
-  /** when document fonts done loading */
+  /** when fonts done loading */
   useEventListener("loadingdone", update, document.fonts);
 
   return (
