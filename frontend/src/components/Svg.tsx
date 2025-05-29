@@ -1,9 +1,15 @@
 import { useCallback, useLayoutEffect, useRef } from "react";
 import type { ComponentProps, ReactNode, RefObject } from "react";
 import clsx from "clsx";
-import { clamp, truncate } from "lodash";
+import { clamp, truncate, zip } from "lodash";
 import { useElementSize, useEventListener } from "@reactuses/core";
-import { getSvgTransform, getTextWidth, getViewBoxFit } from "@/util/dom";
+import {
+  getSvgTransform,
+  getTextWidth,
+  getViewBox,
+  getViewBoxFit,
+  type ViewBox,
+} from "@/util/dom";
 import { rootFontSize } from "@/util/hooks";
 import classes from "./Svg.module.css";
 
@@ -67,9 +73,16 @@ const Svg = ({ ref: _ref, className, children, ...props }: Props) => {
     for (let i = 0; i < 100; i++) {
       const fontSize = updateFontSize(ref.current);
       truncateText(ref.current, fontSize);
-      if (updateViewBox(ref.current))
-        /** if already converged closely, stop iterating */
+      const { viewBox, changed } = updateViewBox(ref.current);
+      /** if already converged closely, stop iterating */
+      if (!changed) {
+        /** set size styles, unless explicitly set by consumer */
+        if (["width", "height"].every((prop) => !(prop in props))) {
+          updateStyles(ref.current, viewBox);
+          console.log("hi");
+        }
         break;
+      }
     }
 
     /** re-show hidden elements */
@@ -78,7 +91,7 @@ const Svg = ({ ref: _ref, className, children, ...props }: Props) => {
     /** prevent consecutive synchronous updates */
     window.clearTimeout(justUpdated.current);
     justUpdated.current = window.setTimeout(() => (justUpdated.current = 0), 0);
-  }, [ref]);
+  }, [ref, props]);
 
   /** when contents or document size of svg change */
   useLayoutEffect(() => {
@@ -103,7 +116,7 @@ export default Svg;
 const updateFontSize = (svg: SVGSVGElement) => {
   let scale = getSvgTransform(svg).h;
   /** prevent extreme scales */
-  scale = clamp(scale, 1, 10);
+  scale = clamp(scale, 0.0001, 100);
   const fontSize = rootFontSize() * scale;
   svg.style.fontSize = fontSize + "px";
   return fontSize;
@@ -111,20 +124,28 @@ const updateFontSize = (svg: SVGSVGElement) => {
 
 /** update view box attr of root svg element */
 const updateViewBox = (svg: SVGSVGElement) => {
-  /** get current view box */
-  const current = svg.getAttribute("viewBox")?.split(" ").map(Number);
   /** get view box fitted to svg contents */
-  const bbox = getViewBoxFit(svg);
-  const fitted = Object.values(bbox);
-  /** if current view box already close to fitted view box, don't change */
-  if (current?.every((c, i) => Math.abs(c - fitted[i]!) < 1)) return true;
+  const fitted = getViewBoxFit(svg);
+  /** get current view box */
+  const current = getViewBox(svg);
+  if (current) {
+    /** if current view box already close to fitted view box, don't change */
+    if (
+      zip(current, fitted).every(([a, b]) => Math.abs((a ?? 0) - (b ?? 0)) < 1)
+    )
+      return { viewBox: current, changed: false };
+  }
   /** set fitted view box */
   svg.setAttribute("viewBox", fitted.join(" "));
-  /** set dom sizing styles to match view box */
-  svg.style.width = bbox.w + "px";
-  svg.style.aspectRatio = `${bbox.w} / ${bbox.h}`;
-  svg.style.maxWidth = `min(${bbox.w}px, 100%)`;
-  svg.style.maxHeight = `min(${bbox.h}px, 100%)`;
+  return { viewBox: fitted, changed: true };
+};
+
+/** set dom sizing styles to match view box */
+const updateStyles = (svg: SVGSVGElement, [, , w, h]: ViewBox) => {
+  svg.style.width = w + "px";
+  svg.style.aspectRatio = `${w} / ${h}`;
+  svg.style.maxWidth = `min(${w}px, 100%)`;
+  svg.style.maxHeight = `min(${h}px, 100%)`;
 };
 
 /** get text children of svg */

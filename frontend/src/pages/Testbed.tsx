@@ -58,6 +58,7 @@ import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import Sunburst from "@/components/Sunburst";
+import Svg from "@/components/Svg";
 import Table from "@/components/Table";
 import Tabs, { Tab } from "@/components/Tabs";
 import TextBox from "@/components/TextBox";
@@ -86,8 +87,6 @@ import tableData from "../../fixtures/table.json";
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
-  return <SectionUpset />;
-
   return (
     <>
       <Meta title="Testbed" />

@@ -170,10 +170,20 @@ export const getSvgTransform = (svg: SVGSVGElement) => {
   };
 };
 
+export type ViewBox = [number, number, number, number];
+
+/** get current view box */
+export const getViewBox = (svg: SVGSVGElement): ViewBox | undefined => {
+  const [x, y, w, h] =
+    svg.getAttribute("viewBox")?.split(" ").map(Number) ?? [];
+  if (!x || !y || !w || !h) return;
+  return [x, y, w, h];
+};
+
 /** get bounding box of svg contents */
-export const getViewBoxFit = (svg: SVGSVGElement) => {
+export const getViewBoxFit = (svg: SVGSVGElement): ViewBox => {
   const { x, y, width, height } = svg.getBBox();
-  return { x, y, w: width, h: height };
+  return [x, y, width, height];
 };
 
 /** fit view box to contents of svg */
