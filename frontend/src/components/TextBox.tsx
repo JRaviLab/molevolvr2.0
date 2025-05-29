@@ -23,7 +23,7 @@ type Base = {
   value?: string;
   /** on text state change */
   onChange?: (value: string) => void;
-  /** className */
+  /** class on textbox */
   className?: string;
 };
 

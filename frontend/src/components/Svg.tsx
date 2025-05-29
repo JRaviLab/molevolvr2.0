@@ -1,17 +1,25 @@
 import { useCallback, useLayoutEffect, useRef } from "react";
 import type { ComponentProps, ReactNode, RefObject } from "react";
+import clsx from "clsx";
 import { clamp, truncate } from "lodash";
 import { useElementSize, useEventListener } from "@reactuses/core";
 import { getSvgTransform, getTextWidth, getViewBoxFit } from "@/util/dom";
 import { rootFontSize } from "@/util/hooks";
+import classes from "./Svg.module.css";
 
 type Props = {
   ref?: RefObject<SVGSVGElement | null>;
+  /** class on svg */
+  className?: string;
+  /**
+   * svg contents. use class "fit-ignore" on element to ignore in fitting calc,
+   * e.g. for things like clip-path that don't work with getBBox
+   */
   children: ReactNode;
 } & ComponentProps<"svg">;
 
 /**
- * wrapper to make writing SVGs easier
+ * wrapper to make writing SVGs easier. goals:
  *
  * - should never exceed document container size or svg content size
  * - when container has no specified size, should expand up to content size or max
@@ -22,9 +30,10 @@ type Props = {
  *   inside available space)
  * - text size should match document font size (except at extreme scales)
  * - text should be automatically truncated if it exceeds its specified width
+ * - should provide a way to ignore certain elements in bbox fitting calc
  * - should never result in infinite/many renders
  */
-const Svg = ({ ref: _ref, children, ...props }: Props) => {
+const Svg = ({ ref: _ref, className, children, ...props }: Props) => {
   /** internal ref */
   const ref = useRef<SVGSVGElement>(null);
   /** external ref */
@@ -48,6 +57,12 @@ const Svg = ({ ref: _ref, children, ...props }: Props) => {
     /** if just ran, don't run again (hard protection against infinite loop) */
     if (justUpdated.current) return;
 
+    /**
+     * temporarily hide elements that we don't wish to include in bbox calc
+     * https://stackoverflow.com/questions/10430518/getting-a-display-bounding-box-for-a-clipped-object/79644309#79644309
+     */
+    ref.current.classList.add(classes.fitting!);
+
     /** iteratively update, which should converge to stable values */
     for (let i = 0; i < 100; i++) {
       const fontSize = updateFontSize(ref.current);
@@ -56,6 +71,9 @@ const Svg = ({ ref: _ref, children, ...props }: Props) => {
         /** if already converged closely, stop iterating */
         break;
     }
+
+    /** re-show hidden elements */
+    ref.current.classList.remove(classes.fitting!);
 
     /** prevent consecutive synchronous updates */
     window.clearTimeout(justUpdated.current);
@@ -67,11 +85,13 @@ const Svg = ({ ref: _ref, children, ...props }: Props) => {
     update();
   }, [update, width, height, children]);
 
+  /** when document done loading */
+  useEventListener("load", update, window);
   /** when fonts done loading */
   useEventListener("loadingdone", update, document.fonts);
 
   return (
-    <svg ref={ref} {...props} style={{ overflow: "visible" }}>
+    <svg ref={ref} className={clsx(classes.svg, className)} {...props}>
       {children}
     </svg>
   );

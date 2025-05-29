@@ -1,0 +1,7 @@
+.svg {
+  overflow: visible;
+}
+
+.fitting :global(.fit-ignore) {
+  display: none;
+}

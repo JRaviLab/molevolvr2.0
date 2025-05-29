@@ -17,7 +17,7 @@ type Props = {
   icon?: ReactElement;
   /** content next to icon */
   children: ReactNode;
-  /** class */
+  /** class on mark */
   className?: string;
 };
 

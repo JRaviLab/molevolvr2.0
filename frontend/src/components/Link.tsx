@@ -12,7 +12,7 @@ type Base = {
   showArrow?: boolean;
   /** tooltip content */
   tooltip?: ReactNode;
-  /** class */
+  /** class on link */
   className?: string;
   /** content */
   children: ReactNode;
