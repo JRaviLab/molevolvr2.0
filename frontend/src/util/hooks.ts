@@ -3,6 +3,7 @@ import { flushSync } from "react-dom";
 import { useAtomValue } from "jotai";
 import {
   useDebounceFn,
+  useEventListener,
   useMutationObserver,
   useResizeObserver,
 } from "@reactuses/core";
@@ -40,10 +41,17 @@ export const useTheme = () => {
   /** dark mode state */
   const darkMode = useAtomValue(darkModeAtom);
 
+  const update = useCallback(() => setTheme(getTheme()), []);
+
   /** update theme variables when dark mode changes */
   useEffect(() => {
-    setTheme(getTheme());
-  }, [darkMode]);
+    update();
+  }, [update, darkMode]);
+
+  /** when document done loading */
+  useEventListener("load", update, window);
+  /** when fonts done loading */
+  useEventListener("loadingdone", update, document.fonts);
 
   return theme;
 };
