@@ -12,7 +12,7 @@ import { inRange, mapValues, sumBy } from "lodash";
 import Download from "@/components/Download";
 import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
-import Svg from "@/components/Svg";
+import Svg, { Truncate } from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
@@ -303,9 +303,9 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
         dy="0.55ex"
         fill={theme["--black"]}
       >
-        <textPath href={`#${id}`} startOffset="50%">
+        <Truncate tag="textPath" href={`#${id}`} startOffset="50%">
           {label || "-"}
-        </textPath>
+        </Truncate>
       </text>
     </g>
   );

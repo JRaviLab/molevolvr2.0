@@ -13,7 +13,7 @@ import {
 import { map, orderBy } from "lodash";
 import Download from "@/components/Download";
 import Flex from "@/components/Flex";
-import Svg from "@/components/Svg";
+import Svg, { Truncate } from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
 import { useTheme } from "@/util/hooks";
 import classes from "./Upset.module.css";
@@ -236,7 +236,8 @@ const Upset = ({ x, y, data }: Props) => {
             <g transform={`translate(${-barLength * 2}, 0)`}>
               {y.data.map((row, rowIndex) => (
                 <Tooltip key={rowIndex} content={row.label}>
-                  <text
+                  <Truncate
+                    tag="text"
                     x={0}
                     y={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
                     width={barLength}
@@ -245,7 +246,7 @@ const Upset = ({ x, y, data }: Props) => {
                     tabIndex={0}
                   >
                     {row.label ?? "-"}
-                  </text>
+                  </Truncate>
                 </Tooltip>
               ))}
             </g>

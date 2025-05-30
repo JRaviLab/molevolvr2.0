@@ -1,16 +1,24 @@
-import { useCallback, useLayoutEffect, useRef } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import type { ComponentProps, ReactNode, RefObject } from "react";
+import { flushSync } from "react-dom";
 import clsx from "clsx";
 import { clamp, truncate, zip } from "lodash";
 import { useElementSize, useEventListener } from "@reactuses/core";
 import {
   getSvgTransform,
   getTextWidth,
-  getViewBox,
   getViewBoxFit,
   type ViewBox,
 } from "@/util/dom";
 import { rootFontSize } from "@/util/hooks";
+import { sleep } from "@/util/misc";
 import classes from "./Svg.module.css";
 
 type Props = {
@@ -19,10 +27,12 @@ type Props = {
   className?: string;
   /**
    * svg contents. use class "fit-ignore" on element to ignore in fitting calc,
-   * e.g. for things like clip-path that don't work with getBBox
+   * e.g. for things like clip-path that don't work with getBBox.
    */
-  children: ReactNode;
+  children: ReactNode | (({ fontSize }: { fontSize: number }) => ReactNode);
 } & ComponentProps<"svg">;
+
+const SVGContext = createContext({ fontSize: 16 });
 
 /**
  * wrapper to make writing SVGs easier. goals:
@@ -48,18 +58,33 @@ const Svg = ({ ref: _ref, className, children, ...props }: Props) => {
   /** document size of svg */
   const [width, height] = useElementSize(ref);
 
-  /** did sizing just update */
+  /** scale factor to transform document units to svg units */
+  const [scale, setScale] = useState<ReturnType<typeof getSvgTransform>>({
+    w: 1,
+    h: 1,
+  });
+
+  /** prevent extreme scales */
+  scale.w = clamp(scale.w, 0.1, 10);
+  scale.h = clamp(scale.h, 0.1, 10);
+
+  /** scale font to match document */
+  const fontSize = rootFontSize() * scale.h;
+
+  /** view box, fitted to content */
+  const [viewBox, setViewBox] = useState<ViewBox>({
+    x: 0,
+    y: 0,
+    w: 100,
+    h: 100,
+  });
+
+  /** did update just run */
   const justUpdated = useRef(0);
 
-  /** when children change */
-  useLayoutEffect(() => {
-    if (!ref.current) return;
-    rememberText(ref.current);
-  }, [ref, children]);
-
-  /** update sizing */
   const update = useCallback(() => {
     if (!ref.current) return;
+
     /** if just ran, don't run again (hard protection against infinite loop) */
     if (justUpdated.current) return;
 
@@ -69,21 +94,34 @@ const Svg = ({ ref: _ref, className, children, ...props }: Props) => {
      */
     ref.current.classList.add(classes.fitting!);
 
-    /** iteratively update, which should converge to stable values */
-    for (let i = 0; i < 100; i++) {
-      const fontSize = updateFontSize(ref.current);
-      truncateText(ref.current, fontSize);
-      const { viewBox, changed } = updateViewBox(ref.current);
-      /** if already converged closely, stop iterating */
-      if (!changed) {
-        /** set size styles, unless explicitly set by consumer */
-        if (["width", "height"].every((prop) => !(prop in props))) {
-          updateStyles(ref.current, viewBox);
-          console.log("hi");
-        }
-        break;
+    /** re-render component and children immediately based on state changes */
+    flushSync(() => {
+      if (!ref.current) return;
+
+      /** fitted view box from previous iteration */
+      let prevViewBox: ViewBox | Record<string, never> = {};
+
+      /** iteratively fit & scale, which should converge to stable values */
+      for (let i = 0; i < 3; i++) {
+        /** get view box fitted to content */
+        const viewBox = getViewBoxFit(ref.current);
+
+        /** if converged closely, stop iterating */
+        if (
+          zip(Object.values(viewBox), Object.values(prevViewBox)).every(
+            ([a = Infinity, b = Infinity]) => Math.abs(b - a) < 1,
+          )
+        )
+          break;
+
+        /** update view box */
+        setViewBox(viewBox);
+        /** update scale factor */
+        setScale(getSvgTransform(ref.current));
+
+        prevViewBox = viewBox;
       }
-    }
+    });
 
     /** re-show hidden elements */
     ref.current.classList.remove(classes.fitting!);
@@ -91,11 +129,11 @@ const Svg = ({ ref: _ref, className, children, ...props }: Props) => {
     /** prevent consecutive synchronous updates */
     window.clearTimeout(justUpdated.current);
     justUpdated.current = window.setTimeout(() => (justUpdated.current = 0), 0);
-  }, [ref, props]);
+  }, [ref]);
 
   /** when contents or document size of svg change */
   useLayoutEffect(() => {
-    update();
+    sleep().then(update);
   }, [update, width, height, children]);
 
   /** when document done loading */
@@ -104,105 +142,89 @@ const Svg = ({ ref: _ref, className, children, ...props }: Props) => {
   useEventListener("loadingdone", update, document.fonts);
 
   return (
-    <svg ref={ref} className={clsx(classes.svg, className)} {...props}>
-      {children}
-    </svg>
+    <>
+      <SVGContext.Provider value={{ fontSize }}>
+        <svg
+          ref={ref}
+          viewBox={Object.values(viewBox).join(" ")}
+          className={clsx(classes.svg, className)}
+          style={{
+            /** ensure proper sizing based on content */
+            width: viewBox.w + "px",
+            aspectRatio: `${viewBox.w} / ${viewBox.h}`,
+            maxWidth: `min(${viewBox.w}px, 100%)`,
+            maxHeight: `min(${viewBox.h}px, 100%)`,
+
+            fontSize,
+          }}
+          {...props}
+        >
+          {children}
+        </svg>
+      </SVGContext.Provider>
+
+      {/* debug */}
+      {/* <pre>
+        {JSON.stringify({ width, height, viewBox, scale, fontSize }, null, 2)}
+      </pre> */}
+    </>
   );
 };
 
 export default Svg;
 
-/** set font size of root svg element to match document font size */
-const updateFontSize = (svg: SVGSVGElement) => {
-  let scale = getSvgTransform(svg).h;
-  /** prevent extreme scales */
-  scale = clamp(scale, 0.0001, 100);
-  const fontSize = rootFontSize() * scale;
-  svg.style.fontSize = fontSize + "px";
-  return fontSize;
-};
+type TruncateProps = {
+  children: string;
+} & (
+  | ({ tag: "text"; width: number } & ComponentProps<"text">)
+  | ({ tag: "textPath"; href: string } & ComponentProps<"textPath">)
+);
 
-/** update view box attr of root svg element */
-const updateViewBox = (svg: SVGSVGElement) => {
-  /** get view box fitted to svg contents */
-  const fitted = getViewBoxFit(svg);
-  /** get current view box */
-  const current = getViewBox(svg);
-  if (current) {
-    /** if current view box already close to fitted view box, don't change */
-    if (
-      zip(current, fitted).every(([a, b]) => Math.abs((a ?? 0) - (b ?? 0)) < 1)
-    )
-      return { viewBox: current, changed: false };
-  }
-  /** set fitted view box */
-  svg.setAttribute("viewBox", fitted.join(" "));
-  return { viewBox: fitted, changed: true };
-};
+/** automatically truncate text */
+export const Truncate = ({
+  tag: Tag,
+  width,
+  href,
+  children,
+  ...props
+}: TruncateProps) => {
+  /** width limit */
+  const [limit, setLimit] = useState(Infinity);
 
-/** set dom sizing styles to match view box */
-const updateStyles = (svg: SVGSVGElement, [, , w, h]: ViewBox) => {
-  svg.style.width = w + "px";
-  svg.style.aspectRatio = `${w} / ${h}`;
-  svg.style.maxWidth = `min(${w}px, 100%)`;
-  svg.style.maxHeight = `min(${h}px, 100%)`;
-};
+  /** font size from parent svg */
+  const { fontSize } = useContext(SVGContext);
 
-/** get text children of svg */
-const getTextElements = (svg: SVGSVGElement) =>
-  [
-    ...(svg.querySelectorAll<
-      SVGTextElement | SVGTSpanElement | SVGTextPathElement
-    >("text, tspan, textPath") ?? []),
-  ].filter(
-    (element) =>
-      /** only truncate if element has text child node (no element children) */
-      !element.children.length,
-  );
-
-/** remember full text of svg text elements */
-const rememberText = (svg: SVGSVGElement) => {
-  for (const element of getTextElements(svg))
-    element.setAttribute("data-text", element.textContent ?? "");
-};
-
-/** truncate text content of svg text elements */
-const truncateText = (svg: SVGSVGElement, fontSize: number) => {
-  for (const element of getTextElements(svg)) {
-    /** get original full text from data attribute */
-    const text = element.getAttribute("data-text") ?? "";
-    /** reset text content to be possibly limited again */
-    element.textContent = text;
-
-    /** text length limit */
-    let limit = 0;
-
+  useLayoutEffect(() => {
     /** get limit from text path length */
-    const href = element.getAttribute("href");
-    if (element instanceof SVGTextPathElement && href)
-      limit =
-        document.querySelector<SVGPathElement>(href)?.getTotalLength() || 0;
+    if (href) {
+      setLimit(
+        document.querySelector<SVGPathElement>(href)?.getTotalLength() || 0,
+      );
+      return;
+    }
 
     /** get limit from width attr */
-    const width = Number(element.getAttribute("width"));
-    if (width) limit = width;
+    const _width = Number(width);
+    if (_width) {
+      setLimit(_width);
+      return;
+    }
+  }, [width, href]);
 
-    if (!limit) continue;
-
-    /** reduce string length until text width under width limit */
-    for (let slice = text.length; slice > 0; slice--) {
-      /** truncated string */
-      const truncated = truncate(text, { length: slice });
-      /**
-       * get text length. can't use getComputedTextLength b/c, for textPath, too
-       * slow on chrome, and ff returns length clipped to path.
-       */
-      const length = getTextWidth(truncated, fontSize);
-      if (length < limit) {
-        /** truncate text */
-        element.textContent = truncated;
-        break;
-      }
+  /** reduce string length until text width under width limit */
+  for (let slice = children.length; slice > 0; slice--) {
+    const truncated = truncate(children, { length: slice });
+    /**
+     * get actual text width. can't use getComputedTextLength b/c, for textPath,
+     * too slow on chrome, and ff returns length clipped to path.
+     */
+    const length = getTextWidth(truncated, fontSize);
+    if (length < limit) {
+      children = truncated;
+      break;
     }
   }
+
+  // @ts-expect-error ts not smart enough here
+  return <Tag {...props}>{children}</Tag>;
 };
