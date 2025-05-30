@@ -1,6 +1,6 @@
 .svg {
   overflow: visible;
-  /* outline: solid 1px red; */
+  outline: solid 1px red;
 }
 
 .fitting :global(.fit-ignore) {

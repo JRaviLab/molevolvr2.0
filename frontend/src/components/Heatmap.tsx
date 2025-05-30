@@ -7,7 +7,7 @@ import Download from "@/components/Download";
 import Flex from "@/components/Flex";
 import { Gradient, gradientFunc, gradientOptions } from "@/components/Gradient";
 import SelectSingle from "@/components/SelectSingle";
-import Svg from "@/components/Svg";
+import Svg, { Truncate } from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
 import { useTheme } from "@/util/hooks";
 import classes from "./Heatmap.module.css";
@@ -138,7 +138,8 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           <g fill={theme["--black"]} dominantBaseline="central">
             {x.labels.map((label, index) => (
               <Tooltip content={label} key={index}>
-                <text
+                <Truncate
+                  tag="text"
                   width={cellSize * 4}
                   transform={[
                     `translate(0, ${-cellSize * 0.5})`,
@@ -150,7 +151,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
                   dominantBaseline="central"
                 >
                   {label ?? "-"}
-                </text>
+                </Truncate>
               </Tooltip>
             ))}
           </g>
@@ -163,7 +164,8 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           >
             {y.labels.map((label, index) => (
               <Tooltip content={label} key={index}>
-                <text
+                <Truncate
+                  tag="text"
                   width={cellSize * 4}
                   transform={[
                     `translate(${-cellSize * 0.5}, 0)`,
@@ -175,7 +177,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
                   dominantBaseline="central"
                 >
                   {label ?? "-"}
-                </text>
+                </Truncate>
               </Tooltip>
             ))}
           </g>

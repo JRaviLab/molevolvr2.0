@@ -5,7 +5,7 @@ import { map, mapValues, max, min, orderBy, sum, uniqueId } from "lodash";
 import Download from "@/components/Download";
 import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
-import Svg from "@/components/Svg";
+import Svg, { Truncate } from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
@@ -185,7 +185,8 @@ const Tree = ({ data }: Props) => {
                       strokeWidth={strokeWidth}
                       strokeDasharray={[strokeWidth, strokeWidth * 2].join(" ")}
                     />
-                    <text
+                    <Truncate
+                      tag="text"
                       x={maxY}
                       y={node.x ?? 0}
                       width={200}
@@ -194,7 +195,7 @@ const Tree = ({ data }: Props) => {
                       dominantBaseline="central"
                     >
                       {node.data.label ?? "-"}
-                    </text>
+                    </Truncate>
                   </>
                 )}
 
