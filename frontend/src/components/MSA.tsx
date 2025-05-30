@@ -1,11 +1,4 @@
 import { Fragment, useMemo, useRef, useState } from "react";
-import {
-  FaDownload,
-  FaFilePdf,
-  FaRegImage,
-  FaTableCellsLarge,
-} from "react-icons/fa6";
-import { TbPrompt } from "react-icons/tb";
 import clsx from "clsx";
 import { pairs } from "d3";
 import {
@@ -22,19 +15,12 @@ import { useLocalStorage } from "@reactuses/core";
 import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
+import Download from "@/components/Download";
 import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
 import NumberBox from "@/components/NumberBox";
-import Popover from "@/components/Popover";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap, type Hue } from "@/util/color";
-import { printElement } from "@/util/dom";
-import {
-  downloadJpg,
-  downloadPng,
-  downloadTsv,
-  downloadTxt,
-} from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
 import { sleep } from "@/util/misc";
@@ -153,83 +139,35 @@ const MSA = ({
         />
 
         <Flex gap="xs">
-          <Popover
-            content={
-              <Flex direction="column" hAlign="stretch" gap="xs">
-                <Button
-                  icon={<FaRegImage />}
-                  text="PNG"
-                  onClick={async () => {
-                    if (!ref.current) return;
-                    const oldWrap = wrap;
-                    setWrap(autoWrap(expanded));
-                    await sleep(10);
-                    downloadPng(ref.current, "msa");
-                    await sleep(10);
-                    setWrap(oldWrap);
-                  }}
-                  tooltip="High-resolution image"
-                />
-                <Button
-                  icon={<FaRegImage />}
-                  text="JPEG"
-                  onClick={async () => {
-                    if (!ref.current) return;
-                    const oldWrap = wrap;
-                    setWrap(autoWrap(expanded));
-                    await sleep(10);
-                    downloadJpg(ref.current, "msa");
-                    await sleep(10);
-                    setWrap(oldWrap);
-                  }}
-                  tooltip="Compressed image"
-                />
-                <Button
-                  icon={<FaTableCellsLarge />}
-                  text="TSV"
-                  onClick={() =>
-                    downloadTsv(
-                      tracks.map((track) =>
-                        mapKeys(track, (value, key) => startCase(key)),
-                      ),
-                      "msa",
-                    )
-                  }
-                  tooltip="Raw sequence data, tab-separated"
-                />
-                <Button
-                  icon={<TbPrompt />}
-                  text="FASTA"
-                  onClick={() =>
-                    downloadTxt(
-                      tracks
-                        .map((track) => `> ${track.label}\n${track.sequence}`)
-                        .join("\n\n"),
-                      "msa",
-                    )
-                  }
-                  tooltip="Raw sequence data, FASTA format"
-                />
-                <Button
-                  icon={<FaFilePdf />}
-                  text="PDF"
-                  onClick={async () => {
-                    if (!ref.current) return;
-                    const oldWrap = wrap;
-                    await printElement(ref.current, () => setWrap(40));
-                    setWrap(oldWrap);
-                  }}
-                  tooltip="Print as pdf"
-                />
-              </Flex>
-            }
-          >
-            <Button
-              icon={<FaDownload />}
-              design="hollow"
-              tooltip="Download visualization"
-            />
-          </Popover>
+          <Download
+            filename="MSA"
+            raster={ref}
+            rasterEffect={async () => {
+              const oldWrap = wrap;
+              setWrap(autoWrap(expanded));
+              await sleep(10);
+              return async () => {
+                await sleep(10);
+                setWrap(oldWrap);
+              };
+            }}
+            print={ref}
+            printEffect={async () => {
+              const oldWrap = wrap;
+              setWrap(40);
+              return () => setWrap(oldWrap);
+            }}
+            tabular={[
+              {
+                data: tracks.map((track) =>
+                  mapKeys(track, (value, key) => startCase(key)),
+                ),
+              },
+            ]}
+            text={tracks
+              .map((track) => `> ${track.label}\n${track.sequence}`)
+              .join("\n\n")}
+          />
 
           <Button
             icon={expanded ? <Collapse /> : <Expand />}

@@ -1,10 +1,4 @@
 import { Fragment, useRef } from "react";
-import {
-  FaBezierCurve,
-  FaDownload,
-  FaFilePdf,
-  FaRegImage,
-} from "react-icons/fa6";
 import clsx from "clsx";
 import {
   axisLeft,
@@ -17,13 +11,10 @@ import {
   transpose,
 } from "d3";
 import { map, orderBy } from "lodash";
-import Button from "@/components/Button";
+import Download from "@/components/Download";
 import Flex from "@/components/Flex";
-import Popover from "@/components/Popover";
 import Svg from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
-import { printElement } from "@/util/dom";
-import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import classes from "./Upset.module.css";
 
@@ -264,52 +255,7 @@ const Upset = ({ x, y, data }: Props) => {
 
       {/* controls */}
       <Flex>
-        <Popover
-          content={
-            <Flex direction="column" hAlign="stretch" gap="xs">
-              <Button
-                icon={<FaRegImage />}
-                text="PNG"
-                onClick={() =>
-                  containerRef.current &&
-                  downloadPng(containerRef.current, "upset")
-                }
-                tooltip="High-resolution image"
-              />
-              <Button
-                icon={<FaRegImage />}
-                text="JPEG"
-                onClick={() =>
-                  containerRef.current &&
-                  downloadJpg(containerRef.current, "upset")
-                }
-                tooltip="Compressed image"
-              />
-              <Button
-                icon={<FaBezierCurve />}
-                text="SVG"
-                onClick={() =>
-                  svgRef.current && downloadSvg(svgRef.current, "upset")
-                }
-                tooltip="Vector image"
-              />
-              <Button
-                icon={<FaFilePdf />}
-                text="PDF"
-                onClick={() =>
-                  containerRef.current && printElement(containerRef.current)
-                }
-                tooltip="Print as pdf"
-              />
-            </Flex>
-          }
-        >
-          <Button
-            icon={<FaDownload />}
-            design="hollow"
-            tooltip="Download chart"
-          />
-        </Popover>
+        <Download filename="upset" raster={containerRef} vector={svgRef} />
       </Flex>
     </Flex>
   );
