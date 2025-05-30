@@ -1,22 +1,13 @@
 import { Fragment, useMemo, useRef, useState } from "react";
-import {
-  FaBezierCurve,
-  FaDownload,
-  FaFilePdf,
-  FaRegImage,
-} from "react-icons/fa6";
 import clsx from "clsx";
 import { curveStepBefore, hierarchy, line, type HierarchyNode } from "d3";
 import { map, mapValues, max, min, orderBy, sum, uniqueId } from "lodash";
-import Button from "@/components/Button";
+import Download from "@/components/Download";
 import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
-import Popover from "@/components/Popover";
 import Svg from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { printElement } from "@/util/dom";
-import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
 import classes from "./Tree.module.css";
@@ -274,52 +265,7 @@ const Tree = ({ data }: Props) => {
 
       {/* controls */}
       <Flex>
-        <Popover
-          content={
-            <Flex direction="column" hAlign="stretch" gap="xs">
-              <Button
-                icon={<FaRegImage />}
-                text="PNG"
-                onClick={() =>
-                  containerRef.current &&
-                  downloadPng(containerRef.current, "tree")
-                }
-                tooltip="High-resolution image"
-              />
-              <Button
-                icon={<FaRegImage />}
-                text="JPEG"
-                onClick={() =>
-                  containerRef.current &&
-                  downloadJpg(containerRef.current, "tree")
-                }
-                tooltip="Compressed image"
-              />
-              <Button
-                icon={<FaBezierCurve />}
-                text="SVG"
-                onClick={() =>
-                  svgRef.current && downloadSvg(svgRef.current, "tree")
-                }
-                tooltip="Vector image (no legends)"
-              />
-              <Button
-                icon={<FaFilePdf />}
-                text="PDF"
-                onClick={() =>
-                  containerRef.current && printElement(containerRef.current)
-                }
-                tooltip="Print as pdf"
-              />
-            </Flex>
-          }
-        >
-          <Button
-            icon={<FaDownload />}
-            design="hollow"
-            tooltip="Download chart"
-          />
-        </Popover>
+        <Download filename="tree" raster={containerRef} vector={svgRef} />
       </Flex>
     </Flex>
   );

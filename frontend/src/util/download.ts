@@ -51,7 +51,7 @@ export const downloadTxt = (data: string, filename: Filename) =>
   download(getUrl(data, "text/plain;charset=utf-8"), filename, "txt");
 
 /** tabular data format. array of objects or array of arrays. */
-type Tabular = (Record<string, unknown> | unknown[])[];
+export type Tabular = (Record<string, unknown> | unknown[])[];
 
 /** stringify csv/tsv data */
 const getCsv = (data: Tabular, delimiter = ",") =>

@@ -6,7 +6,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { FaDownload, FaFilePdf, FaRegImage } from "react-icons/fa6";
 import clsx from "clsx";
 import {
   drag,
@@ -20,15 +19,12 @@ import {
 } from "d3";
 import { clamp, inRange, mapValues, range, truncate } from "lodash";
 import { useElementSize } from "@reactuses/core";
-import Button from "@/components/Button";
+import Download from "@/components/Download";
 import Flex from "@/components/Flex";
 import Help from "@/components/Help";
 import Legend from "@/components/Legend";
-import Popover from "@/components/Popover";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { printElement } from "@/util/dom";
-import { downloadJpg, downloadPng } from "@/util/download";
 import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
 import classes from "./IPR.module.css";
 
@@ -458,44 +454,7 @@ const IPR = ({ sequence, tracks }: Props) => {
 
       {/* controls */}
       <Flex>
-        <Popover
-          content={
-            <Flex direction="column" hAlign="stretch" gap="xs">
-              <Button
-                icon={<FaRegImage />}
-                text="PNG"
-                onClick={() =>
-                  containerRef.current &&
-                  downloadPng(containerRef.current, "ipr")
-                }
-                tooltip="High-resolution image"
-              />
-              <Button
-                icon={<FaRegImage />}
-                text="JPEG"
-                onClick={() =>
-                  containerRef.current &&
-                  downloadJpg(containerRef.current, "ipr")
-                }
-                tooltip="Compressed image"
-              />
-              <Button
-                icon={<FaFilePdf />}
-                text="PDF"
-                onClick={() =>
-                  containerRef.current && printElement(containerRef.current)
-                }
-                tooltip="Print as pdf"
-              />
-            </Flex>
-          }
-        >
-          <Button
-            icon={<FaDownload />}
-            design="hollow"
-            tooltip="Download chart"
-          />
-        </Popover>
+        <Download filename="interpro" raster={containerRef} />
 
         <Help tooltip="On main chart area, scroll/pinch to zoom, drag to move">
           Controls

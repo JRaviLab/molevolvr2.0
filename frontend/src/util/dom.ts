@@ -195,18 +195,11 @@ export const fitViewBox = (svg?: SVGSVGElement | null) => {
   return { x, y, width, height };
 };
 /** open browser print dialog with just one element shown */
-export const printElement = async (
-  element: Element,
-  beforePrint?: () => void,
-) => {
+export const printElement = async (element: Element) => {
   /** remember scroll position */
-  const oldY = element.getBoundingClientRect().top;
+  const oldScroll = element.getBoundingClientRect().top;
   /** make element fullscreen/print ready */
   element.classList.add("print-element");
-  if (beforePrint) {
-    await sleep(100);
-    beforePrint();
-  }
   /** wait for any layout shift */
   await sleep(100);
   /** trigger print dialog */
@@ -215,8 +208,8 @@ export const printElement = async (
   element.classList.remove("print-element");
   /** restore scroll */
   await sleep(100);
-  const newY = element.getBoundingClientRect().top;
-  window.scrollBy({ top: newY - oldY, behavior: "instant" });
+  const newScroll = element.getBoundingClientRect().top;
+  window.scrollBy({ top: newScroll - oldScroll, behavior: "instant" });
 };
 
 /** scroll page so that mouse stays at same position in document */

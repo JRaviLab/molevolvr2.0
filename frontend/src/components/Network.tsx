@@ -1,20 +1,5 @@
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import {
-  FaCropSimple,
-  FaDownload,
-  FaExpand,
-  FaFilePdf,
-  FaRegImage,
-  FaShareNodes,
-  FaTableCellsLarge,
-} from "react-icons/fa6";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { FaCropSimple, FaExpand } from "react-icons/fa6";
 import clsx from "clsx";
 import cytoscape from "cytoscape";
 import type {
@@ -54,21 +39,13 @@ import {
 import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
+import Download from "@/components/Download";
 import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
-import Popover from "@/components/Popover";
 import type { Option } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import { useColorMap } from "@/util/color";
-import { printElement } from "@/util/dom";
-import {
-  downloadCsv,
-  downloadJpg,
-  downloadJson,
-  downloadPng,
-  downloadTsv,
-} from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { lerp } from "@/util/math";
 import { sleep } from "@/util/misc";
@@ -616,22 +593,6 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     }, 100),
   );
 
-  /** download network as csv/tsv */
-  const downloadCSV = useCallback(
-    (format: string) => {
-      const download = format === "csv" ? downloadCsv : downloadTsv;
-      download(
-        nodes.map((node) => omit(node, ["color", "shape", "size", "strength"])),
-        ["network", "nodes"],
-      );
-      download(
-        edges.map((edge) => omit(edge, ["color", "shape", "size", "strength"])),
-        ["network", "edges"],
-      );
-    },
-    [nodes, edges],
-  );
-
   /** fullscreen viz */
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
 
@@ -749,63 +710,25 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
         </Flex>
 
         <Flex gap="xs">
-          <Popover
-            content={
-              <Flex direction="column" hAlign="stretch" gap="xs">
-                <Button
-                  icon={<FaRegImage />}
-                  text="PNG"
-                  onClick={() =>
-                    ref.current && downloadPng(ref.current, "network")
-                  }
-                  tooltip="High-resolution image"
-                />
-                <Button
-                  icon={<FaRegImage />}
-                  text="JPEG"
-                  onClick={() =>
-                    ref.current && downloadJpg(ref.current, "network")
-                  }
-                  tooltip="Compressed image"
-                />
-                <Button
-                  icon={<FaFilePdf />}
-                  text="PDF"
-                  onClick={() => ref.current && printElement(ref.current)}
-                  tooltip="Print as pdf"
-                />
-
-                <Button
-                  icon={<FaTableCellsLarge />}
-                  text="CSV"
-                  onClick={() => downloadCSV("csv")}
-                  tooltip="Raw node and edge data, comma-separated"
-                />
-                <Button
-                  icon={<FaTableCellsLarge />}
-                  text="TSV"
-                  onClick={() => downloadCSV("tsv")}
-                  tooltip="Raw node and edge data, tab-separated"
-                />
-
-                <Button
-                  icon={<FaShareNodes />}
-                  text="JSON"
-                  onClick={() =>
-                    graphRef.current &&
-                    downloadJson(graphRef.current?.json(), "network")
-                  }
-                  tooltip="For import into Cytoscape"
-                />
-              </Flex>
-            }
-          >
-            <Button
-              icon={<FaDownload />}
-              design="hollow"
-              tooltip="Download network"
-            />
-          </Popover>
+          <Download
+            filename="network"
+            raster={ref}
+            tabular={[
+              {
+                data: nodes.map((node) =>
+                  omit(node, ["color", "shape", "size", "strength"]),
+                ),
+                filename: "nodes",
+              },
+              {
+                data: edges.map((edge) =>
+                  omit(edge, ["color", "shape", "size", "strength"]),
+                ),
+                filename: "edges",
+              },
+            ]}
+            json={graphRef.current?.json()}
+          />
 
           <Button
             icon={<FaCropSimple />}
