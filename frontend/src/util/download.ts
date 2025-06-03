@@ -1,6 +1,6 @@
 import { stringify } from "csv-stringify/browser/esm/sync";
 import { toJpeg, toPng } from "html-to-image";
-import { getTheme } from "@/util/hooks";
+import { getTheme } from "@/util/dom";
 
 export type Filename = string | string[];
 

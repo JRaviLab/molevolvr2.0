@@ -25,7 +25,8 @@ import Help from "@/components/Help";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
+import { rootFontSize } from "@/util/dom";
+import { useSvgTransform, useTheme } from "@/util/hooks";
 import classes from "./IPR.module.css";
 
 /** track of features */
