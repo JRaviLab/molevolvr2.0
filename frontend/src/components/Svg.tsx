@@ -14,10 +14,10 @@ import { useElementSize, useEventListener } from "@reactuses/core";
 import {
   getSvgTransform,
   getViewBoxFit,
+  rootFontSize,
   truncateWidth,
   type ViewBox,
 } from "@/util/dom";
-import { rootFontSize } from "@/util/hooks";
 import { sleep } from "@/util/misc";
 import classes from "./Svg.module.css";
 
