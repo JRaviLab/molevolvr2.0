@@ -8,30 +8,7 @@ import {
   useResizeObserver,
 } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
-import { getSvgTransform } from "@/util/dom";
-
-/** get document root font size */
-export const rootFontSize = () =>
-  parseFloat(window.getComputedStyle(document.body).fontSize);
-
-/** https://stackoverflow.com/a/78994961/2180570 */
-export const getTheme = () => {
-  const rootStyles = window.getComputedStyle(document.documentElement);
-  return Object.fromEntries(
-    Array.from(document.styleSheets)
-      .flatMap((styleSheet) => {
-        try {
-          return Array.from(styleSheet.cssRules);
-        } catch (error) {
-          return [];
-        }
-      })
-      .filter((cssRule) => cssRule instanceof CSSStyleRule)
-      .flatMap((cssRule) => Array.from(cssRule.style))
-      .filter((style) => style.startsWith("--"))
-      .map((variable) => [variable, rootStyles.getPropertyValue(variable)]),
-  );
-};
+import { getSvgTransform, getTheme } from "@/util/dom";
 
 /** get theme css variables */
 export const useTheme = () => {
