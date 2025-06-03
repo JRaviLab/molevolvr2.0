@@ -1,7 +1,33 @@
 import { cloneElement, type ReactElement, type ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
-import { debounce } from "lodash";
+import { debounce, truncate } from "lodash";
 import { sleep } from "@/util/misc";
+
+/** get document root styles */
+export const getRootStyles = () =>
+  window.getComputedStyle(document.documentElement);
+
+/** get document root font size */
+export const rootFontSize = () => parseFloat(getRootStyles().fontSize);
+
+/** https://stackoverflow.com/a/78994961/2180570 */
+export const getTheme = () => {
+  const styles = getRootStyles();
+  return Object.fromEntries(
+    Array.from(document.styleSheets)
+      .flatMap((styleSheet) => {
+        try {
+          return Array.from(styleSheet.cssRules);
+        } catch (error) {
+          return [];
+        }
+      })
+      .filter((cssRule) => cssRule instanceof CSSStyleRule)
+      .flatMap((cssRule) => Array.from(cssRule.style))
+      .filter((style) => style.startsWith("--"))
+      .map((variable) => [variable, styles.getPropertyValue(variable)]),
+  );
+};
 
 /** wait for element matching selector to appear, checking periodically */
 export const waitFor = async <El extends Element>(
@@ -212,12 +238,36 @@ export const preserveScroll = async (element: Element) => {
   window.scrollBy({ top: newY - oldY, behavior: "instant" });
 };
 
+/** objects for text measurement */
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d")!;
-const font = window.getComputedStyle(document.body).fontFamily;
+let font = getRootStyles().fontFamily;
+window.document.fonts.addEventListener(
+  "loadingdone",
+  () => (font = getRootStyles().fontFamily),
+);
 
-/** compute width of text based on font size */
+/**
+ * compute actual rendered width of text based on font size
+ * https://stackoverflow.com/a/72148318/2180570
+ */
 export const getTextWidth = (text: string, size = 16) => {
   ctx.font = `${size}px ${font}`;
   return ctx.measureText(text).width;
+};
+
+/** truncate text based on actual rendered width */
+export const truncateWidth = (text: string, size: number, limit: number) => {
+  /** reduce string length until text width under width limit */
+  for (let slice = text.length; slice > 0; slice--) {
+    const truncated = truncate(text, { length: slice });
+    /**
+     * can't use getComputedTextLength w/ svgs because, for textPath, too slow
+     * on chrome, and ff returns length clipped to path.
+     */
+    const length = getTextWidth(truncated, size);
+    if (length < limit) return truncated;
+  }
+
+  return text;
 };

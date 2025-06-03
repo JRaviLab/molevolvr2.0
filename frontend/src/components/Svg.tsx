@@ -9,12 +9,12 @@ import {
 import type { ComponentProps, ReactNode, RefObject } from "react";
 import { flushSync } from "react-dom";
 import clsx from "clsx";
-import { clamp, truncate, zip } from "lodash";
+import { clamp, zip } from "lodash";
 import { useElementSize, useEventListener } from "@reactuses/core";
 import {
   getSvgTransform,
-  getTextWidth,
   getViewBoxFit,
+  truncateWidth,
   type ViewBox,
 } from "@/util/dom";
 import { rootFontSize } from "@/util/hooks";
@@ -29,8 +29,8 @@ type Props = {
    * svg contents. use class "fit-ignore" on element to ignore in fitting calc,
    * e.g. for things like clip-path that don't work with getBBox.
    */
-  children: ReactNode | (({ fontSize }: { fontSize: number }) => ReactNode);
-} & ComponentProps<"svg">;
+  children: ReactNode;
+} & Omit<ComponentProps<"svg">, "children">;
 
 const SVGContext = createContext({ fontSize: 16 });
 
@@ -198,7 +198,8 @@ export const Truncate = ({
     /** get limit from text path length */
     if (href) {
       setLimit(
-        document.querySelector<SVGPathElement>(href)?.getTotalLength() || 0,
+        document.querySelector<SVGPathElement>(href)?.getTotalLength() ||
+          Infinity,
       );
       return;
     }
@@ -211,20 +212,12 @@ export const Truncate = ({
     }
   }, [width, href]);
 
-  /** reduce string length until text width under width limit */
-  for (let slice = children.length; slice > 0; slice--) {
-    const truncated = truncate(children, { length: slice });
-    /**
-     * get actual text width. can't use getComputedTextLength b/c, for textPath,
-     * too slow on chrome, and ff returns length clipped to path.
-     */
-    const length = getTextWidth(truncated, fontSize);
-    if (length < limit) {
-      children = truncated;
-      break;
-    }
-  }
+  children = truncateWidth(children, fontSize, limit);
 
-  // @ts-expect-error ts not smart enough here
-  return <Tag {...props}>{children}</Tag>;
+  return (
+    // @ts-expect-error ts not smart enough here
+    <Tag {...props} href={href}>
+      {children}
+    </Tag>
+  );
 };
