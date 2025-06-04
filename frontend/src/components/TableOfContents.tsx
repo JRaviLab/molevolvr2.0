@@ -133,7 +133,7 @@ const TableOfContents = () => {
               className={classes.link}
               to={{ hash: "#" + heading.id }}
               replace
-              style={{ paddingLeft: heading.level * 10 }}
+              style={{ paddingLeft: 10 * heading.level }}
               onClick={() => scrollTo("#" + heading.id)}
             >
               {heading.text}

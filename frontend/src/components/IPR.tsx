@@ -103,7 +103,7 @@ const IPR = ({ sequence, tracks }: Props) => {
 
   /** skip position labels based on zoom */
   const skip =
-    [1, 5, 10, 20, 50, 100].find((skip) => skip * cellSize > height * 1.5) ?? 1;
+    [1, 5, 10, 20, 50, 100].find((skip) => skip * cellSize > 1.5 * height) ?? 1;
 
   /** position ticks */
   const ticks = range(startPosition, endPosition).filter(
@@ -115,10 +115,10 @@ const IPR = ({ sequence, tracks }: Props) => {
     const first = ticks.at(0);
     const last = ticks.at(-1);
     if (first !== undefined)
-      if (first === startPosition || scaleX(first + 0.5) < fontSize * 2)
+      if (first === startPosition || scaleX(first + 0.5) < 2 * fontSize)
         ticks.shift();
     if (last !== undefined)
-      if (last === endPosition || width - scaleX(last + 0.5) < fontSize * 2)
+      if (last === endPosition || width - scaleX(last + 0.5) < 2 * fontSize)
         ticks.pop();
   }
 
@@ -409,7 +409,7 @@ const IPR = ({ sequence, tracks }: Props) => {
                               style={{ fontSize }}
                             >
                               {truncate(label ?? id, {
-                                length: (drawWidth / height) * 3,
+                                length: 3 * (drawWidth / height),
                               })}
                             </text>
                           )}

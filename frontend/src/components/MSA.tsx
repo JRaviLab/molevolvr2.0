@@ -330,14 +330,14 @@ const MSAChunk = ({ combined, tracks, colors, start, end }: ChunkProps) => {
             fill={theme["--black"]}
             textAnchor="middle"
             dominantBaseline="central"
-            style={{ fontSize: fontSize * 0.75 }}
+            style={{ fontSize: 0.75 * fontSize }}
             className="axe-ignore"
           >
             {range(0, length)
               .filter((index) => index % 5 === 0)
               .map((index) => {
                 const x = (index + 0.5) * cellWidth;
-                const y = cellHeight * 0.5;
+                const y = 0.5 * cellHeight;
                 return (
                   <Fragment key={index}>
                     <text

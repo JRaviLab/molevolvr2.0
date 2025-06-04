@@ -52,9 +52,9 @@ const strokeWidth = 2;
 const barLength = 100;
 /** target number of bar chart ticks */
 const ticks = 3;
-/** max label width */
+/** label width limits */
 const minLabelWidth = 100;
-const maxLabelWidth = 300;
+const maxLabelWidth = 200;
 
 /** upset plot */
 const Upset = ({ title, filename = [], x, y, data }: Props) => {
@@ -119,15 +119,16 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
   /** x axis */
   const xAxis = axisLeft(xBarScale)
     .tickValues(xTicks)
-    .tickSize(strokeWidth * 2)
-    .tickPadding(strokeWidth * 1);
+    .tickSize(2 * strokeWidth)
+    .tickPadding(1 * strokeWidth);
   /** y axis */
   const yAxis = axisTop(yBarScale)
     .tickValues(yTicks)
-    .tickSize(strokeWidth * 2)
-    .tickPadding(strokeWidth * 1);
+    .tickSize(2 * strokeWidth)
+    .tickPadding(1 * strokeWidth);
 
   const Content = () => {
+    /** info from chart wrapper */
     const { width, fontSize } = useContext(ChartContext);
 
     /** calc label positioning */

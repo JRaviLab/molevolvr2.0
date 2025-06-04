@@ -63,7 +63,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   const cellSize = 30;
   const legendHeight = Math.min(
     cellSize * Math.max(0, data.length - 2),
-    cellSize * 5,
+    5 * cellSize,
   );
 
   /** num of rows/cols */
@@ -140,10 +140,10 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
               <Tooltip content={label} key={index}>
                 <Truncate
                   tag="text"
-                  width={cellSize * 4}
+                  width={4 * cellSize}
                   transform={[
-                    `translate(0, ${-cellSize * 0.5})`,
-                    `translate(${(xScale(index) ?? 0) + xScale.bandwidth() * 0.5}, 0)`,
+                    `translate(0, ${-0.5 * cellSize})`,
+                    `translate(${(xScale(index) ?? 0) + 0.5 * xScale.bandwidth()}, 0)`,
                     `rotate(-45)`,
                   ].join("")}
                   tabIndex={0}
@@ -166,10 +166,10 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
               <Tooltip content={label} key={index}>
                 <Truncate
                   tag="text"
-                  width={cellSize * 4}
+                  width={4 * cellSize}
                   transform={[
-                    `translate(${-cellSize * 0.5}, 0)`,
-                    `translate(0, ${(yScale(index) ?? 0) + yScale.bandwidth() * 0.5})`,
+                    `translate(${-0.5 * cellSize}, 0)`,
+                    `translate(0, ${(yScale(index) ?? 0) + 0.5 * yScale.bandwidth()})`,
                     `rotate(-45)`,
                   ].join(" ")}
                   tabIndex={0}
@@ -191,8 +191,8 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           >
             <text
               transform={[
-                `translate(${width * 0.5}, ${height})`,
-                `translate(0, ${cellSize * 0.75})`,
+                `translate(${0.5 * width}, ${height})`,
+                `translate(0, ${0.75 * cellSize})`,
               ].join(" ")}
               // for safari
               dominantBaseline="central"
@@ -202,8 +202,8 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
 
             <text
               transform={[
-                `translate(${width}, ${height * 0.5})`,
-                `translate(${cellSize * 0.75}, 0)`,
+                `translate(${width}, ${0.5 * height})`,
+                `translate(${0.75 * cellSize}, 0)`,
                 `rotate(-90)`,
               ].join(" ")}
             >
@@ -214,7 +214,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           {/* legend */}
           <g
             fill={theme["--black"]}
-            transform={`translate(${width + cellSize * 3}, ${height * 0.5 - legendHeight * 0.5})`}
+            transform={`translate(${width + 3 * cellSize}, ${0.5 * height - 0.5 * legendHeight})`}
           >
             {/* main label */}
             <text
@@ -232,9 +232,9 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
               id={gradient}
               reverse={reverse}
               direction="vertical"
-              x={-cellSize * 0.25}
+              x={-0.25 * cellSize}
               y={0}
-              width={cellSize * 0.5}
+              width={0.5 * cellSize}
               height={legendHeight}
             />
 
@@ -242,7 +242,7 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
             {legendScale.map(({ label, percent }, index) => (
               <text
                 key={index}
-                x={cellSize * 0.5}
+                x={0.5 * cellSize}
                 y={percent * legendHeight}
                 dominantBaseline="central"
               >

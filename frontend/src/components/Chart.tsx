@@ -1,5 +1,5 @@
 import { createContext, useEffect, useRef, useState } from "react";
-import type { ReactNode, RefObject } from "react";
+import type { ComponentProps, ReactNode, RefObject } from "react";
 import { createPortal } from "react-dom";
 import {
   FaBezierCurve,
@@ -17,7 +17,6 @@ import { useElementSize } from "@reactuses/core";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
-import { root } from "@/main";
 import { getViewBoxFit, rootFontSize } from "@/util/dom";
 import {
   downloadCsv,
@@ -52,11 +51,16 @@ type Props = {
 
   /** svg content */
   children: ReactNode;
+
+  /** container click */
+  onClick?: ComponentProps<"div">["onClick"];
 };
 
 const defaultContext = {
   svgRef: { current: null } as RefObject<SVGSVGElement | null>,
+  /** available width */
   width: 100,
+  /** document root font size */
   fontSize: 16,
 };
 
@@ -76,6 +80,7 @@ const Chart = ({
   json,
   controls,
   children,
+  onClick,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -117,9 +122,11 @@ const Chart = ({
 
   useEffect(() => {
     (async () => {
+      const appElement = document.getElementById("app")!;
+
       if (printing) {
         /** hide rest of app */
-        root.style.display = "none";
+        appElement.style.display = "none";
 
         const post = await printEffect?.();
 
@@ -129,23 +136,32 @@ const Chart = ({
         /** cleanup */
         setPrinting(false);
         await post?.();
-      } else root.style.display = "";
+      } else appElement.style.display = "";
     })();
   }, [printing, printEffect]);
 
   /** chart content */
   const chart = (
-    <div
-      ref={containerRef}
-      className={clsx("card", classes.container, printing && classes.printing)}
-      style={{ padding }}
-    >
-      <ChartContext.Provider value={contextValue}>
-        <svg ref={svgRef} className={classes.svg}>
-          {children}
-        </svg>
-      </ChartContext.Provider>
-    </div>
+    <>
+      {/* rely on component consumer handling keyboard accessibly */}
+      {/* eslint-disable-next-line */}
+      <div
+        ref={containerRef}
+        className={clsx(
+          "card",
+          classes.container,
+          printing && classes.printing,
+        )}
+        style={{ padding }}
+        onClick={onClick}
+      >
+        <ChartContext.Provider value={contextValue}>
+          <svg ref={svgRef} className={classes.svg}>
+            {children}
+          </svg>
+        </ChartContext.Provider>
+      </div>
+    </>
   );
 
   /** if printing, only render chart */
