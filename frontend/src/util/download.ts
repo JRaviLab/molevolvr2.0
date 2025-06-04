@@ -128,7 +128,7 @@ export const downloadSvg = (
     clone.setAttribute(key, value);
 
   /** remove specific attributes from all elements */
-  for (const element of clone.querySelectorAll("*"))
+  for (const element of [clone, ...clone.querySelectorAll("*")])
     for (const removeAttr of removeAttrs)
       for (const { name } of [...element.attributes])
         if (name.match(removeAttr)) element.removeAttribute(name);

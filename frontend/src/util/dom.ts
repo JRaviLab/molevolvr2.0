@@ -209,7 +209,7 @@ export const getSvgTransform = (svg: SVGSVGElement) => {
 };
 
 /** get bounding box of svg contents */
-export const getViewBoxFit = (svg: SVGSVGElement) => {
+export const getViewBoxFit = (svg: SVGGraphicsElement) => {
   const { x, y, width, height } = svg.getBBox();
   return { x, y, w: width, h: height };
 };

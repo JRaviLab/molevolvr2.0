@@ -12,13 +12,13 @@ import {
 import { map, orderBy } from "lodash";
 import Chart from "@/components/Chart";
 import Tooltip from "@/components/Tooltip";
-import { getTextWidth, rootFontSize, truncateWidth } from "@/util/dom";
+import { getTextWidth, truncateWidth } from "@/util/dom";
 import type { Filename } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import classes from "./Upset.module.css";
 
 type Props = {
-  /** chart title text */
+  /** title text */
   title?: string;
   /** download filename */
   filename?: Filename;
@@ -127,26 +127,13 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
     .tickPadding(1 * strokeWidth);
 
   /** calc label positioning */
-  const right = xScale.range()[1];
   const longestLabel =
     max(y.data.map(({ label = "" }) => getTextWidth(label))) ?? 0;
   const labelLength = Math.min(labelWidth, longestLabel);
   const left = -labelLength - barLength;
 
   return (
-    <Chart filename={[...filename, "upset"]}>
-      {/* title */}
-      {title && (
-        <text
-          x={(right + left) / 2}
-          y={-barLength - 2 * rootFontSize}
-          textAnchor="middle"
-          style={{ fontWeight: "bold" }}
-        >
-          {truncateWidth(title, right - left)}
-        </text>
-      )}
-
+    <Chart title={title} filename={[...filename, "upset"]}>
       {/* main chart area */}
       <g>
         {/* cells */}

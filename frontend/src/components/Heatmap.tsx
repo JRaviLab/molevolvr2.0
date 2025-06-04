@@ -1,18 +1,21 @@
-import { useRef, useState } from "react";
-import clsx from "clsx";
+import { useState } from "react";
 import { extent, scaleBand, scaleLinear, transpose } from "d3";
 import { range } from "lodash";
+import Chart from "@/components/Chart";
 import CheckBox from "@/components/CheckBox";
-import Download from "@/components/Download";
-import Flex from "@/components/Flex";
 import { Gradient, gradientFunc, gradientOptions } from "@/components/Gradient";
 import SelectSingle from "@/components/SelectSingle";
-import Svg, { Truncate } from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
+import { truncateWidth } from "@/util/dom";
+import type { Filename } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import classes from "./Heatmap.module.css";
 
 type Props = {
+  /** title text */
+  title?: string;
+  /** download filename */
+  filename?: Filename;
   /** x-axis */
   x: {
     /** axis label */
@@ -38,10 +41,16 @@ type Props = {
 };
 
 /** heatmap plot */
-const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
-
+const Heatmap = ({
+  title,
+  filename = [],
+  x,
+  y,
+  data,
+  legend,
+  min,
+  max,
+}: Props) => {
   /** selected gradient */
   const [gradient, setGradient] = useState(gradientOptions(false)[0]!.id);
 
@@ -99,191 +108,178 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   }));
 
   return (
-    <Flex direction="column" gap="lg">
-      <div ref={containerRef} className={clsx("card", classes.container)}>
-        <Svg ref={svgRef} className={classes.chart}>
-          {/* cells */}
-          {data.map((row, rowIndex) =>
-            row.map((col, colIndex) => (
-              <Tooltip
-                key={[colIndex, rowIndex].join("-")}
-                content={
-                  <div className="mini-table">
-                    <span>Value</span>
-                    <span>{col}</span>
-                    <span>{x.label}</span>
-                    <span>{x.labels[colIndex]}</span>
-                    <span>{y.label}</span>
-                    <span>{y.labels[colIndex]}</span>
-                  </div>
-                }
-              >
-                <rect
-                  className={classes.cell}
-                  x={xScale(colIndex) ?? 0}
-                  y={yScale(rowIndex) ?? 0}
-                  width={xScale.bandwidth() ?? 0}
-                  height={yScale.bandwidth() ?? 0}
-                  fill={
-                    col ? colorScale(valueScale(col)) : theme["--light-gray"]
-                  }
-                  tabIndex={0}
-                  role="button"
-                />
-              </Tooltip>
-            )),
-          )}
+    <Chart
+      title={title}
+      filename={[...filename, "heatmap"]}
+      controls={[
+        <>
+          <SelectSingle
+            label="Gradient"
+            options={gradientOptions(reverse)}
+            layout="horizontal"
+            value={gradient}
+            onChange={setGradient}
+          />
 
-          {/* x axis tick labels */}
-          <g fill={theme["--black"]} dominantBaseline="central">
-            {x.labels.map((label, index) => (
-              <Tooltip content={label} key={index}>
-                <Truncate
-                  tag="text"
-                  width={4 * cellSize}
-                  transform={[
-                    `translate(0, ${-0.5 * cellSize})`,
-                    `translate(${(xScale(index) ?? 0) + 0.5 * xScale.bandwidth()}, 0)`,
-                    `rotate(-45)`,
-                  ].join("")}
-                  tabIndex={0}
-                  // for safari
-                  dominantBaseline="central"
-                >
-                  {label ?? "-"}
-                </Truncate>
-              </Tooltip>
-            ))}
-          </g>
+          <CheckBox
+            label="Reverse"
+            tooltip="Reverse gradient direction"
+            value={reverse}
+            onChange={setReverse}
+          />
 
-          {/* y axis tick labels */}
-          <g
-            fill={theme["--black"]}
-            textAnchor="end"
-            dominantBaseline="central"
-          >
-            {y.labels.map((label, index) => (
-              <Tooltip content={label} key={index}>
-                <Truncate
-                  tag="text"
-                  width={4 * cellSize}
-                  transform={[
-                    `translate(${-0.5 * cellSize}, 0)`,
-                    `translate(0, ${(yScale(index) ?? 0) + 0.5 * yScale.bandwidth()})`,
-                    `rotate(-45)`,
-                  ].join(" ")}
-                  tabIndex={0}
-                  // for safari
-                  dominantBaseline="central"
-                >
-                  {label ?? "-"}
-                </Truncate>
-              </Tooltip>
-            ))}
-          </g>
+          <CheckBox
+            label="Swap"
+            tooltip="Swap rows & cols (transpose)"
+            value={swap}
+            onChange={setSwap}
+          />
+        </>,
+      ]}
+    >
+      {/* cells */}
+      <g>
+        {data.map((row, rowIndex) =>
+          row.map((col, colIndex) => (
+            <Tooltip
+              key={[colIndex, rowIndex].join("-")}
+              content={
+                <div className="mini-table">
+                  <span>Value</span>
+                  <span>{col}</span>
+                  <span>{x.label}</span>
+                  <span>{x.labels[colIndex]}</span>
+                  <span>{y.label}</span>
+                  <span>{y.labels[colIndex]}</span>
+                </div>
+              }
+            >
+              <rect
+                className={classes.cell}
+                x={xScale(colIndex) ?? 0}
+                y={yScale(rowIndex) ?? 0}
+                width={xScale.bandwidth() ?? 0}
+                height={yScale.bandwidth() ?? 0}
+                fill={col ? colorScale(valueScale(col)) : theme["--light-gray"]}
+                tabIndex={0}
+                role="button"
+              />
+            </Tooltip>
+          )),
+        )}
+      </g>
 
-          {/* main axis labels */}
-          <g
-            fill={theme["--black"]}
-            textAnchor="middle"
-            dominantBaseline="central"
-            style={{ fontWeight: "500" }}
-          >
+      {/* x axis tick labels */}
+      <g fill={theme["--black"]} dominantBaseline="central">
+        {x.labels.map((label, index) => (
+          <Tooltip content={label} key={index}>
             <text
               transform={[
-                `translate(${0.5 * width}, ${height})`,
-                `translate(0, ${0.75 * cellSize})`,
-              ].join(" ")}
+                `translate(0, ${-0.5 * cellSize})`,
+                `translate(${(xScale(index) ?? 0) + 0.5 * xScale.bandwidth()}, 0)`,
+                `rotate(-45)`,
+              ].join("")}
+              tabIndex={0}
               // for safari
               dominantBaseline="central"
             >
-              {x.label ?? "-"}
+              {truncateWidth(label ?? "-", 4 * cellSize)}
             </text>
+          </Tooltip>
+        ))}
+      </g>
 
+      {/* y axis tick labels */}
+      <g fill={theme["--black"]} textAnchor="end" dominantBaseline="central">
+        {y.labels.map((label, index) => (
+          <Tooltip content={label} key={index}>
             <text
               transform={[
-                `translate(${width}, ${0.5 * height})`,
-                `translate(${0.75 * cellSize}, 0)`,
-                `rotate(-90)`,
+                `translate(${-0.5 * cellSize}, 0)`,
+                `translate(0, ${(yScale(index) ?? 0) + 0.5 * yScale.bandwidth()})`,
+                `rotate(-45)`,
               ].join(" ")}
-            >
-              {y.label ?? "-"}
-            </text>
-          </g>
-
-          {/* legend */}
-          <g
-            fill={theme["--black"]}
-            transform={`translate(${width + 3 * cellSize}, ${0.5 * height - 0.5 * legendHeight})`}
-          >
-            {/* main label */}
-            <text
-              x={0}
-              y={-cellSize}
-              textAnchor="middle"
+              tabIndex={0}
+              // for safari
               dominantBaseline="central"
-              style={{ fontWeight: "500" }}
             >
-              {legend ?? "-"}
+              {truncateWidth(label ?? "-", 4 * cellSize)}
             </text>
+          </Tooltip>
+        ))}
+      </g>
 
-            {/* gradient rect */}
-            <Gradient
-              id={gradient}
-              reverse={reverse}
-              direction="vertical"
-              x={-0.25 * cellSize}
-              y={0}
-              width={0.5 * cellSize}
-              height={legendHeight}
-            />
+      {/* main axis labels */}
+      <g
+        fill={theme["--black"]}
+        textAnchor="middle"
+        dominantBaseline="central"
+        style={{ fontWeight: "500" }}
+      >
+        <text
+          transform={[
+            `translate(${0.5 * width}, ${height})`,
+            `translate(0, ${0.75 * cellSize})`,
+          ].join(" ")}
+          // for safari
+          dominantBaseline="central"
+        >
+          {x.label ?? "-"}
+        </text>
 
-            {/* labels */}
-            {legendScale.map(({ label, percent }, index) => (
-              <text
-                key={index}
-                x={0.5 * cellSize}
-                y={percent * legendHeight}
-                dominantBaseline="central"
-              >
-                {label}
-              </text>
-            ))}
-          </g>
-        </Svg>
-      </div>
+        <text
+          transform={[
+            `translate(${width}, ${0.5 * height})`,
+            `translate(${0.75 * cellSize}, 0)`,
+            `rotate(-90)`,
+          ].join(" ")}
+        >
+          {y.label ?? "-"}
+        </text>
+      </g>
 
-      {/* controls */}
-      <Flex>
-        <SelectSingle
-          label="Gradient"
-          options={gradientOptions(reverse)}
-          layout="horizontal"
-          value={gradient}
-          onChange={setGradient}
+      {/* legend */}
+      <g
+        fill={theme["--black"]}
+        transform={`translate(${width + 3 * cellSize}, ${0.5 * height - 0.5 * legendHeight})`}
+      >
+        {/* main label */}
+        <text
+          x={0}
+          y={-cellSize}
+          textAnchor="middle"
+          dominantBaseline="central"
+          style={{ fontWeight: "500" }}
+        >
+          {legend ?? "-"}
+        </text>
+
+        {/* gradient rect */}
+        <Gradient
+          id={gradient}
+          reverse={reverse}
+          direction="vertical"
+          x={-0.25 * cellSize}
+          y={0}
+          width={0.5 * cellSize}
+          height={legendHeight}
         />
 
-        <CheckBox
-          label="Reverse"
-          tooltip="Reverse gradient direction"
-          value={reverse}
-          onChange={setReverse}
-        />
-
-        <CheckBox
-          label="Swap"
-          tooltip="Swap rows & cols (transpose)"
-          value={swap}
-          onChange={setSwap}
-        />
-
-        <Download
-          filename={["Heatmap"]}
-          raster={containerRef}
-          vector={svgRef}
-        />
-      </Flex>
-    </Flex>
+        {/* labels */}
+        <g>
+          {legendScale.map(({ label, percent }, index) => (
+            <text
+              key={index}
+              x={0.5 * cellSize}
+              y={percent * legendHeight}
+              dominantBaseline="central"
+            >
+              {label}
+            </text>
+          ))}
+        </g>
+      </g>
+    </Chart>
   );
 };
 

@@ -17,7 +17,7 @@ import { useElementSize } from "@reactuses/core";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
-import { getViewBoxFit } from "@/util/dom";
+import { getViewBoxFit, rootFontSize, truncateWidth } from "@/util/dom";
 import {
   downloadCsv,
   downloadJpg,
@@ -32,6 +32,8 @@ import {
 import classes from "./Chart.module.css";
 
 type Props = {
+  /** title text */
+  title?: string;
   /** download filename */
   filename: Filename;
 
@@ -70,6 +72,7 @@ const padding = 20;
 
 /** generic chart wrapper */
 const Chart = ({
+  title,
   filename,
   rasterEffect,
   printEffect,
@@ -82,6 +85,8 @@ const Chart = ({
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const fitRef = useRef<SVGGElement>(null);
+  const titleRef = useRef<SVGTextElement>(null);
 
   /** available width */
   const [containerWidth] = useElementSize(containerRef.current);
@@ -97,10 +102,24 @@ const Chart = ({
   const contextValue: typeof defaultContext = { svgRef, width };
 
   useEffect(() => {
-    if (!svgRef.current) return;
+    if (!svgRef.current || !fitRef.current) return;
 
     /** get bbox of contents */
-    const { x, y, w, h } = getViewBoxFit(svgRef.current);
+    let { x, y, w, h } = getViewBoxFit(fitRef.current);
+
+    /** chart title */
+    if (title && titleRef.current) {
+      /** make room */
+      const titleSpace = 2 * rootFontSize;
+      y -= titleSpace;
+      h += titleSpace;
+      /** position */
+      titleRef.current.setAttribute("y", String(y));
+      titleRef.current.setAttribute("x", String(x + w / 2));
+      /** content */
+      titleRef.current.innerHTML = truncateWidth(title, w);
+    }
+
     /** fit view to contents */
     svgRef.current.setAttribute("viewBox", [x, y, w, h].join(" "));
     /** make svg units match document */
@@ -148,7 +167,17 @@ const Chart = ({
       >
         <ChartContext.Provider value={contextValue}>
           <svg ref={svgRef} className={classes.svg}>
-            {children}
+            {/* title */}
+            {title && (
+              <text
+                ref={titleRef}
+                textAnchor="middle"
+                dominantBaseline="hanging"
+                style={{ fontWeight: "bold" }}
+              />
+            )}
+
+            <g ref={fitRef}>{children}</g>
           </svg>
         </ChartContext.Provider>
       </div>

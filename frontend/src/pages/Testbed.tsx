@@ -105,8 +105,8 @@ const TestbedPage = () => {
 
       <SectionUpset />
       <SectionSunburst />
-      {/*
       <SectionHeatmap />
+      {/*
       <SectionTree />
       <SectionNetwork />
       <SectionMSA />
@@ -294,7 +294,7 @@ const SectionUpset = () => (
       Upset
     </Heading>
 
-    <Upset {...upset} filename={[analysis]} />
+    <Upset title={label()} filename={[analysis]} {...upset} />
   </Section>
 );
 
@@ -304,7 +304,7 @@ const SectionSunburst = () => (
       Sunburst
     </Heading>
 
-    <Sunburst title={label()} data={sunburst} />
+    <Sunburst title={label()} filename={[analysis]} data={sunburst} />
   </Section>
 );
 
@@ -314,7 +314,7 @@ const SectionHeatmap = () => (
       Heatmap
     </Heading>
 
-    <Heatmap {...heatmap} />
+    <Heatmap title={label()} filename={[analysis]} {...heatmap} />
   </Section>
 );
 
@@ -324,7 +324,7 @@ const SectionTree = () => (
       Tree
     </Heading>
 
-    <Tree data={tree} />
+    <Tree title={label()} filename={[analysis]} data={tree} />
   </Section>
 );
 
@@ -334,7 +334,12 @@ const SectionNetwork = () => (
       Network
     </Heading>
 
-    <Network nodes={nodes} edges={edges} />
+    <Network
+      title={label()}
+      filename={[analysis]}
+      nodes={nodes}
+      edges={edges}
+    />
   </Section>
 );
 
@@ -344,7 +349,13 @@ const SectionMSA = () => (
       MSA
     </Heading>
 
-    <MSA tracks={msaTracks} getType={clustalType} colors={clustalColors} />
+    <MSA
+      title={label()}
+      filename={[analysis]}
+      tracks={msaTracks}
+      getType={clustalType}
+      colors={clustalColors}
+    />
   </Section>
 );
 
@@ -354,7 +365,12 @@ const SectionIPR = () => (
       IPR
     </Heading>
 
-    <IPR sequence={iprSequence} tracks={iprTracks} />
+    <IPR
+      title={label()}
+      filename={[analysis]}
+      sequence={iprSequence}
+      tracks={iprTracks}
+    />
   </Section>
 );
 
