@@ -82,7 +82,7 @@ const IPR = ({ sequence, tracks }: Props) => {
   const [, scrollHeight] = useElementSize(scrollRef);
 
   /** font size, in svg units */
-  const fontSize = useSvgTransform([...svgRefs.current][0]!).h * rootFontSize();
+  const fontSize = useSvgTransform([...svgRefs.current][0]!).h * rootFontSize;
 
   /** view box for all svgs */
   const viewBox = [0, 0, width, height].join(" ");

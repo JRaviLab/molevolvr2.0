@@ -17,7 +17,7 @@ import { useElementSize } from "@reactuses/core";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
-import { getViewBoxFit, rootFontSize } from "@/util/dom";
+import { getViewBoxFit } from "@/util/dom";
 import {
   downloadCsv,
   downloadJpg,
@@ -60,8 +60,6 @@ const defaultContext = {
   svgRef: { current: null } as RefObject<SVGSVGElement | null>,
   /** available width */
   width: 100,
-  /** document root font size */
-  fontSize: 16,
 };
 
 /** context passed to children */
@@ -95,15 +93,8 @@ const Chart = ({
     2 * padding -
     1;
 
-  /** document font size */
-  const fontSize = rootFontSize();
-
   /** context passed to children */
-  const contextValue: typeof defaultContext = {
-    svgRef,
-    width,
-    fontSize,
-  };
+  const contextValue: typeof defaultContext = { svgRef, width };
 
   useEffect(() => {
     if (!svgRef.current) return;

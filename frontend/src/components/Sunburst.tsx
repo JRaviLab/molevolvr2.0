@@ -1,18 +1,11 @@
-import {
-  Fragment,
-  useContext,
-  useId,
-  useMemo,
-  useState,
-  type ReactElement,
-} from "react";
+import { Fragment, useId, useMemo, useState, type ReactElement } from "react";
 import { arc, hierarchy, type HierarchyNode } from "d3";
 import { inRange, mapValues, sumBy } from "lodash";
-import Chart, { ChartContext } from "@/components/Chart";
+import Chart from "@/components/Chart";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { truncateWidth } from "@/util/dom";
+import { rootFontSize, truncateWidth } from "@/util/dom";
 import type { Filename } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { tau } from "@/util/math";
@@ -62,13 +55,13 @@ type Props = {
 };
 
 /** thickness of rings */
-const ringSize = 40;
+const ringSize = 30;
 /** gap between rings */
 const gapSize = 3;
 /** depth/level of first ring from center */
 const startDepth = 1;
-/** line thickness */
-const strokeWidth = 2;
+/** width of side panels */
+const panelWidth = 150;
 
 /** sunburst plot */
 const Sunburst = ({ title, filename = [], data }: Props) => {
@@ -141,89 +134,82 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
   /** clear selection */
   const deselect = () => setSelected([]);
 
-  const Content = () => {
-    /** info from chart wrapper */
-    const { width, fontSize } = useContext(ChartContext);
+  /** max ring radius */
+  const maxR = (startDepth + tree.height) * ringSize;
 
-    /** max ring radius */
-    const maxR = (startDepth + tree.height) * ringSize;
-
-    return (
-      <>
-        {/* title */}
-        {title && (
-          <text
-            x={0}
-            y={-maxR - ringSize}
-            textAnchor="middle"
-            style={{ fontWeight: "bold" }}
-          >
-            {truncateWidth(title, fontSize, width)}
-          </text>
-        )}
-
-        <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
-
-        {nodes.map((node, index) => (
-          <Fragment key={index}>
-            {node.parent && (
-              <Segment
-                select={() =>
-                  node.data.lastSelected
-                    ? deselect()
-                    : setSelected(node.ancestors().slice(0, -1).reverse())
-                }
-                deselect={deselect}
-                node={node}
-              />
-            )}
-          </Fragment>
-        ))}
-
-        {/* selected breadcrumbs */}
-        {selected.map((node, index) => {
-          /** label size */
-          const w = 150;
-          const h = 1.5 * fontSize;
-
-          /** label position */
-          const x = maxR + ringSize;
-          const y = maxR - (index + 1) * (h + gapSize);
-
-          return (
-            <Fragment key={index}>
-              <rect
-                fill={node.data.color}
-                x={x}
-                y={y - h / 2}
-                width={w}
-                height={h}
-              />
-              <NodeTooltip {...node.data}>
-                <text
-                  x={x + gapSize}
-                  y={y}
-                  dominantBaseline="central"
-                  tabIndex={0}
-                  role="button"
-                >
-                  {truncateWidth(
-                    node.data.label || "-",
-                    fontSize,
-                    w - 2 * gapSize,
-                  )}
-                </text>
-              </NodeTooltip>
-            </Fragment>
-          );
-        })}
-      </>
-    );
-  };
+  /** legend props */
+  const legendX = -maxR - ringSize - panelWidth;
+  const legendY = -maxR;
 
   return (
     <Chart filename={[...filename, "sunburst"]} onClick={deselect}>
-      <Content />
+      {/* title */}
+      {title && (
+        <text
+          x={0}
+          y={-maxR - ringSize}
+          textAnchor="middle"
+          style={{ fontWeight: "bold" }}
+        >
+          {truncateWidth(title, 2 * maxR)}
+        </text>
+      )}
+
+      <Legend
+        entries={mapValues(colorMap, (color) => ({ color }))}
+        x={legendX}
+        y={legendY}
+        w={panelWidth}
+      />
+
+      {nodes.map((node, index) => (
+        <Fragment key={index}>
+          {node.parent && (
+            <Segment
+              select={() =>
+                node.data.lastSelected
+                  ? deselect()
+                  : setSelected(node.ancestors().slice(0, -1).reverse())
+              }
+              deselect={deselect}
+              node={node}
+            />
+          )}
+        </Fragment>
+      ))}
+
+      {/* selected breadcrumbs */}
+      {selected.map((node, index) => {
+        const h = 1.5 * rootFontSize;
+        const x = maxR + ringSize;
+        const y = maxR - (index + 1) * (h + gapSize);
+
+        return (
+          <Fragment key={index}>
+            <rect
+              fill={node.data.color}
+              x={x}
+              y={y - h / 2}
+              width={panelWidth}
+              height={h}
+            />
+            <NodeTooltip {...node.data}>
+              <text
+                x={x + gapSize}
+                y={y}
+                dominantBaseline="central"
+                tabIndex={0}
+                role="button"
+              >
+                {truncateWidth(
+                  node.data.label || "-",
+                  panelWidth - 2 * gapSize,
+                )}
+              </text>
+            </NodeTooltip>
+          </Fragment>
+        );
+      })}
     </Chart>
   );
 };
@@ -243,7 +229,7 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
 
   /** extract props */
   const { depth, data } = node;
-  const { label, color, percent, angle, selected, lastSelected } = data;
+  const { label, color, percent, angle, selected } = data;
   const end = angle + percent;
 
   /** reactive CSS vars */
@@ -294,8 +280,6 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
   /** length of arc centerline */
   const arcLength = radius * Math.abs(end - angle) * tau - 2 * gapSize;
 
-  const { fontSize } = useContext(ChartContext);
-
   return (
     <g className={classes.segment} opacity={selected === false ? 0.25 : 1}>
       {/* shape */}
@@ -303,9 +287,6 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
         <path
           className={classes.shape}
           fill={color}
-          stroke={theme["--black"]}
-          strokeWidth={strokeWidth}
-          strokeOpacity={lastSelected === true ? 1 : 0}
           d={fill}
           tabIndex={0}
           role="button"
@@ -334,7 +315,7 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
         fill={theme["--black"]}
       >
         <textPath href={`#${id}`} startOffset="50%">
-          {truncateWidth(label || "-", fontSize, arcLength)}
+          {truncateWidth(label || "-", arcLength)}
         </textPath>
       </text>
     </g>
