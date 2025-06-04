@@ -277,7 +277,11 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
           onChange={setSwap}
         />
 
-        <Download filename="Heatmap" raster={containerRef} vector={svgRef} />
+        <Download
+          filename={["Heatmap"]}
+          raster={containerRef}
+          vector={svgRef}
+        />
       </Flex>
     </Flex>
   );

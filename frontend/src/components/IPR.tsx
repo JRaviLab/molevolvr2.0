@@ -455,7 +455,7 @@ const IPR = ({ sequence, tracks }: Props) => {
 
       {/* controls */}
       <Flex>
-        <Download filename="interpro" raster={containerRef} />
+        <Download filename={["interpro"]} raster={containerRef} />
 
         <Help tooltip="On main chart area, scroll/pinch to zoom, drag to move">
           Controls
