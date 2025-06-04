@@ -2,7 +2,7 @@ import { stringify } from "csv-stringify/browser/esm/sync";
 import { toJpeg, toPng } from "html-to-image";
 import { getTheme } from "@/util/dom";
 
-export type Filename = string | string[];
+export type Filename = (string | undefined)[];
 
 /** download url as file */
 const download = (
@@ -13,24 +13,30 @@ const download = (
   /** extension, without dot */
   ext: string,
 ) => {
+  /** assemble and clean full filename */
+  let download = [
+    /** always start filename with app name */
+    String(import.meta.env.VITE_TITLE),
+    /** other filename parts */
+    ...filename.filter((part) => part !== undefined),
+  ]
+    .map((part) =>
+      part
+        /** make path safe */
+        .replace(/[^A-Za-z0-9]+/g, "-")
+        /** remove leading/trailing dashes */
+        .replace(/(^-+)|(-+$)/g, ""),
+    )
+    .filter((part) => part.trim())
+    .join("_");
+
+  /** add extension */
+  if (!download.endsWith("." + ext)) download += "." + ext;
+
+  /** trigger download */
   const link = document.createElement("a");
   link.href = url;
-  link.download =
-    [import.meta.env.VITE_TITLE, filename]
-      .flat()
-      .map((part) =>
-        part
-          /** make path safe */
-          .replace(/[^A-Za-z0-9]+/g, "-")
-          /** remove leading/trailing dashes */
-          .replace(/(^-+)|(-+$)/g, ""),
-      )
-      .filter(Boolean)
-      .join("_")
-      /** remove extension if already included */
-      .replace(new RegExp("." + ext + "$"), "") +
-    "." +
-    ext;
+  link.download = download;
   link.click();
   window.URL.revokeObjectURL(url);
 };

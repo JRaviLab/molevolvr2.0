@@ -7,6 +7,12 @@ export const logChange = (...args: unknown[]) => {
   console.debug(...args);
 };
 
+/** fake analysis id */
+export const analysis = Array(8)
+  .fill(null)
+  .map(() => sample("abcdefghijklmnopqrstuvwxyz"))
+  .join("");
+
 /** random words of varying length */
 export const words =
   "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum".split(
@@ -55,6 +61,7 @@ export const sequence = (chars?: string, min = 10, max = 100) =>
 const upsetCols = random(3, 10);
 const upsetRows = random(3, 10);
 export const upset = {
+  title: label(),
   x: {
     data: Array(upsetCols)
       .fill(null)

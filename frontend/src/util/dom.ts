@@ -266,7 +266,7 @@ export const truncateWidth = (text: string, size: number, limit: number) => {
      * on chrome, and ff returns length clipped to path.
      */
     const length = getTextWidth(truncated, size);
-    if (length < limit) return truncated;
+    if (length <= limit) return truncated;
   }
 
   return text;

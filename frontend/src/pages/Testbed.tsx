@@ -67,6 +67,7 @@ import Tooltip from "@/components/Tooltip";
 import Tree from "@/components/Tree";
 import Upset from "@/components/Upset";
 import {
+  analysis,
   edges,
   heatmap,
   iprSequence,
@@ -92,26 +93,31 @@ const TestbedPage = () => {
 
       <Section>
         <Heading level={1}>Testbed</Heading>
+
+        <div className="mini-table">
+          <span>Fake Analysis ID</span>
+          <span>{analysis}</span>
+        </div>
       </Section>
 
       {/* complex components */}
 
       <SectionUpset />
-      <SectionSunburst />
+      {/* <SectionSunburst />
       <SectionHeatmap />
       <SectionTree />
       <SectionNetwork />
       <SectionMSA />
-      <SectionIPR />
+      <SectionIPR /> */}
 
       {/* formatting */}
 
-      <SectionElements />
-      <SectionHeading />
+      {/* <SectionElements />
+      <SectionHeading /> */}
 
       {/* generic components */}
 
-      <SectionLink />
+      {/* <SectionLink />
       <SectionButton />
       <SectionTextBox />
       <SectionSelect />
@@ -128,12 +134,12 @@ const TestbedPage = () => {
       <SectionTable />
       <SectionTooltip />
       <SectionPopover />
-      <SectionDialog />
+      <SectionDialog /> */}
 
       {/* misc */}
 
-      <SectionForm />
-      <SectionCSS />
+      {/* <SectionForm />
+      <SectionCSS /> */}
     </>
   );
 };
@@ -286,7 +292,7 @@ const SectionUpset = () => (
       Upset
     </Heading>
 
-    <Upset {...upset} />
+    <Upset {...upset} filename={[analysis]} />
   </Section>
 );
 
