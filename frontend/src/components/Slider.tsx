@@ -91,7 +91,7 @@ const Slider = ({
             <div
               className={classes.fill}
               style={{
-                left: multi ? state.getThumbPercent(0) * 100 + "%" : "",
+                left: multi ? 100 * state.getThumbPercent(0) + "%" : "",
                 width:
                   (multi
                     ? state.getThumbPercent(1) - state.getThumbPercent(0)

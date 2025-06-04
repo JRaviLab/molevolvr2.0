@@ -154,7 +154,7 @@ const Tree = ({ data }: Props) => {
                 className={classes.line}
                 fill="none"
                 stroke={isSelected ? theme["--accent"] : theme["--black"]}
-                strokeWidth={isSelected ? strokeWidth * 2 : strokeWidth}
+                strokeWidth={isSelected ? 2 * strokeWidth : strokeWidth}
                 opacity={isSelected === false ? 0.25 : 1}
                 d={
                   link([
@@ -183,7 +183,7 @@ const Tree = ({ data }: Props) => {
                       y2={node.x ?? 0}
                       stroke={theme["--black"]}
                       strokeWidth={strokeWidth}
-                      strokeDasharray={[strokeWidth, strokeWidth * 2].join(" ")}
+                      strokeDasharray={[strokeWidth, 2 * strokeWidth].join(" ")}
                     />
                     <Truncate
                       tag="text"
@@ -191,7 +191,7 @@ const Tree = ({ data }: Props) => {
                       y={node.x ?? 0}
                       width={200}
                       fill={theme["--black"]}
-                      transform={`translate(${nodeSize * 2}, 0)`}
+                      transform={`translate(${2 * nodeSize}, 0)`}
                       dominantBaseline="central"
                     >
                       {node.data.label ?? "-"}

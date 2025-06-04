@@ -1,8 +1,11 @@
 import { clamp } from "lodash";
 
+/** 2 pi */
+export const tau = 2 * Math.PI;
+
 /** trig in degrees */
-export const sin = (degrees: number) => Math.sin(2 * Math.PI * (degrees / 360));
-export const cos = (degrees: number) => Math.cos(2 * Math.PI * (degrees / 360));
+export const sin = (degrees: number) => Math.sin(tau * (degrees / 360));
+export const cos = (degrees: number) => Math.cos(tau * (degrees / 360));
 
 /** linear interpolate */
 export const lerp = (

@@ -72,6 +72,7 @@ import {
   heatmap,
   iprSequence,
   iprTracks,
+  label,
   logChange,
   msaTracks,
   nodes,
@@ -303,7 +304,7 @@ const SectionSunburst = () => (
       Sunburst
     </Heading>
 
-    <Sunburst data={sunburst} />
+    <Sunburst title={label()} data={sunburst} />
   </Section>
 );
 

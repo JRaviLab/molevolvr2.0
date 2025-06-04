@@ -1,21 +1,21 @@
 import {
   Fragment,
+  useContext,
   useId,
   useMemo,
-  useRef,
   useState,
   type ReactElement,
 } from "react";
-import clsx from "clsx";
 import { arc, hierarchy, type HierarchyNode } from "d3";
 import { inRange, mapValues, sumBy } from "lodash";
-import Download from "@/components/Download";
-import Flex from "@/components/Flex";
+import Chart, { ChartContext } from "@/components/Chart";
 import Legend from "@/components/Legend";
-import Svg, { Truncate } from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
+import { truncateWidth } from "@/util/dom";
+import type { Filename } from "@/util/download";
 import { useTheme } from "@/util/hooks";
+import { tau } from "@/util/math";
 import { formatNumber } from "@/util/string";
 import classes from "./Sunburst.module.css";
 
@@ -52,6 +52,11 @@ type Derived = {
 type Node = HierarchyNode<Derived>;
 
 type Props = {
+  /** chart title text */
+  title?: string;
+  /** download filename */
+  filename?: Filename;
+
   /** chart data */
   data: Item[];
 };
@@ -66,10 +71,7 @@ const startDepth = 1;
 const strokeWidth = 2;
 
 /** sunburst plot */
-const Sunburst = ({ data }: Props) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
-
+const Sunburst = ({ title, filename = [], data }: Props) => {
   /** "breadcrumb trail" of selected nodes */
   const [selected, setSelected] = useState<Node[]>([]);
 
@@ -139,71 +141,90 @@ const Sunburst = ({ data }: Props) => {
   /** clear selection */
   const deselect = () => setSelected([]);
 
-  return (
-    <Flex direction="column" gap="lg" full>
-      {/* keyboard listener not necessary here because we have one below */}
-      {/* eslint-disable-next-line */}
-      <div
-        ref={containerRef}
-        className={clsx("card", classes.container)}
-        onClick={deselect}
-      >
+  const Content = () => {
+    /** info from chart wrapper */
+    const { width, fontSize } = useContext(ChartContext);
+
+    /** max ring radius */
+    const maxR = (startDepth + tree.height) * ringSize;
+
+    return (
+      <>
+        {/* title */}
+        {title && (
+          <text
+            x={0}
+            y={-maxR - ringSize}
+            textAnchor="middle"
+            style={{ fontWeight: "bold" }}
+          >
+            {truncateWidth(title, fontSize, width)}
+          </text>
+        )}
+
         <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
-        {/* chart container */}
-        <Svg ref={svgRef} className={classes.chart}>
-          {nodes.map((node, index) => (
-            <Fragment key={index}>
-              {node.parent && (
-                <Segment
-                  select={() =>
-                    node.data.lastSelected
-                      ? deselect()
-                      : setSelected(node.ancestors().slice(0, -1).reverse())
-                  }
-                  deselect={deselect}
-                  node={node}
-                />
-              )}
-            </Fragment>
-          ))}
-        </Svg>
+        {nodes.map((node, index) => (
+          <Fragment key={index}>
+            {node.parent && (
+              <Segment
+                select={() =>
+                  node.data.lastSelected
+                    ? deselect()
+                    : setSelected(node.ancestors().slice(0, -1).reverse())
+                }
+                deselect={deselect}
+                node={node}
+              />
+            )}
+          </Fragment>
+        ))}
 
         {/* selected breadcrumbs */}
-        {anySelected && (
-          <Flex
-            className={classes.breadcrumbs}
-            gap="sm"
-            gapRatio={1}
-            direction="column"
-            hAlign="right"
-            vAlign="top"
-          >
-            {selected.map((node, index) => (
-              <NodeTooltip key={index} {...node.data}>
-                <div
-                  className={classes.breadcrumb}
-                  style={{ background: node.data.color }}
+        {selected.map((node, index) => {
+          /** label size */
+          const w = 150;
+          const h = 1.5 * fontSize;
+
+          /** label position */
+          const x = maxR + ringSize;
+          const y = maxR - (index + 1) * (h + gapSize);
+
+          return (
+            <Fragment key={index}>
+              <rect
+                fill={node.data.color}
+                x={x}
+                y={y - h / 2}
+                width={w}
+                height={h}
+              />
+              <NodeTooltip {...node.data}>
+                <text
+                  x={x + gapSize}
+                  y={y}
+                  dominantBaseline="central"
                   tabIndex={0}
                   role="button"
                 >
-                  {node.data.label || "-"}
-                </div>
+                  {truncateWidth(
+                    node.data.label || "-",
+                    fontSize,
+                    w - 2 * gapSize,
+                  )}
+                </text>
               </NodeTooltip>
-            ))}
-          </Flex>
-        )}
-      </div>
+            </Fragment>
+          );
+        })}
+      </>
+    );
+  };
 
-      {/* controls */}
-      <Flex>
-        <Download
-          filename={["sunburst"]}
-          raster={containerRef}
-          vector={svgRef}
-        />
-      </Flex>
-    </Flex>
+  return (
+    <Chart filename={[...filename, "sunburst"]} onClick={deselect}>
+      <Content />
+    </Chart>
   );
 };
 
@@ -237,8 +258,8 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
       arc<null>()
         .innerRadius(radius - ringSize / 2 + gapSize / 2)
         .outerRadius(radius + ringSize / 2 - gapSize / 2)
-        .startAngle(angle * 2 * Math.PI)
-        .endAngle(end * 2 * Math.PI)
+        .startAngle(angle * tau)
+        .endAngle(end * tau)
         .padRadius(gapSize)
         .padAngle(1)(null) ?? "",
     [radius, angle, end],
@@ -259,9 +280,9 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
          * that, so thickness can be arbitrary.
          */
         .outerRadius(radius - 999)
-        .startAngle((flip ? end : angle) * 2 * Math.PI)
-        .endAngle((flip ? angle : end) * 2 * Math.PI)
-        .padRadius(gapSize * 3)
+        .startAngle((flip ? end : angle) * tau)
+        .endAngle((flip ? angle : end) * tau)
+        .padRadius(3 * gapSize)
         .padAngle(1)(null) ?? "";
 
     /** extract just first half of path, center-line of segment */
@@ -269,6 +290,11 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
 
     return stroke;
   }, [radius, angle, end]);
+
+  /** length of arc centerline */
+  const arcLength = radius * Math.abs(end - angle) * tau - 2 * gapSize;
+
+  const { fontSize } = useContext(ChartContext);
 
   return (
     <g className={classes.segment} opacity={selected === false ? 0.25 : 1}>
@@ -307,9 +333,9 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
         dy="0.55ex"
         fill={theme["--black"]}
       >
-        <Truncate tag="textPath" href={`#${id}`} startOffset="50%">
-          {label || "-"}
-        </Truncate>
+        <textPath href={`#${id}`} startOffset="50%">
+          {truncateWidth(label || "-", fontSize, arcLength)}
+        </textPath>
       </text>
     </g>
   );
@@ -342,4 +368,4 @@ const NodeTooltip = ({
 );
 
 /** format 0-1 as % */
-const formatPercent = (percent = 0) => `${(percent * 100).toFixed(0)}%`;
+const formatPercent = (percent = 0) => `${(100 * percent).toFixed(0)}%`;
