@@ -61,7 +61,6 @@ export const sequence = (chars?: string, min = 10, max = 100) =>
 const upsetCols = random(3, 10);
 const upsetRows = random(3, 10);
 export const upset = {
-  title: label(),
   x: {
     data: Array(upsetCols)
       .fill(null)

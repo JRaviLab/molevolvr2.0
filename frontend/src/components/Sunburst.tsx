@@ -45,7 +45,7 @@ type Derived = {
 type Node = HierarchyNode<Derived>;
 
 type Props = {
-  /** chart title text */
+  /** title text */
   title?: string;
   /** download filename */
   filename?: Filename;
@@ -142,19 +142,11 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
   const legendY = -maxR;
 
   return (
-    <Chart filename={[...filename, "sunburst"]} onClick={deselect}>
-      {/* title */}
-      {title && (
-        <text
-          x={0}
-          y={-maxR - ringSize}
-          textAnchor="middle"
-          style={{ fontWeight: "bold" }}
-        >
-          {truncateWidth(title, 2 * maxR)}
-        </text>
-      )}
-
+    <Chart
+      title={title}
+      filename={[...filename, "sunburst"]}
+      onClick={deselect}
+    >
       <Legend
         entries={mapValues(colorMap, (color) => ({ color }))}
         x={legendX}
@@ -162,54 +154,58 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
         w={panelWidth}
       />
 
-      {nodes.map((node, index) => (
-        <Fragment key={index}>
-          {node.parent && (
-            <Segment
-              select={() =>
-                node.data.lastSelected
-                  ? deselect()
-                  : setSelected(node.ancestors().slice(0, -1).reverse())
-              }
-              deselect={deselect}
-              node={node}
-            />
-          )}
-        </Fragment>
-      ))}
+      <g>
+        {nodes.map((node, index) => (
+          <Fragment key={index}>
+            {node.parent && (
+              <Segment
+                select={() =>
+                  node.data.lastSelected
+                    ? deselect()
+                    : setSelected(node.ancestors().slice(0, -1).reverse())
+                }
+                deselect={deselect}
+                node={node}
+              />
+            )}
+          </Fragment>
+        ))}
+      </g>
 
       {/* selected breadcrumbs */}
-      {selected.map((node, index) => {
-        const h = 1.5 * rootFontSize;
-        const x = maxR + ringSize;
-        const y = maxR - (index + 1) * (h + gapSize);
+      <g>
+        {selected.map((node, index) => {
+          const h = 1.5 * rootFontSize;
+          const x = maxR + ringSize;
+          const y = maxR - (index + 1) * (h + gapSize);
 
-        return (
-          <Fragment key={index}>
-            <rect
-              fill={node.data.color}
-              x={x}
-              y={y - h / 2}
-              width={panelWidth}
-              height={h}
-            />
-            <NodeTooltip {...node.data}>
-              <text
-                x={x + gapSize}
-                y={y}
-                dominantBaseline="central"
-                tabIndex={0}
-                role="button"
-              >
-                {truncateWidth(
-                  node.data.label || "-",
-                  panelWidth - 2 * gapSize,
-                )}
-              </text>
-            </NodeTooltip>
-          </Fragment>
-        );
-      })}
+          return (
+            <Fragment key={index}>
+              <rect
+                fill={node.data.color}
+                x={x}
+                y={y - h / 2}
+                width={panelWidth}
+                height={h}
+              />
+              <NodeTooltip {...node.data}>
+                <text
+                  x={x + gapSize}
+                  y={y}
+                  dominantBaseline="central"
+                  tabIndex={0}
+                  role="button"
+                >
+                  {truncateWidth(
+                    node.data.label || "-",
+                    panelWidth - 2 * gapSize,
+                  )}
+                </text>
+              </NodeTooltip>
+            </Fragment>
+          );
+        })}
+      </g>
     </Chart>
   );
 };
