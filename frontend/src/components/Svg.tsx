@@ -69,7 +69,7 @@ const Svg = ({ ref: _ref, className, children, ...props }: Props) => {
   scale.h = clamp(scale.h, 0.1, 10);
 
   /** scale font to match document */
-  const fontSize = rootFontSize() * scale.h;
+  const fontSize = rootFontSize * scale.h;
 
   /** view box, fitted to content */
   const [viewBox, setViewBox] = useState<ViewBox>({
@@ -212,7 +212,7 @@ export const Truncate = ({
     }
   }, [width, href]);
 
-  children = truncateWidth(children, fontSize, limit);
+  children = truncateWidth(children, limit);
 
   return (
     // @ts-expect-error ts not smart enough here

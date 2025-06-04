@@ -1,4 +1,4 @@
-import { Fragment, useContext } from "react";
+import { Fragment } from "react";
 import {
   axisLeft,
   axisTop,
@@ -9,10 +9,10 @@ import {
   select,
   transpose,
 } from "d3";
-import { clamp, map, orderBy } from "lodash";
-import Chart, { ChartContext } from "@/components/Chart";
+import { map, orderBy } from "lodash";
+import Chart from "@/components/Chart";
 import Tooltip from "@/components/Tooltip";
-import { getTextWidth, truncateWidth } from "@/util/dom";
+import { getTextWidth, rootFontSize, truncateWidth } from "@/util/dom";
 import type { Filename } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import classes from "./Upset.module.css";
@@ -52,9 +52,8 @@ const strokeWidth = 2;
 const barLength = 100;
 /** target number of bar chart ticks */
 const ticks = 3;
-/** label width limits */
-const minLabelWidth = 100;
-const maxLabelWidth = 200;
+/** label size */
+const labelWidth = 150;
 
 /** upset plot */
 const Upset = ({ title, filename = [], x, y, data }: Props) => {
@@ -127,161 +126,147 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
     .tickSize(2 * strokeWidth)
     .tickPadding(1 * strokeWidth);
 
-  const Content = () => {
-    /** info from chart wrapper */
-    const { width, fontSize } = useContext(ChartContext);
+  /** calc label positioning */
+  const right = xScale.range()[1];
+  const longestLabel =
+    max(y.data.map(({ label = "" }) => getTextWidth(label))) ?? 0;
+  const labelLength = Math.min(labelWidth, longestLabel);
+  const left = -labelLength - barLength;
 
-    /** calc label positioning */
-    const right = xScale.range()[1];
-    const longestLabel =
-      max(y.data.map(({ label = "" }) => getTextWidth(label, fontSize))) ?? 0;
-    let labelLength = clamp(width - right - barLength, 0, longestLabel);
-    labelLength = clamp(labelLength, minLabelWidth, maxLabelWidth);
-    const left = -labelLength - barLength;
+  return (
+    <Chart filename={[...filename, "upset"]}>
+      {/* title */}
+      {title && (
+        <text
+          x={(right + left) / 2}
+          y={-barLength - 2 * rootFontSize}
+          textAnchor="middle"
+          style={{ fontWeight: "bold" }}
+        >
+          {truncateWidth(title, right - left)}
+        </text>
+      )}
 
-    return (
-      <>
-        {/* title */}
-        {title && (
-          <text
-            x={(right + left) / 2}
-            y={-barLength - 2 * fontSize}
-            textAnchor="middle"
-            style={{ fontWeight: "bold" }}
-          >
-            {truncateWidth(title, fontSize, right - left)}
-          </text>
-        )}
-
-        {/* main chart area */}
+      {/* main chart area */}
+      <g>
+        {/* cells */}
         <g>
-          {/* cells */}
-          <g>
-            {data.map((row, rowIndex) =>
-              row.map((col, colIndex) => (
-                <circle
-                  key={[colIndex, rowIndex].join("-")}
-                  className={classes.cell}
-                  cx={(xScale(colIndex) ?? 0) + xScale.bandwidth() / 2}
-                  cy={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
-                  r={nodeSize}
-                  fill={col ? theme["--accent"] : theme["--light-gray"]}
-                  tabIndex={col ? 0 : undefined}
-                  role={col ? "button" : undefined}
-                />
-              )),
-            )}
-          </g>
-
-          {/* lines */}
-          <g>
-            {links.map(([[col1, row1], [col2, row2]], index) => (
-              <line
-                key={index}
-                stroke={theme["--accent"]}
-                strokeWidth={strokeWidth}
-                x1={(xScale(col1) ?? 0) + xScale.bandwidth() / 2}
-                y1={(yScale(row1) ?? 0) + yScale.bandwidth() / 2}
-                x2={(xScale(col2) ?? 0) + xScale.bandwidth() / 2}
-                y2={(yScale(row2) ?? 0) + yScale.bandwidth() / 2}
+          {data.map((row, rowIndex) =>
+            row.map((col, colIndex) => (
+              <circle
+                key={[colIndex, rowIndex].join("-")}
+                className={classes.cell}
+                cx={(xScale(colIndex) ?? 0) + xScale.bandwidth() / 2}
+                cy={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
+                r={nodeSize}
+                fill={col ? theme["--accent"] : theme["--light-gray"]}
               />
-            ))}
-          </g>
+            )),
+          )}
         </g>
 
-        {/* x bar chart */}
+        {/* lines */}
         <g>
-          {/* axis */}
-          <g
-            ref={(el) => {
-              if (el) {
-                /** render axis */
-                xAxis(select(el));
-                /** remove interfering d3 axis styles */
-                el.removeAttribute("font-size");
-                el.removeAttribute("font-family");
-              }
-            }}
-            strokeWidth={strokeWidth}
-          />
+          {links.map(([[col1, row1], [col2, row2]], index) => (
+            <line
+              key={index}
+              stroke={theme["--accent"]}
+              strokeWidth={strokeWidth}
+              x1={(xScale(col1) ?? 0) + xScale.bandwidth() / 2}
+              y1={(yScale(row1) ?? 0) + yScale.bandwidth() / 2}
+              x2={(xScale(col2) ?? 0) + xScale.bandwidth() / 2}
+              y2={(yScale(row2) ?? 0) + yScale.bandwidth() / 2}
+            />
+          ))}
+        </g>
+      </g>
 
-          {/* bars */}
-          <g>
-            {x.data.map((col, colIndex) => (
-              <Tooltip key={colIndex} content={col.value}>
+      {/* x bar chart */}
+      <g>
+        {/* axis */}
+        <g
+          ref={(el) => {
+            if (el) {
+              /** render axis */
+              xAxis(select(el));
+              /** remove interfering d3 axis styles */
+              el.removeAttribute("font-size");
+              el.removeAttribute("font-family");
+            }
+          }}
+          strokeWidth={strokeWidth}
+        />
+
+        {/* bars */}
+        <g>
+          {x.data.map((col, colIndex) => (
+            <Tooltip key={colIndex} content={col.value}>
+              <rect
+                x={xScale(colIndex)}
+                y={xBarScale(col.value)}
+                width={xScale.bandwidth() ?? 0}
+                height={-xBarScale(col.value)}
+                fill={theme["--accent"]}
+                tabIndex={0}
+                role="button"
+              />
+            </Tooltip>
+          ))}
+        </g>
+      </g>
+
+      {/* y bar chart */}
+      <g>
+        {/* axis */}
+        <g
+          ref={(el) => {
+            if (el) {
+              /** render axis */
+              yAxis(select(el));
+              /** remove interfering d3 axis styles */
+              el.removeAttribute("font-size");
+              el.removeAttribute("font-family");
+            }
+          }}
+          strokeWidth={strokeWidth}
+        />
+
+        {/* bars */}
+        <g>
+          {y.data.map((row, rowIndex) => (
+            <Fragment key={rowIndex}>
+              <Tooltip content={row.value}>
                 <rect
-                  x={xScale(colIndex)}
-                  y={xBarScale(col.value)}
-                  width={xScale.bandwidth() ?? 0}
-                  height={-xBarScale(col.value)}
+                  x={yBarScale(row.value)}
+                  y={yScale(rowIndex)}
+                  width={-yBarScale(row.value)}
+                  height={yScale.bandwidth() ?? 0}
                   fill={theme["--accent"]}
                   tabIndex={0}
                   role="button"
                 />
               </Tooltip>
-            ))}
-          </g>
+            </Fragment>
+          ))}
         </g>
 
-        {/* y bar chart */}
+        {/* labels */}
         <g>
-          {/* axis */}
-          <g
-            ref={(el) => {
-              if (el) {
-                /** render axis */
-                yAxis(select(el));
-                /** remove interfering d3 axis styles */
-                el.removeAttribute("font-size");
-                el.removeAttribute("font-family");
-              }
-            }}
-            strokeWidth={strokeWidth}
-          />
-
-          {/* bars */}
-          <g>
-            {y.data.map((row, rowIndex) => (
-              <Fragment key={rowIndex}>
-                <Tooltip content={row.value}>
-                  <rect
-                    x={yBarScale(row.value)}
-                    y={yScale(rowIndex)}
-                    width={-yBarScale(row.value)}
-                    height={yScale.bandwidth() ?? 0}
-                    fill={theme["--accent"]}
-                    tabIndex={0}
-                    role="button"
-                  />
-                </Tooltip>
-              </Fragment>
-            ))}
-          </g>
-
-          {/* labels */}
-          <g>
-            {y.data.map((row, rowIndex) => (
-              <Tooltip key={rowIndex} content={row.label}>
-                <text
-                  x={left}
-                  y={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
-                  fill={theme["--black"]}
-                  dominantBaseline="central"
-                  tabIndex={0}
-                >
-                  {truncateWidth(row.label ?? "-", fontSize, labelLength)}
-                </text>
-              </Tooltip>
-            ))}
-          </g>
+          {y.data.map((row, rowIndex) => (
+            <Tooltip key={rowIndex} content={row.label}>
+              <text
+                x={left}
+                y={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
+                fill={theme["--black"]}
+                dominantBaseline="central"
+                tabIndex={0}
+              >
+                {truncateWidth(row.label ?? "-", labelLength)}
+              </text>
+            </Tooltip>
+          ))}
         </g>
-      </>
-    );
-  };
-
-  return (
-    <Chart filename={[...filename, "upset"]}>
-      <Content />
+      </g>
     </Chart>
   );
 };
