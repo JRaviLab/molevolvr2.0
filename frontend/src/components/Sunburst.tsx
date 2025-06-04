@@ -197,7 +197,11 @@ const Sunburst = ({ data }: Props) => {
 
       {/* controls */}
       <Flex>
-        <Download filename="upset" raster={containerRef} vector={svgRef} />
+        <Download
+          filename={["sunburst"]}
+          raster={containerRef}
+          vector={svgRef}
+        />
       </Flex>
     </Flex>
   );

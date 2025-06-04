@@ -103,7 +103,8 @@ const TestbedPage = () => {
       {/* complex components */}
 
       <SectionUpset />
-      {/* <SectionSunburst />
+      <SectionSunburst />
+      {/*
       <SectionHeatmap />
       <SectionTree />
       <SectionNetwork />

@@ -266,7 +266,7 @@ const Tree = ({ data }: Props) => {
 
       {/* controls */}
       <Flex>
-        <Download filename="tree" raster={containerRef} vector={svgRef} />
+        <Download filename={["tree"]} raster={containerRef} vector={svgRef} />
       </Flex>
     </Flex>
   );

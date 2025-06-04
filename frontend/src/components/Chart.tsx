@@ -4,7 +4,8 @@ import { createPortal } from "react-dom";
 import {
   FaBezierCurve,
   FaDownload,
-  FaFilePdf,
+  FaImage,
+  FaPrint,
   FaRegImage,
   FaTableCellsLarge,
 } from "react-icons/fa6";
@@ -179,7 +180,7 @@ const Chart = ({
                   tooltip="High-resolution image"
                 />
                 <Button
-                  icon={<FaRegImage />}
+                  icon={<FaImage />}
                   text="JPEG"
                   onClick={async () => {
                     if (!containerRef.current) return;
@@ -199,7 +200,7 @@ const Chart = ({
                   tooltip="Vector image"
                 />
                 <Button
-                  icon={<FaFilePdf />}
+                  icon={<FaPrint />}
                   text="PDF"
                   onClick={async () => {
                     if (!containerRef.current) return;

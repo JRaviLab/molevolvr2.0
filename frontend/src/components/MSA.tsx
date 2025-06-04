@@ -140,7 +140,7 @@ const MSA = ({
 
         <Flex gap="xs">
           <Download
-            filename="MSA"
+            filename={["MSA"]}
             raster={ref}
             rasterEffect={async () => {
               const oldWrap = wrap;

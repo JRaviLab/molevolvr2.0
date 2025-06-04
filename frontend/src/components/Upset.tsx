@@ -54,7 +54,7 @@ const barLength = 100;
 const ticks = 3;
 /** max label width */
 const minLabelWidth = 100;
-const maxLabelWidth = 3000;
+const maxLabelWidth = 300;
 
 /** upset plot */
 const Upset = ({ title, filename = [], x, y, data }: Props) => {

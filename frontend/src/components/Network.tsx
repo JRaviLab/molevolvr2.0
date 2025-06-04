@@ -711,7 +711,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
 
         <Flex gap="xs">
           <Download
-            filename="network"
+            filename={["network"]}
             raster={ref}
             tabular={[
               {
