@@ -6,6 +6,8 @@ console.debug({ env: import.meta.env });
 
 const mock = true;
 
+export const root = document.getElementById("app")!;
+
 (async () => {
   /** mock network/api calls */
   if (mock || import.meta.env.MODE === "test") {
@@ -17,7 +19,7 @@ const mock = true;
   }
 
   /** render app entrypoint */
-  createRoot(document.getElementById("app")!).render(
+  createRoot(root).render(
     <StrictMode>
       <App />
     </StrictMode>,

@@ -116,7 +116,7 @@ const Table = <Datum extends object>({
   cols,
   rows,
   sort,
-  filename = "table",
+  filename = [],
 }: Props<Datum>) => {
   /** expanded state */
   const [expanded, setExpanded] = useLocalStorage("table-expanded", false);
@@ -529,7 +529,7 @@ const Table = <Datum extends object>({
                 .rows.map((row) => Object.values(pick(row.original, keys)));
 
               /** download */
-              downloadCsv([names, ...data], filename);
+              downloadCsv([names, ...data], [...filename, "table"]);
             }}
           />
           {/* expand/collapse */}
