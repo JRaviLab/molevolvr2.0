@@ -92,8 +92,6 @@ import tableData from "../../fixtures/table.json";
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
-  return <SectionMSA />;
-
   return (
     <>
       <Meta title="Testbed" />
