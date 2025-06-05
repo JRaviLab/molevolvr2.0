@@ -29,6 +29,7 @@ import {
   type Filename,
   type Tabular,
 } from "@/util/download";
+import { useTheme } from "@/util/hooks";
 import classes from "./Chart.module.css";
 
 type Props = {
@@ -150,6 +151,8 @@ const Chart = ({
     })();
   }, [printing, printEffect]);
 
+  const theme = useTheme();
+
   /** chart content */
   const chart = (
     <>
@@ -173,7 +176,7 @@ const Chart = ({
                 ref={titleRef}
                 textAnchor="middle"
                 dominantBaseline="hanging"
-                style={{ fontWeight: "bold" }}
+                style={{ fontWeight: theme["--bold"] }}
               />
             )}
 

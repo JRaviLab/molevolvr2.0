@@ -1,6 +1,6 @@
 import { cloneElement, type ReactElement, type ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
-import { debounce, truncate } from "lodash";
+import { debounce } from "lodash";
 import { sleep } from "@/util/misc";
 
 /** get document root styles */
@@ -271,14 +271,9 @@ export const getTextWidth = (
 export const truncateWidth = (text: string, limit: number, size?: number) => {
   /** reduce string length until text width under width limit */
   for (let slice = text.length; slice > 0; slice--) {
-    const truncated = truncate(text, { length: slice });
-    /**
-     * can't use getComputedTextLength w/ svgs because, for textPath, too slow
-     * on chrome, and ff returns length clipped to path.
-     */
+    const truncated = text.slice(0, slice) + (slice < text.length ? "..." : "");
     const length = getTextWidth(truncated, size);
     if (length <= limit) return truncated;
   }
-
   return text;
 };

@@ -12,9 +12,9 @@ import {
 import { map, orderBy } from "lodash";
 import Chart from "@/components/Chart";
 import Tooltip from "@/components/Tooltip";
-import { getTextWidth, truncateWidth } from "@/util/dom";
+import { getTextWidth } from "@/util/dom";
 import type { Filename } from "@/util/download";
-import { useTheme } from "@/util/hooks";
+import { useTheme, useTruncateWidth } from "@/util/hooks";
 import classes from "./Upset.module.css";
 
 type Props = {
@@ -131,6 +131,8 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
     max(y.data.map(({ label = "" }) => getTextWidth(label))) ?? 0;
   const labelLength = Math.min(labelWidth, longestLabel);
   const left = -labelLength - barLength;
+
+  const truncateWidth = useTruncateWidth();
 
   return (
     <Chart title={title} filename={[...filename, "upset"]}>

@@ -6,9 +6,8 @@ import CheckBox from "@/components/CheckBox";
 import { Gradient, gradientFunc, gradientOptions } from "@/components/Gradient";
 import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
-import { truncateWidth } from "@/util/dom";
 import type { Filename } from "@/util/download";
-import { useTheme } from "@/util/hooks";
+import { useTheme, useTruncateWidth } from "@/util/hooks";
 import classes from "./Heatmap.module.css";
 
 type Props = {
@@ -106,6 +105,8 @@ const Heatmap = ({
     percent: index / (array.length - 1),
     color: colorScale(valueScale(tick)),
   }));
+
+  const truncateWidth = useTruncateWidth();
 
   return (
     <Chart
@@ -214,7 +215,7 @@ const Heatmap = ({
         fill={theme["--black"]}
         textAnchor="middle"
         dominantBaseline="central"
-        style={{ fontWeight: "500" }}
+        style={{ fontWeight: theme["--medium"] }}
       >
         <text
           transform={[
@@ -249,7 +250,7 @@ const Heatmap = ({
           y={-cellSize}
           textAnchor="middle"
           dominantBaseline="central"
-          style={{ fontWeight: "500" }}
+          style={{ fontWeight: theme["--medium"] }}
         >
           {legend ?? "-"}
         </text>

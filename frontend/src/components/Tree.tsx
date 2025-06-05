@@ -1,14 +1,12 @@
-import { Fragment, useMemo, useRef, useState } from "react";
-import clsx from "clsx";
+import { Fragment, useMemo, useState } from "react";
 import { curveStepBefore, hierarchy, line, type HierarchyNode } from "d3";
 import { map, mapValues, max, min, orderBy, sum, uniqueId } from "lodash";
-import Download from "@/components/Download";
-import Flex from "@/components/Flex";
+import Chart from "@/components/Chart";
 import Legend from "@/components/Legend";
-import Svg, { Truncate } from "@/components/Svg";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { useTheme } from "@/util/hooks";
+import type { Filename } from "@/util/download";
+import { useTheme, useTruncateWidth } from "@/util/hooks";
 import { round } from "@/util/math";
 import classes from "./Tree.module.css";
 
@@ -24,6 +22,10 @@ export type Item = {
 };
 
 type Props = {
+  /** title text */
+  title?: string;
+  /** download filename */
+  filename?: Filename;
   /** chart data */
   data: Item[];
 };
@@ -33,16 +35,15 @@ const size = 30;
 /** circle size */
 const nodeSize = 6;
 /** line thickness */
-const strokeWidth = 2;
+const lineWidth = 1;
+/** width of legend and labels */
+const sideWidth = 150;
 
 /** link line generator */
 const link = line().curve(curveStepBefore);
 
 /** tree/hierarchy plot */
-const Tree = ({ data }: Props) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
-
+const Tree = ({ title, filename = [], data }: Props) => {
   type Node = Item & { id?: string; rootDist?: number };
 
   const tree = useMemo(() => {
@@ -106,6 +107,9 @@ const Tree = ({ data }: Props) => {
   /** max node depth */
   const maxY = max(map(tree.descendants(), "y")) ?? 0;
 
+  /** max node breadth */
+  const maxX = max(map(tree.descendants(), "x")) ?? 0;
+
   /** reactive CSS vars */
   const theme = useTheme();
 
@@ -126,149 +130,162 @@ const Tree = ({ data }: Props) => {
         : selected.slice(0, 1).concat([node]),
     );
 
+  const truncateWidth = useTruncateWidth();
+
   return (
-    <Flex direction="column" gap="lg" full>
-      {/* keyboard listener not necessary here because we have one below */}
-      {/* eslint-disable-next-line */}
-      <div
-        ref={containerRef}
-        className={clsx("card", classes.container)}
-        onClick={deselect}
-      >
-        <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
+    <Chart title={title} filename={[...filename, "tree"]} onClick={deselect}>
+      <Legend
+        x={-2 * size}
+        y={maxX / 2}
+        w={sideWidth}
+        anchor={[1, 0.5]}
+        entries={mapValues(colorMap, (color) => ({ color }))}
+      />
 
-        {/* chart */}
-        <Svg ref={svgRef} className={classes.chart}>
-          {tree.links().map(({ source, target }, index) => {
-            /** is link selected */
-            const isSelected =
-              selected.length > 1
-                ? selectedPath.includes(source) && selectedPath.includes(target)
-                : selected.length === 1
-                  ? false
-                  : null;
+      <g>
+        {tree.links().map(({ source, target }, index) => {
+          /** is link selected */
+          const isSelected =
+            selected.length > 1
+              ? selectedPath.includes(source) && selectedPath.includes(target)
+              : selected.length === 1
+                ? false
+                : null;
 
-            return (
-              <path
-                key={index}
-                className={classes.line}
-                fill="none"
-                stroke={isSelected ? theme["--accent"] : theme["--black"]}
-                strokeWidth={isSelected ? 2 * strokeWidth : strokeWidth}
-                opacity={isSelected === false ? 0.25 : 1}
-                d={
-                  link([
-                    [source.y ?? 0, source.x ?? 0],
-                    [target.y ?? 0, target.x ?? 0],
-                  ]) ?? ""
-                }
-              />
-            );
-          })}
+          return (
+            <path
+              key={index}
+              className={classes.line}
+              fill="none"
+              stroke={isSelected ? theme["--accent"] : theme["--black"]}
+              strokeWidth={isSelected ? 2 * lineWidth : lineWidth}
+              opacity={isSelected === false ? 0.25 : 1}
+              d={
+                link([
+                  [source.y ?? 0, source.x ?? 0],
+                  [target.y ?? 0, target.x ?? 0],
+                ]) ?? ""
+              }
+            />
+          );
+        })}
+      </g>
 
-          {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => {
-            /** is node selected */
-            const isSelected = selected.length
-              ? selected.includes(node) || selectedPath.includes(node)
-              : null;
+      <g>
+        {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => {
+          /** is node selected */
+          const isSelected = selected.length
+            ? selected.includes(node) || selectedPath.includes(node)
+            : null;
 
-            return (
-              <Fragment key={index}>
-                {!node.children && (
-                  <>
-                    <line
-                      x1={node.y}
-                      x2={maxY}
-                      y1={node.x ?? 0}
-                      y2={node.x ?? 0}
-                      stroke={theme["--black"]}
-                      strokeWidth={strokeWidth}
-                      strokeDasharray={[strokeWidth, 2 * strokeWidth].join(" ")}
-                    />
-                    <Truncate
-                      tag="text"
-                      x={maxY}
-                      y={node.x ?? 0}
-                      width={200}
-                      fill={theme["--black"]}
-                      transform={`translate(${2 * nodeSize}, 0)`}
-                      dominantBaseline="central"
-                    >
-                      {node.data.label ?? "-"}
-                    </Truncate>
-                  </>
-                )}
-
-                <Tooltip
-                  content={
-                    <>
-                      <div className="mini-table">
-                        <span>Name</span>
-                        <span>{node.data.label}</span>
-                        <span>Type</span>
-                        <span>{node.data.type}</span>
-                        {node.ancestors().length > 1 && (
-                          <>
-                            <span>Dist</span>
-                            <span>{node.data.dist?.toFixed(3)}</span>
-                            <span>From root</span>
-                            <span>{node.data.rootDist?.toFixed(3)}</span>
-                          </>
-                        )}
-                      </div>
-                      Click to select
-                    </>
-                  }
-                >
-                  <circle
-                    className={classes.node}
-                    cx={node.y ?? 0}
-                    cy={node.x ?? 0}
-                    r={nodeSize}
-                    fill={
-                      isSelected === false
-                        ? theme["--light-gray"]
-                        : colorMap[node.data.type ?? ""]
-                    }
-                    tabIndex={0}
-                    role="button"
-                    onClick={(event) => {
-                      /** prevent deselect from container onClick */
-                      event.stopPropagation();
-                      select(node);
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        event.preventDefault();
-                        select(node);
-                      }
-                      if (event.key === "Escape") deselect();
-                    }}
+          return (
+            <Fragment key={index}>
+              {!node.children && (
+                <>
+                  <line
+                    x1={node.y}
+                    x2={maxY}
+                    y1={node.x ?? 0}
+                    y2={node.x ?? 0}
+                    stroke={theme["--black"]}
+                    strokeWidth={lineWidth}
+                    strokeDasharray={[lineWidth, 2 * lineWidth].join(" ")}
                   />
-                </Tooltip>
-              </Fragment>
-            );
-          })}
-        </Svg>
+                  <text
+                    x={maxY}
+                    y={node.x ?? 0}
+                    fill={theme["--black"]}
+                    transform={`translate(${2 * nodeSize}, 0)`}
+                    dominantBaseline="central"
+                  >
+                    {truncateWidth(node.data.label ?? "-", sideWidth)}
+                  </text>
+                </>
+              )}
 
-        {/* selected */}
-        {selectedPath.length > 1 && (
-          <div className={clsx("mini-table", classes.selected)}>
-            <span>From</span>
-            <span>{selectedA?.data.label}</span>
-            <span>To</span>
-            <span>{selectedB?.data.label}</span>
-            <span>Dist.</span>
-            <span>{selectedDist.toFixed(2)}</span>
-          </div>
-        )}
-      </div>
+              <Tooltip
+                content={
+                  <>
+                    <div className="mini-table">
+                      <span>Name</span>
+                      <span>{node.data.label}</span>
+                      <span>Type</span>
+                      <span>{node.data.type}</span>
+                      {node.ancestors().length > 1 && (
+                        <>
+                          <span>Dist</span>
+                          <span>{node.data.dist?.toFixed(3)}</span>
+                          <span>From root</span>
+                          <span>{node.data.rootDist?.toFixed(3)}</span>
+                        </>
+                      )}
+                    </div>
+                    <hr />
+                    Click to select. Select two to see path.
+                  </>
+                }
+              >
+                <circle
+                  className={classes.node}
+                  cx={node.y ?? 0}
+                  cy={node.x ?? 0}
+                  r={nodeSize}
+                  fill={
+                    isSelected === false
+                      ? theme["--light-gray"]
+                      : colorMap[node.data.type ?? ""]
+                  }
+                  stroke={theme["--black"]}
+                  strokeWidth={lineWidth}
+                  tabIndex={0}
+                  role="button"
+                  onClick={(event) => {
+                    /** prevent deselect from container onClick */
+                    event.stopPropagation();
+                    select(node);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      select(node);
+                    }
+                    if (event.key === "Escape") deselect();
+                  }}
+                />
+              </Tooltip>
+            </Fragment>
+          );
+        })}
+      </g>
 
-      {/* controls */}
-      <Flex>
-        <Download filename={["tree"]} raster={containerRef} vector={svgRef} />
-      </Flex>
-    </Flex>
+      {/* selected */}
+      {selectedPath.length > 1 && (
+        <g
+          fill={theme["--black"]}
+          transform={`translate(0, ${maxX + 2 * size})`}
+        >
+          <text x={-2 * size} y={0 * size}>
+            From
+          </text>
+          <text x={0} y={0 * size}>
+            {truncateWidth(selectedA?.data.label ?? "", maxY + sideWidth)}
+          </text>
+          <text x={-2 * size} y={1 * size}>
+            To
+          </text>
+          <text x={0} y={1 * size}>
+            {truncateWidth(selectedB?.data.label ?? "", maxY + sideWidth)}
+          </text>
+          <text x={-2 * size} y={2 * size}>
+            Dist.
+          </text>
+          <text x={0} y={2 * size}>
+            {sum(map(selectedPath, "data.dist") ?? 0).toFixed(2)} (
+            {selectedPath.length} nodes)
+          </text>
+        </g>
+      )}
+    </Chart>
   );
 };
 

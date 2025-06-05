@@ -46,6 +46,7 @@ import type { Option } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import { useColorMap } from "@/util/color";
+import type { Filename } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { lerp } from "@/util/math";
 import { sleep } from "@/util/misc";
@@ -86,6 +87,8 @@ type Edge = {
 };
 
 type Props = {
+  /** download filename */
+  filename?: Filename;
   nodes: Node[];
   edges: Edge[];
 };
@@ -95,7 +98,7 @@ const minNodeSize = 30;
 const maxNodeSize = 50;
 const minEdgeSize = 1;
 const maxEdgeSize = 3;
-const edgeLength = 1.5 * maxNodeSize;
+const edgeLength = 0.5 * maxNodeSize;
 const fontSize = 10;
 const padding = 10;
 const minZoom = 0.2;
@@ -465,14 +468,14 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     const getNodeLabel = (node: NodeSingular) => node.data().shortLabel;
     const getNodeSize = (node: NodeSingular) => node.data().size;
     const getNodeColor = (node: NodeSingular) =>
-      node.selected() ? (theme["--light-gray"] ?? "") : node.data().color;
+      node.selected() ? (theme["--gray"] ?? "") : node.data().color;
     const getNodeShape = (node: NodeSingular) => node.data().shape;
     const getNodeOpacity = (node: NodeSingular) => (node.active() ? 0.1 : 0);
     const getEdgeLabel = (edge: EdgeSingular) => edge.data().shortLabel;
     const getEdgeSize = (edge: EdgeSingular) => edge.data().size;
     const getEdgeArrowSize = () => 1;
     const getEdgeColor = (edge: EdgeSingular) =>
-      edge.selected() ? (theme["--light-gray"] ?? "") : edge.data().color;
+      edge.selected() ? (theme["--gray"] ?? "") : edge.data().color;
     const getEdgeArrow =
       (directions: Edge["direction"][]) => (edge: EdgeSingular) =>
         directions.includes(edge.data().direction) ? "triangle" : "none";
@@ -486,7 +489,6 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       shape: "polygon",
       "shape-polygon-points": getNodeShape,
       label: getNodeLabel,
-
       "font-size": fontSize,
       "font-family": theme["--sans"],
       color: theme["--black"],
@@ -494,6 +496,8 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "text-valign": "center",
       "text-max-width": getNodeSize,
       "text-wrap": "wrap",
+      // "text-outline-width": 1,
+      // "text-outline-color": theme["--white"],
       // "outline-width": 1,
       // "outline-color": theme["--black"],
       "underlay-padding": minNodeSize / 4,
@@ -518,6 +522,10 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "font-family": theme["--sans"],
       color: theme["--black"],
       "text-rotation": "autorotate",
+      // "text-outline-width": 1,
+      // "text-outline-color": theme["--white"],
+      // "line-outline-width": 1,
+      // "line-outline-color": theme["--black"],
       "underlay-padding": minEdgeSize / 2,
       "underlay-opacity": getEdgeOpacity,
       "underlay-shape": "ellipse",
@@ -675,7 +683,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                 <Legend
                   entries={mapValues(edgeColors, (color) => ({
                     color,
-                    shape: [-0.75, 0.5, 0.75, -0.5],
+                    shape: [-0.75, 0.75, 0.75, -0.75],
                     stroke: true,
                   }))}
                 />

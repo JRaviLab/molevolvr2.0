@@ -1,3 +1,4 @@
+import { useMemo, useRef } from "react";
 import {
   FaArrowRight,
   FaArrowsUpDown,
@@ -25,6 +26,7 @@ import {
   FaRegMessage,
   FaRegSquareCheck,
   FaRegWindowMaximize,
+  FaShapes,
   FaShareNodes,
   FaSitemap,
   FaSliders,
@@ -32,7 +34,8 @@ import {
   FaTableCells,
 } from "react-icons/fa6";
 import { PiSquaresFourFill } from "react-icons/pi";
-import { sample, uniq } from "lodash";
+import { mapValues, random, sample, uniq } from "lodash";
+import { useElementSize } from "@reactuses/core";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -45,6 +48,7 @@ import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Heatmap from "@/components/Heatmap";
 import IPR from "@/components/IPR";
+import Legend from "@/components/Legend";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import MSA from "@/components/MSA";
@@ -103,12 +107,13 @@ const TestbedPage = () => {
 
       {/* complex components */}
 
+      <SectionLegend />
       <SectionUpset />
       <SectionSunburst />
       <SectionHeatmap />
-      {/*
       <SectionTree />
       <SectionNetwork />
+      {/*
       <SectionMSA />
       <SectionIPR /> */}
 
@@ -288,6 +293,44 @@ const SectionHeading = () => (
   </Section>
 );
 
+const SectionLegend = () => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [width] = useElementSize(ref);
+
+  const labels = useMemo(
+    () =>
+      Array(10)
+        .fill(null)
+        .map(label)
+        .map((label) => label || ""),
+    [],
+  );
+  const colorMap = useColorMap(labels, "mode");
+  const entries = mapValues(colorMap, (color) => ({ color }));
+
+  return (
+    <Section>
+      <Heading level={2} icon={<FaShapes />}>
+        Legend
+      </Heading>
+
+      <div
+        ref={ref}
+        className="card"
+        style={{
+          width: 400,
+          padding: 20,
+          resize: "both",
+          overflow: "auto",
+        }}
+      >
+        <Legend entries={entries} x={0} y={0} w={width} />
+      </div>
+    </Section>
+  );
+};
+
 const SectionUpset = () => (
   <Section>
     <Heading level={2} icon={<FaFaceSadCry />}>
@@ -334,12 +377,7 @@ const SectionNetwork = () => (
       Network
     </Heading>
 
-    <Network
-      title={label()}
-      filename={[analysis]}
-      nodes={nodes}
-      edges={edges}
-    />
+    <Network filename={[analysis]} nodes={nodes} edges={edges} />
   </Section>
 );
 
