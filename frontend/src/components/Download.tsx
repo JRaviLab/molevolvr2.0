@@ -66,9 +66,11 @@ const Download = ({
   useEffect(() => {
     (async () => {
       if (printing) {
+        /** wait for layout shifts */
         await sleep(100);
         /** open print dialog */
         window.print();
+        /** keep showing for brief period */
         await sleep(100);
         setPrinting(false);
       }
@@ -77,6 +79,7 @@ const Download = ({
 
   /** if printing, render just chart */
   if (printing) {
+    /** hide rest of app */
     appElement.style.display = "none";
 
     return createPortal(
@@ -85,6 +88,7 @@ const Download = ({
     );
   }
 
+  /** re-show rest of app */
   appElement.style.display = "";
 
   return (
