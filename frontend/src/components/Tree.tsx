@@ -10,16 +10,14 @@ import { useTheme, useTruncateWidth } from "@/util/hooks";
 import { round } from "@/util/math";
 import classes from "./Tree.module.css";
 
-export type Item = {
-  /** human-readable label */
-  label?: string;
-  /** arbitrary type/category */
-  type?: string;
-  /** distance from parent */
-  dist?: number;
-  /** children items */
-  children?: Item[];
-};
+/** grid spacing */
+const size = 30;
+/** circle size */
+const nodeSize = 6;
+/** line thickness */
+const lineWidth = 1;
+/** width of legend and labels */
+const sideWidth = 150;
 
 type Props = {
   /** title text */
@@ -30,14 +28,16 @@ type Props = {
   data: Item[];
 };
 
-/** grid spacing */
-const size = 30;
-/** circle size */
-const nodeSize = 6;
-/** line thickness */
-const lineWidth = 1;
-/** width of legend and labels */
-const sideWidth = 150;
+export type Item = {
+  /** human-readable label */
+  label?: string;
+  /** arbitrary type/category */
+  type?: string;
+  /** distance from parent */
+  dist?: number;
+  /** children items */
+  children?: Item[];
+};
 
 /** link line generator */
 const link = line().curve(curveStepBefore);
@@ -135,7 +135,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
   return (
     <Chart title={title} filename={[...filename, "tree"]} onClick={deselect}>
       <Legend
-        x={-2 * size}
+        x={-size}
         y={maxX / 2}
         w={sideWidth}
         anchor={[1, 0.5]}

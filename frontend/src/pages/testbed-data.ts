@@ -1,4 +1,4 @@
-import { random, range, sample, uniqueId } from "lodash";
+import { random, range, sample, startCase, uniqueId } from "lodash";
 import type { Item as SunburstItem } from "@/components/Sunburst";
 import type { Item as TreeItem } from "@/components/Tree";
 
@@ -29,7 +29,11 @@ export const phrases = () =>
   );
 
 /** generate fake label */
-export const label = () => sample([...phrases(), undefined]);
+export const label = () => {
+  let label = sample([...phrases(), undefined]);
+  if (label) label = startCase(label);
+  return label;
+};
 
 /** generate fake "type" */
 export const type = () =>

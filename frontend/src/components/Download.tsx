@@ -1,18 +1,18 @@
-import type { ReactNode, RefObject } from "react";
+import { useEffect, useState } from "react";
+import type { ReactElement, ReactNode, RefObject } from "react";
+import { createPortal } from "react-dom";
 import {
   FaBezierCurve,
   FaDownload,
-  FaFilePdf,
+  FaPrint,
   FaRegImage,
   FaTableCellsLarge,
 } from "react-icons/fa6";
 import { PiBracketsCurlyBold } from "react-icons/pi";
 import { TbPrompt } from "react-icons/tb";
-import type { Promisable } from "type-fest";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
-import { printElement } from "@/util/dom";
 import {
   downloadCsv,
   downloadJpg,
@@ -24,20 +24,18 @@ import {
   type Filename,
   type Tabular,
 } from "@/util/download";
+import { sleep } from "@/util/misc";
+import classes from "./Download.module.css";
 
 type Props = {
   /** download filename */
   filename: Filename;
   /** element to render raster image of */
   raster?: RefObject<Element | null>;
-  /** code to run before and after raster download */
-  rasterEffect?: () => Promisable<() => Promisable<void>>;
+  /** component to print to pdf */
+  print?: ReactElement;
   /** svg element to save */
   vector?: RefObject<SVGSVGElement | null>;
-  /** element to print to pdf */
-  print?: RefObject<Element | null>;
-  /** code to run before and after print */
-  printEffect?: () => Promisable<() => Promisable<void>>;
   /** csv/tsv data */
   tabular?: { data: Tabular; filename?: string }[];
   /** text string */
@@ -48,19 +46,47 @@ type Props = {
   children?: ReactNode;
 };
 
+/** app entrypoint element */
+const appElement = document.getElementById("app")!;
+
 /** chart download button */
 const Download = ({
   filename,
   raster,
-  rasterEffect,
   vector,
   print,
-  printEffect,
   tabular,
   text,
   json,
   children,
 }: Props) => {
+  /** printing state */
+  const [printing, setPrinting] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      if (printing) {
+        await sleep(100);
+        /** open print dialog */
+        window.print();
+        await sleep(100);
+        setPrinting(false);
+      }
+    })();
+  }, [printing]);
+
+  /** if printing, render just chart */
+  if (printing) {
+    appElement.style.display = "none";
+
+    return createPortal(
+      <div className={classes.printing}>{print}</div>,
+      document.body,
+    );
+  }
+
+  appElement.style.display = "";
+
   return (
     <Popover
       content={
@@ -72,9 +98,7 @@ const Download = ({
                 text="PNG"
                 onClick={async () => {
                   if (!raster.current) return;
-                  const post = await rasterEffect?.();
                   downloadPng(raster.current, filename);
-                  await post?.();
                 }}
                 tooltip="High-resolution image"
               />
@@ -83,9 +107,7 @@ const Download = ({
                 text="JPEG"
                 onClick={async () => {
                   if (!raster.current) return;
-                  const post = await rasterEffect?.();
                   downloadJpg(raster.current, filename);
-                  await post?.();
                 }}
                 tooltip="Compressed image"
               />
@@ -104,14 +126,9 @@ const Download = ({
           )}
           {print && (
             <Button
-              icon={<FaFilePdf />}
+              icon={<FaPrint />}
               text="PDF"
-              onClick={async () => {
-                if (!print.current) return;
-                const post = await printEffect?.();
-                printElement(print.current);
-                await post?.();
-              }}
+              onClick={() => setPrinting(true)}
               tooltip="Print as pdf"
             />
           )}

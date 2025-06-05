@@ -34,7 +34,7 @@ import {
   FaTableCells,
 } from "react-icons/fa6";
 import { PiSquaresFourFill } from "react-icons/pi";
-import { mapValues, random, sample, uniq } from "lodash";
+import { mapValues, sample, uniq } from "lodash";
 import { useElementSize } from "@reactuses/core";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
@@ -92,6 +92,8 @@ import tableData from "../../fixtures/table.json";
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
+  return <SectionMSA />;
+
   return (
     <>
       <Meta title="Testbed" />
@@ -114,17 +116,16 @@ const TestbedPage = () => {
       <SectionTree />
       <SectionNetwork />
       <SectionMSA />
-      {/*
-      <SectionIPR /> */}
+      <SectionIPR />
 
       {/* formatting */}
 
-      {/* <SectionElements />
-      <SectionHeading /> */}
+      <SectionElements />
+      <SectionHeading />
 
       {/* generic components */}
 
-      {/* <SectionLink />
+      <SectionLink />
       <SectionButton />
       <SectionTextBox />
       <SectionSelect />
@@ -141,12 +142,12 @@ const TestbedPage = () => {
       <SectionTable />
       <SectionTooltip />
       <SectionPopover />
-      <SectionDialog /> */}
+      <SectionDialog />
 
       {/* misc */}
 
-      {/* <SectionForm />
-      <SectionCSS /> */}
+      <SectionForm />
+      <SectionCSS />
     </>
   );
 };
@@ -392,7 +393,7 @@ const SectionMSA = () => (
       filename={[analysis]}
       tracks={msaTracks}
       getType={clustalType}
-      colors={clustalColors}
+      colorMap={clustalColors}
     />
   </Section>
 );

@@ -1,0 +1,15 @@
+.printing > * {
+  aspect-ratio: unset !important;
+  width: 100vw !important;
+  min-width: unset !important;
+  max-width: unset !important;
+  height: 100vh !important;
+  min-height: unset !important;
+  max-height: unset !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: var(--white) !important;
+  box-shadow: none !important;
+  resize: unset !important;
+}

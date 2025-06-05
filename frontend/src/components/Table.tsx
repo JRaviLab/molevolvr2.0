@@ -50,6 +50,13 @@ import type { Filename } from "@/util/download";
 import { formatDate, formatNumber } from "@/util/string";
 import classes from "./Table.module.css";
 
+type Props<Datum extends object> = {
+  cols: _Col<Datum>[];
+  rows: Datum[];
+  sort?: SortingState;
+  filename?: Filename;
+};
+
 type Col<
   Datum extends object = object,
   Key extends keyof Datum = keyof Datum,
@@ -89,13 +96,6 @@ type Col<
 type _Col<Datum extends object> = {
   [Key in keyof Datum]: Col<Datum, Key>;
 }[keyof Datum];
-
-type Props<Datum extends object> = {
-  cols: _Col<Datum>[];
-  rows: Datum[];
-  sort?: SortingState;
-  filename?: Filename;
-};
 
 /** map column definition to multi-select option */
 const colToOption = <Datum extends object>(

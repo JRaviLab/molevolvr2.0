@@ -1,37 +1,19 @@
-import { createContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { createPortal } from "react-dom";
-import {
-  FaBezierCurve,
-  FaDownload,
-  FaExpand,
-  FaImage,
-  FaPrint,
-  FaRegImage,
-  FaTableCellsLarge,
-} from "react-icons/fa6";
-import { PiBracketsCurlyBold } from "react-icons/pi";
-import { TbPrompt } from "react-icons/tb";
+import { FaExpand } from "react-icons/fa6";
 import clsx from "clsx";
-import type { Promisable } from "type-fest";
 import { useElementSize, useFullscreen } from "@reactuses/core";
 import Button from "@/components/Button";
+import Download from "@/components/Download";
 import Flex from "@/components/Flex";
-import Popover from "@/components/Popover";
 import { getViewBoxFit, rootFontSize, truncateWidth } from "@/util/dom";
-import {
-  downloadCsv,
-  downloadJpg,
-  downloadJson,
-  downloadPng,
-  downloadSvg,
-  downloadTsv,
-  downloadTxt,
-  type Filename,
-  type Tabular,
-} from "@/util/download";
+import type { Filename, Tabular } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import classes from "./Chart.module.css";
+
+/** container padding */
+const padding = 20;
 
 type Props = {
   /** title text */
@@ -41,10 +23,6 @@ type Props = {
   /** full width */
   full?: boolean;
 
-  /** code to run before and after raster download */
-  rasterEffect?: () => Promisable<() => Promisable<void>>;
-  /** code to run before and after print */
-  printEffect?: () => Promisable<() => Promisable<void>>;
   /** csv/tsv data */
   tabular?: { data: Tabular; filename?: string }[];
   /** text string */
@@ -56,30 +34,22 @@ type Props = {
   controls?: ReactNode[];
 
   /** svg content */
-  children: ReactNode;
+  children: ReactNode | ((props: ChildrenProps) => ReactNode);
 
   /** container click */
   onClick?: ComponentProps<"div">["onClick"];
 };
 
-const defaultContext = {
+export type ChildrenProps = {
   /** available width */
-  width: 100,
+  width: number;
 };
-
-/** context passed to children */
-export const ChartContext = createContext(defaultContext);
-
-/** container padding */
-const padding = 20;
 
 /** generic chart wrapper */
 const Chart = ({
   title,
   filename,
   full,
-  rasterEffect,
-  printEffect,
   tabular,
   text,
   json,
@@ -92,24 +62,33 @@ const Chart = ({
   const fitRef = useRef<SVGGElement>(null);
   const titleRef = useRef<SVGTextElement>(null);
 
-  /** available width */
   const [containerWidth] = useElementSize(containerRef.current);
   const [parentWidth] = useElementSize(containerRef.current?.parentElement);
-  const width = (full ? containerWidth : parentWidth) - 2 * padding - 1;
 
-  /** context passed to children */
-  const contextValue: typeof defaultContext = { width };
+  /** available width */
+  let width = full ? containerWidth : parentWidth;
+  width -= 2 * padding - 1;
+  /** ensure nominal width */
+  width = Math.max(width, 10);
 
   useEffect(() => {
     if (!svgRef.current || !fitRef.current) return;
 
+    /** ignore certain elements in fitting */
+    const ignores =
+      svgRef.current.querySelectorAll<SVGGraphicsElement>("[data-fit-ignore]");
+    ignores.forEach((el) => (el.style.display = "none"));
+
     /** get bbox of contents */
     let { x, y, w, h } = getViewBoxFit(fitRef.current);
+
+    /** restore fit ignore elements */
+    ignores.forEach((el) => (el.style.display = ""));
 
     /** chart title */
     if (title && titleRef.current) {
       /** make room */
-      const titleSpace = 2 * rootFontSize;
+      const titleSpace = 3 * rootFontSize;
       y -= titleSpace;
       h += titleSpace;
       /** position */
@@ -140,17 +119,16 @@ const Chart = ({
         /** hide rest of app */
         appElement.style.display = "none";
 
-        const post = await printEffect?.();
-
         /** open print dialog */
         window.print();
 
-        /** cleanup */
         setPrinting(false);
-        await post?.();
-      } else appElement.style.display = "";
+      } else {
+        /** re-show rest of app */
+        appElement.style.display = "";
+      }
     })();
-  }, [printing, printEffect]);
+  }, [printing]);
 
   const theme = useTheme();
 
@@ -160,7 +138,7 @@ const Chart = ({
   /** chart content */
   const chart = (
     <>
-      {/* rely on component consumer handling keyboard accessibly */}
+      {/* rely on component consumer handling keyboard appropriately */}
       {/* eslint-disable-next-line */}
       <div
         ref={containerRef}
@@ -179,21 +157,21 @@ const Chart = ({
           target.style.height = "";
         }}
       >
-        <ChartContext.Provider value={contextValue}>
-          <svg ref={svgRef} className={classes.svg}>
-            {/* title */}
-            {title && (
-              <text
-                ref={titleRef}
-                textAnchor="middle"
-                dominantBaseline="hanging"
-                style={{ fontWeight: theme["--bold"] }}
-              />
-            )}
+        <svg ref={svgRef} className={classes.svg}>
+          {/* title */}
+          {title && (
+            <text
+              ref={titleRef}
+              textAnchor="middle"
+              dominantBaseline="hanging"
+              style={{ fontWeight: theme["--bold"] }}
+            />
+          )}
 
-            <g ref={fitRef}>{children}</g>
-          </svg>
-        </ChartContext.Provider>
+          <g ref={fitRef}>
+            {typeof children === "function" ? children({ width }) : children}
+          </g>
+        </svg>
       </div>
     </>
   );
@@ -223,86 +201,15 @@ const Chart = ({
           />
 
           {/* download */}
-          <Popover
-            content={
-              <Flex direction="column" hAlign="stretch" gap="sm">
-                <Button
-                  icon={<FaRegImage />}
-                  text="PNG"
-                  onClick={async () => {
-                    if (!containerRef.current) return;
-                    const post = await rasterEffect?.();
-                    downloadPng(containerRef.current, filename);
-                    await post?.();
-                  }}
-                  tooltip="High-resolution image"
-                />
-                <Button
-                  icon={<FaImage />}
-                  text="JPEG"
-                  onClick={async () => {
-                    if (!containerRef.current) return;
-                    const post = await rasterEffect?.();
-                    downloadJpg(containerRef.current, filename);
-                    await post?.();
-                  }}
-                  tooltip="Compressed image"
-                />
-                <Button
-                  icon={<FaBezierCurve />}
-                  text="SVG"
-                  onClick={() => {
-                    if (!svgRef.current) return;
-                    downloadSvg(svgRef.current, filename);
-                  }}
-                  tooltip="Vector image"
-                />
-                <Button
-                  icon={<FaPrint />}
-                  text="PDF"
-                  onClick={async () => {
-                    if (!containerRef.current) return;
-                    setPrinting(true);
-                  }}
-                  tooltip="Print as pdf"
-                />
-                {tabular && (
-                  <>
-                    <Button
-                      icon={<FaTableCellsLarge />}
-                      text="TSV"
-                      onClick={() => downloadTsv(tabular, filename)}
-                      tooltip="Tab-separated data"
-                    />
-                    <Button
-                      icon={<FaTableCellsLarge />}
-                      text="CSV"
-                      onClick={() => downloadCsv(tabular, filename)}
-                      tooltip="Tab-separated data"
-                    />
-                  </>
-                )}
-                {!!text && (
-                  <Button
-                    icon={<TbPrompt />}
-                    text="Text"
-                    onClick={() => downloadTxt(text, filename)}
-                    tooltip="Raw text data"
-                  />
-                )}
-                {!!json && (
-                  <Button
-                    icon={<PiBracketsCurlyBold />}
-                    text="JSON"
-                    onClick={() => downloadJson(json, filename)}
-                    tooltip="JSON data"
-                  />
-                )}
-              </Flex>
-            }
-          >
-            <Button icon={<FaDownload />} design="hollow" tooltip="Download" />
-          </Popover>
+          <Download
+            filename={filename}
+            raster={containerRef}
+            print={chart}
+            vector={svgRef}
+            tabular={tabular}
+            text={text}
+            json={json}
+          />
         </Flex>
       </Flex>
     </Flex>

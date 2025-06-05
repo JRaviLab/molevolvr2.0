@@ -13,17 +13,6 @@ import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import classes from "./Select.module.css";
 
-export type Option<ID = string> = {
-  /** unique id */
-  id: ID;
-  /** primary label */
-  primary: ReactNode;
-  /** secondary label */
-  secondary?: ReactNode;
-  /** icon */
-  icon?: ReactElement<{ className: string }>;
-};
-
 type Props<O extends Option> = {
   /** layout of label and control */
   layout?: "vertical" | "horizontal";
@@ -39,6 +28,17 @@ type Props<O extends Option> = {
   onChange?: (value: O["id"][], count: number | "all" | "none") => void;
   /** field name in form data */
   name?: string;
+};
+
+export type Option<ID = string> = {
+  /** unique id */
+  id: ID;
+  /** primary label */
+  primary: ReactNode;
+  /** secondary label */
+  secondary?: ReactNode;
+  /** icon */
+  icon?: ReactElement<{ className: string }>;
 };
 
 /** multi select box */
