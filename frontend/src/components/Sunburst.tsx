@@ -7,7 +7,7 @@ import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import { rootFontSize, truncateWidth } from "@/util/dom";
 import type { Filename } from "@/util/download";
-import { useTheme } from "@/util/hooks";
+import { useTheme, useTruncateWidth } from "@/util/hooks";
 import { tau } from "@/util/math";
 import { formatNumber } from "@/util/string";
 import classes from "./Sunburst.module.css";
@@ -140,6 +140,8 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
   /** legend props */
   const legendX = -maxR - ringSize - panelWidth;
   const legendY = -maxR;
+
+  const truncateWidth = useTruncateWidth();
 
   return (
     <Chart

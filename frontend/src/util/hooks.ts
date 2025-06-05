@@ -8,7 +8,7 @@ import {
   useResizeObserver,
 } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
-import { getSvgTransform, getTheme } from "@/util/dom";
+import { getSvgTransform, getTheme, truncateWidth } from "@/util/dom";
 
 /** get theme css variables */
 export const useTheme = () => {
@@ -83,4 +83,20 @@ export const useSvgTransform = (svg: SVGSVGElement | null) => {
   });
 
   return scale;
+};
+
+/** trigger component rerender by event listener */
+export const useEventRerender = (
+  target: Parameters<typeof useEventListener>[2],
+  event: Parameters<typeof useEventListener>[0],
+) => {
+  const [count, setCount] = useState(0);
+  useEventListener(event, () => setCount(count + 1), target);
+  return count;
+};
+
+/** re-calc truncateWidth on font load */
+export const useTruncateWidth = () => {
+  const count = useEventRerender(window.document.fonts, "loadingdone");
+  return useCallback(truncateWidth, [count]);
 };
