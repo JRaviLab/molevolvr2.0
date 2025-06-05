@@ -601,7 +601,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     }, 100),
   );
 
-  /** fullscreen viz */
+  /** fullscreen */
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
 
   return (
