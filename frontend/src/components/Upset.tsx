@@ -17,6 +17,19 @@ import type { Filename } from "@/util/download";
 import { useTheme, useTruncateWidth } from "@/util/hooks";
 import classes from "./Upset.module.css";
 
+/** size of cells in main plot area */
+const cellSize = 30;
+/** circle size */
+const nodeSize = 6;
+/** line thickness */
+const strokeWidth = 2;
+/** length of bar charts on side */
+const barLength = 100;
+/** target number of bar chart ticks */
+const ticks = 3;
+/** label size */
+const labelWidth = 150;
+
 type Props = {
   /** title text */
   title?: string;
@@ -41,19 +54,6 @@ type Props = {
   /** cell values */
   data: (boolean | undefined)[][];
 };
-
-/** size of cells in main plot area */
-const cellSize = 30;
-/** circle size */
-const nodeSize = 6;
-/** line thickness */
-const strokeWidth = 2;
-/** length of bar charts on side */
-const barLength = 100;
-/** target number of bar chart ticks */
-const ticks = 3;
-/** label size */
-const labelWidth = 150;
 
 /** upset plot */
 const Upset = ({ title, filename = [], x, y, data }: Props) => {

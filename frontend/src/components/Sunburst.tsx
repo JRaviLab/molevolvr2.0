@@ -12,6 +12,25 @@ import { tau } from "@/util/math";
 import { formatNumber } from "@/util/string";
 import classes from "./Sunburst.module.css";
 
+/** thickness of rings */
+const ringSize = 30;
+/** gap between rings */
+const gapSize = 3;
+/** depth/level of first ring from center */
+const startDepth = 1;
+/** width of side panels */
+const panelWidth = 150;
+
+type Props = {
+  /** title text */
+  title?: string;
+  /** download filename */
+  filename?: Filename;
+
+  /** chart data */
+  data: Item[];
+};
+
 export type Item = {
   /** human-readable label */
   label?: string;
@@ -43,25 +62,6 @@ type Derived = {
 };
 
 type Node = HierarchyNode<Derived>;
-
-type Props = {
-  /** title text */
-  title?: string;
-  /** download filename */
-  filename?: Filename;
-
-  /** chart data */
-  data: Item[];
-};
-
-/** thickness of rings */
-const ringSize = 30;
-/** gap between rings */
-const gapSize = 3;
-/** depth/level of first ring from center */
-const startDepth = 1;
-/** width of side panels */
-const panelWidth = 150;
 
 /** sunburst plot */
 const Sunburst = ({ title, filename = [], data }: Props) => {
@@ -137,10 +137,6 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
   /** max ring radius */
   const maxR = (startDepth + tree.height) * ringSize;
 
-  /** legend props */
-  const legendX = -maxR - ringSize - panelWidth;
-  const legendY = -maxR;
-
   const truncateWidth = useTruncateWidth();
 
   return (
@@ -151,9 +147,10 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
     >
       <Legend
         entries={mapValues(colorMap, (color) => ({ color }))}
-        x={legendX}
-        y={legendY}
+        x={-maxR - ringSize}
+        y={0}
         w={panelWidth}
+        anchor={[1, 0.5]}
       />
 
       <g>

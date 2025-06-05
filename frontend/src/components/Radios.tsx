@@ -8,19 +8,6 @@ import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import classes from "./Radios.module.css";
 
-export type Option<ID = string> = {
-  /** unique id */
-  id: ID;
-  /** primary content */
-  primary: ReactNode;
-  /** secondary content */
-  secondary?: ReactNode;
-  /** tertiary content */
-  tertiary?: ReactNode;
-  /** icon next to content */
-  icon?: ReactElement<{ className: string }>;
-};
-
 type Props<O extends Option> = {
   /** label content */
   label: ReactNode;
@@ -34,6 +21,19 @@ type Props<O extends Option> = {
   onChange?: (value: O["id"]) => void;
   /** field name in form data */
   name?: string;
+};
+
+export type Option<ID = string> = {
+  /** unique id */
+  id: ID;
+  /** primary content */
+  primary: ReactNode;
+  /** secondary content */
+  secondary?: ReactNode;
+  /** tertiary content */
+  tertiary?: ReactNode;
+  /** icon next to content */
+  icon?: ReactElement<{ className: string }>;
 };
 
 /**

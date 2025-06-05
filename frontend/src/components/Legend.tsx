@@ -4,25 +4,6 @@ import { getTextWidth, rootFontSize } from "@/util/dom";
 import { useTheme, useTruncateWidth } from "@/util/hooks";
 import classes from "./Legend.module.css";
 
-type Entry = {
-  color?: string;
-  shape?: number[];
-  stroke?: boolean;
-};
-
-type Props = {
-  /** key entries */
-  entries: Record<string, Entry>;
-  /** x position */
-  x?: number;
-  /** y position */
-  y?: number;
-  /** available width */
-  w?: number;
-  /** % of width/height, e.g. [0.5, 0.5] to center align on x/y point */
-  anchor?: [number, number];
-};
-
 /** entry symbol size */
 const rowHeight = 20;
 /** gap between entries */
@@ -31,6 +12,25 @@ const gapSize = 10;
 const maxEntryWidth = 150;
 /** line thickness */
 const strokeWidth = 1;
+
+type Props = {
+  /** key entries */
+  entries: Record<string, Entry>;
+  /** origin x position */
+  x?: number;
+  /** origin y position */
+  y?: number;
+  /** available width */
+  w?: number;
+  /** % of width/height to align origin with, e.g. [0.5, 0.5] to center align */
+  anchor?: [number, number];
+};
+
+type Entry = {
+  color?: string;
+  shape?: number[];
+  stroke?: boolean;
+};
 
 /** general purpose legend with colored symbols and labels */
 const Legend = ({
@@ -73,6 +73,9 @@ const Legend = ({
 
   /** resulting root height */
   const rootH = rows * rowHeight + (rows - 1) * gapSize;
+
+  /** if resulting width less than available, shift appropriately to fill space */
+  if (colWidth < rootW) rootX += anchor[0] * (rootW - colWidth);
 
   /** shift by anchor point */
   rootX -= anchor[0] * rootW;

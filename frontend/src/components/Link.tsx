@@ -5,6 +5,8 @@ import clsx from "clsx";
 import Tooltip from "@/components/Tooltip";
 import classes from "./Link.module.css";
 
+type Props = Base & (_Anchor | _Router);
+
 type Base = {
   /** force link opening in new/same tab */
   newTab?: boolean;
@@ -20,8 +22,6 @@ type Base = {
 
 type _Anchor = ComponentProps<"a"> & { to: string };
 type _Router = ComponentProps<typeof RouterLink>;
-
-type Props = Base & (_Anchor | _Router);
 
 /** link to internal route or external url */
 const Link = ({

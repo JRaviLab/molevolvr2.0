@@ -54,6 +54,31 @@ import { getShapeMap } from "@/util/shapes";
 import { formatNumber } from "@/util/string";
 import classes from "./Network.module.css";
 
+/** settings */
+const minNodeSize = 30;
+const maxNodeSize = 50;
+const minEdgeSize = 1;
+const maxEdgeSize = 3;
+const edgeLength = 0.5 * maxNodeSize;
+const fontSize = 10;
+const padding = 10;
+const minZoom = 0.2;
+const maxZoom = 5;
+const aspectRatio = 16 / 9;
+const boundingBox = {
+  x1: 8 * -minNodeSize * aspectRatio,
+  y1: 8 * -minNodeSize,
+  x2: 8 * minNodeSize * aspectRatio,
+  y2: 8 * minNodeSize,
+};
+
+type Props = {
+  /** download filename */
+  filename?: Filename;
+  nodes: Node[];
+  edges: Edge[];
+};
+
 type Node = {
   /** unique id */
   id: string;
@@ -84,31 +109,6 @@ type Edge = {
   strength?: number;
   /** any extra info about edge */
   [key: string]: string | number | undefined;
-};
-
-type Props = {
-  /** download filename */
-  filename?: Filename;
-  nodes: Node[];
-  edges: Edge[];
-};
-
-/** settings */
-const minNodeSize = 30;
-const maxNodeSize = 50;
-const minEdgeSize = 1;
-const maxEdgeSize = 3;
-const edgeLength = 0.5 * maxNodeSize;
-const fontSize = 10;
-const padding = 10;
-const minZoom = 0.2;
-const maxZoom = 5;
-const aspectRatio = 16 / 9;
-const boundingBox = {
-  x1: 8 * -minNodeSize * aspectRatio,
-  y1: 8 * -minNodeSize,
-  x2: 8 * minNodeSize * aspectRatio,
-  y2: 8 * minNodeSize,
 };
 
 /** import non-built-in layout algorithms */
@@ -260,7 +260,7 @@ const layoutOptions = layouts.map(({ name, label }) => ({
   primary: label,
 })) satisfies Option[];
 
-const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
+const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const graphRef = useRef<Core | null>(null);
@@ -719,7 +719,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
 
         <Flex gap="xs">
           <Download
-            filename={["network"]}
+            filename={[...filename, "network"]}
             raster={ref}
             tabular={[
               {

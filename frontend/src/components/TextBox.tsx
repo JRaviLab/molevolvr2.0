@@ -10,6 +10,8 @@ import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
 import classes from "./TextBox.module.css";
 
+type Props = Base & (Single | Multi);
+
 type Base = {
   /** layout of label and control */
   layout?: "vertical" | "horizontal";
@@ -42,8 +44,6 @@ type Multi = {
   ComponentProps<"textarea">,
   "placeholder" | "autoComplete" | "name" | "required"
 >;
-
-type Props = Base & (Single | Multi);
 
 /** single or multi-line text input box */
 const TextBox = ({

@@ -1,34 +1,3 @@
-.container {
-  padding: 20px;
-}
-
-.grid {
-  display: grid !important;
-  grid-template-columns: minmax(100px, min(25%, 200px)) 1fr;
-  align-items: center;
-  justify-items: stretch;
-  width: 100%;
-  gap: 5px 20px;
-  line-height: unset !important;
-}
-
-.top-label {
-  font-weight: var(--bold);
-  line-height: var(--compact);
-  text-align: right;
-}
-
-.track-label {
-  line-height: var(--compact);
-  text-align: right;
-}
-
-.row {
-  height: 2em;
+.area {
   cursor: grab;
-}
-
-.scrollbar {
-  height: 0.5em;
-  cursor: ew-resize;
 }

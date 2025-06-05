@@ -216,32 +216,6 @@ export const getViewBoxFit = (svg: SVGGraphicsElement) => {
 
 export type ViewBox = ReturnType<typeof getViewBoxFit>;
 
-/** fit view box to contents of svg */
-export const fitViewBox = (svg?: SVGSVGElement | null) => {
-  if (!svg) return { x: 0, y: 0, width: 100, height: 100 };
-  const { x, y, width, height } = svg.getBBox();
-  const viewBox = [x, y, width, height].join(" ");
-  svg.setAttribute("viewBox", viewBox);
-  return { x, y, width, height };
-};
-/** open browser print dialog with just one element shown */
-export const printElement = async (element: Element) => {
-  /** remember scroll position */
-  const oldScroll = element.getBoundingClientRect().top;
-  /** make element fullscreen/print ready */
-  element.classList.add("print-element");
-  /** wait for any layout shift */
-  await sleep(100);
-  /** trigger print dialog */
-  window.print();
-  /** restore element styles */
-  element.classList.remove("print-element");
-  /** restore scroll */
-  await sleep(100);
-  const newScroll = element.getBoundingClientRect().top;
-  window.scrollBy({ top: newScroll - oldScroll, behavior: "instant" });
-};
-
 /** scroll page so that mouse stays at same position in document */
 export const preserveScroll = async (element: Element) => {
   const oldY = element.getBoundingClientRect().top;

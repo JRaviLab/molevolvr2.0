@@ -10,6 +10,9 @@ import type { Filename } from "@/util/download";
 import { useTheme, useTruncateWidth } from "@/util/hooks";
 import classes from "./Heatmap.module.css";
 
+/** width/height of cells */
+const cellSize = 30;
+
 type Props = {
   /** title text */
   title?: string;
@@ -67,8 +70,6 @@ const Heatmap = ({
   /** reactive CSS vars */
   const theme = useTheme();
 
-  /** sizes of elements */
-  const cellSize = 30;
   const legendHeight = Math.min(
     cellSize * Math.max(0, data.length - 2),
     5 * cellSize,
