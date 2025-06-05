@@ -139,7 +139,7 @@ const Heatmap = ({
       ]}
     >
       {/* cells */}
-      <g>
+      <g className={classes.cells}>
         {data.map((row, rowIndex) =>
           row.map((col, colIndex) => (
             <Tooltip
