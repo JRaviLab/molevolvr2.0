@@ -43,21 +43,21 @@ const Legend = ({
   /** prettify label */
   entries = mapKeys(entries, (v, label) => startCase(label) || "-");
 
-  /** width of longest label */
-  const longestLabel =
+  /** longest label width */
+  const widestLabel =
     max(Object.keys(entries).map((label) => getTextWidth(label))) ?? 0;
 
   /** label offset */
   const labelX = rowHeight + gapSize;
 
   /** max entry width */
-  const longestEntry = longestLabel + labelX;
+  const widestEntry = widestLabel + labelX;
 
   /** col width limit */
-  const colLimit = Math.min(longestEntry, maxEntryWidth);
+  const maxColWidth = Math.min(widestEntry, maxEntryWidth);
 
   /** fit as many columns in available width as possible */
-  let cols = Math.floor((rootW + gapSize) / (gapSize + colLimit));
+  let cols = Math.floor((rootW + gapSize) / (gapSize + maxColWidth));
   if (cols < 1) cols = 1;
   /** number of rows */
   const rows = Math.ceil(Object.keys(entries).length / cols);
@@ -65,7 +65,7 @@ const Legend = ({
   /** actual column width */
   const colWidth = Math.min(
     (gapSize - cols * gapSize + rootW) / cols,
-    colLimit,
+    maxColWidth,
   );
 
   /** resulting root width */

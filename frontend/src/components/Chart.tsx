@@ -1,9 +1,10 @@
 import { createContext, useEffect, useRef, useState } from "react";
-import type { ComponentProps, ReactNode, RefObject } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import {
   FaBezierCurve,
   FaDownload,
+  FaExpand,
   FaImage,
   FaPrint,
   FaRegImage,
@@ -13,7 +14,7 @@ import { PiBracketsCurlyBold } from "react-icons/pi";
 import { TbPrompt } from "react-icons/tb";
 import clsx from "clsx";
 import type { Promisable } from "type-fest";
-import { useElementSize } from "@reactuses/core";
+import { useElementSize, useFullscreen } from "@reactuses/core";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
@@ -37,6 +38,8 @@ type Props = {
   title?: string;
   /** download filename */
   filename: Filename;
+  /** full width */
+  full?: boolean;
 
   /** code to run before and after raster download */
   rasterEffect?: () => Promisable<() => Promisable<void>>;
@@ -60,7 +63,6 @@ type Props = {
 };
 
 const defaultContext = {
-  svgRef: { current: null } as RefObject<SVGSVGElement | null>,
   /** available width */
   width: 100,
 };
@@ -75,6 +77,7 @@ const padding = 20;
 const Chart = ({
   title,
   filename,
+  full,
   rasterEffect,
   printEffect,
   tabular,
@@ -92,15 +95,10 @@ const Chart = ({
   /** available width */
   const [containerWidth] = useElementSize(containerRef.current);
   const [parentWidth] = useElementSize(containerRef.current?.parentElement);
-
-  /** prevent scrollbar flashing */
-  const width =
-    Math.min(parentWidth || containerWidth, window.innerWidth) -
-    2 * padding -
-    1;
+  const width = (full ? containerWidth : parentWidth) - 2 * padding - 1;
 
   /** context passed to children */
-  const contextValue: typeof defaultContext = { svgRef, width };
+  const contextValue: typeof defaultContext = { width };
 
   useEffect(() => {
     if (!svgRef.current || !fitRef.current) return;
@@ -118,7 +116,10 @@ const Chart = ({
       titleRef.current.setAttribute("y", String(y));
       titleRef.current.setAttribute("x", String(x + w / 2));
       /** content */
-      titleRef.current.innerHTML = truncateWidth(title, w);
+      titleRef.current.innerHTML = truncateWidth(
+        title,
+        Math.max(w, containerWidth),
+      );
     }
 
     /** fit view to contents */
@@ -153,6 +154,9 @@ const Chart = ({
 
   const theme = useTheme();
 
+  /** fullscreen */
+  const [, { toggleFullscreen }] = useFullscreen(containerRef);
+
   /** chart content */
   const chart = (
     <>
@@ -163,10 +167,17 @@ const Chart = ({
         className={clsx(
           "card",
           classes.container,
+          full && "full",
           printing && classes.printing,
         )}
         style={{ padding }}
         onClick={onClick}
+        onDoubleClick={(event) => {
+          /** reset resize */
+          const target = event.currentTarget;
+          target.style.width = "";
+          target.style.height = "";
+        }}
       >
         <ChartContext.Provider value={contextValue}>
           <svg ref={svgRef} className={classes.svg}>
@@ -203,6 +214,14 @@ const Chart = ({
         ))}
 
         <Flex gap="sm">
+          {/* fullscreen */}
+          <Button
+            icon={<FaExpand />}
+            design="hollow"
+            tooltip="Full screen"
+            onClick={toggleFullscreen}
+          />
+
           {/* download */}
           <Popover
             content={

@@ -1,29 +1,13 @@
-import { Fragment, useMemo, useRef, useState } from "react";
-import clsx from "clsx";
+import { Fragment, useContext, useMemo, useState } from "react";
 import { pairs } from "d3";
-import {
-  clamp,
-  countBy,
-  mapKeys,
-  mapValues,
-  max,
-  orderBy,
-  range,
-  startCase,
-} from "lodash";
-import { useLocalStorage } from "@reactuses/core";
-import Collapse from "@/assets/collapse.svg?react";
-import Expand from "@/assets/expand.svg?react";
-import Button from "@/components/Button";
-import Download from "@/components/Download";
-import Flex from "@/components/Flex";
-import Legend from "@/components/Legend";
-import NumberBox from "@/components/NumberBox";
+import { countBy, mapKeys, mapValues, max, orderBy, range } from "lodash";
+import Chart, { ChartContext } from "@/components/Chart";
+import CheckBox from "@/components/CheckBox";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap, type Hue } from "@/util/color";
-import { useTheme } from "@/util/hooks";
-import { round } from "@/util/math";
-import { sleep } from "@/util/misc";
+import { rootFontSize } from "@/util/dom";
+import type { Filename } from "@/util/download";
+import { useTheme, useTruncateWidth } from "@/util/hooks";
 import classes from "./MSA.module.css";
 
 /** track of single sequence */
@@ -36,6 +20,10 @@ type Track = {
 export type Combined = Record<string, number>;
 
 export type Props = {
+  /** title text */
+  title?: string;
+  /** download filename */
+  filename?: Filename;
   /** tracks of sequences */
   tracks: Track[];
   /** func to map character to arbitrary type/category */
@@ -44,45 +32,29 @@ export type Props = {
   colors?: Record<string, Hue>;
 };
 
-const minWrap = 10;
-const maxWrap = 1000;
-
-const cellWidth = 5;
-const cellHeight = 10;
-const combinedHeight = 20;
-const fontSize = 7;
-const strokeWidth = 0.25;
-
-/** ROUGHLY tune wrap to match window size */
-/** dependent on page css */
-/** 1000 px -> 50 chars, 500px -> 10 chars */
-const autoWrap = (expanded: boolean) =>
-  clamp(
-    round(0.08 * window.innerWidth - 30, 5),
-    minWrap,
-    expanded ? maxWrap : 60,
-  );
+/** label size */
+const labelWidth = 150;
+/** seq char width */
+const charWidth = 10;
+/** row height */
+const rowHeight = 20;
 
 /** multiple sequence alignment plot */
 const MSA = ({
+  title,
+  filename = [],
   tracks,
   getType = (char) => char,
   colors: manualColors = {},
 }: Props) => {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  /** full width */
-  let [expanded, setExpanded] = useLocalStorage("msa-expanded", false);
-  expanded ??= false;
+  /** whether to wrap sequence to separate "panels" */
+  const [wrap, setWrap] = useState(true);
 
   /** maximum sequence length */
   const length = useMemo(
     () => max(tracks.map((track) => track.sequence.length)) ?? 0,
     [tracks],
   );
-
-  /** wrap sequence to new row if more than this num of chars */
-  const [wrap, setWrap] = useState(length);
 
   /** assign types */
   const { combinedWithTypes, tracksWithTypes, types } = useMemo(
@@ -93,91 +65,209 @@ const MSA = ({
   /** map of type to color */
   const colors = useColorMap(types, "mode", manualColors);
 
-  /** split sequence into chunks */
-  const chunks: [number, number][] = pairs(
-    range(0, length, wrap).concat([length]),
-  );
+  const theme = useTheme();
+
+  const truncateWidth = useTruncateWidth();
+
+  /** chart content */
+  const Content = () => {
+    /** info from chart wrapper */
+    const { width } = useContext(ChartContext);
+
+    /** max num of chars that can fit in width */
+    const rowChars = wrap
+      ? Math.max(Math.floor((width - labelWidth) / charWidth), 10)
+      : length;
+
+    /** split sequence into multiple panels */
+    const panels: [number, number][] = pairs(
+      range(0, length, rowChars).concat([length]),
+    );
+
+    return panels.map(([start, end], panelIndex) => {
+      const panelCombined = combinedWithTypes.slice(start, end);
+      const panelTracks = tracksWithTypes.map((track) => ({
+        ...track,
+        sequence: track.sequence.slice(start, end),
+      }));
+
+      return (
+        <g
+          key={panelIndex}
+          transform={`translate(0, ${panelIndex * (4 + tracks.length) * rowHeight})`}
+        >
+          {/* labels col */}
+          <g textAnchor="end" dominantBaseline="central">
+            <g fill={theme["--gray"]}>
+              <text
+                x={-rowHeight}
+                y={-1.5 * rowHeight}
+                // for safari
+                dominantBaseline="central"
+              >
+                Combined
+              </text>
+              <text
+                x={-rowHeight}
+                y={-0.5 * rowHeight}
+                // for safari
+                dominantBaseline="central"
+              >
+                Position
+              </text>
+            </g>
+            <g fill={theme["--black"]}>
+              {panelTracks.map((track, trackIndex) => (
+                <Tooltip key={trackIndex} content={track.label}>
+                  <text
+                    x={-rowHeight}
+                    y={(trackIndex + 0.5) * rowHeight}
+                    tabIndex={0}
+                    role="button"
+                    // for safari
+                    dominantBaseline="central"
+                  >
+                    {truncateWidth(track.label ?? "-", labelWidth)}
+                  </text>
+                </Tooltip>
+              ))}
+            </g>
+          </g>
+
+          {/* combined row */}
+          <g
+            fill={theme["--black"]}
+            textAnchor="middle"
+            transform={`translate(0, ${-2 * rowHeight})`}
+            style={{ fontFamily: theme["--mono"], fontSize: rootFontSize }}
+          >
+            {panelCombined.map((col, colIndex) => {
+              let accumulatedPercent = 0;
+              return Object.entries(col).map(
+                ([char, { percent, type }], charIndex) => {
+                  const x = colIndex * charWidth;
+                  const y = accumulatedPercent * rowHeight;
+                  const width = charWidth;
+                  const height = percent * rowHeight;
+
+                  const element = (
+                    <Fragment key={charIndex}>
+                      {/* cell */}
+                      <rect
+                        x={x}
+                        y={y}
+                        width={width}
+                        height={height}
+                        fill={colors[type] ?? colors[""]}
+                      />
+                      {/* char */}
+                      <text
+                        transform={[
+                          `translate(${x + width / 2}, ${y + height / 2})`,
+                          `scale(1, ${(percent * rowHeight) / 16})`,
+                        ].join(" ")}
+                        // for safari
+                        dominantBaseline="central"
+                      >
+                        {char && char.trim() ? char : "-"}
+                      </text>
+                    </Fragment>
+                  );
+                  accumulatedPercent += percent;
+                  return element;
+                },
+              );
+            })}
+          </g>
+
+          {/* ticks row */}
+          <g
+            fill={theme["--black"]}
+            textAnchor="middle"
+            dominantBaseline="central"
+            transform={`translate(0, ${-1 * rowHeight})`}
+            style={{ fontSize: 0.75 * rootFontSize }}
+          >
+            {range(0, length)
+              .filter((index) => index >= start && index <= end)
+              .filter((index) => index % 5 === 0)
+              .map((index) => {
+                const x = (index - start + 0.5) * charWidth;
+                const y = 0.5 * rowHeight;
+                return (
+                  <Fragment key={index}>
+                    <text
+                      x={x}
+                      y={y}
+                      // for safari
+                      dominantBaseline="central"
+                    >
+                      {index}
+                    </text>
+                  </Fragment>
+                );
+              })}
+          </g>
+
+          <g
+            fill={theme["--black"]}
+            textAnchor="middle"
+            dominantBaseline="central"
+            style={{ fontFamily: theme["--mono"], fontSize: rootFontSize }}
+          >
+            {panelTracks.map(({ sequence }, trackIndex) => {
+              return (
+                <Fragment key={trackIndex}>
+                  {/* cells */}
+                  {sequence.map(({ type }, charIndex) => (
+                    <rect
+                      key={trackIndex + "-" + charIndex}
+                      x={charIndex * charWidth}
+                      y={trackIndex * rowHeight}
+                      width={charWidth}
+                      height={rowHeight}
+                      fill={colors[type] ?? colors[""]}
+                    />
+                  ))}
+                  {/* characters */}
+                  <text key={trackIndex} className={classes.sequence}>
+                    {sequence.map(({ char }, charIndex) => (
+                      <tspan
+                        key={charIndex}
+                        x={(charIndex + 0.5) * charWidth}
+                        y={(trackIndex + 0.5) * rowHeight}
+                        // for safari
+                        dominantBaseline="central"
+                      >
+                        {char.trim() ? char : "-"}
+                      </tspan>
+                    ))}
+                  </text>
+                </Fragment>
+              );
+            })}
+          </g>
+        </g>
+      );
+    });
+  };
 
   return (
-    <Flex direction="column" full>
-      <Flex
-        ref={ref}
-        direction="column"
-        hAlign="left"
-        className={clsx("card", classes.root, expanded && classes.expanded)}
-      >
-        {/* chunks */}
-        {chunks.map(([start, end], index) => (
-          <MSAChunk
-            key={index}
-            tracks={tracksWithTypes.map((track) => ({
-              ...track,
-              sequence: track.sequence.slice(start, end),
-            }))}
-            colors={colors}
-            combined={combinedWithTypes.slice(start, end)}
-            start={start}
-            end={end}
-          />
-        ))}
-
-        {/* legend */}
-        <Legend entries={mapValues(colors, (color) => ({ color }))} />
-      </Flex>
-
-      {/* controls */}
-      <Flex gap="lg" gapRatio={0.5}>
-        <NumberBox
+    <Chart
+      title={title}
+      filename={[...filename, "msa"]}
+      full
+      controls={[
+        <CheckBox
           label="Wrap"
-          layout="horizontal"
           value={wrap}
           onChange={setWrap}
-          min={10}
-          max={round(length, 10, "ceil")}
-          step={5}
-          tooltip="Wrap to new rows if sequence longer than this many characters"
-        />
-
-        <Flex gap="xs">
-          <Download
-            filename={["MSA"]}
-            raster={ref}
-            rasterEffect={async () => {
-              const oldWrap = wrap;
-              setWrap(autoWrap(expanded));
-              await sleep(10);
-              return async () => {
-                await sleep(10);
-                setWrap(oldWrap);
-              };
-            }}
-            print={ref}
-            printEffect={async () => {
-              const oldWrap = wrap;
-              setWrap(40);
-              return () => setWrap(oldWrap);
-            }}
-            tabular={[
-              {
-                data: tracks.map((track) =>
-                  mapKeys(track, (value, key) => startCase(key)),
-                ),
-              },
-            ]}
-            text={tracks
-              .map((track) => `> ${track.label}\n${track.sequence}`)
-              .join("\n\n")}
-          />
-
-          <Button
-            icon={expanded ? <Collapse /> : <Expand />}
-            tooltip={expanded ? "Collapse width" : "Expand width"}
-            design="hollow"
-            onClick={() => setExpanded(!expanded)}
-          />
-        </Flex>
-      </Flex>
-    </Flex>
+          tooltip="Wrap sequence to stacked panels"
+        />,
+      ]}
+    >
+      <Content />
+    </Chart>
   );
 };
 
@@ -230,187 +320,4 @@ const getDerived = (
   }));
 
   return { combinedWithTypes, tracksWithTypes, types: Array.from(types) };
-};
-
-type ChunkProps = {
-  combined: ReturnType<typeof getDerived>["combinedWithTypes"];
-  tracks: ReturnType<typeof getDerived>["tracksWithTypes"];
-  colors: Record<string, string>;
-  start: number;
-  end: number;
-};
-
-const MSAChunk = ({ combined, tracks, colors, start, end }: ChunkProps) => {
-  /** reactive CSS vars */
-  const theme = useTheme();
-
-  /** chunk sequence length */
-  const length = end - start;
-
-  return (
-    <div className={classes.msa}>
-      <div className={clsx("secondary", classes["combined-label"])}>
-        Combined
-      </div>
-      <div className={clsx("secondary", classes["tick-label"])}>Position</div>
-
-      <div className={classes.labels}>
-        {tracks.map((track, index) => (
-          <Tooltip key={index} content={track.label}>
-            <div className="truncate" tabIndex={0} role="button">
-              {track.label ?? "-"}
-            </div>
-          </Tooltip>
-        ))}
-      </div>
-
-      <div
-        className={classes.scroll}
-        tabIndex={0}
-        role="button"
-        aria-label="Sequence data"
-      >
-        {/* combined row */}
-        <svg
-          viewBox={[0, 0, length * cellWidth, combinedHeight].join(" ")}
-          height={`${combinedHeight / cellHeight}lh`}
-        >
-          <g
-            fill={theme["--black"]}
-            textAnchor="middle"
-            style={{ fontFamily: theme["--mono"], fontSize }}
-            className="axe-ignore"
-          >
-            {combined.map((col, colIndex) => {
-              let accumulatedPercent = 0;
-              return Object.entries(col).map(
-                ([char, { percent, type }], charIndex) => {
-                  const x = colIndex * cellWidth;
-                  const y = accumulatedPercent * combinedHeight;
-                  const width = cellWidth;
-                  const height = percent * combinedHeight;
-
-                  const element = (
-                    <Fragment key={charIndex}>
-                      {/* cell */}
-                      <rect
-                        x={x}
-                        y={y}
-                        width={width}
-                        height={height}
-                        fill={colors[type] ?? colors[""]}
-                      />
-                      {/* char */}
-                      <text
-                        transform={[
-                          `translate(${x + width / 2}, ${y + height / 2})`,
-                          `scale(1, ${(percent * combinedHeight) / fontSize})`,
-                        ].join(" ")}
-                        // for safari
-                        dominantBaseline="central"
-                      >
-                        {char && char.trim() ? char : "-"}
-                      </text>
-                    </Fragment>
-                  );
-                  accumulatedPercent += percent;
-                  return element;
-                },
-              );
-            })}
-          </g>
-        </svg>
-
-        {/* tick row */}
-        <svg
-          viewBox={[0, 0, length * cellWidth, cellHeight].join(" ")}
-          height="1lh"
-        >
-          <g
-            fill={theme["--black"]}
-            textAnchor="middle"
-            dominantBaseline="central"
-            style={{ fontSize: 0.75 * fontSize }}
-            className="axe-ignore"
-          >
-            {range(0, length)
-              .filter((index) => index % 5 === 0)
-              .map((index) => {
-                const x = (index + 0.5) * cellWidth;
-                const y = 0.5 * cellHeight;
-                return (
-                  <Fragment key={index}>
-                    <text
-                      x={x}
-                      y={y}
-                      // for safari
-                      dominantBaseline="central"
-                    >
-                      {index + start}
-                    </text>
-                    <line
-                      x1={x}
-                      x2={x}
-                      y1={0.75 * cellHeight}
-                      y2={cellHeight}
-                      stroke={theme["--black"]}
-                      strokeWidth={strokeWidth}
-                    />
-                  </Fragment>
-                );
-              })}
-          </g>
-        </svg>
-
-        {/* sequence rows */}
-        <svg
-          viewBox={[0, 0, length * cellWidth, tracks.length * cellHeight].join(
-            " ",
-          )}
-          height={`${tracks.length}lh`}
-        >
-          {/* cells */}
-          <g
-            fill={theme["--black"]}
-            textAnchor="middle"
-            dominantBaseline="central"
-            style={{ fontFamily: theme["--mono"], fontSize }}
-            className="axe-ignore"
-          >
-            {tracks.map(({ sequence }, trackIndex) => {
-              return (
-                <Fragment key={trackIndex}>
-                  {/* cells */}
-                  {sequence.map(({ type }, charIndex) => (
-                    <rect
-                      key={trackIndex + "-" + charIndex}
-                      x={charIndex * cellWidth}
-                      y={trackIndex * cellHeight}
-                      width={cellWidth}
-                      height={cellHeight}
-                      fill={colors[type] ?? colors[""]}
-                    />
-                  ))}
-                  {/* characters */}
-                  <text key={trackIndex} className={classes.sequence}>
-                    {sequence.map(({ char }, charIndex) => (
-                      <tspan
-                        key={charIndex}
-                        x={(charIndex + 0.5) * cellWidth}
-                        y={(trackIndex + 0.5) * cellHeight}
-                        // for safari
-                        dominantBaseline="central"
-                      >
-                        {char.trim() ? char : "-"}
-                      </tspan>
-                    ))}
-                  </text>
-                </Fragment>
-              );
-            })}
-          </g>
-        </svg>
-      </div>
-    </div>
-  );
 };

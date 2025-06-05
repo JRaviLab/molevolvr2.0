@@ -113,8 +113,8 @@ const TestbedPage = () => {
       <SectionHeatmap />
       <SectionTree />
       <SectionNetwork />
-      {/*
       <SectionMSA />
+      {/*
       <SectionIPR /> */}
 
       {/* formatting */}

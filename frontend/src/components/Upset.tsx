@@ -129,8 +129,8 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
   /** calc label positioning */
   const longestLabel =
     max(y.data.map(({ label = "" }) => getTextWidth(label))) ?? 0;
-  const labelLength = Math.min(labelWidth, longestLabel);
-  const left = -labelLength - barLength;
+  const labelWidthLimited = Math.min(labelWidth, longestLabel);
+  const left = -labelWidthLimited - barLength;
 
   const truncateWidth = useTruncateWidth();
 
@@ -187,7 +187,7 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
         />
 
         {/* bars */}
-        <g>
+        <g fill={theme["--accent"]}>
           {x.data.map((col, colIndex) => (
             <Tooltip key={colIndex} content={col.value}>
               <rect
@@ -195,7 +195,6 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
                 y={xBarScale(col.value)}
                 width={xScale.bandwidth() ?? 0}
                 height={-xBarScale(col.value)}
-                fill={theme["--accent"]}
                 tabIndex={0}
                 role="button"
               />
@@ -221,7 +220,7 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
         />
 
         {/* bars */}
-        <g>
+        <g fill={theme["--accent"]}>
           {y.data.map((row, rowIndex) => (
             <Fragment key={rowIndex}>
               <Tooltip content={row.value}>
@@ -230,7 +229,6 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
                   y={yScale(rowIndex)}
                   width={-yBarScale(row.value)}
                   height={yScale.bandwidth() ?? 0}
-                  fill={theme["--accent"]}
                   tabIndex={0}
                   role="button"
                 />
@@ -240,17 +238,17 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
         </g>
 
         {/* labels */}
-        <g>
+        <g fill={theme["--black"]} dominantBaseline="central">
           {y.data.map((row, rowIndex) => (
             <Tooltip key={rowIndex} content={row.label}>
               <text
                 x={left}
                 y={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
-                fill={theme["--black"]}
+                // for safari
                 dominantBaseline="central"
                 tabIndex={0}
               >
-                {truncateWidth(row.label ?? "-", labelLength)}
+                {truncateWidth(row.label ?? "-", labelWidthLimited)}
               </text>
             </Tooltip>
           ))}
