@@ -611,12 +611,12 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
         className={clsx("card", classes.network, expanded && classes.expanded)}
         style={{ aspectRatio }}
       >
-        {/* legend */}
+        {/* panel */}
         <Flex
           direction="column"
           hAlign="left"
           vAlign="top"
-          className={classes.legend}
+          className={classes.panel}
           tabIndex={0}
         >
           {selectedItems.length ? (

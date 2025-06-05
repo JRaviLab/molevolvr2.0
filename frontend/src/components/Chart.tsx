@@ -164,6 +164,7 @@ const Chart = ({
               ref={titleRef}
               textAnchor="middle"
               dominantBaseline="hanging"
+              fill={theme["--black"]}
               style={{ fontWeight: theme["--bold"] }}
             />
           )}

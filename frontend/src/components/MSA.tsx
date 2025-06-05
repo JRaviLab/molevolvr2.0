@@ -212,7 +212,7 @@ const MSA = ({
                     style={{ fontSize: 0.75 * rootFontSize }}
                   >
                     {range(0, length)
-                      .filter((index) => index >= start && index <= end)
+                      .filter((index) => index >= start && index < end)
                       .filter((index) => index % 5 === 0)
                       .map((index) => {
                         const x = (index - start + 0.5) * charWidth;
