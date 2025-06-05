@@ -105,6 +105,11 @@ const Tree = ({ title, filename = [], data }: Props) => {
   /** max node breadth */
   const maxX = max(map(tree.descendants(), "x")) ?? 0;
 
+  /** dist between selected nodes */
+  const selectedDist = Math.abs(
+    (selectedA?.data.rootDist ?? 0) - (selectedB?.data.rootDist ?? 0),
+  );
+
   /** reactive CSS vars */
   const theme = useTheme();
 
@@ -275,8 +280,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
             Dist.
           </text>
           <text x={0} y={2 * size}>
-            {sum(map(selectedPath, "data.dist") ?? 0).toFixed(2)} (
-            {selectedPath.length} nodes)
+            {selectedDist.toFixed(2)}
           </text>
         </g>
       )}
