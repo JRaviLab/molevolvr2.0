@@ -1,4 +1,5 @@
-import { useId, type ComponentProps } from "react";
+import { useId } from "react";
+import type { ComponentProps } from "react";
 import * as d3 from "d3";
 import { range } from "lodash";
 import type { Option } from "@/components/SelectSingle";

@@ -12,9 +12,8 @@ import {
 import { map, orderBy } from "lodash";
 import Chart from "@/components/Chart";
 import Tooltip from "@/components/Tooltip";
-import { getTextWidth } from "@/util/dom";
 import type { Filename } from "@/util/download";
-import { useTheme, useTruncateWidth } from "@/util/hooks";
+import { useTextSize, useTheme } from "@/util/hooks";
 import classes from "./Upset.module.css";
 
 /** size of cells in main plot area */
@@ -59,6 +58,8 @@ type Props = {
 const Upset = ({ title, filename = [], x, y, data }: Props) => {
   /** reactive CSS vars */
   const theme = useTheme();
+
+  const { getWidth, truncateWidth } = useTextSize();
 
   /** num of rows/cols */
   const cols = x.data.length;
@@ -128,11 +129,9 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
 
   /** calc label positioning */
   const longestLabel =
-    max(y.data.map(({ label = "" }) => getTextWidth(label))) ?? 0;
+    max(y.data.map(({ label = "" }) => getWidth(label))) ?? 0;
   const labelWidthLimited = Math.min(labelWidth, longestLabel);
   const left = -labelWidthLimited - barLength;
-
-  const truncateWidth = useTruncateWidth();
 
   return (
     <Chart title={title} filename={[...filename, "upset"]}>
@@ -244,8 +243,6 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
               <text
                 x={left}
                 y={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
-                // for safari
-                dominantBaseline="central"
                 tabIndex={0}
               >
                 {truncateWidth(row.label ?? "-", labelWidthLimited)}

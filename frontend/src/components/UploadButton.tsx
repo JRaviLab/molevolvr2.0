@@ -1,5 +1,5 @@
-import type { ChangeEvent, ComponentProps, DragEvent } from "react";
 import { useRef, useState } from "react";
+import type { ChangeEvent, ComponentProps, DragEvent } from "react";
 import clsx from "clsx";
 import Button from "@/components/Button";
 import classes from "./UploadButton.module.css";

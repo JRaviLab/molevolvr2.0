@@ -1,7 +1,6 @@
 import { mapKeys, max, startCase } from "lodash";
 import Tooltip from "@/components/Tooltip";
-import { getTextWidth, rootFontSize } from "@/util/dom";
-import { useTheme, useTruncateWidth } from "@/util/hooks";
+import { useTextSize, useTheme } from "@/util/hooks";
 import classes from "./Legend.module.css";
 
 /** entry symbol size */
@@ -40,12 +39,17 @@ const Legend = ({
   w: rootW = maxEntryWidth,
   anchor = [0, 0],
 }: Props) => {
+  /** reactive CSS vars */
+  const theme = useTheme();
+
+  const { fontSize, getWidth, truncateWidth } = useTextSize();
+
   /** prettify label */
   entries = mapKeys(entries, (v, label) => startCase(label) || "-");
 
   /** longest label width */
   const widestLabel =
-    max(Object.keys(entries).map((label) => getTextWidth(label))) ?? 0;
+    max(Object.keys(entries).map((label) => getWidth(label))) ?? 0;
 
   /** label offset */
   const labelX = rowHeight + gapSize;
@@ -81,10 +85,6 @@ const Legend = ({
   rootX -= anchor[0] * rootW;
   rootY -= anchor[1] * rootH;
 
-  const truncateWidth = useTruncateWidth();
-
-  const theme = useTheme();
-
   return (
     <>
       <svg
@@ -94,11 +94,11 @@ const Legend = ({
         height={rootH}
         viewBox={[0, 0, rootW, rootH].join(" ")}
         className={classes.legend}
-        style={{ fontSize: rootFontSize }}
+        style={{ fontSize }}
       >
         {Object.entries(entries).map(
           ([label, { color, shape, stroke }], index) => {
-            /** wrap single line to grid of rows/cols */
+            /** wrap to grid of rows/cols */
             const row = Math.floor(index / cols);
             const col = index % cols;
             const x = col * (colWidth + gapSize);

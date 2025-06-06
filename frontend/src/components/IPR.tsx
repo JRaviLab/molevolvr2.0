@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
-import { scaleLinear, select, zoom, zoomIdentity, type D3ZoomEvent } from "d3";
+import { scaleLinear, select, zoom, zoomIdentity } from "d3";
+import type { D3ZoomEvent } from "d3";
 import { clamp, inRange, mapValues, range } from "lodash";
 import Chart from "@/components/Chart";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { rootFontSize } from "@/util/dom";
 import type { Filename } from "@/util/download";
-import { useTheme, useTruncateWidth } from "@/util/hooks";
+import { useTextSize, useTheme } from "@/util/hooks";
 import classes from "./IPR.module.css";
 
 /** label size */
@@ -49,9 +49,6 @@ type Feature = {
 
 /** interproscan result visualization */
 const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
-  /** reactive CSS vars */
-  const theme = useTheme();
-
   /** map of feature types to colors */
   const colorMap = useColorMap(
     tracks
@@ -60,7 +57,10 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
     "mode",
   );
 
-  const truncateWidth = useTruncateWidth();
+  /** reactive CSS vars */
+  const theme = useTheme();
+
+  const { fontSize, truncateWidth } = useTextSize();
 
   /** unique id for clip path */
   const clipId = useId();
@@ -91,11 +91,14 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
   }, [zoomBehavior, sequence.length]);
 
   /** clamp tick position near start/end */
-  const clampTick = useCallback((x: number, width: number, string: string) => {
-    /** approximate half-width of string */
-    const padding = (rootFontSize * string.length) / 3;
-    return clamp(x, padding, width - padding);
-  }, []);
+  const clampTick = useCallback(
+    (x: number, width: number, string: string) => {
+      /** approximate half-width of string */
+      const padding = (fontSize * string.length) / 3;
+      return clamp(x, padding, width - padding);
+    },
+    [fontSize],
+  );
 
   return (
     <Chart title={title} filename={[...filename, "ipr"]} full>
@@ -135,15 +138,12 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
           const first = ticks.at(0);
           const last = ticks.at(-1);
           if (first !== undefined)
-            if (
-              first === startPosition ||
-              scaleX(first + 0.5) < 2 * rootFontSize
-            )
+            if (first === startPosition || scaleX(first + 0.5) < 2 * fontSize)
               ticks.shift();
           if (last !== undefined)
             if (
               last === endPosition ||
-              width - scaleX(last + 0.5) < 2 * rootFontSize
+              width - scaleX(last + 0.5) < 2 * fontSize
             )
               ticks.pop();
         }
@@ -168,33 +168,21 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
               transform={`translate(${-rowHeight}, 0)`}
             >
               <g fill={theme["--gray"]}>
-                <text
-                  x={0}
-                  y={-1.5 * (rowHeight + rowGap)}
-                  // for safari
-                  dominantBaseline="central"
-                >
+                <text x={0} y={-1.5 * (rowHeight + rowGap)}>
                   Sequence
                 </text>
-                <text
-                  x={-rowHeight}
-                  y={-0.5 * (rowHeight + rowGap)}
-                  // for safari
-                  dominantBaseline="central"
-                >
+                <text x={0} y={-0.5 * (rowHeight + rowGap)}>
                   Position
                 </text>
               </g>
-              <g fill={theme["--black"]}>
+              <g fill={theme["--black"]} dominantBaseline="central">
                 {tracks.map((track, trackIndex) => (
                   <Tooltip key={trackIndex} content={track.label}>
                     <text
-                      x={-rowHeight}
+                      x={0}
                       y={(trackIndex + 0.5) * (rowHeight + rowGap)}
                       tabIndex={0}
                       role="button"
-                      // for safari
-                      dominantBaseline="central"
                     >
                       {truncateWidth(track.label ?? "-", labelWidth)}
                     </text>
@@ -207,21 +195,26 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
             <g
               ref={(el) => {
                 if (el) {
+                  const selection = select(el);
                   /** attach zoom handler to this element */
-                  zoomBehavior(select(el));
+                  zoomBehavior(selection);
                 }
               }}
               className={classes.area}
             >
               {/* background */}
-              <rect
-                x={0}
-                y={-2 * (rowHeight + rowGap)}
-                width={width}
-                height={(2 + tracks.length) * (rowHeight + rowGap)}
-                fill={theme["--white"]}
-                stroke={theme["--light-gray"]}
-              />
+              <Tooltip content="Scroll/pinch to zoom, drag to move">
+                <rect
+                  x={0}
+                  y={-2 * (rowHeight + rowGap)}
+                  width={width}
+                  height={(2 + tracks.length) * (rowHeight + rowGap)}
+                  fill={theme["--white"]}
+                  stroke={theme["--light-gray"]}
+                  tabIndex={0}
+                  role="button"
+                />
+              </Tooltip>
               <clipPath id={clipId}>
                 <rect
                   x={0}
@@ -234,7 +227,10 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
               {/* main content view */}
               <g clipPath={`url(#${clipId})`} data-fit-ignore>
                 {/* sequence row */}
-                <g transform={`translate(0, ${-1.5 * (rowHeight + rowGap)})`}>
+                <g
+                  className={classes["no-mouse"]}
+                  transform={`translate(0, ${-1.5 * (rowHeight + rowGap)})`}
+                >
                   {sequence.split("").map((char, index) => (
                     <g
                       key={index}
@@ -252,7 +248,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                         x={0}
                         y={0}
                         fill={theme["--black"]}
-                        transform={`scale(${clamp(charWidth / rootFontSize, 0, 1)})`}
+                        transform={`scale(${clamp(charWidth / fontSize, 0, 1)})`}
                         textAnchor="middle"
                         dominantBaseline="central"
                       >
@@ -264,6 +260,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
 
                 {/* ticks row */}
                 <g
+                  className={classes["no-mouse"]}
                   fill={theme["--black"]}
                   textAnchor="middle"
                   dominantBaseline="central"
@@ -278,8 +275,6 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                         String(position + 1),
                       )}
                       y={0}
-                      // for safari
-                      dominantBaseline="central"
                     >
                       {position + 1}
                     </text>
@@ -336,7 +331,11 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                                 </div>
                               }
                             >
-                              <g tabIndex={0} role="button">
+                              <g
+                                tabIndex={0}
+                                role="button"
+                                dominantBaseline="central"
+                              >
                                 <rect
                                   x={drawX}
                                   y={0}
@@ -346,15 +345,14 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                                 />
                                 {inRange(
                                   drawMidX,
-                                  rootFontSize,
-                                  width - rootFontSize,
+                                  fontSize,
+                                  width - fontSize,
                                 ) && (
                                   <text
                                     x={drawMidX}
                                     y={rowHeight / 2}
                                     fill={theme["--black"]}
                                     textAnchor="middle"
-                                    dominantBaseline="central"
                                   >
                                     {truncateWidth(label ?? id, drawWidth)}
                                   </text>

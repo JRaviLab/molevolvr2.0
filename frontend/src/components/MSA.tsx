@@ -5,10 +5,10 @@ import Chart from "@/components/Chart";
 import CheckBox from "@/components/CheckBox";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
-import { useColorMap, type Hue } from "@/util/color";
-import { preserveScroll, rootFontSize } from "@/util/dom";
+import { useColorMap } from "@/util/color";
+import type { Hue } from "@/util/color";
 import type { Filename } from "@/util/download";
-import { useTheme, useTruncateWidth } from "@/util/hooks";
+import { useTextSize, useTheme } from "@/util/hooks";
 
 /** label size */
 const labelWidth = 150;
@@ -53,6 +53,11 @@ const MSA = ({
   /** whether to wrap sequence to separate "panels" */
   const [wrap, setWrap] = useState(true);
 
+  /** reactive CSS vars */
+  const theme = useTheme();
+
+  const { fontSize, truncateWidth } = useTextSize();
+
   /** maximum sequence length */
   const length = useMemo(
     () => max(tracks.map((track) => track.sequence.length)) ?? 0,
@@ -68,10 +73,6 @@ const MSA = ({
   /** map of type to color */
   const colorMap = useColorMap(types, "mode", manualColors);
 
-  const theme = useTheme();
-
-  const truncateWidth = useTruncateWidth();
-
   return (
     <Chart
       title={title}
@@ -81,10 +82,7 @@ const MSA = ({
         <CheckBox
           label="Wrap"
           value={wrap}
-          onChange={(value, event) => {
-            if (event.currentTarget) preserveScroll(event.currentTarget);
-            setWrap(value);
-          }}
+          onChange={setWrap}
           tooltip="Wrap sequence to stacked panels"
         />,
       ]}
@@ -122,24 +120,14 @@ const MSA = ({
                     transform={`translate(${-rowHeight}, 0)`}
                   >
                     <g fill={theme["--gray"]}>
-                      <text
-                        x={0}
-                        y={-1.5 * rowHeight}
-                        // for safari
-                        dominantBaseline="central"
-                      >
+                      <text x={0} y={-1.5 * rowHeight}>
                         Combined
                       </text>
-                      <text
-                        x={0}
-                        y={-0.5 * rowHeight}
-                        // for safari
-                        dominantBaseline="central"
-                      >
+                      <text x={0} y={-0.5 * rowHeight}>
                         Position
                       </text>
                     </g>
-                    <g fill={theme["--black"]}>
+                    <g fill={theme["--black"]} dominantBaseline="central">
                       {panelTracks.map((track, trackIndex) => (
                         <Tooltip key={trackIndex} content={track.label}>
                           <text
@@ -147,8 +135,6 @@ const MSA = ({
                             y={(trackIndex + 0.5) * rowHeight}
                             tabIndex={0}
                             role="button"
-                            // for safari
-                            dominantBaseline="central"
                           >
                             {truncateWidth(track.label ?? "-", labelWidth)}
                           </text>
@@ -161,6 +147,7 @@ const MSA = ({
                   <g
                     fill={theme["--black"]}
                     textAnchor="middle"
+                    dominantBaseline="central"
                     transform={`translate(0, ${-2 * rowHeight})`}
                     style={{ fontFamily: theme["--mono"] }}
                   >
@@ -189,8 +176,6 @@ const MSA = ({
                                   `translate(${x + width / 2}, ${y + height / 2})`,
                                   `scale(1, ${(percent * rowHeight) / 16})`,
                                 ].join(" ")}
-                                // for safari
-                                dominantBaseline="central"
                               >
                                 {char && char.trim() ? char : "-"}
                               </text>
@@ -209,7 +194,7 @@ const MSA = ({
                     textAnchor="middle"
                     dominantBaseline="central"
                     transform={`translate(0, ${-1 * rowHeight})`}
-                    style={{ fontSize: 0.75 * rootFontSize }}
+                    style={{ fontSize: 0.75 * fontSize }}
                   >
                     {range(0, length)
                       .filter((index) => index >= start && index < end)
@@ -219,12 +204,7 @@ const MSA = ({
                         const y = 0.5 * rowHeight;
                         return (
                           <Fragment key={index}>
-                            <text
-                              x={x}
-                              y={y}
-                              // for safari
-                              dominantBaseline="central"
-                            >
+                            <text x={x} y={y}>
                               {index}
                             </text>
                           </Fragment>
@@ -260,8 +240,6 @@ const MSA = ({
                                 key={charIndex}
                                 x={(charIndex + 0.5) * charWidth}
                                 y={(trackIndex + 0.5) * rowHeight}
-                                // for safari
-                                dominantBaseline="central"
                               >
                                 {char.trim() ? char : "-"}
                               </tspan>

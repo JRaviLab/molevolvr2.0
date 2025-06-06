@@ -1,5 +1,5 @@
-import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { useId, useRef, useState } from "react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { FaRegCopy, FaXmark } from "react-icons/fa6";
 import clsx from "clsx";
 import { useElementBounding } from "@reactuses/core";

@@ -1,32 +1,13 @@
-import { cloneElement, type ReactElement, type ReactNode } from "react";
+import { cloneElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
 import { debounce } from "lodash";
 import { sleep } from "@/util/misc";
 
-/** get document root styles */
-const getRootStyles = () => window.getComputedStyle(document.documentElement);
-
-/** document root styles */
-let rootStyles = getRootStyles();
-
-/** document root font size */
-export let rootFontSize = 16;
-export let rootFontFamily = "";
-
-/** update root styles values */
-export const updateRootStyles = () => {
-  rootStyles = getRootStyles();
-  rootFontSize = parseFloat(rootStyles.fontSize);
-  rootFontFamily = rootStyles.fontFamily;
-};
-
-/** update root styles on certain events */
-window.addEventListener("load", updateRootStyles);
-window.document.fonts.addEventListener("loadingdone", updateRootStyles);
-
 /** https://stackoverflow.com/a/78994961/2180570 */
-export const getTheme = () =>
-  Object.fromEntries(
+export const getTheme = () => {
+  const styles = window.getComputedStyle(document.documentElement);
+  return Object.fromEntries(
     Array.from(document.styleSheets)
       .flatMap((styleSheet) => {
         try {
@@ -38,8 +19,9 @@ export const getTheme = () =>
       .filter((cssRule) => cssRule instanceof CSSStyleRule)
       .flatMap((cssRule) => Array.from(cssRule.style))
       .filter((style) => style.startsWith("--"))
-      .map((variable) => [variable, rootStyles.getPropertyValue(variable)]),
+      .map((variable) => [variable, styles.getPropertyValue(variable)]),
   );
+};
 
 /** wait for element matching selector to appear, checking periodically */
 export const waitFor = async <El extends Element>(
@@ -232,21 +214,22 @@ const ctx = canvas.getContext("2d")!;
  * compute actual rendered width of text based on font size
  * https://stackoverflow.com/a/72148318/2180570
  */
-export const getTextWidth = (
-  text: string,
-  size = rootFontSize,
-  family = rootFontFamily,
-) => {
+export const getWidth = (text: string, size: number, family: string) => {
   ctx.font = `${size}px ${family}`;
   return ctx.measureText(text).width;
 };
 
 /** truncate text based on actual rendered width */
-export const truncateWidth = (text: string, limit: number, size?: number) => {
+export const truncateWidth = (
+  text: string,
+  limit: number,
+  size: number,
+  family: string,
+) => {
   /** reduce string length until text width under width limit */
   for (let slice = text.length; slice > 0; slice--) {
     const truncated = text.slice(0, slice) + (slice < text.length ? "..." : "");
-    const length = getTextWidth(truncated, size);
+    const length = getWidth(truncated, size, family);
     if (length <= limit) return truncated;
   }
   return text;
