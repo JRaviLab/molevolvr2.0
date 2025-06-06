@@ -1,7 +1,7 @@
 import { Fragment, useMemo, useState } from "react";
 import { curveStepBefore, hierarchy, line } from "d3";
 import type { HierarchyNode } from "d3";
-import { map, mapValues, max, min, orderBy, sum, uniqueId } from "lodash";
+import { map, mapValues, max, min, orderBy, sum } from "lodash";
 import Chart from "@/components/Chart";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
@@ -50,48 +50,65 @@ const Tree = ({ title, filename = [], data }: Props) => {
 
   const { truncateWidth } = useTextSize();
 
-  type Node = Item & { id?: string; rootDist?: number };
+  type Node = Item & {
+    /** normalized distance from parent */
+    normDist?: number;
+    /** distance from root (sum of ancestors dists) */
+    rootDist?: number;
+    /** normalized distance from root (sum of ancestors normalized dists) */
+    normRootDist?: number;
+  };
 
   const tree = useMemo(() => {
     /** hierarchical data structure with convenient access methods */
     const tree = hierarchy<Node>({ children: data });
 
     /** set fallbacks */
-    tree
-      .descendants()
-      .forEach((node) => (node.data.dist ??= node.depth > 0 ? 1 : 0));
-
-    /** calculate distance from root */
     tree.descendants().forEach((node) => {
-      node.data.id = uniqueId();
-      node.data.rootDist ??= sum(
-        node.ancestors().map((node) => node.data.dist ?? 0),
+      node.data.dist ??= node.depth > 0 ? 1 : 0;
+    });
+
+    /** normalize distances */
+    const dists = tree.descendants().map((node) => node.data.dist!);
+    const minDist = min(dists)!;
+    const maxDist = max(dists)!;
+    tree.descendants().forEach((node) => {
+      node.data.normDist = (node.data.dist! + minDist) / (maxDist - minDist);
+    });
+
+    /** calc distance from root */
+    tree.descendants().forEach((node) => {
+      node.data.rootDist = sum(node.ancestors().map((node) => node.data.dist!));
+      node.data.normRootDist = sum(
+        node.ancestors().map((node) => node.data.normDist!),
       );
     });
 
     /** sort breadth by dist */
-    tree.sort((a, b) => (b.data.rootDist ?? 0) - (a.data.rootDist ?? 0));
+    tree.sort((a, b) => b.data.rootDist! - a.data.rootDist!);
 
-    /** position depths */
-    tree
-      .descendants()
-      .forEach((node) => (node.y ??= (node.data.rootDist ?? 0) * size));
+    /** calc depths */
+    tree.descendants().forEach((node) => {
+      node.y = node.data.normRootDist! * size;
+    });
 
     /** make leaves evenly spaced breadth-wise */
-    tree.leaves().forEach((node, index) => (node.x = index * size));
+    tree.leaves().forEach((node, index) => {
+      node.x = index * size;
+    });
 
     /** go up tree */
     orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
       if (!node.x) {
-        /** position node in middle of children */
+        /** position node breadth in middle of children */
         const xs = map(node.children ?? [], "x");
         node.x = ((min(xs) ?? 0) + (max(xs) ?? 0)) / 2;
       }
     });
 
-    /** snap to grid */
+    /** snap breadth to grid */
     tree.descendants().forEach((node) => {
-      node.x = round(node.x ?? 0, size);
+      node.x = round(node.x!, size);
     });
 
     return tree;
@@ -268,24 +285,30 @@ const Tree = ({ title, filename = [], data }: Props) => {
       {selectedPath.length > 1 && (
         <g transform={`translate(0, ${maxX + 2 * size})`}>
           <g fill={theme["--gray"]}>
-            <text x={-2 * size} y={0 * size}>
+            <text x={0} y={0 * size}>
               From
             </text>
-            <text x={-2 * size} y={1 * size}>
+            <text x={0} y={1 * size}>
               To
             </text>
-            <text x={-2 * size} y={2 * size}>
+            <text x={0} y={2 * size}>
               Dist.
             </text>
           </g>
           <g fill={theme["--black"]}>
-            <text x={0} y={0 * size}>
-              {truncateWidth(selectedA?.data.label ?? "", maxY + sideWidth)}
+            <text x={2 * size} y={0 * size}>
+              {truncateWidth(
+                selectedA?.data.label ?? "",
+                maxY + sideWidth - 2 * size,
+              )}
             </text>
-            <text x={0} y={1 * size}>
-              {truncateWidth(selectedB?.data.label ?? "", maxY + sideWidth)}
+            <text x={2 * size} y={1 * size}>
+              {truncateWidth(
+                selectedB?.data.label ?? "",
+                maxY + sideWidth - 2 * size,
+              )}
             </text>
-            <text x={0} y={2 * size}>
+            <text x={2 * size} y={2 * size}>
               {selectedDist.toFixed(2)}
             </text>
           </g>
