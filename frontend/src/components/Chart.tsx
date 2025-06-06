@@ -120,6 +120,7 @@ const Chart = ({
         if (!parent) continue;
         const value = parent.getAttribute("dominant-baseline");
         if (!value) continue;
+        if (text.getAttribute("dominant-baseline")) continue;
         text.setAttribute("dominant-baseline", value);
       }
     }
