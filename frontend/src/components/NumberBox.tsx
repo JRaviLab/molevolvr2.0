@@ -1,4 +1,5 @@
-import { useRef, type ReactNode } from "react";
+import { useRef } from "react";
+import type { ReactNode } from "react";
 import {
   Button,
   Group,
@@ -64,8 +65,8 @@ const NumberBox = ({
       defaultValue={defaultValue ?? min}
       value={value}
       onChange={(value) => {
-        onChange?.(value);
         if (ref.current) preserveScroll(ref.current);
+        onChange?.(value);
       }}
       name={name}
       formatOptions={{ maximumFractionDigits: 10 }}

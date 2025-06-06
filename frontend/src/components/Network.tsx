@@ -1,20 +1,5 @@
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import {
-  FaCropSimple,
-  FaDownload,
-  FaExpand,
-  FaFilePdf,
-  FaRegImage,
-  FaShareNodes,
-  FaTableCellsLarge,
-} from "react-icons/fa6";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { FaCropSimple, FaExpand } from "react-icons/fa6";
 import clsx from "clsx";
 import cytoscape from "cytoscape";
 import type {
@@ -54,27 +39,45 @@ import {
 import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
+import Download from "@/components/Download";
 import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
-import Popover from "@/components/Popover";
-import type { Option } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
+import type { Option } from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import { useColorMap } from "@/util/color";
-import { printElement } from "@/util/dom";
-import {
-  downloadCsv,
-  downloadJpg,
-  downloadJson,
-  downloadPng,
-  downloadTsv,
-} from "@/util/download";
+import type { Filename } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { lerp } from "@/util/math";
 import { sleep } from "@/util/misc";
 import { getShapeMap } from "@/util/shapes";
 import { formatNumber } from "@/util/string";
 import classes from "./Network.module.css";
+
+/** settings */
+const minNodeSize = 30;
+const maxNodeSize = 50;
+const minEdgeSize = 1;
+const maxEdgeSize = 3;
+const edgeLength = 0.5 * maxNodeSize;
+const fontSize = 10;
+const padding = 10;
+const minZoom = 0.2;
+const maxZoom = 5;
+const aspectRatio = 16 / 9;
+const boundingBox = {
+  x1: 8 * -minNodeSize * aspectRatio,
+  y1: 8 * -minNodeSize,
+  x2: 8 * minNodeSize * aspectRatio,
+  y2: 8 * minNodeSize,
+};
+
+type Props = {
+  /** download filename */
+  filename?: Filename;
+  nodes: Node[];
+  edges: Edge[];
+};
 
 type Node = {
   /** unique id */
@@ -106,29 +109,6 @@ type Edge = {
   strength?: number;
   /** any extra info about edge */
   [key: string]: string | number | undefined;
-};
-
-type Props = {
-  nodes: Node[];
-  edges: Edge[];
-};
-
-/** settings */
-const minNodeSize = 30;
-const maxNodeSize = 50;
-const minEdgeSize = 1;
-const maxEdgeSize = 3;
-const edgeLength = maxNodeSize * 1.5;
-const fontSize = 10;
-const padding = 10;
-const minZoom = 0.2;
-const maxZoom = 5;
-const aspectRatio = 16 / 9;
-const boundingBox = {
-  x1: 8 * -minNodeSize * aspectRatio,
-  y1: 8 * -minNodeSize,
-  x2: 8 * minNodeSize * aspectRatio,
-  y2: 8 * minNodeSize,
 };
 
 /** import non-built-in layout algorithms */
@@ -280,7 +260,7 @@ const layoutOptions = layouts.map(({ name, label }) => ({
   primary: label,
 })) satisfies Option[];
 
-const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
+const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const graphRef = useRef<Core | null>(null);
@@ -488,14 +468,14 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     const getNodeLabel = (node: NodeSingular) => node.data().shortLabel;
     const getNodeSize = (node: NodeSingular) => node.data().size;
     const getNodeColor = (node: NodeSingular) =>
-      node.selected() ? (theme["--light-gray"] ?? "") : node.data().color;
+      node.selected() ? (theme["--gray"] ?? "") : node.data().color;
     const getNodeShape = (node: NodeSingular) => node.data().shape;
     const getNodeOpacity = (node: NodeSingular) => (node.active() ? 0.1 : 0);
     const getEdgeLabel = (edge: EdgeSingular) => edge.data().shortLabel;
     const getEdgeSize = (edge: EdgeSingular) => edge.data().size;
     const getEdgeArrowSize = () => 1;
     const getEdgeColor = (edge: EdgeSingular) =>
-      edge.selected() ? (theme["--light-gray"] ?? "") : edge.data().color;
+      edge.selected() ? (theme["--gray"] ?? "") : edge.data().color;
     const getEdgeArrow =
       (directions: Edge["direction"][]) => (edge: EdgeSingular) =>
         directions.includes(edge.data().direction) ? "triangle" : "none";
@@ -509,7 +489,6 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       shape: "polygon",
       "shape-polygon-points": getNodeShape,
       label: getNodeLabel,
-
       "font-size": fontSize,
       "font-family": theme["--sans"],
       color: theme["--black"],
@@ -517,6 +496,8 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "text-valign": "center",
       "text-max-width": getNodeSize,
       "text-wrap": "wrap",
+      // "text-outline-width": 1,
+      // "text-outline-color": theme["--white"],
       // "outline-width": 1,
       // "outline-color": theme["--black"],
       "underlay-padding": minNodeSize / 4,
@@ -541,6 +522,10 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
       "font-family": theme["--sans"],
       color: theme["--black"],
       "text-rotation": "autorotate",
+      // "text-outline-width": 1,
+      // "text-outline-color": theme["--white"],
+      // "line-outline-width": 1,
+      // "line-outline-color": theme["--black"],
       "underlay-padding": minEdgeSize / 2,
       "underlay-opacity": getEdgeOpacity,
       "underlay-shape": "ellipse",
@@ -616,23 +601,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
     }, 100),
   );
 
-  /** download network as csv/tsv */
-  const downloadCSV = useCallback(
-    (format: string) => {
-      const download = format === "csv" ? downloadCsv : downloadTsv;
-      download(
-        nodes.map((node) => omit(node, ["color", "shape", "size", "strength"])),
-        ["network", "nodes"],
-      );
-      download(
-        edges.map((edge) => omit(edge, ["color", "shape", "size", "strength"])),
-        ["network", "edges"],
-      );
-    },
-    [nodes, edges],
-  );
-
-  /** fullscreen viz */
+  /** fullscreen */
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
 
   return (
@@ -642,12 +611,12 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
         className={clsx("card", classes.network, expanded && classes.expanded)}
         style={{ aspectRatio }}
       >
-        {/* legend */}
+        {/* panel */}
         <Flex
           direction="column"
           hAlign="left"
           vAlign="top"
-          className={classes.legend}
+          className={classes.panel}
           tabIndex={0}
         >
           {selectedItems.length ? (
@@ -714,7 +683,7 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
                 <Legend
                   entries={mapValues(edgeColors, (color) => ({
                     color,
-                    shape: [-0.75, 0.5, 0.75, -0.5],
+                    shape: [-0.75, 0.75, 0.75, -0.75],
                     stroke: true,
                   }))}
                 />
@@ -749,63 +718,25 @@ const Network = ({ nodes: _nodes, edges: _edges }: Props) => {
         </Flex>
 
         <Flex gap="xs">
-          <Popover
-            content={
-              <Flex direction="column" hAlign="stretch" gap="xs">
-                <Button
-                  icon={<FaRegImage />}
-                  text="PNG"
-                  onClick={() =>
-                    ref.current && downloadPng(ref.current, "network")
-                  }
-                  tooltip="High-resolution image"
-                />
-                <Button
-                  icon={<FaRegImage />}
-                  text="JPEG"
-                  onClick={() =>
-                    ref.current && downloadJpg(ref.current, "network")
-                  }
-                  tooltip="Compressed image"
-                />
-                <Button
-                  icon={<FaFilePdf />}
-                  text="PDF"
-                  onClick={() => ref.current && printElement(ref.current)}
-                  tooltip="Print as pdf"
-                />
-
-                <Button
-                  icon={<FaTableCellsLarge />}
-                  text="CSV"
-                  onClick={() => downloadCSV("csv")}
-                  tooltip="Raw node and edge data, comma-separated"
-                />
-                <Button
-                  icon={<FaTableCellsLarge />}
-                  text="TSV"
-                  onClick={() => downloadCSV("tsv")}
-                  tooltip="Raw node and edge data, tab-separated"
-                />
-
-                <Button
-                  icon={<FaShareNodes />}
-                  text="JSON"
-                  onClick={() =>
-                    graphRef.current &&
-                    downloadJson(graphRef.current?.json(), "network")
-                  }
-                  tooltip="For import into Cytoscape"
-                />
-              </Flex>
-            }
-          >
-            <Button
-              icon={<FaDownload />}
-              design="hollow"
-              tooltip="Download network"
-            />
-          </Popover>
+          <Download
+            filename={[...filename, "network"]}
+            raster={ref}
+            tabular={[
+              {
+                data: nodes.map((node) =>
+                  omit(node, ["color", "shape", "size", "strength"]),
+                ),
+                filename: "nodes",
+              },
+              {
+                data: edges.map((edge) =>
+                  omit(edge, ["color", "shape", "size", "strength"]),
+                ),
+                filename: "edges",
+              },
+            ]}
+            json={graphRef.current?.json()}
+          />
 
           <Button
             icon={<FaCropSimple />}

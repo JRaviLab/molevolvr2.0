@@ -1,3 +1,4 @@
+import { useMemo, useRef } from "react";
 import {
   FaArrowRight,
   FaArrowsUpDown,
@@ -10,6 +11,7 @@ import {
   FaChartPie,
   FaCircleInfo,
   FaClipboardList,
+  FaFaceSadCry,
   FaFont,
   FaHashtag,
   FaHorse,
@@ -24,13 +26,16 @@ import {
   FaRegMessage,
   FaRegSquareCheck,
   FaRegWindowMaximize,
+  FaShapes,
   FaShareNodes,
+  FaSitemap,
   FaSliders,
   FaStop,
   FaTableCells,
 } from "react-icons/fa6";
 import { PiSquaresFourFill } from "react-icons/pi";
-import { sample, uniq } from "lodash";
+import { mapValues, sample, uniq } from "lodash";
+import { useElementSize } from "@reactuses/core";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -43,6 +48,7 @@ import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Heatmap from "@/components/Heatmap";
 import IPR from "@/components/IPR";
+import Legend from "@/components/Legend";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import MSA from "@/components/MSA";
@@ -62,15 +68,21 @@ import TextBox from "@/components/TextBox";
 import Tile from "@/components/Tile";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
+import Tree from "@/components/Tree";
+import Upset from "@/components/Upset";
 import {
+  analysis,
   edges,
   heatmap,
   iprSequence,
   iprTracks,
+  label,
   logChange,
   msaTracks,
   nodes,
   sunburst,
+  tree,
+  upset,
   words,
 } from "@/pages/testbed-data";
 import { useColorMap } from "@/util/color";
@@ -79,54 +91,64 @@ import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
 
 /** test and example usage of formatting, elements, components, etc. */
-const TestbedPage = () => (
-  <>
-    <Meta title="Testbed" />
+const TestbedPage = () => {
+  return (
+    <>
+      <Meta title="Testbed" />
 
-    <Section>
-      <Heading level={1}>Testbed</Heading>
-    </Section>
+      <Section>
+        <Heading level={1}>Testbed</Heading>
 
-    {/* complex components */}
+        <div className="mini-table">
+          <span>Fake Analysis ID</span>
+          <span>{analysis}</span>
+        </div>
+      </Section>
 
-    <SectionIPR />
-    <SectionHeatmap />
-    <SectionSunburst />
-    <SectionMSA />
-    <SectionNetwork />
+      {/* complex components */}
 
-    {/* formatting */}
+      <SectionLegend />
+      <SectionUpset />
+      <SectionSunburst />
+      <SectionHeatmap />
+      <SectionTree />
+      <SectionNetwork />
+      <SectionMSA />
+      <SectionIPR />
 
-    <SectionElements />
-    <SectionHeading />
+      {/* formatting */}
 
-    {/* generic components */}
+      <SectionElements />
+      <SectionHeading />
 
-    <SectionLink />
-    <SectionButton />
-    <SectionTextBox />
-    <SectionSelect />
-    <SectionCheckBox />
-    <SectionSlider />
-    <SectionNumberBox />
-    <SectionRadios />
-    <SectionAgo />
-    <SectionAlert />
-    <SectionTabs />
-    <SectionToast />
-    <SectionCollapsible />
-    <SectionTile />
-    <SectionTable />
-    <SectionTooltip />
-    <SectionPopover />
-    <SectionDialog />
+      {/* generic components */}
 
-    {/* misc */}
+      <SectionLink />
+      <SectionButton />
+      <SectionTextBox />
+      <SectionSelect />
+      <SectionCheckBox />
+      <SectionSlider />
+      <SectionNumberBox />
+      <SectionRadios />
+      <SectionAgo />
+      <SectionAlert />
+      <SectionTabs />
+      <SectionToast />
+      <SectionCollapsible />
+      <SectionTile />
+      <SectionTable />
+      <SectionTooltip />
+      <SectionPopover />
+      <SectionDialog />
 
-    <SectionForm />
-    <SectionCSS />
-  </>
-);
+      {/* misc */}
+
+      <SectionForm />
+      <SectionCSS />
+    </>
+  );
+};
 
 export default TestbedPage;
 
@@ -270,13 +292,51 @@ const SectionHeading = () => (
   </Section>
 );
 
-const SectionHeatmap = () => (
+const SectionLegend = () => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [width] = useElementSize(ref);
+
+  const labels = useMemo(
+    () =>
+      Array(10)
+        .fill(null)
+        .map(label)
+        .map((label) => label || ""),
+    [],
+  );
+  const colorMap = useColorMap(labels, "mode");
+  const entries = mapValues(colorMap, (color) => ({ color }));
+
+  return (
+    <Section>
+      <Heading level={2} icon={<FaShapes />}>
+        Legend
+      </Heading>
+
+      <div
+        ref={ref}
+        className="card"
+        style={{
+          width: 400,
+          padding: 20,
+          resize: "both",
+          overflow: "auto",
+        }}
+      >
+        <Legend entries={entries} x={0} y={0} w={width} />
+      </div>
+    </Section>
+  );
+};
+
+const SectionUpset = () => (
   <Section>
-    <Heading level={2} icon={<PiSquaresFourFill />}>
-      Heatmap
+    <Heading level={2} icon={<FaFaceSadCry />}>
+      Upset
     </Heading>
 
-    <Heatmap {...heatmap} />
+    <Upset title={label()} filename={[analysis]} {...upset} />
   </Section>
 );
 
@@ -286,7 +346,27 @@ const SectionSunburst = () => (
       Sunburst
     </Heading>
 
-    <Sunburst data={sunburst} />
+    <Sunburst title={label()} filename={[analysis]} data={sunburst} />
+  </Section>
+);
+
+const SectionHeatmap = () => (
+  <Section>
+    <Heading level={2} icon={<PiSquaresFourFill />}>
+      Heatmap
+    </Heading>
+
+    <Heatmap title={label()} filename={[analysis]} {...heatmap} />
+  </Section>
+);
+
+const SectionTree = () => (
+  <Section>
+    <Heading level={2} icon={<FaSitemap />}>
+      Tree
+    </Heading>
+
+    <Tree title={label()} filename={[analysis]} data={tree} />
   </Section>
 );
 
@@ -296,17 +376,7 @@ const SectionNetwork = () => (
       Network
     </Heading>
 
-    <Network nodes={nodes} edges={edges} />
-  </Section>
-);
-
-const SectionIPR = () => (
-  <Section>
-    <Heading level={2} icon={<FaBarcode />}>
-      IPR
-    </Heading>
-
-    <IPR sequence={iprSequence} tracks={iprTracks} />
+    <Network filename={[analysis]} nodes={nodes} edges={edges} />
   </Section>
 );
 
@@ -316,7 +386,28 @@ const SectionMSA = () => (
       MSA
     </Heading>
 
-    <MSA tracks={msaTracks} getType={clustalType} colors={clustalColors} />
+    <MSA
+      title={label()}
+      filename={[analysis]}
+      tracks={msaTracks}
+      getType={clustalType}
+      colorMap={clustalColors}
+    />
+  </Section>
+);
+
+const SectionIPR = () => (
+  <Section>
+    <Heading level={2} icon={<FaBarcode />}>
+      IPR
+    </Heading>
+
+    <IPR
+      title={label()}
+      filename={[analysis]}
+      sequence={iprSequence}
+      tracks={iprTracks}
+    />
   </Section>
 );
 

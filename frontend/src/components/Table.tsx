@@ -1,5 +1,5 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
+import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import {
   FaAngleLeft,
   FaAngleRight,
@@ -15,12 +15,6 @@ import {
 import { MdFilterAltOff } from "react-icons/md";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
-import type {
-  Column,
-  FilterFn,
-  NoInfer,
-  SortingState,
-} from "@tanstack/react-table";
 import {
   createColumnHelper,
   flexRender,
@@ -32,6 +26,12 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+} from "@tanstack/react-table";
+import type {
+  Column,
+  FilterFn,
+  NoInfer,
+  SortingState,
 } from "@tanstack/react-table";
 import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
@@ -49,6 +49,13 @@ import { downloadCsv } from "@/util/download";
 import type { Filename } from "@/util/download";
 import { formatDate, formatNumber } from "@/util/string";
 import classes from "./Table.module.css";
+
+type Props<Datum extends object> = {
+  cols: _Col<Datum>[];
+  rows: Datum[];
+  sort?: SortingState;
+  filename?: Filename;
+};
 
 type Col<
   Datum extends object = object,
@@ -90,13 +97,6 @@ type _Col<Datum extends object> = {
   [Key in keyof Datum]: Col<Datum, Key>;
 }[keyof Datum];
 
-type Props<Datum extends object> = {
-  cols: _Col<Datum>[];
-  rows: Datum[];
-  sort?: SortingState;
-  filename?: Filename;
-};
-
 /** map column definition to multi-select option */
 const colToOption = <Datum extends object>(
   col: Props<Datum>["cols"][number],
@@ -116,7 +116,7 @@ const Table = <Datum extends object>({
   cols,
   rows,
   sort,
-  filename = "table",
+  filename = [],
 }: Props<Datum>) => {
   /** expanded state */
   const [expanded, setExpanded] = useLocalStorage("table-expanded", false);
@@ -529,7 +529,7 @@ const Table = <Datum extends object>({
                 .rows.map((row) => Object.values(pick(row.original, keys)));
 
               /** download */
-              downloadCsv([names, ...data], filename);
+              downloadCsv([names, ...data], [...filename, "table"]);
             }}
           />
           {/* expand/collapse */}

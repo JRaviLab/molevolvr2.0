@@ -1,9 +1,11 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { FaRegSquare, FaRegSquareCheck } from "react-icons/fa6";
 import Asterisk from "@/components/Asterisk";
 import Flex from "@/components/Flex";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
+import { preserveScroll } from "@/util/dom";
 import classes from "./CheckBox.module.css";
 
 type Props = {
@@ -52,6 +54,7 @@ const CheckBox = ({
         checked={value}
         onChange={(event) => {
           const value = event.currentTarget.checked;
+          preserveScroll(event.currentTarget);
           onChange?.(value);
           setChecked(value);
         }}

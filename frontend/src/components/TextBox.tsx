@@ -1,5 +1,5 @@
-import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { useId, useRef, useState } from "react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { FaRegCopy, FaXmark } from "react-icons/fa6";
 import clsx from "clsx";
 import { useElementBounding } from "@reactuses/core";
@@ -9,6 +9,8 @@ import Help from "@/components/Help";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
 import classes from "./TextBox.module.css";
+
+type Props = Base & (Single | Multi);
 
 type Base = {
   /** layout of label and control */
@@ -23,7 +25,7 @@ type Base = {
   value?: string;
   /** on text state change */
   onChange?: (value: string) => void;
-  /** className */
+  /** class on textbox */
   className?: string;
 };
 
@@ -42,8 +44,6 @@ type Multi = {
   ComponentProps<"textarea">,
   "placeholder" | "autoComplete" | "name" | "required"
 >;
-
-type Props = Base & (Single | Multi);
 
 /** single or multi-line text input box */
 const TextBox = ({
