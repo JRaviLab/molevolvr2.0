@@ -1,5 +1,5 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import { useCallback, useMemo, useState } from "react";
+import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import {
   FaAngleLeft,
   FaAngleRight,
@@ -15,12 +15,6 @@ import {
 import { MdFilterAltOff } from "react-icons/md";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
-import type {
-  Column,
-  FilterFn,
-  NoInfer,
-  SortingState,
-} from "@tanstack/react-table";
 import {
   createColumnHelper,
   flexRender,
@@ -32,6 +26,12 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+} from "@tanstack/react-table";
+import type {
+  Column,
+  FilterFn,
+  NoInfer,
+  SortingState,
 } from "@tanstack/react-table";
 import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";

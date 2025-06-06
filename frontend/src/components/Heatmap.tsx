@@ -7,7 +7,7 @@ import { Gradient, gradientFunc, gradientOptions } from "@/components/Gradient";
 import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
 import type { Filename } from "@/util/download";
-import { useTheme, useTruncateWidth } from "@/util/hooks";
+import { useTextSize, useTheme } from "@/util/hooks";
 import classes from "./Heatmap.module.css";
 
 /** width/height of cells */
@@ -70,6 +70,8 @@ const Heatmap = ({
   /** reactive CSS vars */
   const theme = useTheme();
 
+  const { truncateWidth } = useTextSize();
+
   const legendHeight = Math.min(
     cellSize * Math.max(0, data.length - 2),
     5 * cellSize,
@@ -106,8 +108,6 @@ const Heatmap = ({
     percent: index / (array.length - 1),
     color: colorScale(valueScale(tick)),
   }));
-
-  const truncateWidth = useTruncateWidth();
 
   return (
     <Chart
@@ -182,8 +182,6 @@ const Heatmap = ({
                 `rotate(-45)`,
               ].join("")}
               tabIndex={0}
-              // for safari
-              dominantBaseline="central"
             >
               {truncateWidth(label ?? "-", 4 * cellSize)}
             </text>
@@ -202,8 +200,6 @@ const Heatmap = ({
                 `rotate(-45)`,
               ].join(" ")}
               tabIndex={0}
-              // for safari
-              dominantBaseline="central"
             >
               {truncateWidth(label ?? "-", 4 * cellSize)}
             </text>
@@ -223,8 +219,6 @@ const Heatmap = ({
             `translate(${0.5 * width}, ${height})`,
             `translate(0, ${0.75 * cellSize})`,
           ].join(" ")}
-          // for safari
-          dominantBaseline="central"
         >
           {x.label ?? "-"}
         </text>

@@ -1,9 +1,11 @@
-import { useEffect, useState, type ChangeEvent, type ReactNode } from "react";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { FaRegSquare, FaRegSquareCheck } from "react-icons/fa6";
 import Asterisk from "@/components/Asterisk";
 import Flex from "@/components/Flex";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
+import { preserveScroll } from "@/util/dom";
 import classes from "./CheckBox.module.css";
 
 type Props = {
@@ -14,7 +16,7 @@ type Props = {
   /** checked state */
   value?: boolean;
   /** on checked state change */
-  onChange?: (value: boolean, event: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (value: boolean) => void;
   /** field name in form data */
   name?: string;
   /** whether must be checked for form to be submitted */
@@ -52,7 +54,8 @@ const CheckBox = ({
         checked={value}
         onChange={(event) => {
           const value = event.currentTarget.checked;
-          onChange?.(value, event);
+          preserveScroll(event.currentTarget);
+          onChange?.(value);
           setChecked(value);
         }}
         form={form}

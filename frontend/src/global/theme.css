@@ -57,6 +57,9 @@
 }
 
 :root {
+  /** font size */
+  --font-size: 16px;
+
   /** font families */
   --sans: "Poppins", sans-serif;
   --mono: "IBM Plex Mono", monospace;

@@ -1,5 +1,5 @@
-import type { ReactElement, ReactNode } from "react";
 import { cloneElement, useEffect, useId, useState } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { FaCircleDot, FaRegCircle } from "react-icons/fa6";
 import clsx from "clsx";
 import { usePrevious } from "@reactuses/core";

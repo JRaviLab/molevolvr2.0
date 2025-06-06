@@ -7,9 +7,10 @@ import { useElementSize, useFullscreen } from "@reactuses/core";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
 import Flex from "@/components/Flex";
-import { getViewBoxFit, rootFontSize, truncateWidth } from "@/util/dom";
+import { isSafari } from "@/util/browser";
+import { getViewBoxFit } from "@/util/dom";
 import type { Filename, Tabular } from "@/util/download";
-import { useTheme } from "@/util/hooks";
+import { useTextSize, useTheme } from "@/util/hooks";
 import classes from "./Chart.module.css";
 
 /** container padding */
@@ -62,6 +63,11 @@ const Chart = ({
   const fitRef = useRef<SVGGElement>(null);
   const titleRef = useRef<SVGTextElement>(null);
 
+  /** reactive CSS vars */
+  const theme = useTheme();
+
+  const { fontSize, truncateWidth } = useTextSize();
+
   const [containerWidth] = useElementSize(containerRef.current);
   const [parentWidth] = useElementSize(containerRef.current?.parentElement);
 
@@ -88,7 +94,7 @@ const Chart = ({
     /** chart title */
     if (title && titleRef.current) {
       /** make room */
-      const titleSpace = 3 * rootFontSize;
+      const titleSpace = 3 * fontSize;
       y -= titleSpace;
       h += titleSpace;
       /** position */
@@ -106,6 +112,17 @@ const Chart = ({
     /** make svg units match document */
     svgRef.current.style.width = w + "px";
     svgRef.current.style.height = h + "px";
+
+    /** fix safari bug where dominant baseline does not inherit */
+    if (isSafari) {
+      for (const text of svgRef.current.querySelectorAll("text, tspan")) {
+        const parent = text.closest("[dominant-baseline]");
+        if (!parent) continue;
+        const value = parent.getAttribute("dominant-baseline");
+        if (!value) continue;
+        text.setAttribute("dominant-baseline", value);
+      }
+    }
   });
 
   /** printing state */
@@ -129,8 +146,6 @@ const Chart = ({
       }
     })();
   }, [printing]);
-
-  const theme = useTheme();
 
   /** fullscreen */
   const [, { toggleFullscreen }] = useFullscreen(containerRef);

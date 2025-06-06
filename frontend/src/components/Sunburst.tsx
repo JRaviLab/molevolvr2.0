@@ -1,13 +1,14 @@
-import { Fragment, useId, useMemo, useState, type ReactElement } from "react";
-import { arc, hierarchy, type HierarchyNode } from "d3";
+import { Fragment, useId, useMemo, useState } from "react";
+import type { ReactElement } from "react";
+import { arc, hierarchy } from "d3";
+import type { HierarchyNode } from "d3";
 import { inRange, mapValues, sumBy } from "lodash";
 import Chart from "@/components/Chart";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { rootFontSize, truncateWidth } from "@/util/dom";
 import type { Filename } from "@/util/download";
-import { useTheme, useTruncateWidth } from "@/util/hooks";
+import { useTextSize, useTheme } from "@/util/hooks";
 import { tau } from "@/util/math";
 import { formatNumber } from "@/util/string";
 import classes from "./Sunburst.module.css";
@@ -67,6 +68,8 @@ type Node = HierarchyNode<Derived>;
 const Sunburst = ({ title, filename = [], data }: Props) => {
   /** "breadcrumb trail" of selected nodes */
   const [selected, setSelected] = useState<Node[]>([]);
+
+  const { fontSize, truncateWidth } = useTextSize();
 
   /** are any nodes selected */
   const anySelected = !!selected.length;
@@ -137,8 +140,6 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
   /** max ring radius */
   const maxR = (startDepth + tree.height) * ringSize;
 
-  const truncateWidth = useTruncateWidth();
-
   return (
     <Chart
       title={title}
@@ -174,7 +175,7 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
       {/* selected breadcrumbs */}
       <g>
         {selected.map((node, index) => {
-          const h = 1.5 * rootFontSize;
+          const h = 1.5 * fontSize;
           const x = maxR + ringSize;
           const y = maxR - (index + 1) * (h + gapSize);
 
@@ -222,13 +223,15 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
   /** unique segment id */
   const id = useId();
 
+  /** reactive CSS vars */
+  const theme = useTheme();
+
+  const { truncateWidth } = useTextSize();
+
   /** extract props */
   const { depth, data } = node;
   const { label, color, percent, angle, selected } = data;
   const end = angle + percent;
-
-  /** reactive CSS vars */
-  const theme = useTheme();
 
   /** segment arc radius */
   const radius = (depth + startDepth - 0.5) * ringSize;

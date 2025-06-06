@@ -1,12 +1,13 @@
 import { Fragment, useMemo, useState } from "react";
-import { curveStepBefore, hierarchy, line, type HierarchyNode } from "d3";
+import { curveStepBefore, hierarchy, line } from "d3";
+import type { HierarchyNode } from "d3";
 import { map, mapValues, max, min, orderBy, sum, uniqueId } from "lodash";
 import Chart from "@/components/Chart";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import type { Filename } from "@/util/download";
-import { useTheme, useTruncateWidth } from "@/util/hooks";
+import { useTextSize, useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
 import classes from "./Tree.module.css";
 
@@ -44,6 +45,11 @@ const link = line().curve(curveStepBefore);
 
 /** tree/hierarchy plot */
 const Tree = ({ title, filename = [], data }: Props) => {
+  /** reactive CSS vars */
+  const theme = useTheme();
+
+  const { truncateWidth } = useTextSize();
+
   type Node = Item & { id?: string; rootDist?: number };
 
   const tree = useMemo(() => {
@@ -115,9 +121,6 @@ const Tree = ({ title, filename = [], data }: Props) => {
     (selectedA?.data.rootDist ?? 0) - (selectedB?.data.rootDist ?? 0),
   );
 
-  /** reactive CSS vars */
-  const theme = useTheme();
-
   /** map of node types to colors */
   const colorMap = useColorMap(
     map(tree.descendants(), (node) => node.data.type ?? ""),
@@ -134,8 +137,6 @@ const Tree = ({ title, filename = [], data }: Props) => {
         ? selected.filter((n) => n !== node)
         : selected.slice(0, 1).concat([node]),
     );
-
-  const truncateWidth = useTruncateWidth();
 
   return (
     <Chart title={title} filename={[...filename, "tree"]} onClick={deselect}>
@@ -226,7 +227,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
                       )}
                     </div>
                     <hr />
-                    Click to select. Select two to see path.
+                    Click to select. Select two to see path between them.
                   </>
                 }
               >
@@ -265,28 +266,29 @@ const Tree = ({ title, filename = [], data }: Props) => {
 
       {/* selected */}
       {selectedPath.length > 1 && (
-        <g
-          fill={theme["--black"]}
-          transform={`translate(0, ${maxX + 2 * size})`}
-        >
-          <text x={-2 * size} y={0 * size}>
-            From
-          </text>
-          <text x={0} y={0 * size}>
-            {truncateWidth(selectedA?.data.label ?? "", maxY + sideWidth)}
-          </text>
-          <text x={-2 * size} y={1 * size}>
-            To
-          </text>
-          <text x={0} y={1 * size}>
-            {truncateWidth(selectedB?.data.label ?? "", maxY + sideWidth)}
-          </text>
-          <text x={-2 * size} y={2 * size}>
-            Dist.
-          </text>
-          <text x={0} y={2 * size}>
-            {selectedDist.toFixed(2)}
-          </text>
+        <g transform={`translate(0, ${maxX + 2 * size})`}>
+          <g fill={theme["--gray"]}>
+            <text x={-2 * size} y={0 * size}>
+              From
+            </text>
+            <text x={-2 * size} y={1 * size}>
+              To
+            </text>
+            <text x={-2 * size} y={2 * size}>
+              Dist.
+            </text>
+          </g>
+          <g fill={theme["--black"]}>
+            <text x={0} y={0 * size}>
+              {truncateWidth(selectedA?.data.label ?? "", maxY + sideWidth)}
+            </text>
+            <text x={0} y={1 * size}>
+              {truncateWidth(selectedB?.data.label ?? "", maxY + sideWidth)}
+            </text>
+            <text x={0} y={2 * size}>
+              {selectedDist.toFixed(2)}
+            </text>
+          </g>
         </g>
       )}
     </Chart>
