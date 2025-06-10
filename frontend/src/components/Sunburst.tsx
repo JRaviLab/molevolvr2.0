@@ -189,7 +189,7 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
                 height={h}
               />
               <NodeTooltip {...node.data}>
-                <text x={x + gapSize} y={y} tabIndex={0} role="graphics-symbol">
+                <text x={x + gapSize} y={y} tabIndex={0}>
                   {truncateWidth(
                     node.data.label || "-",
                     panelWidth - 2 * gapSize,

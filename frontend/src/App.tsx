@@ -140,6 +140,7 @@ const scrollToHash = async (
   hashChanged: boolean,
   restChanged: boolean,
 ) => {
+  if (!hash) return;
   if (!hashChanged) return;
 
   /** wait for element to appear */

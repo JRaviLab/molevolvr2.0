@@ -41,12 +41,24 @@ const checkPage = (path: string) =>
       const criticals = violations.filter(isCritical(true));
       const warnings = violations.filter(isCritical(false));
 
+      /** log errors */
+      if (criticals.length) {
+        const json = JSON.stringify(criticals, null, 2);
+        console.error(json);
+        /** just log warnings on non-critical violations */
+        test.info().annotations.push({
+          type: "Axe Error",
+          description: json,
+        });
+      }
+
       /** fail test on critical violations */
-      expect(criticals).toEqual([]);
+      expect(criticals.length).toBe(0);
+
       /** just log warnings on non-critical violations */
       test.info().annotations.push({
-        type: " Warning",
-        description: JSON.stringify(warnings),
+        type: "Axe Warning",
+        description: JSON.stringify(warnings, null, 2),
       });
     };
 

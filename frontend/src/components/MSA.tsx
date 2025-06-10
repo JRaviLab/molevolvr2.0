@@ -133,7 +133,6 @@ const MSA = ({
                             x={0}
                             y={(trackIndex + 0.5) * rowHeight}
                             tabIndex={0}
-                            role="graphics-symbol"
                           >
                             {truncateWidth(track.label ?? "-", labelWidth)}
                           </text>

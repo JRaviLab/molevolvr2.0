@@ -179,7 +179,6 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                       x={0}
                       y={(trackIndex + 0.5) * (rowHeight + rowGap)}
                       tabIndex={0}
-                      role="graphics-symbol"
                     >
                       {truncateWidth(track.label ?? "-", labelWidth)}
                     </text>
@@ -220,8 +219,6 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                 height={(2 + tracks.length) * (rowHeight + rowGap)}
                 fill={theme["--white"]}
                 stroke={theme["--light-gray"]}
-                tabIndex={0}
-                role="graphics-symbol"
               />
               <clipPath id={clipId}>
                 <rect
