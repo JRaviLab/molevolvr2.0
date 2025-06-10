@@ -30,7 +30,7 @@ const Header = () => {
 
   useEffect(() => {
     /** make sure all scrolls take into account header height */
-    doc.style.scrollPaddingTop = height + 20 + "px";
+    doc.style.scrollPaddingTop = height + "px";
   }, [height]);
 
   return (

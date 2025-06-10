@@ -3,13 +3,13 @@ import type { ComponentProps, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { FaExpand } from "react-icons/fa6";
 import clsx from "clsx";
-import { useElementSize, useFullscreen } from "@reactuses/core";
+import { clamp } from "lodash";
+import { useDebounce, useElementSize, useFullscreen } from "@reactuses/core";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
 import Flex from "@/components/Flex";
-import Tooltip from "@/components/Tooltip";
 import { isSafari } from "@/util/browser";
-import { getHPadding, getViewBoxFit } from "@/util/dom";
+import { getViewBoxFit } from "@/util/dom";
 import type { Filename, Tabular } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
 import classes from "./Chart.module.css";
@@ -71,14 +71,16 @@ const Chart = ({
   const { fontSize, truncateWidth } = useTextSize();
 
   /** sizes */
-  let [width] = useElementSize(containerRef.current, { box: "border-box" });
-  let [parentWidth] = useElementSize(containerRef.current?.parentElement, {
-    box: "border-box",
-  });
+  let [width] = useElementSize(containerRef.current);
+  let [parentWidth] = useElementSize(containerRef.current?.parentElement);
 
-  /** subtract padding */
-  width -= getHPadding(containerRef.current);
-  parentWidth -= getHPadding(containerRef.current?.parentElement);
+  /** avoid too-frequent layout changes and flashing scrollbar */
+  width = useDebounce(width, 50);
+  parentWidth = useDebounce(parentWidth, 50);
+
+  /** limit width */
+  width = clamp(width, 10, 10000);
+  parentWidth = clamp(parentWidth, 10, 10000);
 
   useEffect(() => {
     if (!svgRef.current || !fitRef.current) return;
@@ -126,7 +128,9 @@ const Chart = ({
 
     /** fix safari bug where dominant baseline does not inherit */
     if (isSafari) {
-      for (const text of svgRef.current.querySelectorAll("text, tspan")) {
+      for (const text of svgRef.current.querySelectorAll(
+        "text, tspan, textPath",
+      )) {
         const parent = text.closest("[dominant-baseline]");
         if (!parent) continue;
         const value = parent.getAttribute("dominant-baseline");
@@ -164,53 +168,52 @@ const Chart = ({
 
   /** chart content */
   const chart = (
-    <Tooltip content="Double-click to reset size">
-      {/* rely on component consumer handling keyboard appropriately */}
-      {/* eslint-disable-next-line */}
-      <div
-        ref={containerRef}
-        className={clsx(
-          "card",
-          classes.container,
-          printing && classes.printing,
-          containerClassName,
-        )}
-        // https://github.com/dequelabs/axe-core/issues/4566
-        // eslint-disable-next-line
-        tabIndex={0}
-        onClick={onClick}
-        onDoubleClick={(event) => {
-          /** reset resize */
-          const target = event.currentTarget;
-          target.style.width = String(containerProps.style?.width ?? "");
-          target.style.height = "";
-        }}
-        {...containerProps}
+    // rely on component consumer handling keyboard appropriately
+    // eslint-disable-next-line
+    <div
+      ref={containerRef}
+      className={clsx(
+        "card",
+        classes.container,
+        printing && classes.printing,
+        containerClassName,
+      )}
+      // https://github.com/dequelabs/axe-core/issues/4566
+      // eslint-disable-next-line
+      tabIndex={0}
+      onClick={onClick}
+      onDoubleClick={(event) => {
+        /** reset resize */
+        const target = event.currentTarget;
+        target.style.width = String(containerProps.style?.width ?? "");
+        target.style.height = "";
+      }}
+      {...containerProps}
+    >
+      <svg
+        ref={svgRef}
+        className={clsx(classes.svg, svgClassName)}
+        dominantBaseline="central"
+        {...svgProps}
       >
-        <svg
-          ref={svgRef}
-          className={clsx(classes.svg, svgClassName)}
-          {...svgProps}
-        >
-          {/* title */}
-          {title && (
-            <text
-              ref={titleRef}
-              textAnchor="middle"
-              dominantBaseline="hanging"
-              fill={theme["--black"]}
-              style={{ fontWeight: theme["--bold"] }}
-            />
-          )}
+        {/* title */}
+        {title && (
+          <text
+            ref={titleRef}
+            textAnchor="middle"
+            dominantBaseline="hanging"
+            fill={theme["--black"]}
+            style={{ fontWeight: theme["--bold"] }}
+          />
+        )}
 
-          <g ref={fitRef}>
-            {typeof children === "function"
-              ? children({ width, parentWidth })
-              : children}
-          </g>
-        </svg>
-      </div>
-    </Tooltip>
+        <g ref={fitRef}>
+          {typeof children === "function"
+            ? children({ width, parentWidth })
+            : children}
+        </g>
+      </svg>
+    </div>
   );
 
   /** if printing, only render chart */

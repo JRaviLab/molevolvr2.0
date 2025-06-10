@@ -189,13 +189,7 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
                 height={h}
               />
               <NodeTooltip {...node.data}>
-                <text
-                  x={x + gapSize}
-                  y={y}
-                  dominantBaseline="central"
-                  tabIndex={0}
-                  role="graphics-symbol"
-                >
+                <text x={x + gapSize} y={y} tabIndex={0} role="graphics-symbol">
                   {truncateWidth(
                     node.data.label || "-",
                     panelWidth - 2 * gapSize,
@@ -309,7 +303,6 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
       <text
         className={classes.label}
         textAnchor="middle"
-        dy="0.55ex"
         fill={theme["--black"]}
       >
         <textPath href={`#${id}`} startOffset="50%">

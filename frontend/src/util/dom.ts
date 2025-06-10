@@ -1,8 +1,7 @@
 import { cloneElement } from "react";
 import type { ReactElement, ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
-import { debounce } from "lodash";
-import { sleep } from "@/util/misc";
+import { sleep, waitFor } from "@/util/misc";
 
 /** https://stackoverflow.com/a/78994961/2180570 */
 export const getTheme = () => {
@@ -23,53 +22,22 @@ export const getTheme = () => {
   );
 };
 
-/** wait for element matching selector to appear, checking periodically */
-export const waitFor = async <El extends Element>(
-  selector: string,
-): Promise<El | undefined> => {
-  const waits = [
-    0, 1, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000,
-  ];
-  while (waits.length) {
-    const match = document.querySelector<El>(selector);
-    if (match) return match;
-    await sleep(waits.shift());
-  }
-};
-
-/** https://stackoverflow.com/questions/49318497/google-chrome-simultaneously-smooth-scrollintoview-with-more-elements-doesn */
-let isSmoothScrolling = false;
-
 /** scroll to element, optionally by selector */
 export const scrollTo = async (
   selector?: string | Element | null,
   options: ScrollIntoViewOptions = { behavior: "smooth" },
 ) => {
-  /** don't interfere with smooth scroll bug */
-  if (isSmoothScrolling) return;
+  if (!selector) return;
 
   /** wait for element to appear */
   const element =
-    typeof selector === "string" ? await waitFor(selector) : selector;
+    typeof selector === "string"
+      ? await waitFor(() => document.querySelector(selector))
+      : selector;
   if (!element) return;
 
-  /** wait for layout shifts */
-  await sleep(100);
-
   /** scroll to element */
-  element.scrollIntoView(options);
-
-  if (options.behavior === "smooth") {
-    /** set smooth scrolling flag */
-    isSmoothScrolling = true;
-
-    /** unset smooth scrolling flag once done */
-    const unset = debounce(() => {
-      isSmoothScrolling = false;
-      window.removeEventListener("scroll", unset, true);
-    }, 100);
-    window.addEventListener("scroll", unset, true);
-  }
+  elementOrSection(element).scrollIntoView(options);
 };
 
 /** get text content of react node */
@@ -118,7 +86,7 @@ export const firstInView = (elements: HTMLElement[]) => {
     window.getComputedStyle(document.documentElement).scrollPaddingTop,
   );
   for (const element of elements.reverse())
-    if (element.getBoundingClientRect()?.top < offset + 10) return element;
+    if (element.getBoundingClientRect()?.top < offset + 40) return element;
 };
 
 /** shrink width to wrapped text https://stackoverflow.com/questions/14596213 */
@@ -237,11 +205,29 @@ export const truncateWidth = (
   return "...";
 };
 
-/** get horizontal padding of element */
-export const getHPadding = (element?: Element | null) => {
-  if (!element) return 0;
-  const styles = window.getComputedStyle(element);
-  const paddingLeft = parseFloat(styles.paddingLeft);
-  const paddingRight = parseFloat(styles.paddingRight);
-  return paddingLeft + paddingRight;
+/** get coordinates of element relative to document */
+export const getDocBbox = (element: Element) => {
+  const { left, top, right, bottom } = element.getBoundingClientRect();
+  return {
+    top: top + window.scrollY,
+    bottom: bottom + window.scrollY,
+    left: left + window.scrollX,
+    right: right + window.scrollX,
+  };
+};
+
+/** glow element */
+export const glow = (element: Element) =>
+  elementOrSection(element).animate(
+    [
+      { boxShadow: "inset 0 0 40px var(--accent)", offset: 0 },
+      { boxShadow: "inset 0 0 40px transparent", offset: 1 },
+    ],
+    { duration: 2000 },
+  );
+
+/** if element is first child of section, change element to section itself */
+const elementOrSection = (element: Element) => {
+  const parent = element.parentElement;
+  return parent && element.matches("section > :first-child") ? parent : element;
 };

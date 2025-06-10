@@ -90,7 +90,10 @@ const MSA = ({
       {({ width }) => {
         /** max num of chars that can fit in width */
         const rowChars = wrap
-          ? Math.max(Math.floor((width - labelWidth) / charWidth), minChars)
+          ? Math.max(
+              Math.floor((width - labelWidth - rowHeight) / charWidth) - 1,
+              minChars,
+            )
           : length;
 
         /** split sequence into multiple panels */
@@ -114,11 +117,7 @@ const MSA = ({
                   transform={`translate(0, ${panelIndex * (4 + tracks.length) * rowHeight})`}
                 >
                   {/* labels col */}
-                  <g
-                    textAnchor="end"
-                    dominantBaseline="central"
-                    transform={`translate(${-rowHeight}, 0)`}
-                  >
+                  <g textAnchor="end" transform={`translate(${-rowHeight}, 0)`}>
                     <g fill={theme["--gray"]}>
                       <text x={0} y={-1.5 * rowHeight}>
                         Combined
@@ -127,7 +126,7 @@ const MSA = ({
                         Position
                       </text>
                     </g>
-                    <g fill={theme["--black"]} dominantBaseline="central">
+                    <g fill={theme["--black"]}>
                       {panelTracks.map((track, trackIndex) => (
                         <Tooltip key={trackIndex} content={track.label}>
                           <text
@@ -147,7 +146,6 @@ const MSA = ({
                   <g
                     fill={theme["--black"]}
                     textAnchor="middle"
-                    dominantBaseline="central"
                     transform={`translate(0, ${-2 * rowHeight})`}
                     style={{ fontFamily: theme["--mono"] }}
                   >
@@ -174,7 +172,7 @@ const MSA = ({
                               <text
                                 transform={[
                                   `translate(${x + width / 2}, ${y + height / 2})`,
-                                  `scale(1, ${(percent * rowHeight) / 16})`,
+                                  `scale(1, ${(percent * rowHeight) / fontSize})`,
                                 ].join(" ")}
                               >
                                 {char && char.trim() ? char : "-"}
@@ -192,7 +190,6 @@ const MSA = ({
                   <g
                     fill={theme["--black"]}
                     textAnchor="middle"
-                    dominantBaseline="central"
                     transform={`translate(0, ${-1 * rowHeight})`}
                     style={{ fontSize: 0.75 * fontSize }}
                   >
@@ -216,7 +213,6 @@ const MSA = ({
                   <g
                     fill={theme["--black"]}
                     textAnchor="middle"
-                    dominantBaseline="central"
                     style={{ fontFamily: theme["--mono"] }}
                   >
                     {panelTracks.map(({ sequence }, trackIndex) => {
@@ -258,7 +254,7 @@ const MSA = ({
               y={
                 panels.length * (4 + tracks.length) * rowHeight - 2 * rowHeight
               }
-              w={wrap ? width : 99999}
+              w={wrap ? width : Infinity}
               entries={mapValues(colorMap, (color) => ({ color }))}
             />
           </>

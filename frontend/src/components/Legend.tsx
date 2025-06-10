@@ -1,4 +1,4 @@
-import { mapKeys, max, startCase } from "lodash";
+import { clamp, mapKeys, max, startCase } from "lodash";
 import Tooltip from "@/components/Tooltip";
 import { useTextSize, useTheme } from "@/util/hooks";
 import classes from "./Legend.module.css";
@@ -46,6 +46,9 @@ const Legend = ({
   const theme = useTheme();
 
   const { fontSize, getWidth, truncateWidth } = useTextSize();
+
+  /** limit width */
+  rootW = clamp(rootW, 10, 10000);
 
   /** prettify label */
   entries = mapKeys(entries, (v, label) => startCase(label) || "-");
@@ -98,16 +101,8 @@ const Legend = ({
         viewBox={[0, 0, rootW, rootH].join(" ")}
         className={classes.legend}
         style={{ fontSize }}
+        dominantBaseline="central"
       >
-        {/* debug */}
-        <rect
-          x={0}
-          y={0}
-          width={rootW}
-          height={rootH}
-          fill="none"
-          stroke="red"
-        />
         {Object.entries(entries).map(
           ([label, { color, shape, stroke }], index) => {
             /** wrap to grid of rows/cols */
@@ -159,7 +154,6 @@ const Legend = ({
                     x={labelX}
                     y={rowHeight / 2}
                     fill={theme["--black"]}
-                    dominantBaseline="central"
                     tabIndex={0}
                   >
                     {truncateWidth(label, colWidth - labelX)}

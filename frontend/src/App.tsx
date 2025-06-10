@@ -27,7 +27,8 @@ import LoadAnalysis from "@/pages/LoadAnalysis";
 import NewAnalysis from "@/pages/NewAnalysis";
 import NotFound from "@/pages/NotFound";
 import Testbed from "@/pages/Testbed";
-import { scrollTo } from "@/util/dom";
+import { getDocBbox, glow, scrollTo } from "@/util/dom";
+import { waitFor, waitForStable } from "@/util/misc";
 
 /** app entrypoint */
 const App = () => <RouterProvider router={router} />;
@@ -45,9 +46,20 @@ const Layout = () => {
   /** loader data */
   const { toc } = (useRouteLoaderData(id) as Meta) || {};
 
-  /** scroll to hash in url */
+  /** on url hash change */
   useEffect(() => {
-    if (hash) scrollTo(hash);
+    (async () => {
+      if (!hash) return;
+      /** wait for element to appear */
+      const element = await waitFor(() => document.querySelector(hash));
+      if (!element) return;
+      /** wait for layout shifts */
+      await waitForStable(() => getDocBbox(element).top);
+      /** scroll to element */
+      scrollTo(hash);
+      /** highlight element */
+      glow(element);
+    })();
   }, [hash]);
 
   return (

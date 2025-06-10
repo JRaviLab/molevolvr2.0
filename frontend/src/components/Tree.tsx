@@ -219,7 +219,6 @@ const Tree = ({ title, filename = [], data }: Props) => {
                     x={maxY + 0.5 * size}
                     y={node.x ?? 0}
                     fill={theme["--black"]}
-                    dominantBaseline="central"
                   >
                     {truncateWidth(node.data.label ?? "-", sideWidth)}
                   </text>

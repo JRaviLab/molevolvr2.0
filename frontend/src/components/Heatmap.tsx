@@ -172,7 +172,7 @@ const Heatmap = ({
       </g>
 
       {/* x axis tick labels */}
-      <g fill={theme["--black"]} dominantBaseline="central">
+      <g fill={theme["--black"]}>
         {x.labels.map((label, index) => (
           <Tooltip content={label} key={index}>
             <text
@@ -190,7 +190,7 @@ const Heatmap = ({
       </g>
 
       {/* y axis tick labels */}
-      <g fill={theme["--black"]} textAnchor="end" dominantBaseline="central">
+      <g fill={theme["--black"]} textAnchor="end">
         {y.labels.map((label, index) => (
           <Tooltip content={label} key={index}>
             <text
@@ -211,7 +211,6 @@ const Heatmap = ({
       <g
         fill={theme["--black"]}
         textAnchor="middle"
-        dominantBaseline="central"
         style={{ fontWeight: theme["--medium"] }}
       >
         <text
@@ -244,7 +243,6 @@ const Heatmap = ({
           x={0}
           y={-cellSize}
           textAnchor="middle"
-          dominantBaseline="central"
           style={{ fontWeight: theme["--medium"] }}
         >
           {legend ?? "-"}
@@ -264,12 +262,7 @@ const Heatmap = ({
         {/* labels */}
         <g>
           {legendScale.map(({ label, percent }, index) => (
-            <text
-              key={index}
-              x={0.5 * cellSize}
-              y={percent * legendHeight}
-              dominantBaseline="central"
-            >
+            <text key={index} x={0.5 * cellSize} y={percent * legendHeight}>
               {label}
             </text>
           ))}

@@ -183,6 +183,7 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
             }
           }}
           strokeWidth={strokeWidth}
+          dominantBaseline="auto"
         />
 
         {/* bars */}
@@ -216,6 +217,7 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
             }
           }}
           strokeWidth={strokeWidth}
+          dominantBaseline="auto"
         />
 
         {/* bars */}
@@ -237,7 +239,7 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
         </g>
 
         {/* labels */}
-        <g fill={theme["--black"]} dominantBaseline="central">
+        <g fill={theme["--black"]}>
           {y.data.map((row, rowIndex) => (
             <Tooltip key={rowIndex} content={row.label}>
               <text
