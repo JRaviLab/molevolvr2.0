@@ -194,7 +194,7 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
                   y={y}
                   dominantBaseline="central"
                   tabIndex={0}
-                  role="button"
+                  role="graphics-symbol"
                 >
                   {truncateWidth(
                     node.data.label || "-",
@@ -287,7 +287,7 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
           fill={color}
           d={fill}
           tabIndex={0}
-          role="button"
+          role="graphics-symbol"
           onClick={(event) => {
             /** prevent deselect from container onClick */
             event.stopPropagation();

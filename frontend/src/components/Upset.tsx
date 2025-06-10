@@ -195,7 +195,7 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
                 width={xScale.bandwidth() ?? 0}
                 height={-xBarScale(col.value)}
                 tabIndex={0}
-                role="button"
+                role="graphics-symbol"
               />
             </Tooltip>
           ))}
@@ -229,7 +229,7 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
                   width={-yBarScale(row.value)}
                   height={yScale.bandwidth() ?? 0}
                   tabIndex={0}
-                  role="button"
+                  role="graphics-symbol"
                 />
               </Tooltip>
             </Fragment>

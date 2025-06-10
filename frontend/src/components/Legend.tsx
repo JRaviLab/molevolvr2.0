@@ -26,8 +26,11 @@ type Props = {
 };
 
 type Entry = {
+  /** fill color */
   color?: string;
+  /** shape points, from [-1, -1] to [1, 1] */
   shape?: number[];
+  /** whether to stroke shape outline instead of fill */
   stroke?: boolean;
 };
 
@@ -79,7 +82,7 @@ const Legend = ({
   const rootH = rows * rowHeight + (rows - 1) * gapSize;
 
   /** if resulting width less than available, shift appropriately to fill space */
-  if (colWidth < rootW) rootX += anchor[0] * (rootW - colWidth);
+  // if (colWidth < rootW) rootX += anchor[0] * (rootW - colWidth);
 
   /** shift by anchor point */
   rootX -= anchor[0] * rootW;
@@ -96,6 +99,15 @@ const Legend = ({
         className={classes.legend}
         style={{ fontSize }}
       >
+        {/* debug */}
+        <rect
+          x={0}
+          y={0}
+          width={rootW}
+          height={rootH}
+          fill="none"
+          stroke="red"
+        />
         {Object.entries(entries).map(
           ([label, { color, shape, stroke }], index) => {
             /** wrap to grid of rows/cols */
@@ -119,11 +131,13 @@ const Legend = ({
                   {shape ? (
                     stroke ? (
                       <>
-                        <polyline
+                        <polygon
+                          fill="none"
                           strokeWidth={5 * strokeWidth}
                           points={shape.join(" ")}
                         />
-                        <polyline
+                        <polygon
+                          fill="none"
                           stroke={color}
                           strokeWidth={3 * strokeWidth}
                           points={shape.join(" ")}

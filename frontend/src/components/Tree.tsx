@@ -205,6 +205,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
             <Fragment key={index}>
               {!node.children && (
                 <>
+                  {/* leaf node label */}
                   <line
                     x1={node.y}
                     x2={maxY}
@@ -215,10 +216,9 @@ const Tree = ({ title, filename = [], data }: Props) => {
                     strokeDasharray={[lineWidth, 2 * lineWidth].join(" ")}
                   />
                   <text
-                    x={maxY}
+                    x={maxY + 0.5 * size}
                     y={node.x ?? 0}
                     fill={theme["--black"]}
-                    transform={`translate(${2 * nodeSize}, 0)`}
                     dominantBaseline="central"
                   >
                     {truncateWidth(node.data.label ?? "-", sideWidth)}
@@ -226,6 +226,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
                 </>
               )}
 
+              {/* node circle */}
               <Tooltip
                 content={
                   <>
@@ -261,7 +262,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
                   stroke={theme["--black"]}
                   strokeWidth={lineWidth}
                   tabIndex={0}
-                  role="button"
+                  role="graphics-symbol"
                   onClick={(event) => {
                     /** prevent deselect from container onClick */
                     event.stopPropagation();

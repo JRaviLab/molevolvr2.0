@@ -87,11 +87,14 @@ import {
 } from "@/pages/testbed-data";
 import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
+import { getShapeMap } from "@/util/shapes";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
+  return <SectionTree />;
+
   return (
     <>
       <Meta title="Testbed" />
@@ -305,8 +308,17 @@ const SectionLegend = () => {
         .map((label) => label || ""),
     [],
   );
+  const shapesMap = useMemo(() => getShapeMap(labels), [labels]);
   const colorMap = useColorMap(labels, "mode");
-  const entries = mapValues(colorMap, (color) => ({ color }));
+  const entries = useMemo(
+    () =>
+      mapValues(colorMap, (color, label) => ({
+        color,
+        shape: shapesMap[label],
+        stroke: Math.random() > 0.75,
+      })),
+    [colorMap, shapesMap],
+  );
 
   return (
     <Section>

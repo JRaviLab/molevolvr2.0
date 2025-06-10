@@ -226,11 +226,22 @@ export const truncateWidth = (
   size: number,
   family: string,
 ) => {
+  /** ensure nominal width */
+  limit = Math.max(limit, getWidth("...", size, family) + 1);
   /** reduce string length until text width under width limit */
-  for (let slice = text.length; slice > 0; slice--) {
+  for (let slice = text.length; slice >= 0; slice--) {
     const truncated = text.slice(0, slice) + (slice < text.length ? "..." : "");
     const length = getWidth(truncated, size, family);
     if (length <= limit) return truncated;
   }
-  return text;
+  return "...";
+};
+
+/** get horizontal padding of element */
+export const getHPadding = (element?: Element | null) => {
+  if (!element) return 0;
+  const styles = window.getComputedStyle(element);
+  const paddingLeft = parseFloat(styles.paddingLeft);
+  const paddingRight = parseFloat(styles.paddingRight);
+  return paddingLeft + paddingRight;
 };

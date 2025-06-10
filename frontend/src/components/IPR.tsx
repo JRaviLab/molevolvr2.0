@@ -101,7 +101,11 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
   );
 
   return (
-    <Chart title={title} filename={[...filename, "ipr"]} full>
+    <Chart
+      title={title}
+      filename={[...filename, "ipr"]}
+      containerProps={{ className: "full" }}
+    >
       {({ width }) => {
         /** info from chart wrapper */
 
@@ -182,7 +186,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                       x={0}
                       y={(trackIndex + 0.5) * (rowHeight + rowGap)}
                       tabIndex={0}
-                      role="button"
+                      role="graphics-symbol"
                     >
                       {truncateWidth(track.label ?? "-", labelWidth)}
                     </text>
@@ -198,6 +202,8 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                   const selection = select(el);
                   /** attach zoom handler to this element */
                   zoomBehavior(selection);
+                  /** prevent scroll overflow */
+                  selection.on("wheel", (event) => event.preventDefault());
                 }
               }}
               className={classes.area}
@@ -212,7 +218,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                   fill={theme["--white"]}
                   stroke={theme["--light-gray"]}
                   tabIndex={0}
-                  role="button"
+                  role="graphics-symbol"
                 />
               </Tooltip>
               <clipPath id={clipId}>
@@ -333,7 +339,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                             >
                               <g
                                 tabIndex={0}
-                                role="button"
+                                role="graphics-symbol"
                                 dominantBaseline="central"
                               >
                                 <rect

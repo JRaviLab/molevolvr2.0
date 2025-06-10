@@ -7,22 +7,18 @@ import { useElementSize, useFullscreen } from "@reactuses/core";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
 import Flex from "@/components/Flex";
+import Tooltip from "@/components/Tooltip";
 import { isSafari } from "@/util/browser";
-import { getViewBoxFit } from "@/util/dom";
+import { getHPadding, getViewBoxFit } from "@/util/dom";
 import type { Filename, Tabular } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
 import classes from "./Chart.module.css";
-
-/** container padding */
-const padding = 20;
 
 type Props = {
   /** title text */
   title?: string;
   /** download filename */
   filename: Filename;
-  /** full width */
-  full?: boolean;
 
   /** csv/tsv data */
   tabular?: { data: Tabular; filename?: string }[];
@@ -39,24 +35,30 @@ type Props = {
 
   /** container click */
   onClick?: ComponentProps<"div">["onClick"];
+
+  containerProps?: ComponentProps<"div">;
+  svgProps?: ComponentProps<"svg">;
 };
 
 export type ChildrenProps = {
-  /** available width */
+  /** chart container width */
   width: number;
+  /** available (usually page) width */
+  parentWidth: number;
 };
 
 /** generic chart wrapper */
 const Chart = ({
   title,
   filename,
-  full,
   tabular,
   text,
   json,
   controls,
   children,
   onClick,
+  containerProps: { className: containerClassName, ...containerProps } = {},
+  svgProps: { className: svgClassName, ...svgProps } = {},
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -68,14 +70,15 @@ const Chart = ({
 
   const { fontSize, truncateWidth } = useTextSize();
 
-  const [containerWidth] = useElementSize(containerRef.current);
-  const [parentWidth] = useElementSize(containerRef.current?.parentElement);
+  /** sizes */
+  let [width] = useElementSize(containerRef.current, { box: "border-box" });
+  let [parentWidth] = useElementSize(containerRef.current?.parentElement, {
+    box: "border-box",
+  });
 
-  /** available width */
-  let width = full ? containerWidth : parentWidth;
-  width -= 2 * padding - 1;
-  /** ensure nominal width */
-  width = Math.max(width, 10);
+  /** subtract padding */
+  width -= getHPadding(containerRef.current);
+  parentWidth -= getHPadding(containerRef.current?.parentElement);
 
   useEffect(() => {
     if (!svgRef.current || !fitRef.current) return;
@@ -101,11 +104,19 @@ const Chart = ({
       titleRef.current.setAttribute("y", String(y));
       titleRef.current.setAttribute("x", String(x + w / 2));
       /** content */
-      titleRef.current.innerHTML = truncateWidth(
-        title,
-        Math.max(w, containerWidth),
-      );
+      titleRef.current.innerHTML = truncateWidth(title, Math.max(w, width));
     }
+
+    /** debug view box */
+    // const debug =
+    //   svgRef.current.querySelector<SVGRectElement>("." + classes.debug!) ||
+    //   document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    // debug.classList.add(classes.debug!);
+    // debug.setAttribute("x", String(x));
+    // debug.setAttribute("y", String(y));
+    // debug.setAttribute("width", String(w));
+    // debug.setAttribute("height", String(h));
+    // svgRef.current.insertBefore(debug, svgRef.current.firstChild!);
 
     /** fit view to contents */
     svgRef.current.setAttribute("viewBox", [x, y, w, h].join(" "));
@@ -153,7 +164,7 @@ const Chart = ({
 
   /** chart content */
   const chart = (
-    <>
+    <Tooltip content="Double-click to reset size">
       {/* rely on component consumer handling keyboard appropriately */}
       {/* eslint-disable-next-line */}
       <div
@@ -161,19 +172,26 @@ const Chart = ({
         className={clsx(
           "card",
           classes.container,
-          full && "full",
           printing && classes.printing,
+          containerClassName,
         )}
-        style={{ padding }}
+        // https://github.com/dequelabs/axe-core/issues/4566
+        // eslint-disable-next-line
+        tabIndex={0}
         onClick={onClick}
         onDoubleClick={(event) => {
           /** reset resize */
           const target = event.currentTarget;
-          target.style.width = "";
+          target.style.width = String(containerProps.style?.width ?? "");
           target.style.height = "";
         }}
+        {...containerProps}
       >
-        <svg ref={svgRef} className={classes.svg}>
+        <svg
+          ref={svgRef}
+          className={clsx(classes.svg, svgClassName)}
+          {...svgProps}
+        >
           {/* title */}
           {title && (
             <text
@@ -186,11 +204,13 @@ const Chart = ({
           )}
 
           <g ref={fitRef}>
-            {typeof children === "function" ? children({ width }) : children}
+            {typeof children === "function"
+              ? children({ width, parentWidth })
+              : children}
           </g>
         </svg>
       </div>
-    </>
+    </Tooltip>
   );
 
   /** if printing, only render chart */

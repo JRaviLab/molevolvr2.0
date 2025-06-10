@@ -77,7 +77,6 @@ const MSA = ({
     <Chart
       title={title}
       filename={[...filename, "msa"]}
-      full
       controls={[
         <CheckBox
           label="Wrap"
@@ -86,6 +85,7 @@ const MSA = ({
           tooltip="Wrap sequence to stacked panels"
         />,
       ]}
+      containerProps={{ className: "full" }}
     >
       {({ width }) => {
         /** max num of chars that can fit in width */
@@ -134,7 +134,7 @@ const MSA = ({
                             x={0}
                             y={(trackIndex + 0.5) * rowHeight}
                             tabIndex={0}
-                            role="button"
+                            role="graphics-symbol"
                           >
                             {truncateWidth(track.label ?? "-", labelWidth)}
                           </text>
