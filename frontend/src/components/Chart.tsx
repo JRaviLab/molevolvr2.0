@@ -31,7 +31,7 @@ type Props = {
   /** extra control groups */
   controls?: ReactNode[];
 
-  /** svg content */
+  /** svg content. use data-fit-ignore to ignore element from fit calc. */
   children: ReactNode | ((props: ChildrenProps) => ReactNode);
 
   /** container click */
@@ -63,7 +63,6 @@ const Chart = ({
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-  const fitRef = useRef<SVGGElement>(null);
   const titleRef = useRef<SVGTextElement>(null);
 
   /** reactive CSS vars */
@@ -84,7 +83,7 @@ const Chart = ({
   parentWidth = clamp(parentWidth, 10, 10000);
 
   useEffect(() => {
-    if (!svgRef.current || !fitRef.current) return;
+    if (!svgRef.current) return;
 
     /** ignore certain elements in fitting */
     const ignores =
@@ -92,7 +91,7 @@ const Chart = ({
     ignores.forEach((el) => (el.style.display = "none"));
 
     /** get bbox of contents */
-    let { x, y, w, h } = getViewBoxFit(fitRef.current);
+    let { x, y, w, h } = getViewBoxFit(svgRef.current);
 
     /** restore fit ignore elements */
     ignores.forEach((el) => (el.style.display = ""));
@@ -199,14 +198,13 @@ const Chart = ({
             dominantBaseline="hanging"
             fill={theme["--black"]}
             style={{ fontWeight: theme["--bold"] }}
+            data-fit-ignore
           />
         )}
 
-        <g ref={fitRef}>
-          {typeof children === "function"
-            ? children({ width, parentWidth })
-            : children}
-        </g>
+        {typeof children === "function"
+          ? children({ width, parentWidth })
+          : children}
       </svg>
 
       {/* reset handle */}
