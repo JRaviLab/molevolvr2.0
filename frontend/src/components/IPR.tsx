@@ -73,8 +73,8 @@ const IPR = ({ sequence, tracks }: Props) => {
   /** common pan/zoom */
   const [transform, setTransform] = useState(zoomIdentity);
 
-  /** dimensions of first non-overflow svg (all widths should be same) */
-  let [width, height] = useElementSize([...svgRefs.current][1]);
+  /** dimensions of first svg (all widths should be same) */
+  let [width, height] = useElementSize([...svgRefs.current][0]);
 
   /** set min value to avoid temporary divide by 0 errors */
   width ||= 100;
@@ -83,7 +83,7 @@ const IPR = ({ sequence, tracks }: Props) => {
   /** dimensions of scrollbar */
   const [, scrollHeight] = useElementSize(scrollRef);
 
-  /** make svg font size relative to height, which is based on css font size */
+  /** font size, in svg units */
   const fontSize = useSvgTransform(
     [...svgRefs.current][0]!,
     1,
@@ -127,6 +127,13 @@ const IPR = ({ sequence, tracks }: Props) => {
       if (last === endPosition || width - scaleX(last + 0.5) < fontSize * 2)
         ticks.pop();
   }
+
+  /** clamp tick position near start/end */
+  const clampTick = (x: number, string: string) => {
+    /** approximate half-width of string */
+    const padding = (fontSize * string.length) / 3;
+    return clamp(x, padding, width - padding);
+  };
 
   type Extent = [[number, number], [number, number]];
 
@@ -275,16 +282,16 @@ const IPR = ({ sequence, tracks }: Props) => {
 
   return (
     <Flex direction="column" gap="lg" full>
-      <Flex ref={containerRef} direction="column" full>
+      <Flex
+        ref={containerRef}
+        direction="column"
+        full
+        className={clsx("card", classes.container)}
+      >
         <div className={classes.grid}>
           {/* position */}
           <div className={classes["top-label"]}>Position</div>
-          <svg
-            ref={svgRef}
-            viewBox={viewBox}
-            className={classes.row}
-            style={{ overflow: "visible" }}
-          >
+          <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
             <g
               textAnchor="middle"
               dominantBaseline="central"
@@ -294,7 +301,7 @@ const IPR = ({ sequence, tracks }: Props) => {
               {ticks.map((position) => (
                 <text
                   key={position}
-                  x={clamp(scaleX(position + 0.5), 0, width)}
+                  x={clampTick(scaleX(position + 0.5), String(position + 1))}
                   y={height / 2}
                 >
                   {position + 1}
@@ -303,10 +310,16 @@ const IPR = ({ sequence, tracks }: Props) => {
 
               {skip > 1 && (
                 <>
-                  <text x={0} y={height / 2}>
+                  <text
+                    x={clampTick(0, String(startPosition + 1))}
+                    y={height / 2}
+                  >
                     {startPosition + 1}
                   </text>
-                  <text x={width} y={height / 2}>
+                  <text
+                    x={clampTick(width, String(endPosition))}
+                    y={height / 2}
+                  >
                     {endPosition}
                   </text>
                 </>
@@ -333,8 +346,8 @@ const IPR = ({ sequence, tracks }: Props) => {
                     y={-height / 2}
                     width={cellSize}
                     height={height}
-                    fill={theme["--deep"]}
-                    opacity={index % 2 === 0 ? 0.1 : 0.2}
+                    fill={theme["--light-gray"]}
+                    opacity={index % 2 === 0 ? 0.25 : 0.5}
                   />
                   <text
                     x={0}

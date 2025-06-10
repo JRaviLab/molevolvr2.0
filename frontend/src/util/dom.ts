@@ -1,6 +1,7 @@
 import { cloneElement, type ReactElement, type ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
 import { debounce } from "lodash";
+import { round } from "@/util/math";
 import { sleep } from "@/util/misc";
 
 /** wait for element matching selector to appear, checking periodically */
@@ -160,7 +161,7 @@ export const isCovering = (
 };
 
 /** fit view box to contents of svg */
-export const fitViewBox = (svg?: SVGSVGElement, paddingPercent = 0) => {
+export const fitViewBox = (svg?: SVGSVGElement | null, paddingPercent = 0) => {
   if (!svg) return { x: 0, y: 0, width: 100, height: 100 };
   let { x, y, width, height } = svg.getBBox();
   const padding = Math.min(width, height) * paddingPercent;
@@ -168,7 +169,7 @@ export const fitViewBox = (svg?: SVGSVGElement, paddingPercent = 0) => {
   y -= padding;
   width += padding * 2;
   height += padding * 2;
-  const viewBox = [x, y, width, height].map((v) => Math.round(v)).join(" ");
+  const viewBox = [x, y, width, height].map((v) => round(v, 0.01)).join(" ");
   svg.setAttribute("viewBox", viewBox);
   return { x, y, width, height };
 };

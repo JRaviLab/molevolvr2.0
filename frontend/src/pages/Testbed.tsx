@@ -25,6 +25,7 @@ import {
   FaRegSquareCheck,
   FaRegWindowMaximize,
   FaShareNodes,
+  FaSitemap,
   FaSliders,
   FaStop,
   FaTableCells,
@@ -62,6 +63,7 @@ import TextBox from "@/components/TextBox";
 import Tile from "@/components/Tile";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
+import Tree from "@/components/Tree";
 import {
   edges,
   heatmap,
@@ -71,6 +73,7 @@ import {
   msaTracks,
   nodes,
   sunburst,
+  tree,
   words,
 } from "@/pages/testbed-data";
 import { useColorMap } from "@/util/color";
@@ -89,11 +92,12 @@ const TestbedPage = () => (
 
     {/* complex components */}
 
-    <SectionIPR />
-    <SectionHeatmap />
+    <SectionTree />
     <SectionSunburst />
-    <SectionMSA />
+    <SectionHeatmap />
     <SectionNetwork />
+    <SectionMSA />
+    <SectionIPR />
 
     {/* formatting */}
 
@@ -270,6 +274,16 @@ const SectionHeading = () => (
   </Section>
 );
 
+const SectionSunburst = () => (
+  <Section>
+    <Heading level={2} icon={<FaChartPie />}>
+      Sunburst
+    </Heading>
+
+    <Sunburst data={sunburst} />
+  </Section>
+);
+
 const SectionHeatmap = () => (
   <Section>
     <Heading level={2} icon={<PiSquaresFourFill />}>
@@ -280,13 +294,13 @@ const SectionHeatmap = () => (
   </Section>
 );
 
-const SectionSunburst = () => (
+const SectionTree = () => (
   <Section>
-    <Heading level={2} icon={<FaChartPie />}>
-      Sunburst
+    <Heading level={2} icon={<FaSitemap />}>
+      Tree
     </Heading>
 
-    <Sunburst data={sunburst} />
+    <Tree data={tree} />
   </Section>
 );
 
@@ -300,16 +314,6 @@ const SectionNetwork = () => (
   </Section>
 );
 
-const SectionIPR = () => (
-  <Section>
-    <Heading level={2} icon={<FaBarcode />}>
-      IPR
-    </Heading>
-
-    <IPR sequence={iprSequence} tracks={iprTracks} />
-  </Section>
-);
-
 const SectionMSA = () => (
   <Section>
     <Heading level={2} icon={<FaTableCells />}>
@@ -317,6 +321,16 @@ const SectionMSA = () => (
     </Heading>
 
     <MSA tracks={msaTracks} getType={clustalType} colors={clustalColors} />
+  </Section>
+);
+
+const SectionIPR = () => (
+  <Section>
+    <Heading level={2} icon={<FaBarcode />}>
+      IPR
+    </Heading>
+
+    <IPR sequence={iprSequence} tracks={iprTracks} />
   </Section>
 );
 

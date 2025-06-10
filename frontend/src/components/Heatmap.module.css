@@ -1,12 +1,24 @@
-.chart {
-  max-height: 500px;
+.container {
+  display: grid;
+  grid-template-columns: auto;
+  padding: 20px;
+  gap: 20px;
 }
 
-.cell:hover {
+.chart {
+  max-width: 100%;
+}
+
+.cell {
+  outline: none;
+}
+
+.cell:is(:hover, :focus-visible) {
   stroke: var(--black);
   stroke-width: 5;
 }
 
-.chart:has(.cell:hover) .cell:not(:hover) {
+.chart:has(.cell:is(:hover, :focus-visible))
+  .cell:not(:is(:hover, :focus-visible)) {
   opacity: 0.25;
 }

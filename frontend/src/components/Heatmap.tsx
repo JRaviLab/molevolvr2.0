@@ -5,6 +5,7 @@ import {
   FaFilePdf,
   FaRegImage,
 } from "react-icons/fa6";
+import clsx from "clsx";
 import { extent, scaleBand, scaleLinear, transpose } from "d3";
 import { range, truncate } from "lodash";
 import Button from "@/components/Button";
@@ -52,6 +53,7 @@ const legendHeight = 300;
 const labelTruncate = 10;
 
 const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   /** selected gradient */
@@ -73,6 +75,11 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
 
   /** font size, in svg units */
   const fontSize = useSvgTransform(svgRef.current, 1, rootFontSize()).h;
+
+  /** fit view box */
+  useEffect(() => {
+    fitViewBox(svgRef.current, 0.01);
+  });
 
   /** col # to svg x coord */
   const xScale = scaleBand(range(0, x.labels.length), [
@@ -97,12 +104,6 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   /** % to color */
   const colorScale = (value: number) => gradientFunc(gradient, reverse, value);
 
-  /** fit view box */
-  useEffect(() => {
-    if (!svgRef.current) return;
-    fitViewBox(svgRef.current, 0.01);
-  });
-
   /** main chart area svg units */
   const width = (xScale(x.labels.length - 1) ?? 0) + xScale.bandwidth();
   const height = (yScale(y.labels.length - 1) ?? 0) + yScale.bandwidth();
@@ -115,149 +116,155 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
   }));
 
   return (
-    <Flex direction="column" gap="lg" full>
-      <svg ref={svgRef} className={classes.chart} style={{ fontSize }}>
-        {/* cells */}
-        {data.map((row, rowIndex) =>
-          row.map((col, colIndex) => (
-            <Tooltip
-              key={[colIndex, rowIndex].join("-")}
-              content={
-                <div className="mini-table">
-                  <span>Value</span>
-                  <span>{col}</span>
-                  <span>{x.label ?? "-"}</span>
-                  <span>{x.labels[colIndex]}</span>
-                  <span>{y.label ?? "-"}</span>
-                  <span>{y.labels[colIndex]}</span>
-                </div>
-              }
-            >
-              <rect
-                className={classes.cell}
-                x={xScale(colIndex) ?? 0}
-                y={yScale(rowIndex) ?? 0}
-                width={xScale.bandwidth() ?? 0}
-                height={yScale.bandwidth() ?? 0}
-                fill={col ? colorScale(valueScale(col)) : theme["--light-gray"]}
-                tabIndex={0}
-                role="button"
-              />
-            </Tooltip>
-          )),
-        )}
-
-        {/* axis lines */}
-        <g
-          stroke={theme["--black"]}
-          strokeWidth={fontSize / 10}
-          strokeLinecap="square"
+    <Flex direction="column" gap="lg">
+      <div ref={containerRef} className={clsx("card", classes.container)}>
+        <svg
+          ref={svgRef}
+          className={classes.chart}
+          style={{
+            fontSize,
+            /** size based on number of rows */
+            height: 2 * rootFontSize() * (data.length + 2),
+          }}
         >
-          <line x1={0} y1={0} x2={width} y2={0} />
-          <line x1={0} y1={0} x2={0} y2={height} />
-        </g>
-
-        {/* x axis tick labels */}
-        <g fill={theme["--black"]} dominantBaseline="central">
-          {x.labels.map((label, index) => (
-            <Tooltip content={label} key={index}>
-              <text
-                transform={[
-                  `translate(0, ${-fontSize / 2})`,
-                  `translate(${(xScale(index) ?? 0) + xScale.bandwidth() / 2}, 0)`,
-                  `rotate(-45)`,
-                ].join("")}
-                tabIndex={0}
+          {/* cells */}
+          {data.map((row, rowIndex) =>
+            row.map((col, colIndex) => (
+              <Tooltip
+                key={[colIndex, rowIndex].join("-")}
+                content={
+                  <div className="mini-table">
+                    <span>Value</span>
+                    <span>{col}</span>
+                    <span>{x.label ?? "-"}</span>
+                    <span>{x.labels[colIndex]}</span>
+                    <span>{y.label ?? "-"}</span>
+                    <span>{y.labels[colIndex]}</span>
+                  </div>
+                }
               >
-                {truncate(label ?? "-", { length: labelTruncate })}
-              </text>
-            </Tooltip>
-          ))}
-        </g>
+                <rect
+                  className={classes.cell}
+                  x={xScale(colIndex) ?? 0}
+                  y={yScale(rowIndex) ?? 0}
+                  width={xScale.bandwidth() ?? 0}
+                  height={yScale.bandwidth() ?? 0}
+                  fill={
+                    col ? colorScale(valueScale(col)) : theme["--light-gray"]
+                  }
+                  tabIndex={0}
+                  role="button"
+                />
+              </Tooltip>
+            )),
+          )}
 
-        {/* y axis tick labels */}
-        <g fill={theme["--black"]} textAnchor="end" dominantBaseline="central">
-          {y.labels.map((label, index) => (
-            <Tooltip content={label} key={index}>
-              <text
-                transform={[
-                  `translate(${-fontSize / 2}, 0)`,
-                  `translate(0, ${(yScale(index) ?? 0) + yScale.bandwidth() / 2})`,
-                  `rotate(-45)`,
-                ].join(" ")}
-                tabIndex={0}
-              >
-                {truncate(label ?? "-", { length: labelTruncate })}
-              </text>
-            </Tooltip>
-          ))}
-        </g>
+          {/* x axis tick labels */}
+          <g fill={theme["--black"]} dominantBaseline="central">
+            {x.labels.map((label, index) => (
+              <Tooltip content={label} key={index}>
+                <text
+                  transform={[
+                    `translate(0, ${-fontSize / 2})`,
+                    `translate(${(xScale(index) ?? 0) + xScale.bandwidth() / 2}, 0)`,
+                    `rotate(-45)`,
+                  ].join("")}
+                  tabIndex={0}
+                >
+                  {truncate(label ?? "-", { length: labelTruncate })}
+                </text>
+              </Tooltip>
+            ))}
+          </g>
 
-        {/* main axis labels */}
-        <g
-          fill={theme["--black"]}
-          textAnchor="middle"
-          dominantBaseline="central"
-          style={{ fontWeight: "500" }}
-        >
-          <text
-            transform={[`translate(${width / 2}, ${height + fontSize})`].join(
-              " ",
-            )}
+          {/* y axis tick labels */}
+          <g
+            fill={theme["--black"]}
+            textAnchor="end"
+            dominantBaseline="central"
           >
-            {x.label ?? "-"}
-          </text>
+            {y.labels.map((label, index) => (
+              <Tooltip content={label} key={index}>
+                <text
+                  transform={[
+                    `translate(${-fontSize / 2}, 0)`,
+                    `translate(0, ${(yScale(index) ?? 0) + yScale.bandwidth() / 2})`,
+                    `rotate(-45)`,
+                  ].join(" ")}
+                  tabIndex={0}
+                >
+                  {truncate(label ?? "-", { length: labelTruncate })}
+                </text>
+              </Tooltip>
+            ))}
+          </g>
 
-          <text
-            transform={[
-              `translate(${width + fontSize}, ${height / 2})`,
-              `rotate(-90)`,
-            ].join(" ")}
-          >
-            {y.label ?? "-"}
-          </text>
-        </g>
-
-        {/* legend */}
-        <g
-          fill={theme["--black"]}
-          transform={`translate(${width + fontSize * 4}, ${height * 0.5 - legendHeight / 2})`}
-        >
-          {/* main label */}
-          <text
-            x={0}
-            y={-fontSize * 2}
+          {/* main axis labels */}
+          <g
+            fill={theme["--black"]}
             textAnchor="middle"
             dominantBaseline="central"
             style={{ fontWeight: "500" }}
           >
-            {legend ?? "-"}
-          </text>
-
-          {/* gradient rect */}
-          <Gradient
-            id={gradient}
-            reverse={reverse}
-            direction="vertical"
-            x={-fontSize * 0.5}
-            y={0}
-            width={fontSize}
-            height={legendHeight}
-          />
-
-          {/* labels */}
-          {legendScale.map(({ label, percent }, index) => (
             <text
-              key={index}
-              x={fontSize}
-              y={percent * legendHeight}
-              dominantBaseline="central"
+              transform={[`translate(${width / 2}, ${height + fontSize})`].join(
+                " ",
+              )}
             >
-              {label}
+              {x.label ?? "-"}
             </text>
-          ))}
-        </g>
-      </svg>
+
+            <text
+              transform={[
+                `translate(${width + fontSize}, ${height / 2})`,
+                `rotate(-90)`,
+              ].join(" ")}
+            >
+              {y.label ?? "-"}
+            </text>
+          </g>
+
+          {/* legend */}
+          <g
+            fill={theme["--black"]}
+            transform={`translate(${width + fontSize * 4}, ${height * 0.5 - legendHeight / 2})`}
+          >
+            {/* main label */}
+            <text
+              x={0}
+              y={-fontSize * 2}
+              textAnchor="middle"
+              dominantBaseline="central"
+              style={{ fontWeight: "500" }}
+            >
+              {legend ?? "-"}
+            </text>
+
+            {/* gradient rect */}
+            <Gradient
+              id={gradient}
+              reverse={reverse}
+              direction="vertical"
+              x={-fontSize * 0.5}
+              y={0}
+              width={fontSize}
+              height={legendHeight}
+            />
+
+            {/* labels */}
+            {legendScale.map(({ label, percent }, index) => (
+              <text
+                key={index}
+                x={fontSize}
+                y={percent * legendHeight}
+                dominantBaseline="central"
+              >
+                {label}
+              </text>
+            ))}
+          </g>
+        </svg>
+      </div>
 
       {/* controls */}
       <Flex>
@@ -290,7 +297,8 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
                 icon={<FaRegImage />}
                 text="PNG"
                 onClick={() =>
-                  svgRef.current && downloadPng(svgRef.current, "heatmap")
+                  containerRef.current &&
+                  downloadPng(containerRef.current, "heatmap")
                 }
                 tooltip="High-resolution image"
               />
@@ -298,7 +306,8 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
                 icon={<FaRegImage />}
                 text="JPEG"
                 onClick={() =>
-                  svgRef.current && downloadJpg(svgRef.current, "heatmap")
+                  containerRef.current &&
+                  downloadJpg(containerRef.current, "heatmap")
                 }
                 tooltip="Compressed image"
               />
@@ -313,7 +322,9 @@ const Heatmap = ({ x, y, data, legend, min, max }: Props) => {
               <Button
                 icon={<FaFilePdf />}
                 text="PDF"
-                onClick={() => svgRef.current && printElement(svgRef.current)}
+                onClick={() =>
+                  containerRef.current && printElement(containerRef.current)
+                }
                 tooltip="Print as pdf"
               />
             </Flex>

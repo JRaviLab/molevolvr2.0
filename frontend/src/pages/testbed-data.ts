@@ -1,5 +1,6 @@
 import { random, range, sample, uniqueId } from "lodash";
-import { type Item } from "@/components/Sunburst";
+import type { Item as SunburstItem } from "@/components/Sunburst";
+import type { Item as TreeItem } from "@/components/Tree";
 
 /** log change to components for testing */
 export const logChange = (...args: unknown[]) => {
@@ -50,6 +51,21 @@ export const sequence = (chars?: string, min = 10, max = 100) =>
     .map(() => char(chars))
     .join("");
 
+/** generate fake tree item data */
+export const treeItem = (depth: number): TreeItem => ({
+  label: label(),
+  type: type(),
+  dist: Math.random() > 0.1 ? random(0.1, 2, true) : undefined,
+  ...(depth > 0 && {
+    children: Array(random(1, 3))
+      .fill({})
+      .map(() => treeItem(depth - 1)),
+  }),
+});
+
+/** fake sunburst data */
+export const tree = [treeItem(random(1, 3)), treeItem(random(1, 3))];
+
 /** fake heatmap data */
 const heatmapCols = random(5, 20);
 const heatmapRows = random(5, 20);
@@ -77,7 +93,7 @@ export const heatmap = {
 };
 
 /** generate fake sunburst item data */
-export const sunburstItem = (depth: number): Item => ({
+export const sunburstItem = (depth: number): SunburstItem => ({
   label: label(),
   type: type(),
   value: random(10, 100),

@@ -61,8 +61,6 @@ type Derived = {
 type Node = HierarchyNode<Derived>;
 
 type Props = {
-  /** chart title */
-  title?: string;
   /** chart data */
   data: Item[];
 };
@@ -74,7 +72,7 @@ const gapSize = 1;
 /** depth/level of first ring from center */
 const startDepth = 1;
 
-const Sunburst = ({ title, data }: Props) => {
+const Sunburst = ({ data }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -83,7 +81,6 @@ const Sunburst = ({ title, data }: Props) => {
 
   /** fit view box */
   useEffect(() => {
-    if (!svgRef.current) return;
     fitViewBox(svgRef.current, 0.01);
   });
 
@@ -153,6 +150,9 @@ const Sunburst = ({ title, data }: Props) => {
     [tree, colorMap, selected, anySelected],
   );
 
+  /** clear selection */
+  const deselect = () => setSelected([]);
+
   return (
     <Flex direction="column" gap="lg" full>
       {/* keyboard listener not necessary here because we have one below */}
@@ -160,15 +160,20 @@ const Sunburst = ({ title, data }: Props) => {
       <div
         ref={containerRef}
         className={clsx("card", classes.container)}
-        /** deselect */
-        onClick={() => setSelected([])}
+        onClick={deselect}
       >
-        {title && <strong>{title}</strong>}
-
         <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
 
         {/* chart container */}
-        <svg ref={svgRef} className={classes.chart} style={{ fontSize }}>
+        <svg
+          ref={svgRef}
+          className={classes.chart}
+          style={{
+            fontSize,
+            /** size based on number of rings */
+            height: 2 * 2 * rootFontSize() * (tree.height + startDepth),
+          }}
+        >
           {nodes.map((node, index) => (
             <Fragment key={index}>
               {node.parent && (
@@ -176,10 +181,10 @@ const Sunburst = ({ title, data }: Props) => {
                   fontSize={fontSize}
                   select={() =>
                     node.data.lastSelected
-                      ? setSelected([])
+                      ? deselect()
                       : setSelected(node.ancestors().slice(0, -1).reverse())
                   }
-                  deselect={() => setSelected([])}
+                  deselect={deselect}
                   node={node}
                 />
               )}
@@ -285,6 +290,9 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
   const { label, color, percent, angle, selected, lastSelected } = data;
   const end = angle + percent;
 
+  /** reactive CSS vars */
+  const theme = useTheme();
+
   /** segment arc radius */
   const radius = (depth + startDepth - 0.5) * ringSize;
 
@@ -330,16 +338,13 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
   /** get max text chars based on arc length */
   const maxChars = (radius * 2 * Math.PI * percent) / (fontSize / 1.75);
 
-  /** reactive CSS vars */
-  const theme = useTheme();
-
   return (
-    <g className={classes.segment}>
+    <g className={classes.segment} opacity={selected === false ? 0.25 : 1}>
       {/* shape */}
       <NodeTooltip {...data}>
         <path
           className={classes.shape}
-          fill={selected === false ? theme["--light-gray"] : color}
+          fill={color}
           stroke={theme["--black"]}
           strokeWidth={gapSize}
           strokeOpacity={lastSelected === true ? 1 : 0}
