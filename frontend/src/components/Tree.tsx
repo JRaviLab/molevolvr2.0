@@ -122,11 +122,6 @@ const Tree = ({ title, filename = [], data }: Props) => {
   /** path between selected nodes */
   const selectedPath = selectedA && selectedB ? selectedA.path(selectedB) : [];
 
-  /** dist between selected nodes */
-  const selectedDist = Math.abs(
-    (selectedA?.data.rootDist ?? 0) - (selectedB?.data.rootDist ?? 0),
-  );
-
   /** max node depth */
   const maxY = max(map(tree.descendants(), "y")) ?? 0;
 
