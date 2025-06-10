@@ -135,14 +135,19 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
         /** skip position labels based on zoom */
         const skip =
           [1, 2, 5, 10, 20, 50, 100].find(
-            (skip) => skip * charWidth > 2 * rowHeight,
+            (skip) => skip * charWidth > 3 * rowHeight,
           ) ?? 1;
 
         /** position ticks */
         let ticks = range(startPosition, endPosition).filter(
           (position) => position % skip === 0,
         );
-        ticks = uniq([startPosition, ...ticks, endPosition]);
+        ticks = uniq([startPosition, ...ticks, endPosition - 1]);
+
+        if ((ticks.at(1) ?? 0) - (ticks.at(0) ?? 0) < 0.5 * skip)
+          ticks.splice(1, 1);
+        if ((ticks.at(-1) ?? 0) - (ticks.at(-2) ?? 0) < skip)
+          ticks.splice(-2, 1);
 
         /** update pan limit */
         zoomBehavior
@@ -259,8 +264,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                     </g>
                   ))}
                 </g>
-
-                {/* ticks row */}
+                const
                 <g
                   className={classes["no-mouse"]}
                   fill={theme["--black"]}
@@ -278,7 +282,6 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                     );
                   })}
                 </g>
-
                 {/* tracks */}
                 <g>
                   {tracks.map((track, trackIndex) => (

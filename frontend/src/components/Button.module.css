@@ -37,7 +37,7 @@
   color: var(--white);
 }
 
-.normal:focus {
+.normal:focus-visible {
   outline-color: var(--accent);
 }
 
@@ -51,6 +51,6 @@
   color: var(--white);
 }
 
-.critical:focus {
+.critical:focus-visible {
   outline-color: var(--black);
 }

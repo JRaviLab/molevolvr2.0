@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { FaExpand } from "react-icons/fa6";
+import { FaBorderTopLeft, FaExpand } from "react-icons/fa6";
 import clsx from "clsx";
 import { clamp } from "lodash";
 import { useDebounce, useElementSize, useFullscreen } from "@reactuses/core";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
 import Flex from "@/components/Flex";
+import Tooltip from "@/components/Tooltip";
 import { isSafari } from "@/util/browser";
 import { getViewBoxFit } from "@/util/dom";
 import type { Filename, Tabular } from "@/util/download";
@@ -182,12 +183,6 @@ const Chart = ({
       // eslint-disable-next-line
       tabIndex={0}
       onClick={onClick}
-      onDoubleClick={(event) => {
-        /** reset resize */
-        const target = event.currentTarget;
-        target.style.width = String(containerProps.style?.width ?? "");
-        target.style.height = "";
-      }}
       {...containerProps}
     >
       <svg
@@ -213,6 +208,24 @@ const Chart = ({
             : children}
         </g>
       </svg>
+
+      {/* reset handle */}
+      <div className={classes["reset-anchor"]}>
+        <Tooltip content="Reset size">
+          <button
+            className={classes.reset}
+            onClick={() => {
+              /** reset resize */
+              const target = containerRef.current;
+              if (!target) return;
+              target.style.width = String(containerProps.style?.width ?? "");
+              target.style.height = "";
+            }}
+          >
+            <FaBorderTopLeft />
+          </button>
+        </Tooltip>
+      </div>
     </div>
   );
 
