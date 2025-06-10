@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
+import { isEqual } from "lodash";
 import { useEventListener } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
 import { getTheme, getWidth, truncateWidth } from "@/util/dom";
@@ -47,4 +48,13 @@ export const useTextSize = () => {
       [fontSize, fontFamily],
     ),
   };
+};
+
+/** check if value changed from previous render */
+export const useChanged = <Value>(value: Value, initial = true) => {
+  const prev = useRef<Value | undefined>(undefined);
+  const changed = !isEqual(value, prev.current);
+  const result = initial ? changed : changed && prev.current !== undefined;
+  prev.current = value;
+  return result;
 };

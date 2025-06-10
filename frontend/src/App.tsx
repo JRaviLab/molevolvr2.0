@@ -3,7 +3,6 @@ import "@/global/styles.css";
 import "@/global/text.css";
 import "@/global/layout.css";
 import "@/global/effects.css";
-import { useEffect } from "react";
 import { IconContext } from "react-icons";
 import {
   createBrowserRouter,
@@ -28,6 +27,7 @@ import NewAnalysis from "@/pages/NewAnalysis";
 import NotFound from "@/pages/NotFound";
 import Testbed from "@/pages/Testbed";
 import { getDocBbox, glow, scrollTo } from "@/util/dom";
+import { useChanged } from "@/util/hooks";
 import { waitFor, waitForStable } from "@/util/misc";
 
 /** app entrypoint */
@@ -38,7 +38,7 @@ export default App;
 /** route layout */
 const Layout = () => {
   /** current route info */
-  const { hash } = useLocation();
+  const { hash, pathname, search } = useLocation();
 
   /** current route id */
   const id = useMatches().at(-1)?.id || "";
@@ -46,21 +46,11 @@ const Layout = () => {
   /** loader data */
   const { toc } = (useRouteLoaderData(id) as Meta) || {};
 
-  /** on url hash change */
-  useEffect(() => {
-    (async () => {
-      if (!hash) return;
-      /** wait for element to appear */
-      const element = await waitFor(() => document.querySelector(hash));
-      if (!element) return;
-      /** wait for layout shifts */
-      await waitForStable(() => getDocBbox(element).top);
-      /** scroll to element */
-      scrollTo(hash);
-      /** highlight element */
-      glow(element);
-    })();
-  }, [hash]);
+  /** which parts of route have changed from prev render */
+  const hashChanged = useChanged(hash);
+  const restChanged = useChanged({ pathname, search });
+
+  scrollToHash(hash, hashChanged, restChanged);
 
   return (
     <IconContext.Provider
@@ -143,3 +133,30 @@ const router = createBrowserRouter(routes, {
 
 /** query client */
 const queryClient = new QueryClient();
+
+/** scroll to target of url hash on page */
+const scrollToHash = async (
+  hash: string,
+  hashChanged: boolean,
+  restChanged: boolean,
+) => {
+  if (!hashChanged) return;
+
+  /** wait for element to appear */
+  const element = await waitFor(() => document.querySelector(hash));
+  if (!element) return;
+
+  /**
+   * if not just hash changed (indicating we may be on first load of page or
+   * otherwise expecting significant layout changes)
+   */
+  if (restChanged)
+    /** wait for layout shifts */
+    await waitForStable(() => getDocBbox(element).top);
+
+  /** scroll to element */
+  scrollTo(hash);
+
+  /** highlight element */
+  glow(element);
+};

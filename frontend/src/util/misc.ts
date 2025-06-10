@@ -14,7 +14,7 @@ export const waitFor = async <Return>(
   ];
   while (waits.length) {
     const result = func();
-    if (result !== undefined) return result;
+    if (result !== undefined && result !== null) return result;
     await sleep(waits.shift());
   }
 };
