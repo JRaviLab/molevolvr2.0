@@ -87,6 +87,7 @@ import {
 } from "@/pages/testbed-data";
 import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
+import { seed } from "@/util/seed";
 import { getShapeMap } from "@/util/shapes";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
@@ -103,6 +104,8 @@ const TestbedPage = () => {
         <div className="mini-table">
           <span>Fake Analysis ID</span>
           <span>{analysis}</span>
+          <span>Seed</span>
+          <Link to={`?seed=${seed}`}>{seed}</Link>
         </div>
       </Section>
 
