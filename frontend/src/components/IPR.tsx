@@ -25,7 +25,7 @@ const rowHeight = 20;
 /** gap between rows */
 const rowGap = 5;
 /** height of scrollbar */
-const scrollHeight = 10;
+const scrollHeight = 7;
 
 type Props = {
   /** title text */
@@ -143,7 +143,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
               <br />
               &nbsp;• Drag to move
               <br />
-              &nbsp;• Click to reset
+              &nbsp;• Double click to reset
             </>
           }
         />,
@@ -152,8 +152,6 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
       {({ width }) => {
         /** width of main sequence view area */
         width = Math.max(width - labelWidth - 2 * rowHeight, labelWidth);
-
-        // console.log(width);
 
         /** transform sequence index to svg x position */
         const scaleX = transform.rescaleX(
@@ -250,11 +248,10 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                   setTransform(zoomIdentity);
                 };
                 if (prevWidth.current !== width) reset();
-                // selection.on("click", (event) => {
-                //   event.preventDefault();
-                //   reset();
-                // });
-
+                selection.on("dblclick.zoom", (event) => {
+                  event.preventDefault();
+                  reset();
+                });
                 prevWidth.current = width;
               }}
               className={classes.area}
