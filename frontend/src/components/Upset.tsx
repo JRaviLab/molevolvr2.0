@@ -174,13 +174,13 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
         {/* axis */}
         <g
           ref={(el) => {
-            if (el) {
-              /** render axis */
-              xAxis(select(el));
-              /** remove interfering d3 axis styles */
-              el.removeAttribute("font-size");
-              el.removeAttribute("font-family");
-            }
+            if (!el) return;
+
+            /** render axis */
+            xAxis(select(el));
+            /** remove interfering d3 axis styles */
+            el.removeAttribute("font-size");
+            el.removeAttribute("font-family");
           }}
           strokeWidth={strokeWidth}
           dominantBaseline="auto"
@@ -208,13 +208,12 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
         {/* axis */}
         <g
           ref={(el) => {
-            if (el) {
-              /** render axis */
-              yAxis(select(el));
-              /** remove interfering d3 axis styles */
-              el.removeAttribute("font-size");
-              el.removeAttribute("font-family");
-            }
+            if (!el) return;
+            /** render axis */
+            yAxis(select(el));
+            /** remove interfering d3 axis styles */
+            el.removeAttribute("font-size");
+            el.removeAttribute("font-family");
           }}
           strokeWidth={strokeWidth}
           dominantBaseline="auto"

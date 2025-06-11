@@ -1,6 +1,13 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { scaleLinear, select, zoom, zoomIdentity } from "d3";
-import type { D3ZoomEvent } from "d3";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { drag, scaleLinear, select, zoom, zoomIdentity } from "d3";
+import type { D3DragEvent, D3ZoomEvent } from "d3";
 import { clamp, inRange, mapValues, range, uniq } from "lodash";
 import Chart from "@/components/Chart";
 import Help from "@/components/Help";
@@ -17,6 +24,8 @@ const labelWidth = 150;
 const rowHeight = 20;
 /** gap between rows */
 const rowGap = 5;
+/** height of scrollbar */
+const scrollHeight = 10;
 
 type Props = {
   /** title text */
@@ -50,6 +59,9 @@ type Feature = {
 
 /** interproscan result visualization */
 const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
+  const zoomRef = useRef<SVGGElement>(null);
+  const dragRef = useRef<SVGGElement>(null);
+
   /** map of feature types to colors */
   const colorMap = useColorMap(
     tracks
@@ -66,7 +78,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
   /** unique id for clip path */
   const clipId = useId();
 
-  /** zoom transform */
+  /** reactive zoom transform */
   const [transform, setTransform] = useState(zoomIdentity);
 
   /** pan/zoom behavior */
@@ -90,6 +102,29 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
       sequence.length / 3,
     ]);
   }, [zoomBehavior, sequence.length]);
+
+  type Drag = D3DragEvent<SVGSVGElement, unknown, unknown>;
+
+  const onDrag = useCallback(
+    ({ x }: Drag) => {
+      if (!zoomRef.current) return;
+      /** update zoom transform */
+      zoomBehavior.translateTo(select(zoomRef.current), x, 0);
+    },
+    [zoomBehavior],
+  );
+
+  /** scrollbar drag behavior */
+  const dragBehavior = useMemo(
+    () =>
+      drag<SVGGElement, unknown>()
+        .container(function () {
+          return this;
+        })
+        .on("start", onDrag)
+        .on("drag", onDrag),
+    [onDrag],
+  );
 
   const prevWidth = useRef(0);
 
@@ -117,6 +152,8 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
       {({ width }) => {
         /** width of main sequence view area */
         width = Math.max(width - labelWidth - 2 * rowHeight, labelWidth);
+
+        // console.log(width);
 
         /** transform sequence index to svg x position */
         const scaleX = transform.rescaleX(
@@ -160,6 +197,13 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
             [width, 1],
           ]);
 
+        /** scroll bar numbers */
+        const scrollLeft = transform.invertX(0);
+        const scrollRight = transform.invertX(width);
+        const scrollX = (scrollRight + scrollLeft) / 2;
+        let scrollSpan = scrollRight - scrollLeft;
+        scrollSpan = clamp(scrollSpan, scrollHeight, Infinity);
+
         return (
           <>
             {/* labels col */}
@@ -190,24 +234,28 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
             {/* main content area */}
             <g
               ref={(el) => {
-                if (el) {
-                  const selection = select(el);
-                  /** attach zoom handler to this element */
-                  zoomBehavior(selection);
-                  /** prevent scroll overflow */
-                  selection.on("wheel", (event) => event.preventDefault());
-                  /** reset zoom */
-                  const reset = () => {
-                    zoomBehavior.transform(selection, zoomIdentity);
-                    setTransform(zoomIdentity);
-                  };
-                  if (prevWidth.current !== width) reset();
-                  selection.on("click", (event) => {
-                    event.preventDefault();
-                    reset();
-                  });
-                  prevWidth.current = width;
-                }
+                zoomRef.current = el;
+                if (!el) return;
+
+                /** attach zoom behavior */
+                const selection = select(el);
+                zoomBehavior(selection);
+
+                /** prevent scroll overflow */
+                selection.on("wheel", (event) => event.preventDefault());
+
+                /** reset zoom */
+                const reset = () => {
+                  zoomBehavior.transform(selection, zoomIdentity);
+                  setTransform(zoomIdentity);
+                };
+                if (prevWidth.current !== width) reset();
+                // selection.on("click", (event) => {
+                //   event.preventDefault();
+                //   reset();
+                // });
+
+                prevWidth.current = width;
               }}
               className={classes.area}
             >
@@ -343,6 +391,35 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                     </g>
                   ))}
                 </g>
+              </g>
+
+              {/* scrollbar */}
+              <g
+                ref={(el) => {
+                  dragRef.current = el;
+                  if (!el) return;
+
+                  /** attach drag behavior */
+                  dragBehavior(select(el));
+                }}
+                transform={`translate(0, ${tracks.length * (rowHeight + rowGap)})`}
+              >
+                <rect
+                  x={0}
+                  y={0}
+                  width={width}
+                  height={scrollHeight}
+                  fill={theme["--off-white"]}
+                />
+                <rect
+                  x={scrollX - scrollSpan / 2}
+                  y={0}
+                  width={scrollSpan}
+                  height={scrollHeight}
+                  rx={scrollHeight / 2}
+                  ry={scrollHeight / 2}
+                  fill={theme["--gray"]}
+                />
               </g>
             </g>
 
