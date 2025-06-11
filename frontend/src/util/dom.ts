@@ -86,7 +86,8 @@ export const firstInView = (elements: HTMLElement[]) => {
     window.getComputedStyle(document.documentElement).scrollPaddingTop,
   );
   for (const element of elements.reverse())
-    if (element.getBoundingClientRect()?.top < offset + 40) return element;
+    if (elementOrSection(element).getBoundingClientRect()?.top < offset + 5)
+      return element;
 };
 
 /** shrink width to wrapped text https://stackoverflow.com/questions/14596213 */

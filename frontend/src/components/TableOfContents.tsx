@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
 import clsx from "clsx";
-import { debounce } from "lodash";
+import { debounce, isEqual } from "lodash";
 import {
   useClickOutside,
   useEventListener,
@@ -46,7 +46,7 @@ const TableOfContents = () => {
 
   /** full heading details */
   const [headings, setHeadings] = useState<
-    { text: string; id: string; level: number }[]
+    { id: string; level: number; text: string; icon: string }[]
   >([]);
 
   /** active heading id (first in view) */
@@ -79,13 +79,16 @@ const TableOfContents = () => {
   useMutationObserver(
     () => {
       /** read headings from page */
-      setHeadings(
-        getHeadings().map((heading) => ({
-          text: heading.innerText,
+      setHeadings((headings) => {
+        const newHeadings = getHeadings().map((heading) => ({
           id: heading.id,
           level: parseInt(heading.tagName.slice(1)) || 0,
-        })),
-      );
+          text: heading.innerText,
+          icon: heading.querySelector("& > svg")?.outerHTML ?? "",
+        }));
+        if (!isEqual(headings, newHeadings)) return newHeadings;
+        else return headings;
+      });
     },
     /** listen to changes on page */
     document.documentElement,
@@ -125,18 +128,22 @@ const TableOfContents = () => {
       {/* links */}
       {open && (
         <div ref={listRef} className={classes.list}>
-          {headings.map((heading, index) => (
+          {headings.map(({ id, level, text, icon }, index) => (
             <Link
               key={index}
-              ref={heading.id === activeId ? activeRef : undefined}
-              data-active={heading.id === activeId ? "" : undefined}
+              ref={id === activeId ? activeRef : undefined}
+              data-active={id === activeId ? "" : undefined}
               className={classes.link}
-              to={{ hash: "#" + heading.id }}
+              to={{ hash: "#" + id }}
               replace
-              style={{ paddingLeft: 10 * heading.level }}
-              onClick={() => scrollTo("#" + heading.id)}
+              style={{ paddingLeft: 20 * (level - 0.5) }}
+              onClick={() => scrollTo("#" + id)}
             >
-              {heading.text}
+              <span
+                className={classes["link-icon"]}
+                dangerouslySetInnerHTML={{ __html: icon || "•" }}
+              />
+              <span className={classes["link-text"]}>{text}</span>
             </Link>
           ))}
         </div>

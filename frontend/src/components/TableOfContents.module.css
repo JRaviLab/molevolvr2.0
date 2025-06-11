@@ -41,14 +41,12 @@
 }
 
 .link {
-  display: inline-block;
+  display: flex;
   flex-shrink: 0;
+  align-items: center;
   padding: 5px 10px;
-  overflow: hidden;
   color: var(--dark-gray);
   text-decoration: none;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   transition:
     background var(--fast),
     color var(--fast);
@@ -62,4 +60,19 @@
   background: var(--off-white);
   color: var(--accent);
   font-weight: var(--bold);
+}
+
+.link-text {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-icon {
+  display: grid;
+  place-items: center;
+  width: 1em;
+  flex-shrink: 0;
+  opacity: 0.5;
 }
