@@ -69,13 +69,7 @@ const Heading = ({
         headings
           .filter((heading) => heading.ref !== element)
           .concat([
-            {
-              ref: element,
-              id,
-              level,
-              icon: iconElement,
-              text: children,
-            },
+            { ref: element, id, level, icon: iconElement, text: children },
           ])
           .sort((a, b) =>
             a.ref.compareDocumentPosition(b.ref) &
@@ -88,14 +82,7 @@ const Heading = ({
 
     return () =>
       setHeadings((headings) =>
-        headings
-          .filter((heading) => heading.ref !== element)
-          .sort((a, b) =>
-            a.ref.compareDocumentPosition(b.ref) &
-            Node.DOCUMENT_POSITION_FOLLOWING
-              ? -1
-              : 1,
-          ),
+        headings.filter((heading) => heading.ref !== element),
       );
   });
 
