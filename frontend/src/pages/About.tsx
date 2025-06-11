@@ -6,7 +6,6 @@ import {
   FaGithub,
   FaMicroscope,
   FaPenNib,
-  FaTwitter,
   FaUsers,
 } from "react-icons/fa6";
 import Button from "@/components/Button";
@@ -19,58 +18,66 @@ import { trim } from "@/util/string";
 
 const team = [
   {
-    name: "Janani Ravi (corresponding author)",
+    name: "Janani Ravi",
+    role: "PI",
     email: "janani.ravi@cuanschutz.edu",
     github: "jananiravi",
-    twitter: "janani137",
   },
   {
     name: "Jacob D Krol",
+    role: "Developer",
     email: "jacob.krol@cuanschutz.edu",
     github: "jakekrol",
   },
   {
     name: "Joseph T Burke",
+    role: "Developer",
     email: "burkej24@msu.edu",
     github: "jburke11",
   },
   {
     name: "Samuel Z Chen",
+    role: "Developer",
     email: "chensam2@msu.edu",
     github: "samuelzornchen",
-    twitter: "SamuelZChen",
   },
   {
     name: "Lo Sosinski",
+    role: "Developer",
     email: "sosinsk7@msu.edu",
     github: "lsosinski",
-    twitter: "lo_sosinski",
   },
   {
     name: "Faisal S Alquaddoomi",
+    role: "Developer",
     email: "faisal.alquaddoomi@cuanschutz.edu",
     github: "falquaddoomi",
   },
   {
     name: "Evan P Brenner",
+    role: "Developer",
     email: "evan.brenner@cuanschutz.edu",
     github: "epbrenner",
   },
   {
     name: "Vince P Rubinetti",
+    role: "Developer",
     email: "vincent.rubinetti@cuanschutz.edu",
     github: "vincerubinetti",
   },
   {
     name: "Shaddai Amolitos",
+    role: "Developer",
     email: "shaddai.amolitos@cuanschutz.edu",
   },
   {
     name: "Kellen M Reason",
+    role: "Developer",
     email: "reasonke@msu.edu",
   },
   {
     name: "John B Johnston",
+    role: "Developer",
     email: "johnj@msu.edu",
   },
 ];
@@ -449,31 +456,44 @@ const About = () => {
 
         <Heading level={3}>Team</Heading>
 
-        <ul>
-          {team.map(({ name, email, github, twitter }, index) => (
-            <li key={index}>
-              <Flex hAlign="left" gap="sm" gapRatio={0}>
-                <span>{name}</span>
-                {email && (
-                  <Link to={`mailto:${email}`}>
-                    <FaEnvelope />
-                    {email}
-                  </Link>
-                )}
-                {github && (
-                  <Link to={`https://github.com/${github}`} showArrow={false}>
-                    <FaGithub />@{github}
-                  </Link>
-                )}
-                {twitter && (
-                  <Link to={`https://twitter.com/${twitter}`} showArrow={false}>
-                    <FaTwitter />@{twitter}
-                  </Link>
-                )}
-              </Flex>
-            </li>
-          ))}
-        </ul>
+        <div className="table-wrapper full">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Email</th>
+                <th>GitHub</th>
+              </tr>
+            </thead>
+            <tbody>
+              {team.map(({ name, role, email, github }, index) => (
+                <tr key={index}>
+                  <td>{name}</td>
+                  <td>{role}</td>
+                  <td>
+                    {email && (
+                      <Link to={`mailto:${email}`}>
+                        <FaEnvelope />
+                        {email}
+                      </Link>
+                    )}
+                  </td>
+                  <td>
+                    {github && (
+                      <Link
+                        to={`https://github.com/${github}`}
+                        showArrow={false}
+                      >
+                        <FaGithub />@{github}
+                      </Link>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         <Heading level={3}>Funding</Heading>
 
@@ -509,11 +529,6 @@ const About = () => {
             to="https://github.com/jravilab"
             text="GitHub"
             icon={<FaGithub />}
-          />
-          <Button
-            to="https://twitter.com/jravilab"
-            text="Twitter"
-            icon={<FaTwitter />}
           />
         </Flex>
       </Section>

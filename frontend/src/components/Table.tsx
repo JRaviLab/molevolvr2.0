@@ -13,6 +13,7 @@ import {
   FaSortUp,
 } from "react-icons/fa6";
 import { MdFilterAltOff } from "react-icons/md";
+import clsx from "clsx";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
 import {
@@ -280,7 +281,7 @@ const Table = <Datum extends object>({
       direction="column"
       className={expanded ? classes.expanded : classes.collapsed}
     >
-      <div className={classes.scroll}>
+      <div className="table-wrapper">
         {/* table */}
         <table
           className={classes.table}
@@ -319,10 +320,11 @@ const Table = <Datum extends object>({
                           <Tooltip content="Sort this column">
                             <button
                               type="button"
-                              className={classes["header-button"]}
-                              data-active={
-                                header.column.getIsSorted() ? "" : undefined
-                              }
+                              className={clsx(
+                                classes["header-button"],
+                                header.column.getIsSorted() &&
+                                  classes["header-button-active"],
+                              )}
                               onClick={header.column.getToggleSortingHandler()}
                             >
                               {header.column.getIsSorted() ? (
@@ -351,10 +353,11 @@ const Table = <Datum extends object>({
                             <Tooltip content="Filter this column">
                               <button
                                 type="button"
-                                className={classes["header-button"]}
-                                data-active={
-                                  header.column.getIsFiltered() ? "" : undefined
-                                }
+                                className={clsx(
+                                  classes["header-button"],
+                                  header.column.getIsFiltered() &&
+                                    classes["header-button-active"],
+                                )}
                               >
                                 <FaFilter />
                               </button>
