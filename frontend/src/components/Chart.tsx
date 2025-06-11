@@ -82,6 +82,7 @@ const Chart = ({
   width = clamp(width, 10, 10000);
   parentWidth = clamp(parentWidth, 10, 10000);
 
+  /** after every render, "prepare" svg */
   useEffect(() => {
     if (!svgRef.current) return;
 
