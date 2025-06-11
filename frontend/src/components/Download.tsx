@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ReactElement, ReactNode, RefObject } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -63,33 +63,12 @@ const Download = ({
   /** printing state */
   const [printing, setPrinting] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      if (printing) {
-        /** wait for layout shifts */
-        await sleep(100);
-        /** open print dialog */
-        window.print();
-        /** keep showing for brief period */
-        await sleep(100);
-        setPrinting(false);
-      }
-    })();
-  }, [printing]);
-
   /** if printing, render just chart */
-  if (printing) {
-    /** hide rest of app */
-    appElement.style.display = "none";
-
+  if (printing)
     return createPortal(
       <div className={classes.printing}>{print}</div>,
       document.body,
     );
-  }
-
-  /** re-show rest of app */
-  appElement.style.display = "";
 
   return (
     <Popover
@@ -132,7 +111,26 @@ const Download = ({
             <Button
               icon={<FaPrint />}
               text="PDF"
-              onClick={() => setPrinting(true)}
+              onClick={async () => {
+                /** save scroll */
+                const scrollY = window.scrollY;
+                /** turn on printing mode */
+                setPrinting(true);
+                /** hide rest of app */
+                appElement.style.display = "none";
+                /** wait for re-render and paint */
+                await sleep();
+                /** open print dialog */
+                window.print();
+                /** turn off printing mode */
+                setPrinting(false);
+                /** re-show rest of app */
+                appElement.style.display = "";
+                /** wait for re-render and paint */
+                await sleep();
+                /** restore scroll */
+                window.scrollTo(0, scrollY);
+              }}
               tooltip="Print as pdf"
             />
           )}

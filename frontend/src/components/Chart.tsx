@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { ComponentProps, ReactNode } from "react";
-import { createPortal } from "react-dom";
 import { FaBorderTopLeft, FaExpand } from "react-icons/fa6";
 import clsx from "clsx";
 import { clamp } from "lodash";
@@ -142,28 +141,6 @@ const Chart = ({
     }
   });
 
-  /** printing state */
-  const [printing, setPrinting] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      const appElement = document.getElementById("app")!;
-
-      if (printing) {
-        /** hide rest of app */
-        appElement.style.display = "none";
-
-        /** open print dialog */
-        window.print();
-
-        setPrinting(false);
-      } else {
-        /** re-show rest of app */
-        appElement.style.display = "";
-      }
-    })();
-  }, [printing]);
-
   /** fullscreen */
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
 
@@ -173,12 +150,7 @@ const Chart = ({
     // eslint-disable-next-line
     <div
       ref={containerRef}
-      className={clsx(
-        "card",
-        classes.container,
-        printing && classes.printing,
-        containerClassName,
-      )}
+      className={clsx("card", classes.container, containerClassName)}
       // https://github.com/dequelabs/axe-core/issues/4566
       // eslint-disable-next-line
       tabIndex={0}
@@ -227,9 +199,6 @@ const Chart = ({
       </div>
     </div>
   );
-
-  /** if printing, only render chart */
-  if (printing) return createPortal(chart, document.body);
 
   return (
     <Flex direction="column" gap="lg" full>
