@@ -13,7 +13,6 @@ import {
   FaSortUp,
 } from "react-icons/fa6";
 import { MdFilterAltOff } from "react-icons/md";
-import clsx from "clsx";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
 import {
@@ -277,10 +276,7 @@ const Table = <Datum extends object>({
   });
 
   return (
-    <Flex
-      column
-      className={expanded ? classes.expanded : classes.collapsed}
-    >
+    <Flex column className={expanded ? classes.expanded : classes.collapsed}>
       <div className="table-wrapper">
         {/* table */}
         <table
@@ -320,11 +316,8 @@ const Table = <Datum extends object>({
                           <Tooltip content="Sort this column">
                             <button
                               type="button"
-                              className={clsx(
-                                classes["header-button"],
-                                header.column.getIsSorted() &&
-                                  classes["header-button-active"],
-                              )}
+                              className={classes["header-button"]}
+                              data-active={header.column.getIsSorted()}
                               onClick={header.column.getToggleSortingHandler()}
                             >
                               {header.column.getIsSorted() ? (
@@ -353,11 +346,8 @@ const Table = <Datum extends object>({
                             <Tooltip content="Filter this column">
                               <button
                                 type="button"
-                                className={clsx(
-                                  classes["header-button"],
-                                  header.column.getIsFiltered() &&
-                                    classes["header-button-active"],
-                                )}
+                                className={classes["header-button"]}
+                                data-active={header.column.getIsFiltered()}
                               >
                                 <FaFilter />
                               </button>

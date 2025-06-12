@@ -99,10 +99,8 @@ const TableOfContents = () => {
             <Link
               key={index}
               ref={active === index ? activeRef : undefined}
-              className={clsx(
-                classes.link,
-                active === index && classes["link-active"],
-              )}
+              className={classes.link}
+              data-active={active === index}
               to={{ hash: "#" + id }}
               replace
               style={{ paddingLeft: 20 * (level - 0.5) }}

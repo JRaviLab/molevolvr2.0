@@ -61,16 +61,23 @@ const Heading = ({
 
   const setHeadings = useSetAtom(headingsAtom);
 
+  /** on every render */
   useEffect(() => {
     const element = ref.current;
 
     if (element) {
       setHeadings((headings) =>
         headings
+          /** remove heading from list */
           .filter((heading) => heading.ref !== element)
+          /** add heading to list */
           .concat([
             { ref: element, id, level, icon: iconElement, text: children },
           ])
+          /**
+           * make sure list is in order of document appearance
+           * https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
+           */
           .sort((a, b) =>
             a.ref.compareDocumentPosition(b.ref) &
             Node.DOCUMENT_POSITION_FOLLOWING
@@ -81,6 +88,7 @@ const Heading = ({
     }
 
     return () =>
+      /** remove heading from list */
       setHeadings((headings) =>
         headings.filter((heading) => heading.ref !== element),
       );

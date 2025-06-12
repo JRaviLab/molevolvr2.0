@@ -56,7 +56,7 @@
   color: var(--accent);
 }
 
-.link-active {
+.link[data-active="true"] {
   background: var(--off-white);
   color: var(--accent);
   font-weight: var(--bold);
