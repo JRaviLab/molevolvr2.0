@@ -1,7 +1,8 @@
-import { cloneElement, useRef } from "react";
+import { cloneElement, useEffect, useRef } from "react";
 import type { JSX, ReactElement, ReactNode } from "react";
 import { FaLink } from "react-icons/fa6";
 import clsx from "clsx";
+import { atom, useSetAtom } from "jotai";
 import { kebabCase } from "lodash";
 import Badge from "@/components/Badge";
 import Link from "@/components/Link";
@@ -20,6 +21,17 @@ type Props = {
   /** heading content */
   children: ReactNode;
 };
+
+type Heading = {
+  ref: HTMLHeadingElement;
+  id: string;
+  level: number;
+  icon?: ReactNode;
+  text: ReactNode;
+};
+
+/** global list of headings */
+export const headingsAtom = atom<Heading[]>([]);
 
 /**
  * demarcates a new section/level of content. only use one level 1 per page.
@@ -41,11 +53,46 @@ const Heading = ({
   const id = kebabCase(anchor ?? renderText(children));
 
   /** icon or badge */
-  let iconElement = <></>;
+  let iconElement: ReactNode = null;
   if (typeof icon === "string")
     iconElement = <Badge className={classes.badge}>{icon}</Badge>;
   if (typeof icon === "object" && typeof icon.type === "function")
     iconElement = cloneElement(icon, { className: classes.icon });
+
+  const setHeadings = useSetAtom(headingsAtom);
+
+  /** on every render */
+  useEffect(() => {
+    const element = ref.current;
+
+    if (element) {
+      setHeadings((headings) =>
+        headings
+          /** remove heading from list */
+          .filter((heading) => heading.ref !== element)
+          /** add heading to list */
+          .concat([
+            { ref: element, id, level, icon: iconElement, text: children },
+          ])
+          /**
+           * make sure list is in order of document appearance
+           * https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
+           */
+          .sort((a, b) =>
+            a.ref.compareDocumentPosition(b.ref) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+              ? -1
+              : 1,
+          ),
+      );
+    }
+
+    return () =>
+      /** remove heading from list */
+      setHeadings((headings) =>
+        headings.filter((heading) => heading.ref !== element),
+      );
+  });
 
   return (
     <Tag id={id} ref={ref} className={clsx(className, classes.heading)}>

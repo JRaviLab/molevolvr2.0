@@ -7,17 +7,17 @@ type Props<TagName extends TagNames = "div"> = {
   /** tag name */
   tag?: TagNames;
   /** flex display (whether container takes up full width) */
-  display?: "block" | "inline";
-  /** horizontal or vertical */
-  direction?: "row" | "column";
+  inline?: boolean;
+  /** vertical layout instead of horizontal */
+  column?: boolean;
   /** amount of space between items */
   gap?: "md" | "none" | "xs" | "sm" | "lg" | "xl";
   /** vertical gap fraction of horizontal gap */
   gapRatio?: 1 | 0.5 | 0.25 | 0;
   /** whether to wrap items */
-  wrap?: true | false;
+  wrap?: boolean;
   /** whether to make full width */
-  full?: true | false;
+  full?: boolean;
   /** horizontal alignment */
   hAlign?: "center" | "left" | "right" | "stretch" | "space";
   /** vertical alignment */
@@ -51,8 +51,8 @@ const gapMap: Record<NonNullable<Props["gap"]>, number> = {
 const Flex = <TagName extends TagNames>({
   ref,
   tag: Tag = "div",
-  display = "block",
-  direction = "row",
+  inline = false,
+  column = false,
   gap = "md",
   gapRatio = 1,
   wrap = true,
@@ -66,12 +66,11 @@ const Flex = <TagName extends TagNames>({
   const belowBreakpoint = useMediaQuery(`(max-width: ${breakpoint}px)`);
 
   const flexStyles: CSSProperties = {
-    display: display === "block" ? "flex" : "inline-flex",
-    flexDirection: direction === "column" || belowBreakpoint ? "column" : "row",
-    justifyContent:
-      direction === "column" ? alignMap[vAlign] : alignMap[hAlign],
-    alignItems: direction === "column" ? alignMap[hAlign] : alignMap[vAlign],
-    flexWrap: wrap && direction === "row" ? "wrap" : "nowrap",
+    display: inline ? "inline-flex" : "flex",
+    flexDirection: column || belowBreakpoint ? "column" : "row",
+    justifyContent: column ? alignMap[vAlign] : alignMap[hAlign],
+    alignItems: column ? alignMap[hAlign] : alignMap[vAlign],
+    flexWrap: wrap && !column ? "wrap" : "nowrap",
     gap: `${gapMap[gap] * gapRatio}px ${gapMap[gap]}px`,
     width: full ? "100%" : undefined,
     ...style,

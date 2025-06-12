@@ -164,7 +164,15 @@ blockquote {
 
 /** table */
 
+.table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 table {
+  overflow: hidden;
+  border: solid 1px var(--light-gray);
+  border-radius: var(--rounded);
   border-collapse: collapse;
 }
 
@@ -181,17 +189,16 @@ td {
   border-right: solid 1px var(--light-gray);
 }
 
-thead tr:nth-child(odd),
+thead tr:nth-child(odd) {
+  background: var(--off-white);
+}
+
 tr:nth-child(even) {
   background: var(--white);
 }
 
 tr:nth-child(odd) {
   background: var(--alt-white);
-}
-
-thead tr {
-  border-bottom: solid 1px var(--light-gray);
 }
 
 /** interactive */

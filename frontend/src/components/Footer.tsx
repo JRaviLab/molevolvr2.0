@@ -5,7 +5,7 @@ import classes from "./Footer.module.css";
 
 /** at bottom of every page. singleton. */
 const Footer = () => (
-  <Flex tag="footer" direction="column" gap="sm" className={classes.footer}>
+  <Flex tag="footer" column gap="sm" className={classes.footer}>
     <Flex gap="sm" className={classes.icons}>
       <Link
         to="mailto:janani.ravi@cuanschutz.edu"

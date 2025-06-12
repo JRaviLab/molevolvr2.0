@@ -9,7 +9,7 @@ const ViewCorner = () => {
   const { y } = useWindowScroll();
 
   return (
-    <Flex direction="column" hAlign="right" gap="sm" className={classes.list}>
+    <Flex column hAlign="right" gap="sm" className={classes.list}>
       <Toasts />
       {y > 100 && (
         <button

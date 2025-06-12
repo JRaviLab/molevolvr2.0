@@ -665,7 +665,7 @@ const SectionAlert = () => (
       Alert
     </Heading>
 
-    <Flex direction="column">
+    <Flex column>
       <Alert>
         Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua.

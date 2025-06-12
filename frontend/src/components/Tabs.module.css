@@ -26,7 +26,7 @@
   color: var(--deep);
 }
 
-.active {
+.button[data-active="true"] {
   border-color: var(--accent);
   color: var(--accent);
 }

@@ -51,7 +51,7 @@ const Download = ({
   return (
     <Popover
       content={
-        <Flex direction="column" hAlign="stretch" gap="xs">
+        <Flex column hAlign="stretch" gap="xs">
           {raster && (
             <>
               <Button

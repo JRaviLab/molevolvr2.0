@@ -40,13 +40,13 @@ const Dialog = ({ title, content, bottomContent, children }: Props) => {
       <Root open={open} onClose={close}>
         <div className={classes.fullscreen}>
           <Content as={Fragment}>
-            <Flex direction="column" className={classes.content}>
+            <Flex column className={classes.content}>
               <Title>{title}</Title>
               <Description className="sr-only">{title}</Description>
               <button className={classes.close} onClick={close}>
                 <FaCircleXmark />
               </button>
-              <Flex className={classes.scroll} direction="column">
+              <Flex className={classes.scroll} column>
                 {content}
               </Flex>
               {bottomContent && (

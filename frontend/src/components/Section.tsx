@@ -22,7 +22,7 @@ type Props = {
 const Section = ({ fill, full, className, ...props }: Props) => (
   <Flex
     tag="section"
-    direction="column"
+    column
     gap="lg"
     vAlign="top"
     className={clsx(className, classes.section, {

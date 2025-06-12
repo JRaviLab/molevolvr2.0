@@ -211,7 +211,7 @@ const Chart = ({
   if (printing) return createPortal(chart, document.body);
 
   return (
-    <Flex direction="column" gap="lg" full>
+    <Flex column gap="lg" full>
       {chart}
 
       {/* controls */}

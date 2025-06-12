@@ -85,10 +85,15 @@ export const firstInView = (elements: HTMLElement[]) => {
   const offset = parseInt(
     window.getComputedStyle(document.documentElement).scrollPaddingTop,
   );
-  for (const element of elements.reverse())
-    if (element.getBoundingClientRect()?.top < offset + 40) return element;
-};
+  for (let index = elements.length - 1; index >= 0; index--)
+    if (
+      elementOrSection(elements[index]!).getBoundingClientRect()?.top <
+      offset + 5
+    )
+      return index;
 
+  return 0;
+};
 /** shrink width to wrapped text https://stackoverflow.com/questions/14596213 */
 export const shrinkWrap = (
   element: HTMLElement | null,
@@ -227,7 +232,9 @@ export const glow = (element: Element) =>
   );
 
 /** if element is first child of section, change element to section itself */
-const elementOrSection = (element: Element) => {
+export const elementOrSection = <El extends Element>(element: El) => {
   const parent = element.parentElement;
-  return parent && element.matches("section > :first-child") ? parent : element;
+  return parent && element.matches("section > :first-child")
+    ? (parent as HTMLElement)
+    : element;
 };

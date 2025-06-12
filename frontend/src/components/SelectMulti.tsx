@@ -105,12 +105,7 @@ const SelectMulti = <O extends Option>({
               {options.map((option) => (
                 <ListboxOption key={option.id} value={option.id} as={Fragment}>
                   {({ focus, selected }) => (
-                    <li
-                      className={clsx(
-                        classes.option,
-                        focus && classes["option-active"],
-                      )}
-                    >
+                    <li className={classes.option} data-active={focus}>
                       <FaCheck
                         className={classes.check}
                         style={{ opacity: selected ? 1 : 0 }}
