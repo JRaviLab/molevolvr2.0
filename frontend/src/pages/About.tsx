@@ -19,65 +19,54 @@ import { trim } from "@/util/string";
 const team = [
   {
     name: "Janani Ravi",
-    role: "PI",
     email: "janani.ravi@cuanschutz.edu",
     github: "jananiravi",
   },
   {
     name: "Jacob D Krol",
-    role: "Developer",
     email: "jacob.krol@cuanschutz.edu",
     github: "jakekrol",
   },
   {
     name: "Joseph T Burke",
-    role: "Developer",
     email: "burkej24@msu.edu",
     github: "jburke11",
   },
   {
     name: "Samuel Z Chen",
-    role: "Developer",
     email: "chensam2@msu.edu",
     github: "samuelzornchen",
   },
   {
     name: "Lo Sosinski",
-    role: "Developer",
     email: "sosinsk7@msu.edu",
     github: "lsosinski",
   },
   {
     name: "Faisal S Alquaddoomi",
-    role: "Developer",
     email: "faisal.alquaddoomi@cuanschutz.edu",
     github: "falquaddoomi",
   },
   {
     name: "Evan P Brenner",
-    role: "Developer",
     email: "evan.brenner@cuanschutz.edu",
     github: "epbrenner",
   },
   {
     name: "Vince P Rubinetti",
-    role: "Developer",
     email: "vincent.rubinetti@cuanschutz.edu",
     github: "vincerubinetti",
   },
   {
     name: "Shaddai Amolitos",
-    role: "Developer",
     email: "shaddai.amolitos@cuanschutz.edu",
   },
   {
     name: "Kellen M Reason",
-    role: "Developer",
     email: "reasonke@msu.edu",
   },
   {
     name: "John B Johnston",
-    role: "Developer",
     email: "johnj@msu.edu",
   },
 ];
@@ -471,16 +460,14 @@ const About = () => {
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Role</th>
                 <th>Email</th>
                 <th>GitHub</th>
               </tr>
             </thead>
             <tbody>
-              {team.map(({ name, role, email, github }, index) => (
+              {team.map(({ name, email, github }, index) => (
                 <tr key={index}>
                   <td>{name}</td>
-                  <td>{role}</td>
                   <td>
                     {email && (
                       <Link to={`mailto:${email}`}>
