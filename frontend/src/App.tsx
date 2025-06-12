@@ -152,7 +152,7 @@ const scrollToHash = async (
    * otherwise expecting significant layout changes)
    */
   if (restChanged)
-    /** wait for layout shifts */
+    /** wait for layout shifts to stabilize */
     await waitForStable(() => getDocBbox(element).top);
 
   /** scroll to element */

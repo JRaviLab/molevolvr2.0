@@ -90,7 +90,10 @@ export default Link;
 /** string to signify that param should be removed from url search */
 export const deleteParam = "undefined";
 
-/** combine url search params */
+/**
+ * combine url search params. keep all old keys (except ones explicitly
+ * deleted), add new keys (overwriting).
+ */
 const mergeSearch = (a = "", b = "") => {
   const aSearch = new URLSearchParams(a);
   const bSearch = new URLSearchParams(b);
@@ -109,9 +112,14 @@ export const mergeTo = (a: To, b: To) => {
 
   /** preserve parts of url */
   const path = {
+    /** use old path unless new one defined */
     pathname: b.pathname !== "/" ? b.pathname : a.pathname,
     search: mergeSearch(a.search, b.search),
-    hash: b.hash || a.hash,
+    /**
+     * keep old hash unless new one defined. use new one (even if blank) if path
+     * changed).
+     */
+    hash: b.hash || b.pathname !== a.pathname ? b.hash : a.hash,
   };
 
   return path;
