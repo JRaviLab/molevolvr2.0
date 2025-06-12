@@ -13,6 +13,7 @@ import { TbPrompt } from "react-icons/tb";
 import Button from "@/components/Button";
 import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
+import type { Filename, Tabular } from "@/util/download";
 import {
   downloadCsv,
   downloadJpg,
@@ -21,8 +22,7 @@ import {
   downloadSvg,
   downloadTsv,
   downloadTxt,
-  type Filename,
-  type Tabular,
+  getFilename,
 } from "@/util/download";
 import { sleep } from "@/util/misc";
 import classes from "./Download.module.css";
@@ -114,6 +114,10 @@ const Download = ({
               onClick={async () => {
                 /** save scroll */
                 const scrollY = window.scrollY;
+                /** save title */
+                const title = document.title;
+                /** set title to suggest pdf filename */
+                document.title = getFilename(filename);
                 /** turn on printing mode */
                 setPrinting(true);
                 /** hide rest of app */
@@ -124,6 +128,8 @@ const Download = ({
                 window.print();
                 /** turn off printing mode */
                 setPrinting(false);
+                /** restore title */
+                document.title = title;
                 /** re-show rest of app */
                 appElement.style.display = "";
                 /** wait for re-render and paint */

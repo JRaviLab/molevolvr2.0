@@ -4,17 +4,9 @@ import { getTheme } from "@/util/dom";
 
 export type Filename = (string | undefined)[];
 
-/** download url as file */
-const download = (
-  /** url to download */
-  url: string,
-  /** single filename string or filename "parts" */
-  filename: Filename,
-  /** extension, without dot */
-  ext: string,
-) => {
-  /** assemble and clean full filename */
-  let download = [
+/** assemble and clean full filename */
+export const getFilename = (filename: Filename) =>
+  [
     /** always start filename with app name */
     String(import.meta.env.VITE_TITLE),
     /** other filename parts */
@@ -29,6 +21,17 @@ const download = (
     )
     .filter((part) => part.trim())
     .join("_");
+
+/** download url as file */
+const download = (
+  /** url to download */
+  url: string,
+  /** single filename string or filename "parts" */
+  filename: Filename,
+  /** extension, without dot */
+  ext: string,
+) => {
+  let download = getFilename(filename);
 
   /** add extension */
   if (!download.endsWith("." + ext)) download += "." + ext;
