@@ -81,7 +81,7 @@ export const usePrint = (filename: Filename) => {
     /** hide rest of app */
     appElement.style.display = "none";
     /** wait for re-render and paint */
-    await sleep();
+    await sleep(100);
     /** open print dialog */
     window.print();
     /** turn off printing mode */
@@ -91,7 +91,7 @@ export const usePrint = (filename: Filename) => {
     /** re-show rest of app */
     appElement.style.display = "";
     /** wait for re-render and paint */
-    await sleep();
+    await sleep(100);
     /** restore scroll */
     window.scrollTo(0, scrollY);
   }, [filename]);
