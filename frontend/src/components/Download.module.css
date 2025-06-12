@@ -1,12 +1,13 @@
 .printing > * {
   aspect-ratio: unset !important;
-  width: 100vw !important;
+  width: unset !important;
   min-width: unset !important;
   max-width: unset !important;
   height: 100vh !important;
   min-height: unset !important;
   max-height: unset !important;
   padding: 0 !important;
+  overflow: visible !important;
   border: none !important;
   border-radius: 0 !important;
   background: var(--white) !important;

@@ -233,26 +233,31 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
             <g
               ref={(el) => {
                 zoomRef.current = el;
-                if (!el) return;
 
-                /** attach zoom behavior */
-                const selection = select(el);
-                zoomBehavior(selection);
+                if (el) {
+                  /** attach zoom behavior */
+                  const selection = select(el);
+                  zoomBehavior(selection);
 
-                /** prevent scroll overflow */
-                selection.on("wheel", (event) => event.preventDefault());
+                  /** prevent scroll overflow */
+                  selection.on("wheel", (event) => event.preventDefault());
 
-                /** reset zoom */
-                const reset = () => {
-                  zoomBehavior.transform(selection, zoomIdentity);
-                  setTransform(zoomIdentity);
+                  /** reset zoom */
+                  const reset = () => {
+                    zoomBehavior.transform(selection, zoomIdentity);
+                    setTransform(zoomIdentity);
+                  };
+                  if (prevWidth.current !== width) reset();
+                  selection.on("dblclick.zoom", (event) => {
+                    event.preventDefault();
+                    reset();
+                  });
+                  prevWidth.current = width;
+                }
+
+                return () => {
+                  zoomRef.current = null;
                 };
-                if (prevWidth.current !== width) reset();
-                selection.on("dblclick.zoom", (event) => {
-                  event.preventDefault();
-                  reset();
-                });
-                prevWidth.current = width;
               }}
               className={classes.area}
             >
@@ -394,10 +399,14 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
               <g
                 ref={(el) => {
                   dragRef.current = el;
-                  if (!el) return;
 
-                  /** attach drag behavior */
-                  dragBehavior(select(el));
+                  if (el)
+                    /** attach drag behavior */
+                    dragBehavior(select(el));
+
+                  return () => {
+                    dragRef.current = el;
+                  };
                 }}
                 transform={`translate(0, ${tracks.length * (rowHeight + rowGap)})`}
               >

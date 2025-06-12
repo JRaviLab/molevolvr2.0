@@ -149,7 +149,17 @@ const Chart = ({
     // rely on component consumer handling keyboard appropriately
     // eslint-disable-next-line
     <div
-      ref={containerRef}
+      ref={(el) => {
+        /**
+         * "manual" ref callback due to react oddity. prevents null ref after
+         * printing.
+         * https://react.dev/reference/react-dom/components/common#ref-callback
+         */
+        containerRef.current = el;
+        return () => {
+          containerRef.current = null;
+        };
+      }}
       className={clsx("card", classes.container, containerClassName)}
       // https://github.com/dequelabs/axe-core/issues/4566
       // eslint-disable-next-line

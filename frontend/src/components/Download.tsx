@@ -64,7 +64,7 @@ const Download = ({
   const [printing, setPrinting] = useState(false);
 
   /** if printing, render just chart */
-  if (printing)
+  if (print && printing)
     return createPortal(
       <div className={classes.printing}>{print}</div>,
       document.body,
