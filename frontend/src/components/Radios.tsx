@@ -78,7 +78,7 @@ const Radios = <O extends Option>({
 
   return (
     <Flex
-      direction="column"
+      column
       hAlign="left"
       role="group"
       className={classes.container}
@@ -88,7 +88,7 @@ const Radios = <O extends Option>({
         {tooltip && <Help tooltip={tooltip} />}
       </legend>
 
-      <Flex direction="column" gap="xs" hAlign="stretch">
+      <Flex column gap="xs" hAlign="stretch">
         {options.map((option, index) => (
           <Flex
             tag="label"
@@ -117,7 +117,7 @@ const Radios = <O extends Option>({
             )}
 
             {/* text content */}
-            <Flex direction="column" hAlign="left" gap="sm">
+            <Flex column hAlign="left" gap="sm">
               <span
                 className={clsx(
                   "primary",

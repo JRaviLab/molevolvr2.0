@@ -47,7 +47,7 @@ const Toasts = () => {
 
   return (
     <Flex
-      direction="column"
+      column
       hAlign="stretch"
       gap="sm"
       role="region"

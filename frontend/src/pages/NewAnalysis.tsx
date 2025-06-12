@@ -233,7 +233,7 @@ const NewAnalysis = () => {
               name="inputFormat"
             />
 
-            <Flex direction="column" hAlign="left">
+            <Flex column hAlign="left">
               <SelectSingle
                 label="What format is your input in?"
                 layout="vertical"
@@ -334,7 +334,7 @@ const NewAnalysis = () => {
           </Flex>
 
           {inputType === "external" && (
-            <Flex direction="column">
+            <Flex column>
               <CheckBox
                 label={
                   <span>
@@ -396,7 +396,7 @@ const NewAnalysis = () => {
             />
 
             {["homology-domain", "homology"].includes(analysisType) && (
-              <Flex direction="column" hAlign="left">
+              <Flex column hAlign="left">
                 <div className="primary">BLAST Parameters</div>
 
                 <SelectSingle
