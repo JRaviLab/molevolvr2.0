@@ -1,6 +1,11 @@
 import type { ComponentProps, ReactNode } from "react";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
-import { Link as RouterLink, useLocation } from "react-router";
+import {
+  resolvePath,
+  Link as RouterLink,
+  useLocation,
+  type To,
+} from "react-router";
 import clsx from "clsx";
 import Tooltip from "@/components/Tooltip";
 import classes from "./Link.module.css";
@@ -34,7 +39,8 @@ const Link = ({
   className,
   ...props
 }: Props) => {
-  const { state } = useLocation();
+  /** current route */
+  const location = useLocation();
 
   /** whether link is external (some other site) or internal (within router) */
   const external = typeof to === "string" && to.match(/^(http|mailto)/);
@@ -47,6 +53,7 @@ const Link = ({
 
   /** full element to render */
   const element = external ? (
+    /** "external" plain link */
     <a
       ref={ref}
       href={to}
@@ -58,13 +65,16 @@ const Link = ({
       {_showArrow && <FaArrowUpRightFromSquare className={classes.icon} />}
     </a>
   ) : (
+    /** "internal" router link */
     <RouterLink
       ref={ref}
-      to={to}
+      to={mergeTo(location, to)}
+      state={mergeState(
+        location.state,
+        "state" in props ? props.state : undefined,
+      )}
       target={target}
       className={clsx(className, classes.link)}
-      /** preserve state */
-      state={state}
       {...props}
     >
       {children}
@@ -76,3 +86,36 @@ const Link = ({
 };
 
 export default Link;
+
+/** string to signify that param should be removed from url search */
+export const deleteParam = "undefined";
+
+/** combine url search params */
+const mergeSearch = (a = "", b = "") => {
+  const aSearch = new URLSearchParams(a);
+  const bSearch = new URLSearchParams(b);
+  for (const [key, value] of bSearch) {
+    if (value === deleteParam) aSearch.delete(key);
+    else aSearch.set(key, value);
+  }
+  return "?" + aSearch.toString();
+};
+
+/** combine urls, preserving parts where appropriate */
+export const mergeTo = (a: To, b: To) => {
+  /** normalize to path instead of string */
+  a = resolvePath(a);
+  b = resolvePath(b);
+
+  /** preserve parts of url */
+  const path = {
+    pathname: b.pathname !== "/" ? b.pathname : a.pathname,
+    search: mergeSearch(a.search, b.search),
+    hash: b.hash || a.hash,
+  };
+
+  return path;
+};
+
+/** merge state entries */
+export const mergeState = (a: object = {}, b: object = {}) => ({ ...a, ...b });
