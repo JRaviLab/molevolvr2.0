@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { ComponentProps, ReactNode } from "react";
-import { FaBorderTopLeft, FaExpand } from "react-icons/fa6";
+import { createPortal } from "react-dom";
+import { FaBorderTopLeft, FaExpand, FaPrint } from "react-icons/fa6";
 import clsx from "clsx";
 import { clamp } from "lodash";
 import { useDebounce, useElementSize, useFullscreen } from "@reactuses/core";
@@ -11,7 +12,7 @@ import Tooltip from "@/components/Tooltip";
 import { isSafari } from "@/util/browser";
 import { getViewBoxFit } from "@/util/dom";
 import type { Filename, Tabular } from "@/util/download";
-import { useTextSize, useTheme } from "@/util/hooks";
+import { usePrint, useTextSize, useTheme } from "@/util/hooks";
 import classes from "./Chart.module.css";
 
 type Props = {
@@ -144,23 +145,20 @@ const Chart = ({
   /** fullscreen */
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
 
+  const { printing, print } = usePrint(filename);
+
   /** chart content */
   const chart = (
     // rely on component consumer handling keyboard appropriately
     // eslint-disable-next-line
     <div
-      ref={(el) => {
-        /**
-         * "manual" ref callback due to react oddity. prevents null ref after
-         * printing.
-         * https://react.dev/reference/react-dom/components/common#ref-callback
-         */
-        containerRef.current = el;
-        return () => {
-          containerRef.current = null;
-        };
-      }}
-      className={clsx("card", classes.container, containerClassName)}
+      ref={containerRef}
+      className={clsx(
+        "card",
+        classes.container,
+        containerClassName,
+        printing && classes.printing,
+      )}
       // https://github.com/dequelabs/axe-core/issues/4566
       // eslint-disable-next-line
       tabIndex={0}
@@ -210,6 +208,8 @@ const Chart = ({
     </div>
   );
 
+  if (printing) return createPortal(chart, document.body);
+
   return (
     <Flex direction="column" gap="lg" full>
       {chart}
@@ -235,12 +235,18 @@ const Chart = ({
           <Download
             filename={filename}
             raster={containerRef}
-            print={chart}
             vector={svgRef}
             tabular={tabular}
             text={text}
             json={json}
-          />
+          >
+            <Button
+              icon={<FaPrint />}
+              text="PDF"
+              onClick={print}
+              tooltip="Print as pdf"
+            />
+          </Download>
         </Flex>
       </Flex>
     </Flex>

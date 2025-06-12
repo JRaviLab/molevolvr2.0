@@ -4,6 +4,8 @@ import { isEqual } from "lodash";
 import { useEventListener } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
 import { getTheme, getWidth, truncateWidth } from "@/util/dom";
+import { getFilename, type Filename } from "@/util/download";
+import { sleep } from "@/util/misc";
 
 /** get theme CSS variables */
 export const useTheme = () => {
@@ -57,4 +59,42 @@ export const useChanged = <Value>(value: Value, initial = true) => {
   const result = initial ? changed : changed && prev.current !== undefined;
   prev.current = value;
   return result;
+};
+
+/** app entrypoint element */
+const appElement = document.getElementById("app")!;
+
+/** print state and action hook */
+export const usePrint = (filename: Filename) => {
+  /** printing state */
+  const [printing, setPrinting] = useState(false);
+
+  const print = useCallback(async () => {
+    /** save scroll */
+    const scrollY = window.scrollY;
+    /** save title */
+    const title = document.title;
+    /** set title to suggest pdf filename */
+    document.title = getFilename(filename);
+    /** turn on printing mode */
+    setPrinting(true);
+    /** hide rest of app */
+    appElement.style.display = "none";
+    /** wait for re-render and paint */
+    await sleep();
+    /** open print dialog */
+    window.print();
+    /** turn off printing mode */
+    setPrinting(false);
+    /** restore title */
+    document.title = title;
+    /** re-show rest of app */
+    appElement.style.display = "";
+    /** wait for re-render and paint */
+    await sleep();
+    /** restore scroll */
+    window.scrollTo(0, scrollY);
+  }, [filename]);
+
+  return { printing, print };
 };

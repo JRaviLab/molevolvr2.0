@@ -36,3 +36,20 @@
 .container[style*="height"] .reset-anchor {
   display: flex;
 }
+
+.printing {
+  aspect-ratio: unset;
+  width: unset;
+  min-width: unset;
+  max-width: unset;
+  height: 100vh;
+  min-height: unset;
+  max-height: unset;
+  padding: 0;
+  overflow: visible;
+  border: none;
+  border-radius: 0;
+  background: var(--white);
+  box-shadow: none;
+  resize: unset;
+}
