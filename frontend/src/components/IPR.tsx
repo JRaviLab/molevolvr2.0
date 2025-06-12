@@ -1,36 +1,42 @@
 import {
-  Fragment,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { FaDownload, FaFilePdf, FaRegImage } from "react-icons/fa6";
-import clsx from "clsx";
-import {
-  drag,
-  scaleLinear,
-  select,
-  zoom,
-  zoomIdentity,
-  zoomTransform,
-  type D3DragEvent,
-  type D3ZoomEvent,
-} from "d3";
-import { clamp, inRange, mapValues, range, truncate } from "lodash";
-import { useElementSize } from "@reactuses/core";
-import Button from "@/components/Button";
-import Flex from "@/components/Flex";
+import { drag, scaleLinear, select, zoom, zoomIdentity } from "d3";
+import type { D3DragEvent, D3ZoomEvent } from "d3";
+import { clamp, inRange, mapValues, range, uniq } from "lodash";
+import Chart from "@/components/Chart";
 import Help from "@/components/Help";
 import Legend from "@/components/Legend";
-import Popover from "@/components/Popover";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { printElement } from "@/util/dom";
-import { downloadJpg, downloadPng } from "@/util/download";
-import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
+import type { Filename } from "@/util/download";
+import { useTextSize, useTheme } from "@/util/hooks";
 import classes from "./IPR.module.css";
+
+/** label size */
+const labelWidth = 150;
+/** row height */
+const rowHeight = 20;
+/** gap between rows */
+const rowGap = 5;
+/** height of scrollbar */
+const scrollHeight = 7;
+
+type Props = {
+  /** title text */
+  title?: string;
+  /** download filename */
+  filename?: Filename;
+  /** sequence chars */
+  sequence: string;
+  /** track data */
+  tracks: Track[];
+};
 
 /** track of features */
 type Track = {
@@ -51,16 +57,10 @@ type Feature = {
   end: number;
 };
 
-type Props = { sequence: string; tracks: Track[] };
-
-const IPR = ({ sequence, tracks }: Props) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  /** collection of svg refs */
-  const svgRefs = useRef(new Set<SVGSVGElement>());
-  const scrollRef = useRef<SVGSVGElement>(null);
-
-  /** reactive CSS vars */
-  const theme = useTheme();
+/** interproscan result visualization */
+const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
+  const zoomRef = useRef<SVGGElement>(null);
+  const dragRef = useRef<SVGGElement>(null);
 
   /** map of feature types to colors */
   const colorMap = useColorMap(
@@ -70,454 +70,375 @@ const IPR = ({ sequence, tracks }: Props) => {
     "mode",
   );
 
-  /** common pan/zoom */
+  /** reactive CSS vars */
+  const theme = useTheme();
+
+  const { fontSize, getWidth, truncateWidth } = useTextSize();
+
+  /** unique id for clip path */
+  const clipId = useId();
+
+  /** reactive zoom transform */
   const [transform, setTransform] = useState(zoomIdentity);
 
-  /** dimensions of first svg (all widths should be same) */
-  let [width, height] = useElementSize([...svgRefs.current][0]);
-
-  /** set min value to avoid temporary divide by 0 errors */
-  width ||= 100;
-  height ||= 30;
-
-  /** dimensions of scrollbar */
-  const [, scrollHeight] = useElementSize(scrollRef);
-
-  /** font size, in svg units */
-  const fontSize = useSvgTransform(
-    [...svgRefs.current][0]!,
-    1,
-    rootFontSize(),
-  ).h;
-
-  /** view box for all svgs */
-  const viewBox = [0, 0, width, height].join(" ");
-
-  /** transform sequence index to svg x position */
-  const scaleX = transform.rescaleX(
-    scaleLinear([0, sequence.length]).range([0, 1]),
-  );
-
-  /** width of cells in svg units */
-  const cellSize = scaleX(1) - scaleX(0);
-
-  /** start/end positions in view */
-  let startPosition = Math.floor(scaleX.invert(0));
-  let endPosition = Math.ceil(scaleX.invert(width));
-  startPosition = clamp(startPosition, 0, sequence.length);
-  endPosition = clamp(endPosition, 0, sequence.length);
-
-  /** skip position labels based on zoom */
-  const skip =
-    [1, 5, 10, 20, 50, 100].find((skip) => skip * cellSize > height * 1.5) ?? 1;
-
-  /** position ticks */
-  const ticks = range(startPosition, endPosition).filter(
-    (position) => position % skip === 0,
-  );
-
-  /** remove ticks if too close to start/end labels */
-  if (skip > 1) {
-    const first = ticks.at(0);
-    const last = ticks.at(-1);
-    if (first !== undefined)
-      if (first === startPosition || scaleX(first + 0.5) < fontSize * 2)
-        ticks.shift();
-    if (last !== undefined)
-      if (last === endPosition || width - scaleX(last + 0.5) < fontSize * 2)
-        ticks.pop();
-  }
-
-  /** clamp tick position near start/end */
-  const clampTick = (x: number, string: string) => {
-    /** approximate half-width of string */
-    const padding = (fontSize * string.length) / 3;
-    return clamp(x, padding, width - padding);
-  };
-
-  type Extent = [[number, number], [number, number]];
-
-  /** range */
-  const extent: Extent = useMemo(
-    () => [
-      [0, 0],
-      [width, height],
-    ],
-    [width, height],
-  );
-
-  /** translate limit */
-  const translateExtent: Extent = useMemo(
-    () => [
-      [0, 0],
-      [sequence.length, 0],
-    ],
-    [sequence.length],
-  );
-
-  /** scale limit */
-  const scaleExtent: [number, number] = useMemo(
-    () => [
-      /** min zoom out, chars fill width */
-      width / sequence.length,
-      /** max zoom in, by # of chars in view */
-      width / 3,
-    ],
-    [width, sequence.length],
-  );
-
-  /** svg pan/zoom behavior */
+  /** pan/zoom behavior */
   const zoomBehavior = useMemo(
     () =>
-      zoom<SVGSVGElement, unknown>()
-        .extent(extent)
-        .translateExtent(translateExtent)
-        .scaleExtent(scaleExtent)
-        .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
-          /** update all transforms */
-          for (const el of [...svgRefs.current])
-            if (zoomTransform(el).toString() !== event.transform.toString())
-              /** check if not already equal to avoid infinite recursion */
-              event.target.transform(select(el), event.transform);
-
-          /** update common transform */
-          setTransform((transform) =>
-            event.transform.toString() === transform.toString()
-              ? transform
-              : event.transform,
-          );
-        }),
-    [extent, translateExtent, scaleExtent],
+      zoom<SVGGElement, unknown>().on(
+        "zoom",
+        (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
+          setTransform(event.transform);
+        },
+      ),
+    [],
   );
 
-  /** zoom out as much as possible, fitting to contents */
-  const reset = useCallback(() => {
-    /** update all transforms */
-    for (const el of [...svgRefs.current]) zoomBehavior.scaleTo(select(el), 0);
-  }, [zoomBehavior]);
-
-  /** reset on init */
+  /** update zoom limit */
   useEffect(() => {
-    reset();
-  }, [reset, extent, translateExtent, scaleExtent]);
-
-  /** ref func for each svg */
-  const svgRef = useCallback(
-    (el: SVGSVGElement | null) => {
-      /** on mount */
-      if (el) {
-        /** attach zoom handler to this element */
-        zoomBehavior(select(el));
-        /** add to ref collection */
-        svgRefs.current.add(el);
-        /** add listeners */
-        el.addEventListener("wheel", (event) => event.preventDefault());
-        el.addEventListener("dblclick", reset);
-      }
-      return () => {
-        /** remove from ref collection on unmount/cleanup */
-        if (el) svgRefs.current.delete(el);
-      };
-    },
-    [zoomBehavior, reset],
-  );
-
-  /** scroll bar numbers */
-  const scrollRatio = width / sequence.length;
-  const scrollLeft = scrollRatio * transform.invertX(0);
-  const scrollRight = scrollRatio * transform.invertX(width);
-  const scrollX = (scrollRight + scrollLeft) / 2;
-  let scrollSpan = scrollRight - scrollLeft;
-  scrollSpan = clamp(scrollSpan, scrollHeight, Infinity);
+    zoomBehavior.scaleExtent([
+      /** min zoom out, chars fill width */
+      1,
+      /** max zoom in, by # of chars in view */
+      sequence.length / 3,
+    ]);
+  }, [zoomBehavior, sequence.length]);
 
   type Drag = D3DragEvent<SVGSVGElement, unknown, unknown>;
 
-  /** start click position, as % of scroll bar */
-  const dragOffset = useRef(0);
-
   const onDrag = useCallback(
     ({ x }: Drag) => {
-      /** update all transforms */
-      for (const el of [...svgRefs.current]) {
-        zoomBehavior.translateTo(
-          select(el),
-          x / scrollRatio,
-          0,
-          /** offset translate based on start click position */
-          [width * dragOffset.current, 0],
-        );
-      }
+      if (!zoomRef.current) return;
+      /** update zoom transform */
+      zoomBehavior.translateTo(select(zoomRef.current), x, 0);
     },
-    [zoomBehavior, scrollRatio, width],
-  );
-
-  const onDragStart = useCallback(
-    (event: Drag) => {
-      /** if clicked on track */
-      if (event.sourceEvent.target.matches(":first-child"))
-        /** put bar midpoint at click position */
-        dragOffset.current = 0.5;
-      else
-        /** if clicked on bar */
-        /** scroll based on relative drag */
-        dragOffset.current = (event.x - scrollLeft) / scrollSpan;
-
-      /** immediately update transforms */
-      onDrag(event);
-    },
-    [scrollLeft, scrollSpan, onDrag],
+    [zoomBehavior],
   );
 
   /** scrollbar drag behavior */
   const dragBehavior = useMemo(
     () =>
-      drag<SVGSVGElement, unknown>()
+      drag<SVGGElement, unknown>()
         .container(function () {
           return this;
         })
-        .on("start", onDragStart)
+        .on("start", onDrag)
         .on("drag", onDrag),
-    [onDragStart, onDrag],
+    [onDrag],
   );
 
+  const prevWidth = useRef(0);
+
   return (
-    <Flex direction="column" gap="lg" full>
-      <Flex
-        ref={containerRef}
-        direction="column"
-        full
-        className={clsx("card", classes.container)}
-      >
-        <div className={classes.grid}>
-          {/* position */}
-          <div className={classes["top-label"]}>Position</div>
-          <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-            <g
-              textAnchor="middle"
-              dominantBaseline="central"
-              style={{ fontSize }}
-              fill={theme["--black"]}
-            >
-              {ticks.map((position) => (
-                <text
-                  key={position}
-                  x={clampTick(scaleX(position + 0.5), String(position + 1))}
-                  y={height / 2}
-                >
-                  {position + 1}
-                </text>
-              ))}
-
-              {skip > 1 && (
-                <>
-                  <text
-                    x={clampTick(0, String(startPosition + 1))}
-                    y={height / 2}
-                  >
-                    {startPosition + 1}
-                  </text>
-                  <text
-                    x={clampTick(width, String(endPosition))}
-                    y={height / 2}
-                  >
-                    {endPosition}
-                  </text>
-                </>
-              )}
-            </g>
-          </svg>
-
-          {/* sequence */}
-          <div className={classes["top-label"]}>Sequence</div>
-          <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-            <g
-              textAnchor="middle"
-              dominantBaseline="central"
-              style={{ fontSize }}
-            >
-              {sequence.split("").map((char, index) => (
-                <g
-                  key={index}
-                  transform={`translate(${scaleX(index + 0.5)},
-                  ${height / 2})`}
-                >
-                  <rect
-                    x={-cellSize / 2}
-                    y={-height / 2}
-                    width={cellSize}
-                    height={height}
-                    fill={theme["--light-gray"]}
-                    opacity={index % 2 === 0 ? 0.25 : 0.5}
-                  />
-                  <text
-                    x={0}
-                    y={0}
-                    fill={theme["--black"]}
-                    transform={`scale(${clamp(cellSize / fontSize, 0, 1)})`}
-                  >
-                    {char}
-                  </text>
-                </g>
-              ))}
-            </g>
-          </svg>
-
-          {/* tracks */}
-          {tracks.map((track, index) => (
-            <Fragment key={index}>
-              <Tooltip content={track.label}>
-                <div
-                  className={clsx("truncate", classes["track-label"])}
-                  tabIndex={0}
-                  role="button"
-                >
-                  {track.label ?? "-"}
-                </div>
-              </Tooltip>
-
-              <svg ref={svgRef} viewBox={viewBox} className={classes.row}>
-                <g
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  style={{ fontSize }}
-                >
-                  {track.features.map(
-                    ({ id, label, type, start, end }, index) => {
-                      /** x in view */
-                      const drawX = clamp(scaleX(start - 1), 0, width);
-                      /** width in view */
-                      const drawWidth =
-                        clamp(scaleX(end), 0, width) -
-                        clamp(scaleX(start - 1), 0, width);
-                      /** mid in view */
-                      const drawMidX = drawX + drawWidth / 2;
-
-                      return (
-                        <Tooltip
-                          key={index}
-                          content={
-                            <div className="mini-table">
-                              <span>Name</span>
-                              <span>{label ?? id}</span>
-                              <span>Type</span>
-                              <span>{type}</span>
-                              <span>Range</span>
-                              <span>
-                                {start}-{end}
-                              </span>
-                            </div>
-                          }
-                        >
-                          <g
-                            className={classes.track}
-                            tabIndex={0}
-                            role="button"
-                          >
-                            <rect
-                              x={drawX}
-                              y={0}
-                              width={drawWidth}
-                              height={height}
-                              fill={colorMap[type ?? ""]}
-                            />
-                            {inRange(drawMidX, fontSize, width - fontSize) && (
-                              <text
-                                x={drawMidX}
-                                y={height / 2}
-                                fill={theme["--black"]}
-                              >
-                                {truncate(label ?? id, {
-                                  length: (drawWidth / height) * 3,
-                                })}
-                              </text>
-                            )}
-                          </g>
-                        </Tooltip>
-                      );
-                    },
-                  )}
-                </g>
-              </svg>
-            </Fragment>
-          ))}
-          {/* scrollbar */}
-          <div></div>
-          <svg
-            ref={(el) => {
-              if (el) dragBehavior(select(el));
-              scrollRef.current = el;
-            }}
-            className={classes.scrollbar}
-            viewBox={[0, 0, width, scrollHeight].join(" ")}
-          >
-            <rect
-              x={0}
-              y={0}
-              width={width}
-              height={scrollHeight}
-              fill={theme["--off-white"]}
-            />
-            <rect
-              x={scrollX - scrollSpan / 2}
-              y={0}
-              width={scrollSpan}
-              height={scrollHeight}
-              rx={scrollHeight / 2}
-              ry={scrollHeight / 2}
-              fill={theme["--gray"]}
-            />
-          </svg>
-        </div>
-
-        <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
-      </Flex>
-
-      {/* controls */}
-      <Flex>
-        <Popover
-          content={
-            <Flex direction="column" hAlign="stretch" gap="xs">
-              <Button
-                icon={<FaRegImage />}
-                text="PNG"
-                onClick={() =>
-                  containerRef.current &&
-                  downloadPng(containerRef.current, "ipr")
-                }
-                tooltip="High-resolution image"
-              />
-              <Button
-                icon={<FaRegImage />}
-                text="JPEG"
-                onClick={() =>
-                  containerRef.current &&
-                  downloadJpg(containerRef.current, "ipr")
-                }
-                tooltip="Compressed image"
-              />
-              <Button
-                icon={<FaFilePdf />}
-                text="PDF"
-                onClick={() =>
-                  containerRef.current && printElement(containerRef.current)
-                }
-                tooltip="Print as pdf"
-              />
-            </Flex>
+    <Chart
+      title={title}
+      filename={[...filename, "ipr"]}
+      containerProps={{ className: "full" }}
+      controls={[
+        <Help
+          tooltip={
+            <>
+              On main chart area:
+              <br />
+              &nbsp;• Scroll to zoom
+              <br />
+              &nbsp;• Drag to move
+              <br />
+              &nbsp;• Double click to reset
+            </>
           }
-        >
-          <Button
-            icon={<FaDownload />}
-            design="hollow"
-            tooltip="Download chart"
-          />
-        </Popover>
+        />,
+      ]}
+    >
+      {({ width }) => {
+        /** width of main sequence view area */
+        width = Math.max(width - labelWidth - 2 * rowHeight, labelWidth);
 
-        <Help tooltip="On main chart area, scroll/pinch to zoom, drag to move">
-          Controls
-        </Help>
-      </Flex>
-    </Flex>
+        /** transform sequence index to svg x position */
+        const scaleX = transform.rescaleX(
+          scaleLinear().domain([0, sequence.length]).range([0, width]),
+        );
+
+        /** seq char width */
+        const charWidth = scaleX(1) - scaleX(0);
+
+        /** start/end positions in view */
+        let startPosition = Math.floor(scaleX.invert(0));
+        let endPosition = Math.ceil(scaleX.invert(width));
+        startPosition = clamp(startPosition, 0, sequence.length);
+        endPosition = clamp(endPosition, 0, sequence.length);
+
+        /** skip position labels based on zoom */
+        const skip =
+          [1, 2, 5, 10, 20, 50, 100].find(
+            (skip) => skip * charWidth > 3 * rowHeight,
+          ) ?? 1;
+
+        /** position ticks */
+        let ticks = range(startPosition, endPosition).filter(
+          (position) => position % skip === 0,
+        );
+        ticks = uniq([startPosition, ...ticks, endPosition - 1]);
+
+        if ((ticks.at(1) ?? 0) - (ticks.at(0) ?? 0) < 0.5 * skip)
+          ticks.splice(1, 1);
+        if ((ticks.at(-1) ?? 0) - (ticks.at(-2) ?? 0) < skip)
+          ticks.splice(-2, 1);
+
+        /** update pan limit */
+        zoomBehavior
+          .extent([
+            [0, 0],
+            [width, 1],
+          ])
+          .translateExtent([
+            [0, 0],
+            [width, 1],
+          ]);
+
+        /** scroll bar numbers */
+        const scrollLeft = transform.invertX(0);
+        const scrollRight = transform.invertX(width);
+        const scrollX = (scrollRight + scrollLeft) / 2;
+        let scrollSpan = scrollRight - scrollLeft;
+        scrollSpan = clamp(scrollSpan, scrollHeight, Infinity);
+
+        return (
+          <>
+            {/* labels col */}
+            <g textAnchor="end" transform={`translate(${-rowHeight}, 0)`}>
+              <g fill={theme["--gray"]}>
+                <text x={0} y={-1.5 * (rowHeight + rowGap)}>
+                  Sequence
+                </text>
+                <text x={0} y={-0.5 * (rowHeight + rowGap)}>
+                  Position
+                </text>
+              </g>
+              <g fill={theme["--black"]}>
+                {tracks.map((track, trackIndex) => (
+                  <Tooltip key={trackIndex} content={track.label}>
+                    <text
+                      x={0}
+                      y={(trackIndex + 0.5) * (rowHeight + rowGap)}
+                      tabIndex={0}
+                    >
+                      {truncateWidth(track.label ?? "-", labelWidth)}
+                    </text>
+                  </Tooltip>
+                ))}
+              </g>
+            </g>
+
+            {/* main content area */}
+            <g
+              ref={(el) => {
+                zoomRef.current = el;
+
+                if (el) {
+                  /** attach zoom behavior */
+                  const selection = select(el);
+                  zoomBehavior(selection);
+
+                  /** prevent scroll overflow */
+                  selection.on("wheel", (event) => event.preventDefault());
+
+                  /** reset zoom */
+                  const reset = () => {
+                    zoomBehavior.transform(selection, zoomIdentity);
+                    setTransform(zoomIdentity);
+                  };
+                  if (prevWidth.current !== width) reset();
+                  selection.on("dblclick.zoom", (event) => {
+                    event.preventDefault();
+                    reset();
+                  });
+                  prevWidth.current = width;
+                }
+
+                return () => {
+                  zoomRef.current = null;
+                };
+              }}
+              className={classes.area}
+            >
+              {/* background */}
+              <rect
+                x={0}
+                y={-2 * (rowHeight + rowGap)}
+                width={width}
+                height={(2 + tracks.length) * (rowHeight + rowGap)}
+                fill={theme["--white"]}
+                stroke={theme["--light-gray"]}
+              />
+              <clipPath id={clipId}>
+                <rect
+                  x={0}
+                  y={-2 * (rowHeight + rowGap)}
+                  width={width}
+                  height={(2 + tracks.length) * (rowHeight + rowGap)}
+                />
+              </clipPath>
+
+              {/* main content view */}
+              <g clipPath={`url(#${clipId})`} data-fit-ignore>
+                {/* sequence row */}
+                <g
+                  className={classes["no-mouse"]}
+                  transform={`translate(0, ${-1.5 * (rowHeight + rowGap)})`}
+                >
+                  {sequence.split("").map((char, index) => (
+                    <g
+                      key={index}
+                      transform={`translate(${scaleX(index + 0.5)}, 0)`}
+                    >
+                      <rect
+                        x={-charWidth / 2}
+                        y={-rowHeight / 2}
+                        width={charWidth}
+                        height={rowHeight}
+                        fill={theme["--light-gray"]}
+                        opacity={index % 2 === 0 ? 0.25 : 0.5}
+                      />
+                      <text
+                        x={0}
+                        y={0}
+                        fill={theme["--black"]}
+                        transform={`scale(${clamp(charWidth / fontSize, 0, 1)})`}
+                        textAnchor="middle"
+                      >
+                        {char}
+                      </text>
+                    </g>
+                  ))}
+                </g>
+                const
+                <g
+                  className={classes["no-mouse"]}
+                  fill={theme["--black"]}
+                  textAnchor="middle"
+                  transform={`translate(0, ${-0.5 * (rowHeight + rowGap)})`}
+                >
+                  {ticks.map((position) => {
+                    let x = scaleX(position + 0.5);
+                    const w = getWidth(String(position + 1));
+                    x = clamp(x, w / 2, width - w / 2);
+                    return (
+                      <text key={position} x={x} y={0}>
+                        {position + 1}
+                      </text>
+                    );
+                  })}
+                </g>
+                {/* tracks */}
+                <g>
+                  {tracks.map((track, trackIndex) => (
+                    <g
+                      key={trackIndex}
+                      transform={`translate(0, ${trackIndex * (rowHeight + rowGap)})`}
+                    >
+                      {track.features.map(
+                        ({ id, label, type, start, end }, featureIndex) => {
+                          /** x in view */
+                          const drawX = clamp(scaleX(start - 1), 0, width);
+                          /** width in view */
+                          const drawWidth =
+                            clamp(scaleX(end), 0, width) -
+                            clamp(scaleX(start - 1), 0, width);
+                          /** mid in view */
+                          const drawMidX = drawX + drawWidth / 2;
+
+                          return (
+                            <Tooltip
+                              key={featureIndex}
+                              content={
+                                <div className="mini-table">
+                                  <span>Name</span>
+                                  <span>{label ?? id}</span>
+                                  <span>Type</span>
+                                  <span>{type}</span>
+                                  <span>Range</span>
+                                  <span>
+                                    {start}-{end}
+                                  </span>
+                                </div>
+                              }
+                            >
+                              <g tabIndex={0} role="graphics-symbol">
+                                <rect
+                                  x={drawX}
+                                  y={0}
+                                  width={drawWidth}
+                                  height={rowHeight}
+                                  fill={colorMap[type ?? ""]}
+                                />
+                                {inRange(
+                                  drawMidX,
+                                  fontSize,
+                                  width - fontSize,
+                                ) && (
+                                  <text
+                                    x={drawMidX}
+                                    y={rowHeight / 2}
+                                    fill={theme["--black"]}
+                                    textAnchor="middle"
+                                  >
+                                    {truncateWidth(label ?? id, drawWidth)}
+                                  </text>
+                                )}
+                              </g>
+                            </Tooltip>
+                          );
+                        },
+                      )}
+                    </g>
+                  ))}
+                </g>
+              </g>
+
+              {/* scrollbar */}
+              <g
+                ref={(el) => {
+                  dragRef.current = el;
+
+                  if (el)
+                    /** attach drag behavior */
+                    dragBehavior(select(el));
+
+                  return () => {
+                    dragRef.current = el;
+                  };
+                }}
+                transform={`translate(0, ${tracks.length * (rowHeight + rowGap)})`}
+              >
+                <rect
+                  x={0}
+                  y={0}
+                  width={width}
+                  height={scrollHeight}
+                  fill={theme["--off-white"]}
+                />
+                <rect
+                  x={scrollX - scrollSpan / 2}
+                  y={0}
+                  width={scrollSpan}
+                  height={scrollHeight}
+                  rx={scrollHeight / 2}
+                  ry={scrollHeight / 2}
+                  fill={theme["--gray"]}
+                />
+              </g>
+            </g>
+
+            <Legend
+              x={-labelWidth - 2 * rowHeight}
+              y={(1 + tracks.length) * (rowHeight + rowGap)}
+              w={width + labelWidth}
+              entries={mapValues(colorMap, (color) => ({ color }))}
+            />
+          </>
+        );
+      }}
+    </Chart>
   );
 };
 

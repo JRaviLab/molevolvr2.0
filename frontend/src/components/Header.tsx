@@ -7,13 +7,14 @@ import { DarkMode } from "@/components/DarkMode";
 import Flex from "@/components/Flex";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
+import { round } from "@/util/math";
 import classes from "./Header.module.css";
 
 /** doc element abbrev */
 const doc = document.documentElement;
 
 /** set page scroll as css variable */
-const updateY = () => doc.style.setProperty("--y", doc.scrollTop + "px");
+const updateY = () => doc.style.setProperty("--y", round(doc.scrollTop) + "px");
 window.addEventListener("scroll", updateY);
 updateY();
 
@@ -24,11 +25,12 @@ const Header = () => {
 
   /** header height */
   const ref = useRef<HTMLElement | null>(null);
-  const [, height] = useElementSize(ref, { box: "border-box" });
+  let [, height] = useElementSize(ref, { box: "border-box" });
+  height = round(height);
 
   useEffect(() => {
     /** make sure all scrolls take into account header height */
-    doc.style.scrollPaddingTop = height + 20 + "px";
+    doc.style.scrollPaddingTop = height + "px";
   }, [height]);
 
   return (

@@ -1,9 +1,10 @@
-import type { ReactElement, ReactNode } from "react";
 import { Fragment, useEffect, useState } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import clsx from "clsx";
 import { kebabCase } from "lodash";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
+import { deleteParam, mergeTo } from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
 import classes from "./Tabs.module.css";
 
@@ -55,11 +56,12 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
         setSelected(value);
         /** update url from selected */
         if (syncWithUrl) {
-          if (value === defaultValue) searchParams.delete(syncWithUrl);
-          else searchParams.set(syncWithUrl, value);
+          if (value === defaultValue) value = deleteParam;
           navigate(
-            { ...location, search: "?" + searchParams.toString() },
-            { state: location.state },
+            /** preserve current url */
+            /** (useSearchParams set func doesn't preserve hash) */
+            mergeTo(location, `?${syncWithUrl}=${value}`),
+            location.state,
           );
         }
       }}

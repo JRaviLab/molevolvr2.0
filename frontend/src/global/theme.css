@@ -26,6 +26,7 @@
   --success: hsl(160, 90%, 40%);
   --warning: hsl(40, 100%, 50%);
   --error: hsl(350, 80%, 60%);
+  --info: hsl(200, 80%, 60%);
 }
 
 [data-dark="true"] {
@@ -54,9 +55,13 @@
   --success: hsl(160, 90%, 40%);
   --warning: hsl(40, 100%, 50%);
   --error: hsl(350, 80%, 60%);
+  --info: hsl(200, 80%, 60%);
 }
 
 :root {
+  /** font size */
+  --font-size: 16px;
+
   /** font families */
   --sans: "Poppins", sans-serif;
   --mono: "IBM Plex Mono", monospace;

@@ -1,56 +1,43 @@
-import { cloneElement, type ReactElement, type ReactNode } from "react";
+import { cloneElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
-import { debounce } from "lodash";
-import { round } from "@/util/math";
-import { sleep } from "@/util/misc";
+import { sleep, waitFor } from "@/util/misc";
 
-/** wait for element matching selector to appear, checking periodically */
-export const waitFor = async <El extends Element>(
-  selector: string,
-): Promise<El | undefined> => {
-  const waits = [
-    0, 1, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000,
-  ];
-  while (waits.length) {
-    const match = document.querySelector<El>(selector);
-    if (match) return match;
-    await sleep(waits.shift());
-  }
+/** https://stackoverflow.com/a/78994961/2180570 */
+export const getTheme = () => {
+  const styles = window.getComputedStyle(document.documentElement);
+  return Object.fromEntries(
+    Array.from(document.styleSheets)
+      .flatMap((styleSheet) => {
+        try {
+          return Array.from(styleSheet.cssRules);
+        } catch (error) {
+          return [];
+        }
+      })
+      .filter((cssRule) => cssRule instanceof CSSStyleRule)
+      .flatMap((cssRule) => Array.from(cssRule.style))
+      .filter((style) => style.startsWith("--"))
+      .map((variable) => [variable, styles.getPropertyValue(variable)]),
+  );
 };
-
-/** https://stackoverflow.com/questions/49318497/google-chrome-simultaneously-smooth-scrollintoview-with-more-elements-doesn */
-let isSmoothScrolling = false;
 
 /** scroll to element, optionally by selector */
 export const scrollTo = async (
   selector?: string | Element | null,
   options: ScrollIntoViewOptions = { behavior: "smooth" },
 ) => {
-  /** don't interfere with smooth scroll bug */
-  if (isSmoothScrolling) return;
+  if (!selector) return;
 
   /** wait for element to appear */
   const element =
-    typeof selector === "string" ? await waitFor(selector) : selector;
+    typeof selector === "string"
+      ? await waitFor(() => document.querySelector(selector))
+      : selector;
   if (!element) return;
 
-  /** wait for layout shifts */
-  await sleep(100);
-
   /** scroll to element */
-  element.scrollIntoView(options);
-
-  if (options.behavior === "smooth") {
-    /** set smooth scrolling flag */
-    isSmoothScrolling = true;
-
-    /** unset smooth scrolling flag once done */
-    const unset = debounce(() => {
-      isSmoothScrolling = false;
-      window.removeEventListener("scroll", unset, true);
-    }, 100);
-    window.addEventListener("scroll", unset, true);
-  }
+  elementOrSection(element).scrollIntoView(options);
 };
 
 /** get text content of react node */
@@ -99,7 +86,7 @@ export const firstInView = (elements: HTMLElement[]) => {
     window.getComputedStyle(document.documentElement).scrollPaddingTop,
   );
   for (const element of elements.reverse())
-    if (element.getBoundingClientRect()?.top < offset + 10) return element;
+    if (element.getBoundingClientRect()?.top < offset + 40) return element;
 };
 
 /** shrink width to wrapped text https://stackoverflow.com/questions/14596213 */
@@ -160,44 +147,24 @@ export const isCovering = (
   return false;
 };
 
-/** fit view box to contents of svg */
-export const fitViewBox = (svg?: SVGSVGElement | null, paddingPercent = 0) => {
-  if (!svg) return { x: 0, y: 0, width: 100, height: 100 };
-  let { x, y, width, height } = svg.getBBox();
-  const padding = Math.min(width, height) * paddingPercent;
-  x -= padding;
-  y -= padding;
-  width += padding * 2;
-  height += padding * 2;
-  const viewBox = [x, y, width, height].map((v) => round(v, 0.01)).join(" ");
-  svg.setAttribute("viewBox", viewBox);
-  return { x, y, width, height };
+/** get svg scale factor */
+export const getSvgTransform = (svg: SVGSVGElement) => {
+  /** convert to svg coords */
+  const matrix = (svg.getScreenCTM() || new SVGMatrix()).inverse();
+  /** https://www.w3.org/TR/css-transforms-1/#decomposing-a-2d-matrix */
+  return {
+    w: Math.sqrt(matrix.a ** 2 + matrix.b ** 2),
+    h: Math.sqrt(matrix.c ** 2 + matrix.d ** 2),
+  };
 };
 
-/** open browser print dialog with just one element shown */
-export const printElement = async (
-  element: Element,
-  beforePrint?: () => void,
-) => {
-  /** remember scroll position */
-  const oldY = element.getBoundingClientRect().top;
-  /** make element fullscreen/print ready */
-  element.classList.add("print-element");
-  if (beforePrint) {
-    await sleep(100);
-    beforePrint();
-  }
-  /** wait for any layout shift */
-  await sleep(100);
-  /** trigger print dialog */
-  window.print();
-  /** restore element styles */
-  element.classList.remove("print-element");
-  /** restore scroll */
-  await sleep(100);
-  const newY = element.getBoundingClientRect().top;
-  window.scrollBy({ top: newY - oldY, behavior: "instant" });
+/** get bounding box of svg contents */
+export const getViewBoxFit = (svg: SVGGraphicsElement) => {
+  const { x, y, width, height } = svg.getBBox();
+  return { x, y, w: width, h: height };
 };
+
+export type ViewBox = ReturnType<typeof getViewBoxFit>;
 
 /** scroll page so that mouse stays at same position in document */
 export const preserveScroll = async (element: Element) => {
@@ -205,4 +172,62 @@ export const preserveScroll = async (element: Element) => {
   await sleep(0);
   const newY = element.getBoundingClientRect().top;
   window.scrollBy({ top: newY - oldY, behavior: "instant" });
+};
+
+/** objects for text measurement */
+const canvas = document.createElement("canvas");
+const ctx = canvas.getContext("2d")!;
+
+/**
+ * compute actual rendered width of text based on font size
+ * https://stackoverflow.com/a/72148318/2180570
+ */
+export const getWidth = (text: string, size: number, family: string) => {
+  ctx.font = `${size}px ${family}`;
+  return ctx.measureText(text).width;
+};
+
+/** truncate text based on actual rendered width */
+export const truncateWidth = (
+  text: string,
+  limit: number,
+  size: number,
+  family: string,
+) => {
+  /** ensure nominal width */
+  limit = Math.max(limit, getWidth("...", size, family) + 1);
+  /** reduce string length until text width under width limit */
+  for (let slice = text.length; slice >= 0; slice--) {
+    const truncated = text.slice(0, slice) + (slice < text.length ? "..." : "");
+    const length = getWidth(truncated, size, family);
+    if (length <= limit) return truncated;
+  }
+  return "...";
+};
+
+/** get coordinates of element relative to document */
+export const getDocBbox = (element: Element) => {
+  const { left, top, right, bottom } = element.getBoundingClientRect();
+  return {
+    top: top + window.scrollY,
+    bottom: bottom + window.scrollY,
+    left: left + window.scrollX,
+    right: right + window.scrollX,
+  };
+};
+
+/** glow element */
+export const glow = (element: Element) =>
+  elementOrSection(element).animate(
+    [
+      { boxShadow: "inset 0 0 40px var(--accent)", offset: 0 },
+      { boxShadow: "inset 0 0 40px transparent", offset: 1 },
+    ],
+    { duration: 2000 },
+  );
+
+/** if element is first child of section, change element to section itself */
+const elementOrSection = (element: Element) => {
+  const parent = element.parentElement;
+  return parent && element.matches("section > :first-child") ? parent : element;
 };

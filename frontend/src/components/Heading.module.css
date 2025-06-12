@@ -43,6 +43,6 @@ h4.heading {
 }
 
 .heading:hover .anchor,
-.anchor:focus {
+.anchor:focus-visible {
   opacity: 1;
 }

@@ -1,5 +1,5 @@
-import type { ReactElement, ReactNode } from "react";
 import { cloneElement, useEffect, useId, useState } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { FaCircleDot, FaRegCircle } from "react-icons/fa6";
 import clsx from "clsx";
 import { usePrevious } from "@reactuses/core";
@@ -7,19 +7,6 @@ import Flex from "@/components/Flex";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import classes from "./Radios.module.css";
-
-export type Option<ID = string> = {
-  /** unique id */
-  id: ID;
-  /** primary content */
-  primary: ReactNode;
-  /** secondary content */
-  secondary?: ReactNode;
-  /** tertiary content */
-  tertiary?: ReactNode;
-  /** icon next to content */
-  icon?: ReactElement<{ className: string }>;
-};
 
 type Props<O extends Option> = {
   /** label content */
@@ -34,6 +21,19 @@ type Props<O extends Option> = {
   onChange?: (value: O["id"]) => void;
   /** field name in form data */
   name?: string;
+};
+
+export type Option<ID = string> = {
+  /** unique id */
+  id: ID;
+  /** primary content */
+  primary: ReactNode;
+  /** secondary content */
+  secondary?: ReactNode;
+  /** tertiary content */
+  tertiary?: ReactNode;
+  /** icon next to content */
+  icon?: ReactElement<{ className: string }>;
 };
 
 /**

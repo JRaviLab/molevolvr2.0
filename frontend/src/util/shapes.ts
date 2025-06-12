@@ -3,7 +3,7 @@ import { cos, sin } from "@/util/math";
 /** make regular polygon or star */
 const makePolygon = (sides: number, starInset = 1) =>
   Array(sides)
-    .fill(0)
+    .fill(null)
     .map((_, index) => {
       const angle = -90 + 360 * (index / sides);
       const radius = index % 2 === 0 ? 1 : starInset;

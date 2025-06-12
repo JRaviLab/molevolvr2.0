@@ -1,32 +1,36 @@
-import {
-  Fragment,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  type ReactElement,
-} from "react";
-import {
-  FaBezierCurve,
-  FaDownload,
-  FaFilePdf,
-  FaRegImage,
-} from "react-icons/fa6";
-import clsx from "clsx";
-import { arc, hierarchy, type HierarchyNode } from "d3";
-import { inRange, mapValues, sumBy, truncate } from "lodash";
-import Button from "@/components/Button";
-import Flex from "@/components/Flex";
+import { Fragment, useId, useMemo, useState } from "react";
+import type { ReactElement } from "react";
+import { arc, hierarchy } from "d3";
+import type { HierarchyNode } from "d3";
+import { inRange, mapValues, sumBy } from "lodash";
+import Chart from "@/components/Chart";
 import Legend from "@/components/Legend";
-import Popover from "@/components/Popover";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import { fitViewBox, printElement } from "@/util/dom";
-import { downloadJpg, downloadPng, downloadSvg } from "@/util/download";
-import { rootFontSize, useSvgTransform, useTheme } from "@/util/hooks";
+import type { Filename } from "@/util/download";
+import { useTextSize, useTheme } from "@/util/hooks";
+import { tau } from "@/util/math";
 import { formatNumber } from "@/util/string";
 import classes from "./Sunburst.module.css";
+
+/** thickness of rings */
+const ringSize = 30;
+/** gap between rings */
+const gapSize = 3;
+/** depth/level of first ring from center */
+const startDepth = 1;
+/** width of side panels */
+const panelWidth = 150;
+
+type Props = {
+  /** title text */
+  title?: string;
+  /** download filename */
+  filename?: Filename;
+
+  /** chart data */
+  data: Item[];
+};
 
 export type Item = {
   /** human-readable label */
@@ -60,32 +64,12 @@ type Derived = {
 
 type Node = HierarchyNode<Derived>;
 
-type Props = {
-  /** chart data */
-  data: Item[];
-};
-
-/** thickness of rings, in svg units */
-const ringSize = 20;
-/** gap between rings, in svg units */
-const gapSize = 1;
-/** depth/level of first ring from center */
-const startDepth = 1;
-
-const Sunburst = ({ data }: Props) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
-
-  /** font size, in svg units */
-  const fontSize = useSvgTransform(svgRef.current, 1, rootFontSize()).h;
-
-  /** fit view box */
-  useEffect(() => {
-    fitViewBox(svgRef.current, 0.01);
-  });
-
+/** sunburst plot */
+const Sunburst = ({ title, filename = [], data }: Props) => {
   /** "breadcrumb trail" of selected nodes */
   const [selected, setSelected] = useState<Node[]>([]);
+
+  const { fontSize, truncateWidth } = useTextSize();
 
   /** are any nodes selected */
   const anySelected = !!selected.length;
@@ -153,145 +137,95 @@ const Sunburst = ({ data }: Props) => {
   /** clear selection */
   const deselect = () => setSelected([]);
 
+  /** max ring radius */
+  const maxR = (startDepth + tree.height) * ringSize;
+
   return (
-    <Flex direction="column" gap="lg" full>
-      {/* keyboard listener not necessary here because we have one below */}
-      {/* eslint-disable-next-line */}
-      <div
-        ref={containerRef}
-        className={clsx("card", classes.container)}
-        onClick={deselect}
-      >
-        <Legend entries={mapValues(colorMap, (color) => ({ color }))} />
+    <Chart
+      title={title}
+      filename={[...filename, "sunburst"]}
+      onClick={deselect}
+    >
+      <Legend
+        entries={mapValues(colorMap, (color) => ({ color }))}
+        x={-maxR - ringSize}
+        y={0}
+        w={panelWidth}
+        anchor={[1, 0.5]}
+      />
 
-        {/* chart container */}
-        <svg
-          ref={svgRef}
-          className={classes.chart}
-          style={{
-            fontSize,
-            /** size based on number of rings */
-            height: 2 * 2 * rootFontSize() * (tree.height + startDepth),
-          }}
-        >
-          {nodes.map((node, index) => (
+      <g>
+        {nodes.map((node, index) => (
+          <Fragment key={index}>
+            {node.parent && (
+              <Segment
+                select={() =>
+                  node.data.lastSelected
+                    ? deselect()
+                    : setSelected(node.ancestors().slice(0, -1).reverse())
+                }
+                deselect={deselect}
+                node={node}
+              />
+            )}
+          </Fragment>
+        ))}
+      </g>
+
+      {/* selected breadcrumbs */}
+      <g>
+        {selected.map((node, index) => {
+          const h = 1.5 * fontSize;
+          const x = maxR + ringSize;
+          const y = maxR - (index + 1) * (h + gapSize);
+
+          return (
             <Fragment key={index}>
-              {node.parent && (
-                <Segment
-                  fontSize={fontSize}
-                  select={() =>
-                    node.data.lastSelected
-                      ? deselect()
-                      : setSelected(node.ancestors().slice(0, -1).reverse())
-                  }
-                  deselect={deselect}
-                  node={node}
-                />
-              )}
-            </Fragment>
-          ))}
-        </svg>
-
-        {/* selected breadcrumbs */}
-        {anySelected && (
-          <Flex
-            className={classes.breadcrumbs}
-            gap="sm"
-            gapRatio={1}
-            direction="column"
-            hAlign="right"
-            vAlign="top"
-          >
-            {selected.map((node, index) => (
-              <NodeTooltip key={index} {...node.data}>
-                <div
-                  className={classes.breadcrumb}
-                  style={{ background: node.data.color }}
-                  tabIndex={0}
-                  role="button"
-                >
-                  {node.data.label || "-"}
-                </div>
+              <rect
+                fill={node.data.color}
+                x={x}
+                y={y - h / 2}
+                width={panelWidth}
+                height={h}
+              />
+              <NodeTooltip {...node.data}>
+                <text x={x + gapSize} y={y} tabIndex={0}>
+                  {truncateWidth(
+                    node.data.label || "-",
+                    panelWidth - 2 * gapSize,
+                  )}
+                </text>
               </NodeTooltip>
-            ))}
-          </Flex>
-        )}
-      </div>
-
-      {/* controls */}
-      <Flex>
-        <Popover
-          content={
-            <Flex direction="column" hAlign="stretch" gap="xs">
-              <Button
-                icon={<FaRegImage />}
-                text="PNG"
-                onClick={() =>
-                  containerRef.current &&
-                  downloadPng(containerRef.current, "sunburst")
-                }
-                tooltip="High-resolution image"
-              />
-              <Button
-                icon={<FaRegImage />}
-                text="JPEG"
-                onClick={() =>
-                  containerRef.current &&
-                  downloadJpg(containerRef.current, "sunburst")
-                }
-                tooltip="Compressed image"
-              />
-              <Button
-                icon={<FaBezierCurve />}
-                text="SVG"
-                onClick={() =>
-                  svgRef.current && downloadSvg(svgRef.current, "sunburst")
-                }
-                tooltip="Vector image (no legends)"
-              />
-              <Button
-                icon={<FaFilePdf />}
-                text="PDF"
-                onClick={() =>
-                  containerRef.current && printElement(containerRef.current)
-                }
-                tooltip="Print as pdf"
-              />
-            </Flex>
-          }
-        >
-          <Button
-            icon={<FaDownload />}
-            design="hollow"
-            tooltip="Download chart"
-          />
-        </Popover>
-      </Flex>
-    </Flex>
+            </Fragment>
+          );
+        })}
+      </g>
+    </Chart>
   );
 };
 
 export default Sunburst;
 
 type SegmentProps = {
-  fontSize: number;
   node: Node;
   select: () => void;
   deselect: () => void;
 };
 
 /** single arc segment */
-const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
+const Segment = ({ node, select, deselect }: SegmentProps) => {
   /** unique segment id */
   const id = useId();
 
-  /** extract props */
-  const { depth, data } = node;
-  const { label, color, percent, angle, selected, lastSelected } = data;
-  const end = angle + percent;
-
   /** reactive CSS vars */
   const theme = useTheme();
+
+  const { truncateWidth } = useTextSize();
+
+  /** extract props */
+  const { depth, data } = node;
+  const { label, color, percent, angle, selected } = data;
+  const end = angle + percent;
 
   /** segment arc radius */
   const radius = (depth + startDepth - 0.5) * ringSize;
@@ -302,8 +236,8 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
       arc<null>()
         .innerRadius(radius - ringSize / 2 + gapSize / 2)
         .outerRadius(radius + ringSize / 2 - gapSize / 2)
-        .startAngle(angle * 2 * Math.PI)
-        .endAngle(end * 2 * Math.PI)
+        .startAngle(angle * tau)
+        .endAngle(end * tau)
         .padRadius(gapSize)
         .padAngle(1)(null) ?? "",
     [radius, angle, end],
@@ -324,9 +258,9 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
          * that, so thickness can be arbitrary.
          */
         .outerRadius(radius - 999)
-        .startAngle((flip ? end : angle) * 2 * Math.PI)
-        .endAngle((flip ? angle : end) * 2 * Math.PI)
-        .padRadius(gapSize)
+        .startAngle((flip ? end : angle) * tau)
+        .endAngle((flip ? angle : end) * tau)
+        .padRadius(3 * gapSize)
         .padAngle(1)(null) ?? "";
 
     /** extract just first half of path, center-line of segment */
@@ -335,8 +269,8 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
     return stroke;
   }, [radius, angle, end]);
 
-  /** get max text chars based on arc length */
-  const maxChars = (radius * 2 * Math.PI * percent) / (fontSize / 1.75);
+  /** length of arc centerline */
+  const arcLength = radius * Math.abs(end - angle) * tau - 2 * gapSize;
 
   return (
     <g className={classes.segment} opacity={selected === false ? 0.25 : 1}>
@@ -345,12 +279,9 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
         <path
           className={classes.shape}
           fill={color}
-          stroke={theme["--black"]}
-          strokeWidth={gapSize}
-          strokeOpacity={lastSelected === true ? 1 : 0}
           d={fill}
           tabIndex={0}
-          role="button"
+          role="graphics-symbol"
           onClick={(event) => {
             /** prevent deselect from container onClick */
             event.stopPropagation();
@@ -372,11 +303,10 @@ const Segment = ({ fontSize, node, select, deselect }: SegmentProps) => {
       <text
         className={classes.label}
         textAnchor="middle"
-        dy="0.55ex"
         fill={theme["--black"]}
       >
         <textPath href={`#${id}`} startOffset="50%">
-          {truncate(label || "-", { length: maxChars })}
+          {truncateWidth(label || "-", arcLength)}
         </textPath>
       </text>
     </g>
@@ -395,13 +325,13 @@ const NodeTooltip = ({
     content={
       <div className="mini-table">
         <div>Name</div>
-        <div>{label || "-"}</div>
+        <div>{label}</div>
         <div>Value</div>
         <div>{formatNumber(value)}</div>
         <div>Percent</div>
         <div>{formatPercent(percent)}</div>
         <div>Type</div>
-        <div>{type || "-"}</div>
+        <div>{type}</div>
       </div>
     }
   >
@@ -410,4 +340,4 @@ const NodeTooltip = ({
 );
 
 /** format 0-1 as % */
-const formatPercent = (percent = 0) => `${(percent * 100).toFixed(0)}%`;
+const formatPercent = (percent = 0) => `${(100 * percent).toFixed(0)}%`;

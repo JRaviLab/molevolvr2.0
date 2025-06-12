@@ -1,0 +1,55 @@
+.container {
+  display: grid;
+  position: relative;
+  place-items: center;
+  max-width: 100%;
+  padding: 20px;
+  overflow: auto;
+  resize: both;
+}
+
+.svg {
+  overflow: visible;
+}
+
+.debug {
+  fill: none;
+  stroke: red;
+}
+
+.reset-anchor {
+  display: none;
+  position: sticky;
+  right: 5px;
+  bottom: 5px;
+  place-self: flex-end;
+  width: 0;
+  height: 0;
+}
+
+.reset {
+  width: 20px;
+  height: 20px;
+}
+
+.container[style*="width"] .reset-anchor,
+.container[style*="height"] .reset-anchor {
+  display: flex;
+}
+
+.printing {
+  aspect-ratio: unset;
+  width: unset;
+  min-width: unset;
+  max-width: unset;
+  height: 100vh;
+  min-height: unset;
+  max-height: unset;
+  padding: 0;
+  overflow: visible;
+  border: none;
+  border-radius: 0;
+  background: var(--white);
+  box-shadow: none;
+  resize: unset;
+}

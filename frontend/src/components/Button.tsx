@@ -5,6 +5,8 @@ import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
 import classes from "./Button.module.css";
 
+type Props = Base & Description & (_Link | _Button);
+
 type Base = {
   /** icon to show next to text */
   icon?: ReactElement;
@@ -12,7 +14,7 @@ type Base = {
   flip?: boolean;
   /** look */
   design?: "normal" | "hollow" | "critical";
-  /** class */
+  /** class on button */
   className?: string;
 };
 
@@ -36,8 +38,6 @@ type _Button = { ref?: Ref<HTMLButtonElement> } & Pick<
   | "onDragOver"
   | "onDrop"
 >;
-
-type Props = Base & Description & (_Link | _Button);
 
 /**
  * looks like a button and either goes somewhere (link) or does something

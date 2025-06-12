@@ -1,8 +1,26 @@
 import { stringify } from "csv-stringify/browser/esm/sync";
 import { toJpeg, toPng } from "html-to-image";
-import { getTheme } from "@/util/hooks";
+import { getTheme } from "@/util/dom";
 
-export type Filename = string | string[];
+export type Filename = (string | undefined)[];
+
+/** assemble and clean full filename */
+export const getFilename = (filename: Filename) =>
+  [
+    /** always start filename with app name */
+    String(import.meta.env.VITE_TITLE),
+    /** other filename parts */
+    ...filename.filter((part) => part !== undefined),
+  ]
+    .map((part) =>
+      part
+        /** make path safe */
+        .replace(/[^A-Za-z0-9]+/g, "-")
+        /** remove leading/trailing dashes */
+        .replace(/(^-+)|(-+$)/g, ""),
+    )
+    .filter((part) => part.trim())
+    .join("_");
 
 /** download url as file */
 const download = (
@@ -13,24 +31,15 @@ const download = (
   /** extension, without dot */
   ext: string,
 ) => {
+  let download = getFilename(filename);
+
+  /** add extension */
+  if (!download.endsWith("." + ext)) download += "." + ext;
+
+  /** trigger download */
   const link = document.createElement("a");
   link.href = url;
-  link.download =
-    [import.meta.env.VITE_TITLE, filename]
-      .flat()
-      .map((part) =>
-        part
-          /** make path safe */
-          .replace(/[^A-Za-z0-9]+/g, "-")
-          /** remove leading/trailing dashes */
-          .replace(/(^-+)|(-+$)/g, ""),
-      )
-      .filter(Boolean)
-      .join("_")
-      /** remove extension if already included */
-      .replace(new RegExp("." + ext + "$"), "") +
-    "." +
-    ext;
+  link.download = download;
   link.click();
   window.URL.revokeObjectURL(url);
 };
@@ -51,7 +60,7 @@ export const downloadTxt = (data: string, filename: Filename) =>
   download(getUrl(data, "text/plain;charset=utf-8"), filename, "txt");
 
 /** tabular data format. array of objects or array of arrays. */
-type Tabular = (Record<string, unknown> | unknown[])[];
+export type Tabular = (Record<string, unknown> | unknown[])[];
 
 /** stringify csv/tsv data */
 const getCsv = (data: Tabular, delimiter = ",") =>
@@ -122,7 +131,7 @@ export const downloadSvg = (
     clone.setAttribute(key, value);
 
   /** remove specific attributes from all elements */
-  for (const element of clone.querySelectorAll("*"))
+  for (const element of [clone, ...clone.querySelectorAll("*")])
     for (const removeAttr of removeAttrs)
       for (const { name } of [...element.attributes])
         if (name.match(removeAttr)) element.removeAttribute(name);

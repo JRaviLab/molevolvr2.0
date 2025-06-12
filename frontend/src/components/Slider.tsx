@@ -11,6 +11,8 @@ import Help from "@/components/Help";
 import { formatNumber } from "@/util/string";
 import classes from "./Slider.module.css";
 
+type Props = Base & (Single | Multi);
+
 type Base = {
   /** layout of label and control */
   layout?: "vertical" | "horizontal";
@@ -45,8 +47,6 @@ type Multi = {
   /** on numbers state change */
   onChange?: (value: number[]) => void;
 };
-
-type Props = Base & (Single | Multi);
 
 /**
  * single or multi-value number slider. use for numeric values that need quick
@@ -91,7 +91,7 @@ const Slider = ({
             <div
               className={classes.fill}
               style={{
-                left: multi ? state.getThumbPercent(0) * 100 + "%" : "",
+                left: multi ? 100 * state.getThumbPercent(0) + "%" : "",
                 width:
                   (multi
                     ? state.getThumbPercent(1) - state.getThumbPercent(0)
