@@ -28,7 +28,7 @@ import NotFound from "@/pages/NotFound";
 import Testbed from "@/pages/Testbed";
 import { getDocBbox, glow, scrollTo } from "@/util/dom";
 import { useChanged } from "@/util/hooks";
-import { waitFor, waitForStable } from "@/util/misc";
+import { sleep, waitFor, waitForStable } from "@/util/misc";
 
 /** app entrypoint */
 const App = () => <RouterProvider router={router} />;
@@ -151,9 +151,13 @@ const scrollToHash = async (
    * if not just hash changed (indicating we may be on first load of page or
    * otherwise expecting significant layout changes)
    */
-  if (restChanged)
+  if (restChanged) {
     /** wait for layout shifts to stabilize */
     await waitForStable(() => getDocBbox(element).top);
+    /** scroll down a bit to trigger small header */
+    window.scrollBy(0, 100);
+    await sleep();
+  }
 
   /** scroll to element */
   scrollTo(hash);
