@@ -60,7 +60,7 @@ const Feedback = () => {
 
     /** issue title */
     const title = truncate(
-      ["Feedback form", name || username || "anon."].join(" - "),
+      ["Feedback", name || username || "anon."].join(" - "),
       { length: 250 },
     );
 
@@ -80,7 +80,7 @@ const Feedback = () => {
 
   return (
     <Dialog
-      title="Feedback form"
+      title="Feedback"
       onChange={(open) => {
         if (open && isSuccess) {
           reset();
@@ -116,7 +116,7 @@ const Feedback = () => {
           <TextBox
             className="full"
             label="Feedback"
-            placeholder="Comments, suggestions, bugs"
+            placeholder="Questions, suggestions, bugs, etc."
             required
             multi
             value={feedback || ""}
@@ -189,7 +189,7 @@ const Feedback = () => {
         </form>
       )}
     >
-      <Button icon={<FaRegComment />} tooltip="Feedback form" />
+      <Button icon={<FaRegComment />} tooltip="Give us feedback" />
     </Dialog>
   );
 };

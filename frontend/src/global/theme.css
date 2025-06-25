@@ -23,10 +23,10 @@
 
   /** util colors */
   --box-shadow: 0 0 2px var(--shadow), 2px 2px 5px var(--shadow);
+  --info: hsl(200, 80%, 60%);
   --success: hsl(160, 90%, 40%);
   --warning: hsl(40, 100%, 50%);
   --error: hsl(350, 80%, 60%);
-  --info: hsl(200, 80%, 60%);
 }
 
 [data-dark="true"] {
@@ -52,10 +52,10 @@
 
   /** util colors */
   --box-shadow: 0 0 2px var(--shadow), 2px 2px 5px var(--shadow);
+  --info: hsl(200, 80%, 60%);
   --success: hsl(160, 90%, 40%);
   --warning: hsl(40, 100%, 50%);
   --error: hsl(350, 80%, 60%);
-  --info: hsl(200, 80%, 60%);
 }
 
 :root {
