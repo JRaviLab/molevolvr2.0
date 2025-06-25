@@ -67,10 +67,7 @@ const Home = () => {
           Home
         </Heading>
 
-        <p className={classes.hero}>
-          MolEvolvR enables researchers to characterize proteins using molecular
-          evolution and phylogeny
-        </p>
+        <p className={classes.hero}>{import.meta.env.VITE_DESCRIPTION}</p>
         <Flex>
           <Button to="/new-analysis" text="New Analysis" icon={<FaPlus />} />
           <Button

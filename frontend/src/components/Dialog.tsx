@@ -19,25 +19,28 @@ type Props = {
   /** title of dialog */
   title: ReactNode;
   /** main content of dialog. gets scrollbar if it can't fit on screen. */
-  content: ReactNode;
+  content: Content;
   /**
    * content at bottom of dialog, usually for actions. always visible (doesn't
    * get scrollbar).
    */
-  bottomContent?: ReactNode | ((close: () => void) => ReactNode);
+  bottomContent?: Content;
   /** element that triggers dialog on click */
   children: ReactElement<{ onClick: () => void }>;
 };
 
+type Content = ReactNode | ((close: () => void, open: () => void) => ReactNode);
+
 /** "fullscreen" dialog of interactive content when clicking children */
 const Dialog = ({ title, content, bottomContent, children }: Props) => {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setOpen] = useState(false);
+  const open = () => setOpen(true);
   const close = () => setOpen(false);
 
   return (
     <>
       {cloneElement(children, { onClick: () => setOpen(true) })}
-      <Root open={open} onClose={close}>
+      <Root open={isOpen} onClose={close}>
         <div className={classes.fullscreen}>
           <Content as={Fragment}>
             <Flex direction="column" className={classes.content}>
@@ -46,13 +49,18 @@ const Dialog = ({ title, content, bottomContent, children }: Props) => {
               <button className={classes.close} onClick={close}>
                 <FaCircleXmark />
               </button>
-              <Flex className={classes.scroll} direction="column">
-                {content}
+              <Flex
+                className={classes.scroll}
+                direction="column"
+                vAlign="top"
+                full
+              >
+                {typeof content === "function" ? content(close, open) : content}
               </Flex>
               {bottomContent && (
                 <Flex hAlign="right" full>
                   {typeof bottomContent === "function"
-                    ? bottomContent(close)
+                    ? bottomContent(close, open)
                     : bottomContent}
                 </Flex>
               )}

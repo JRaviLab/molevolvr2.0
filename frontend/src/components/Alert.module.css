@@ -1,6 +1,7 @@
 .alert {
   z-index: 0;
   position: relative;
+  flex-shrink: 0;
   padding: 20px;
   overflow: hidden;
   gap: 20px !important;
@@ -14,7 +15,7 @@
   inset: 0;
   background: var(--color);
   content: "";
-  opacity: 0.25;
+  opacity: 0.1;
 }
 
 .alert > svg {

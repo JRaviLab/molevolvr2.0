@@ -38,6 +38,11 @@
   font-size: 1.2rem;
 }
 
+.form {
+  display: contents;
+}
+
 .scroll {
+  padding: 10px;
   overflow-y: auto;
 }
