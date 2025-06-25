@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { onlyText } from "react-children-utilities";
+import { createPortal } from "react-dom";
 import {
   FaCircleCheck,
   FaCircleExclamation,
@@ -47,7 +48,7 @@ const Toasts = () => {
 
   if (toasts.length === 0) return null;
 
-  return (
+  return createPortal(
     <Flex
       className={classes.toasts}
       direction="column"
@@ -71,7 +72,8 @@ const Toasts = () => {
           </button>
         </div>
       ))}
-    </Flex>
+    </Flex>,
+    document.body,
   );
 };
 
