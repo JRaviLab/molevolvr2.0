@@ -1,9 +1,12 @@
+import type { FormEvent } from "react";
 import { FaDownload, FaRegComment, FaRegPaperPlane } from "react-icons/fa6";
 import { useLocation } from "react-router";
 import { Fragment } from "react/jsx-runtime";
 import clsx from "clsx";
-import { mapValues } from "lodash";
+import { mapValues, startCase, truncate } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
+import { useMutation } from "@tanstack/react-query";
+import { submitFeedback } from "@/api/feedback";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import Dialog from "@/components/Dialog";
@@ -12,17 +15,25 @@ import Link from "@/components/Link";
 import TextBox from "@/components/TextBox";
 import { userAgent } from "@/util/browser";
 import { downloadJpg } from "@/util/download";
+import { shortenUrl } from "@/util/string";
 import classes from "./Feedback.module.css";
 
+/** feedback form on every page. singleton. */
 const Feedback = () => {
+  /** form state, saved to local storage */
   const [name, setName] = useLocalStorage("feedback-name", "");
-  const [username, setUsername] = useLocalStorage("feedback-username", "");
+  let [username, setUsername] = useLocalStorage("feedback-username", "");
   const [email, setEmail] = useLocalStorage("feedback-email", "");
   const [feedback, setFeedback] = useLocalStorage("feedback-body", "");
 
   const { pathname, search, hash } = useLocation();
   const { browser, engine, os, device, cpu } = userAgent;
 
+  /** validate username */
+  if (username && username.length > 0)
+    username = username.replaceAll(/^@*/g, "@") || "";
+
+  /** extra details to include in report */
   const details = mapValues(
     {
       Page: [pathname + search + hash],
@@ -35,11 +46,49 @@ const Feedback = () => {
     (value) => value.filter(Boolean).join(" "),
   );
 
+  /** submit feedback action */
+  const { mutate, data, isIdle, isPending, isError, isSuccess, reset } =
+    useMutation({
+      mutationKey: ["feedback"],
+      mutationFn: (params: Parameters<typeof submitFeedback>) =>
+        submitFeedback(...params),
+    });
+
+  /** on form submit */
+  const onSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+
+    /** issue title */
+    const title = truncate(
+      ["Feedback form", name || username || "anon."].join(" - "),
+      { length: 250 },
+    );
+
+    /** issue body */
+    const body = [{ name, username, email }, details, { feedback }]
+      .map((group) =>
+        Object.entries(group)
+          .map(([key, value]) => [`**${startCase(key)}**`, value || "-"])
+          .flat()
+          .join("\n"),
+      )
+      .join("\n\n");
+
+    /** submit issue */
+    mutate([title, body]);
+  };
+
   return (
     <Dialog
       title="Feedback form"
+      onChange={(open) => {
+        if (open && isSuccess) {
+          reset();
+          setFeedback(null);
+        }
+      }}
       content={(close, open) => (
-        <form className={classes.form}>
+        <form className={classes.form} onSubmit={onSubmit}>
           <div className={classes.fields}>
             <TextBox
               label="Name"
@@ -82,20 +131,49 @@ const Feedback = () => {
               </Fragment>
             ))}
           </div>
-          <Alert className={classes.full}>
-            Submitting will start a <strong>public discussion</strong> on{" "}
-            <Link to={import.meta.env.VITE_REPO + "/issues"}>our GitHub</Link>{" "}
-            with <strong>all of the information above</strong>.
-            <br />
-            You'll get a link to it once it's created.
+
+          <Alert
+            className={classes.full}
+            type={
+              isPending
+                ? "loading"
+                : isError
+                  ? "error"
+                  : isSuccess
+                    ? "success"
+                    : "info"
+            }
+          >
+            {isIdle && (
+              <>
+                Submitting will start a <strong>public discussion</strong> on{" "}
+                <Link to={import.meta.env.VITE_REPO + "/issues"}>
+                  our GitHub
+                </Link>{" "}
+                with <strong>all of the information above</strong>.
+                <br />
+                You'll get a link to it once it's created.
+              </>
+            )}
+            {isPending && "Submitting feedback"}
+            {isError && "Error submitting feedback"}
+            {isSuccess && data.link && (
+              <>
+                Submitted feedback!{" "}
+                <Link to={data.link}>{shortenUrl(data.link)}</Link>
+              </>
+            )}
           </Alert>
+
           <Flex>
-            <Button
-              className={classes.middle}
-              text="Submit"
-              icon={<FaRegPaperPlane />}
-              type="submit"
-            />
+            {isIdle && (
+              <Button
+                className={classes.middle}
+                text="Submit"
+                icon={<FaRegPaperPlane />}
+                type="submit"
+              />
+            )}
             <Button
               text="Screenshot"
               icon={<FaDownload />}

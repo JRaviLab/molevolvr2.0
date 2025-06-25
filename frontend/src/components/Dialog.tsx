@@ -25,6 +25,8 @@ type Props = {
    * get scrollbar).
    */
   bottomContent?: Content;
+  /** when open state changes */
+  onChange?: (open: boolean) => void;
   /** element that triggers dialog on click */
   children: ReactElement<{ onClick: () => void }>;
 };
@@ -32,14 +34,26 @@ type Props = {
 type Content = ReactNode | ((close: () => void, open: () => void) => ReactNode);
 
 /** "fullscreen" dialog of interactive content when clicking children */
-const Dialog = ({ title, content, bottomContent, children }: Props) => {
+const Dialog = ({
+  title,
+  content,
+  bottomContent,
+  onChange,
+  children,
+}: Props) => {
   const [isOpen, setOpen] = useState(false);
-  const open = () => setOpen(true);
-  const close = () => setOpen(false);
+  const open = () => {
+    setOpen(true);
+    onChange?.(true);
+  };
+  const close = () => {
+    setOpen(false);
+    onChange?.(false);
+  };
 
   return (
     <>
-      {cloneElement(children, { onClick: () => setOpen(true) })}
+      {cloneElement(children, { onClick: open })}
       <Root open={isOpen} onClose={close}>
         <div className={classes.fullscreen}>
           <Content as={Fragment}>

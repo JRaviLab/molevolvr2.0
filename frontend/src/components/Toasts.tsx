@@ -45,8 +45,11 @@ type Toast = {
 const Toasts = () => {
   const toasts = useAtomValue(toastsAtom);
 
+  if (toasts.length === 0) return null;
+
   return (
     <Flex
+      className={classes.toasts}
       direction="column"
       hAlign="stretch"
       gap="sm"
