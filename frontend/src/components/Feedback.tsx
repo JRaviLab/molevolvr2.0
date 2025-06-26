@@ -86,8 +86,8 @@ const Feedback = () => {
       title="Feedback"
       onChange={(open) => {
         if (open && (isSuccess || isError)) {
+          if (isSuccess) setFeedback(null);
           reset();
-          setFeedback(null);
         }
       }}
       content={(close, open) => (

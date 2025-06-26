@@ -32,7 +32,7 @@ export const handlers = [
   http.post("*/feedback", async ({ request }) => {
     await delay();
     if ((await request.clone().json()).body.includes("fake error"))
-      return new HttpResponse(null, { status: 400 });
+      return new HttpResponse(null, { status: 500 });
     return HttpResponse.json({ link: import.meta.env.VITE_REPO + "/issues" });
   }),
 
