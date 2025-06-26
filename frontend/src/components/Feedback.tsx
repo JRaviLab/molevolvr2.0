@@ -148,7 +148,7 @@ const Feedback = () => {
               <>
                 Submitting will start a <strong>public discussion</strong> on{" "}
                 <Link to={import.meta.env.VITE_REPO + "/issues"}>
-                  our GitHub
+                  our GitHub issue tracker
                 </Link>{" "}
                 with <strong>all of the information above</strong>.
                 <br />
