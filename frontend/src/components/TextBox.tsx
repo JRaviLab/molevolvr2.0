@@ -71,17 +71,19 @@ const TextBox = ({
   if (text || value)
     sideElement = (
       <div ref={sideRef} className={classes.side}>
-        <button
-          className={classes["side-button"]}
-          type="button"
-          onClick={async () => {
-            await window.navigator.clipboard.writeText(text);
-            toast("Copied text", "success");
-          }}
-          aria-label="Copy text"
-        >
-          <FaRegCopy />
-        </button>
+        {multi && (
+          <button
+            className={classes["side-button"]}
+            type="button"
+            onClick={async () => {
+              await window.navigator.clipboard.writeText(text);
+              toast("Copied text", "success");
+            }}
+            aria-label="Copy text"
+          >
+            <FaRegCopy />
+          </button>
+        )}
         <button
           className={classes["side-button"]}
           type="button"

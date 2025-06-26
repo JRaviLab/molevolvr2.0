@@ -11,6 +11,7 @@ import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import Dialog from "@/components/Dialog";
 import Flex from "@/components/Flex";
+import Help from "@/components/Help";
 import Link from "@/components/Link";
 import TextBox from "@/components/TextBox";
 import { userAgent } from "@/util/browser";
@@ -174,17 +175,19 @@ const Feedback = () => {
                 type="submit"
               />
             )}
+            <div />
             <Button
               text="Screenshot"
               icon={<FaDownload />}
               design="hollow"
-              tooltip="Download a screenshot of the current page. Attach to your created discussion to help us debug."
+              tooltip="Download a screenshot of the current page"
               onClick={async () => {
                 close();
                 await downloadJpg(document.body, ["screenshot.jpg"]);
                 open();
               }}
             />
+            <Help tooltip="A screenshot of the current page can help us troubleshoot issues. Currently, we can't automatically attach a screenshot with your feedback, so you'll have to download it and attach/send it to us manually." />
           </Flex>
         </form>
       )}
