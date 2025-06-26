@@ -29,8 +29,10 @@ export const handlers = [
     else return HttpResponse.json(lookup);
   }),
 
-  http.post("*/feedback", async () => {
+  http.post("*/feedback", async ({ request }) => {
     await delay();
+    if ((await request.clone().json()).body.includes("fake error"))
+      return new HttpResponse(null, { status: 400 });
     return HttpResponse.json({ link: import.meta.env.VITE_REPO + "/issues" });
   }),
 

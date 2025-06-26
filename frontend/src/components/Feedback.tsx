@@ -19,6 +19,8 @@ import { downloadJpg } from "@/util/download";
 import { shortenUrl } from "@/util/string";
 import classes from "./Feedback.module.css";
 
+const { VITE_EMAIL, VITE_ISSUES } = import.meta.env;
+
 /** feedback form on every page. singleton. */
 const Feedback = () => {
   /** form state, saved to local storage */
@@ -47,6 +49,22 @@ const Feedback = () => {
     (value) => value.filter(Boolean).join(" "),
   );
 
+  /** issue title */
+  const title = truncate(
+    ["Feedback", name || username || "anon."].join(" - "),
+    { length: 250 },
+  );
+
+  /** issue body */
+  const body = [{ name, username, email }, details, { feedback }]
+    .map((group) =>
+      Object.entries(group)
+        .map(([key, value]) => [`**${startCase(key)}**`, value || "-"])
+        .flat()
+        .join("\n"),
+    )
+    .join("\n\n");
+
   /** submit feedback action */
   const { mutate, data, isIdle, isPending, isError, isSuccess, reset } =
     useMutation({
@@ -59,22 +77,6 @@ const Feedback = () => {
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
-    /** issue title */
-    const title = truncate(
-      ["Feedback", name || username || "anon."].join(" - "),
-      { length: 250 },
-    );
-
-    /** issue body */
-    const body = [{ name, username, email }, details, { feedback }]
-      .map((group) =>
-        Object.entries(group)
-          .map(([key, value]) => [`**${startCase(key)}**`, value || "-"])
-          .flat()
-          .join("\n"),
-      )
-      .join("\n\n");
-
     /** submit issue */
     mutate([title, body]);
   };
@@ -83,7 +85,7 @@ const Feedback = () => {
     <Dialog
       title="Feedback"
       onChange={(open) => {
-        if (open && isSuccess) {
+        if (open && (isSuccess || isError)) {
           reset();
           setFeedback(null);
         }
@@ -124,7 +126,7 @@ const Feedback = () => {
             onChange={setFeedback}
           />
 
-          <div className={clsx("mini-table", classes.details, classes.full)}>
+          <div className={clsx("mini-table", classes.details)}>
             {Object.entries(details).map(([key, value]) => (
               <Fragment key={key}>
                 <div>{key}</div>
@@ -134,7 +136,6 @@ const Feedback = () => {
           </div>
 
           <Alert
-            className={classes.full}
             type={
               isPending
                 ? "loading"
@@ -148,16 +149,23 @@ const Feedback = () => {
             {isIdle && (
               <>
                 Submitting will start a <strong>public discussion</strong> on{" "}
-                <Link to={import.meta.env.VITE_REPO + "/issues"}>
-                  our GitHub issue tracker
-                </Link>{" "}
-                with <strong>all of the information above</strong>.
-                <br />
-                You'll get a link to it once it's created.
+                <Link to={VITE_ISSUES}>our GitHub issue tracker</Link> with{" "}
+                <strong>all of the information above</strong>. You'll get a link
+                to it once it's created.
               </>
             )}
             {isPending && "Submitting feedback"}
-            {isError && "Error submitting feedback"}
+            {isError && (
+              <>
+                Error submitting feedback. Contact us directly:{" "}
+                <Link
+                  to={`mailto:${VITE_EMAIL}?subject=${title}&body=${window.encodeURIComponent(body)}`}
+                >
+                  {VITE_EMAIL}
+                </Link>
+                .
+              </>
+            )}
             {isSuccess && data.link && (
               <>
                 Submitted feedback!{" "}
@@ -166,7 +174,31 @@ const Feedback = () => {
             )}
           </Alert>
 
-          <Flex>
+          <Flex gap="lg" gapRatio={0.5}>
+            <Flex gap="sm">
+              <Button
+                text="Screenshot"
+                icon={<FaDownload />}
+                design="hollow"
+                tooltip="Download a screenshot of the current page"
+                onClick={async () => {
+                  close();
+                  await downloadJpg(document.body, ["screenshot.jpg"]);
+                  open();
+                }}
+              />
+              <Help
+                tooltip={
+                  <div>
+                    A screenshot of the current page can help us troubleshoot
+                    issues. Currently, we can't <i>automatically</i> attach a
+                    screenshot with your feedback, so you'll have to download
+                    and attach/send it manually.
+                  </div>
+                }
+              />
+            </Flex>
+
             {isIdle && (
               <Button
                 className={classes.middle}
@@ -175,19 +207,6 @@ const Feedback = () => {
                 type="submit"
               />
             )}
-            <div />
-            <Button
-              text="Screenshot"
-              icon={<FaDownload />}
-              design="hollow"
-              tooltip="Download a screenshot of the current page"
-              onClick={async () => {
-                close();
-                await downloadJpg(document.body, ["screenshot.jpg"]);
-                open();
-              }}
-            />
-            <Help tooltip="A screenshot of the current page can help us troubleshoot issues. Currently, we can't automatically attach a screenshot with your feedback, so you'll have to download it and attach/send it to us manually." />
           </Flex>
         </form>
       )}

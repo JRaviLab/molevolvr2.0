@@ -11,6 +11,8 @@ type Props = {
   description?: string;
 };
 
+const { VITE_TITLE, VITE_DESCRIPTION } = import.meta.env;
+
 /**
  * set specific metadata for current page (overrides site-wide metadata in
  * .env), akin to react-helmet
@@ -21,7 +23,7 @@ export const Meta = ({ title, description }: Props) => {
     /** concat title string from parts */
     const string = [title]
       .flat()
-      .concat(import.meta.env.VITE_TITLE)
+      .concat(VITE_TITLE)
       .map((part) => truncate(part.trim(), { length: 25, separator: " " }))
       .filter(Boolean)
       .join(" | ");
@@ -39,7 +41,7 @@ export const Meta = ({ title, description }: Props) => {
   /** set description */
   useEffect(() => {
     /** get page-specific, or fall back to site-wide */
-    const string = (description || import.meta.env.VITE_DESCRIPTION).trim();
+    const string = (description || VITE_DESCRIPTION).trim();
 
     /** set attributes */
     document

@@ -672,7 +672,9 @@ const SectionAlert = () => (
         tempor incididunt ut labore et dolore magna aliqua.
       </Alert>
       {Object.keys(types).map((type) => (
-        <Alert type={type as keyof typeof types}>{startCase(type)}</Alert>
+        <Alert key={type} type={type as keyof typeof types}>
+          {startCase(type)}
+        </Alert>
       ))}
     </Flex>
   </Section>

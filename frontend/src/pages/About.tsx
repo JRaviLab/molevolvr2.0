@@ -6,6 +6,7 @@ import {
   FaGithub,
   FaMicroscope,
   FaPenNib,
+  FaRegComment,
   FaTwitter,
   FaUsers,
 } from "react-icons/fa6";
@@ -74,6 +75,14 @@ const team = [
     email: "johnj@msu.edu",
   },
 ];
+
+const {
+  VITE_EMAIL,
+  VITE_ISSUES,
+  VITE_LAB_NAME,
+  VITE_LAB_WEBSITE,
+  VITE_LAB_GITHUB,
+} = import.meta.env;
 
 const About = () => {
   return (
@@ -269,7 +278,7 @@ const About = () => {
           <ul>
             <li>
               <strong>
-                <Link to="https://github.com/JRaviLab/molevolvr">
+                <Link to={`${VITE_LAB_GITHUB}/molevolvr`}>
                   MolEvolvR package
                 </Link>
               </strong>{" "}
@@ -323,7 +332,7 @@ const About = () => {
 
           <p>
             If you encounter a bug, please{" "}
-            <Link to="mailto:janani.ravi@cuanschutz.edu">let us know</Link>!
+            <Link to="#contact">let us know</Link>!
           </p>
         </Flex>
       </Section>
@@ -489,9 +498,17 @@ const About = () => {
         <Heading level={3}>Contact</Heading>
 
         <Flex hAlign="left" full>
+          <p>
+            <strong>Before contacting us privately</strong>, we prefer that you
+            use the <FaRegComment /> feedback form in the corner of every page,
+            or <Link to={VITE_ISSUES}>create a GitHub issue</Link>. This helps
+            us keep better track of work, and lets other people benefit from the
+            discussion.
+          </p>
+
           <Button
-            to="mailto:janani.ravi@cuanschutz.edu"
-            text="janani.ravi@cuanschutz.edu"
+            to={`mailto:${VITE_EMAIL}`}
+            text={VITE_EMAIL}
             icon={<FaEnvelope />}
           />
         </Flex>
@@ -500,21 +517,12 @@ const About = () => {
 
         <Flex hAlign="left" full>
           <Button
-            to="https://jravilab.github.io/"
-            text="JRaviLab"
+            to={VITE_LAB_WEBSITE}
+            text={VITE_LAB_NAME}
             icon={<FaMicroscope />}
-            tooltip="JRaviLab website"
+            tooltip={`${VITE_LAB_NAME} website`}
           />
-          <Button
-            to="https://github.com/jravilab"
-            text="GitHub"
-            icon={<FaGithub />}
-          />
-          <Button
-            to="https://twitter.com/jravilab"
-            text="Twitter"
-            icon={<FaTwitter />}
-          />
+          <Button to={VITE_LAB_GITHUB} text="GitHub" icon={<FaGithub />} />
         </Flex>
       </Section>
     </>
