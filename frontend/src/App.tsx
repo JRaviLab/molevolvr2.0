@@ -10,8 +10,6 @@ import {
   redirect,
   RouterProvider,
   useLocation,
-  useMatches,
-  useRouteLoaderData,
 } from "react-router";
 import { isEmpty } from "lodash";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -41,12 +39,6 @@ const Layout = () => {
   /** current route info */
   const { hash, pathname, search } = useLocation();
 
-  /** current route id */
-  const id = useMatches().at(-1)?.id || "";
-
-  /** loader data */
-  const { toc } = (useRouteLoaderData(id) as Meta) || {};
-
   /** which parts of route have changed from prev render */
   const hashChanged = useChanged(hash);
   const restChanged = useChanged({ pathname, search });
@@ -60,7 +52,7 @@ const Layout = () => {
       >
         <Header />
         <main>
-          {toc && <TableOfContents />}
+          <TableOfContents />
           <Outlet />
         </main>
         <Footer />
@@ -70,9 +62,6 @@ const Layout = () => {
     </QueryClientProvider>
   );
 };
-
-/** route metadata */
-type Meta = { toc?: true } | undefined;
 
 /** route definitions */
 export const routes = [
@@ -108,17 +97,14 @@ export const routes = [
       {
         path: "about",
         element: <About />,
-        loader: () => ({ toc: true }) satisfies Meta,
       },
       {
         path: "analysis/:id",
         element: <Analysis />,
-        loader: () => ({ toc: true }) satisfies Meta,
       },
       {
         path: "testbed",
         element: <Testbed />,
-        loader: () => ({ toc: true }) satisfies Meta,
       },
       {
         path: "*",

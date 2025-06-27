@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
+import { useLocation } from "react-router";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { debounce } from "lodash";
@@ -31,8 +32,15 @@ const TableOfContents = () => {
   const listRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLAnchorElement>(null);
 
+  const { pathname } = useLocation();
+
   /** open/closed state */
-  const [open, setOpen] = useState(window.innerWidth > 1500);
+  const [open, setOpen] = useState(false);
+
+  /** when path changes, hide/show */
+  useEffect(() => {
+    setOpen(pathname === "/" ? false : window.innerWidth > 1500);
+  }, [pathname]);
 
   /** full heading details */
   const headings = useAtomValue(headingsAtom);
@@ -67,7 +75,11 @@ const TableOfContents = () => {
   });
 
   /** if not much value in showing toc, hide */
-  if (headings.length <= 1) return <></>;
+  if (
+    headings.length <= 2 ||
+    document.body.scrollHeight < window.innerHeight * 2
+  )
+    return <></>;
 
   return (
     <aside ref={ref} className={classes.table} aria-label="Table of contents">
