@@ -159,7 +159,7 @@ const Feedback = () => {
               <>
                 Error submitting feedback. Contact us directly:{" "}
                 <Link
-                  to={`mailto:${VITE_EMAIL}?subject=${title}&body=${window.encodeURIComponent(body)}`}
+                  to={`mailto:${VITE_EMAIL}?body=${window.encodeURIComponent(body)}`}
                 >
                   {VITE_EMAIL}
                 </Link>

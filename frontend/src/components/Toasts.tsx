@@ -51,7 +51,7 @@ const Toasts = () => {
   return createPortal(
     <Flex
       className={classes.toasts}
-      direction="column"
+      column
       hAlign="stretch"
       gap="sm"
       role="region"

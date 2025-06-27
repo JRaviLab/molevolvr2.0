@@ -11,7 +11,7 @@ const ViewCorner = () => {
   const scrolled = useScrolled();
 
   return (
-    <Flex className={classes.container} direction="column" gap="sm">
+    <Flex className={classes.container} column gap="sm">
       {scrolled && (
         <Button
           className={classes.button}

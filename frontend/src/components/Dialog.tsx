@@ -63,12 +63,7 @@ const Dialog = ({
               <button className={classes.close} onClick={close}>
                 <FaCircleXmark />
               </button>
-              <Flex
-                className={classes.scroll}
-                direction="column"
-                vAlign="top"
-                full
-              >
+              <Flex className={classes.scroll} column vAlign="top" full>
                 {typeof content === "function" ? content(close, open) : content}
               </Flex>
               {bottomContent && (

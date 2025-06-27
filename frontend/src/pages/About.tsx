@@ -1,13 +1,13 @@
+import { FaExchangeAlt } from "react-icons/fa";
 import {
   FaBook,
   FaCommentDots,
   FaDoorOpen,
-  FaEnvelope,
   FaGithub,
   FaMicroscope,
   FaPenNib,
   FaRegComment,
-  FaTwitter,
+  FaRegEnvelope,
   FaUsers,
 } from "react-icons/fa6";
 import Button from "@/components/Button";
@@ -234,14 +234,14 @@ const About = () => {
                 <code>
                   {trim(
                     `>GCF_000013425.1
-                  MVPEEKGSITLSKEAAIIFAIAKFKPFKNRIKNNPQKTNPFLKLHENKKS
-                  >GCF_000013425.1
-                  MKQKKSKNIFWVFSILAVVFLVLFSFAVGASNVPMMILTFILLVATFGIGFTTKKKYRENDWL
-                  >protein
-                  MKLTLMKFFVGGFAVLLSYIVSVTLPWKEFGGIFATFPAVFLVSMFITGMQYGDKVAVHVSRGAVFGMTGVLVCILVTWM
-                  MLHMTHMWLISIVVGFLSWFISAVCIFEAVEFIAQKRLEKHSWKAGKSNSK
-                  >protein
-                  MVKRTYQPNKRKHSKVHGFRKRMSTKNGRKVLARRRRKGRKVLSA`,
+                    MVPEEKGSITLSKEAAIIFAIAKFKPFKNRIKNNPQKTNPFLKLHENKKS
+                    >GCF_000013425.1
+                    MKQKKSKNIFWVFSILAVVFLVLFSFAVGASNVPMMILTFILLVATFGIGFTTKKKYRENDWL
+                    >protein
+                    MKLTLMKFFVGGFAVLLSYIVSVTLPWKEFGGIFATFPAVFLVSMFITGMQYGDKVAVHVSRGAVFGMTGVLVCILVTWM
+                    MLHMTHMWLISIVVGFLSWFISAVCIFEAVEFIAQKRLEKHSWKAGKSNSK
+                    >protein
+                    MVKRTYQPNKRKHSKVHGFRKRMSTKNGRKVLARRRRKGRKVLSA`,
                   )}
                 </code>
               </pre>
@@ -276,19 +276,19 @@ const About = () => {
               consisting of:
             </p>
 
-          <ul>
-            <li>
-              <strong>
-                <Link to={`${VITE_LAB_GITHUB}/molevolvr`}>
-                  MolEvolvR package
-                </Link>
-              </strong>{" "}
-              &ndash; the R package at the core of everything, which does most
-              of the analysis calculations
-            </li>
-            <li>
-              <strong>Frontend</strong> &ndash; a web app written in React
-            </li>
+            <ul>
+              <li>
+                <strong>
+                  <Link to={`${VITE_LAB_GITHUB}/molevolvr`}>
+                    MolEvolvR package
+                  </Link>
+                </strong>{" "}
+                &ndash; the R package at the core of everything, which does most
+                of the analysis calculations
+              </li>
+              <li>
+                <strong>Frontend</strong> &ndash; a web app written in React
+              </li>
 
               <li>
                 <strong>Backend</strong> &ndash; a backend written in{" "}
@@ -306,36 +306,7 @@ const About = () => {
               </li>
             </ul>
           </Flex>
-
-          <Flex column gap="sm">
-            <Heading level={3}>Compatibility</Heading>
-
-            <p>This web-app is regularly tested on the following:</p>
-
-            <ul>
-              <li>Google Chrome, Mozilla Firefox, Apple Safari</li>
-              <li>Windows, MacOS, iOS, Android</li>
-              <li>Desktop, tablet, phone/mobile</li>
-            </ul>
-
-            <p>
-              The following are NOT supported, and may result in unexpected look
-              or behavior:
-            </p>
-
-          <ul>
-            <li>Internet Explorer</li>
-            <li>
-              Smart watches, or any device with a screen width {"<"} ~250px
-            </li>
-            <li>Browsers without JavaScript enabled</li>
-          </ul>
-
-          <p>
-            If you encounter a bug, please{" "}
-            <Link to="#contact">let us know</Link>!
-          </p>
-        </Flex>
+        </div>
       </Section>
 
       <Section>
@@ -464,13 +435,11 @@ const About = () => {
 
       <Section>
         <Heading level={2} icon={<FaUsers />}>
-          Get to know us
+          Team
         </Heading>
 
-        <Heading level={3}>Team</Heading>
-
-        <div className="table-wrapper">
-          <table>
+        <div className="table-wrapper full">
+          <table className="full">
             <thead>
               <tr>
                 <th>Name</th>
@@ -485,7 +454,7 @@ const About = () => {
                   <td>
                     {email && (
                       <Link to={`mailto:${email}`}>
-                        <FaEnvelope />
+                        <FaRegEnvelope />
                         {email}
                       </Link>
                     )}
@@ -516,30 +485,61 @@ const About = () => {
           scholarship to SZC; NIH NIAID U01AI176414 to JR; NIH NLM T15LM009451
           to EPB.
         </p>
+      </Section>
 
-        <Flex column gap="sm">
-          <Heading level={3}>Contact</Heading>
+      <Section>
+        <Heading level={2} icon={<FaExchangeAlt />}>
+          Compatibility
+        </Heading>
 
-        <Flex hAlign="left" full>
-          <p>
-            <strong>Before contacting us privately</strong>, we prefer that you
-            use the <FaRegComment /> feedback form in the corner of every page,
-            or <Link to={VITE_ISSUES}>create a GitHub issue</Link>. This helps
-            us keep better track of work, and lets other people benefit from the
-            discussion.
-          </p>
+        <div className="grid cols-2">
+          <Flex column gap="sm" full>
+            <p>This web-app is regularly tested on the following:</p>
 
-          <Button
-            to={`mailto:${VITE_EMAIL}`}
-            text={VITE_EMAIL}
-            icon={<FaEnvelope />}
-          />
-        </Flex>
+            <ul>
+              <li>Google Chrome, Mozilla Firefox, Apple Safari</li>
+              <li>Windows, MacOS, iOS, Android</li>
+              <li>Desktop, tablet, phone/mobile</li>
+            </ul>
+          </Flex>
 
-        <Flex column gap="sm">
-          <Heading level={3}>Follow</Heading>
+          <Flex column gap="sm" full>
+            <p>
+              The following are NOT supported, and may result in unexpected look
+              or behavior:
+            </p>
 
-        <Flex hAlign="left" full>
+            <ul>
+              <li>Internet Explorer</li>
+              <li>
+                Smart watches, or any device with a screen width {"<"} ~250px
+              </li>
+              <li>Browsers without JavaScript enabled</li>
+            </ul>
+          </Flex>
+        </div>
+      </Section>
+
+      <Section>
+        <Heading level={2} icon={<FaRegEnvelope />}>
+          Contact
+        </Heading>
+
+        <p>
+          <strong>Before contacting us privately</strong>, we prefer that you
+          use the <FaRegComment /> feedback form in the corner of every page, or{" "}
+          <Link to={VITE_ISSUES}>create a GitHub issue</Link>. This helps us
+          keep better track of work, and lets other people benefit from the
+          discussion.
+        </p>
+
+        <Button
+          to={`mailto:${VITE_EMAIL}`}
+          text={VITE_EMAIL}
+          icon={<FaRegEnvelope />}
+        />
+
+        <Flex gap="sm">
           <Button
             to={VITE_LAB_WEBSITE}
             text={VITE_LAB_NAME}
