@@ -15,7 +15,7 @@ type Props = {
 /** big icon and primary and secondary content/text */
 const Tile = ({ icon, primary, secondary }: Props) => {
   return (
-    <Flex direction="column" className={classes.tile}>
+    <Flex column className={classes.tile}>
       {icon}
       <div>
         <div className={clsx("bold", classes.primary)}>{primary}</div>

@@ -57,7 +57,7 @@ const Dialog = ({
       <Root open={isOpen} onClose={close}>
         <div className={classes.fullscreen}>
           <Content as={Fragment}>
-            <Flex direction="column" className={classes.content}>
+            <Flex column className={classes.content}>
               <Title>{title}</Title>
               <Description className="sr-only">{title}</Description>
               <button className={classes.close} onClick={close}>

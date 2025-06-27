@@ -41,7 +41,7 @@ export type Type = keyof typeof types;
 /** icon and text with color */
 const Mark = ({ type = "info", icon, className, children }: Props) => (
   <Flex
-    display="inline"
+    inline
     gap="sm"
     wrap={false}
     className={clsx(className, classes.mark)}

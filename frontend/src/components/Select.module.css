@@ -61,7 +61,7 @@
   transition: background var(--fast);
 }
 
-.option-active {
+.option[data-active="true"] {
   background: var(--off-white);
 }
 

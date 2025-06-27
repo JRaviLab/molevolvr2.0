@@ -8,7 +8,7 @@ const { VITE_EMAIL, VITE_LAB_NAME, VITE_LAB_WEBSITE, VITE_LAB_GITHUB } =
 
 /** at bottom of every page. singleton. */
 const Footer = () => (
-  <Flex tag="footer" direction="column" gap="sm" className={classes.footer}>
+  <Flex tag="footer" column gap="sm" className={classes.footer}>
     <Flex gap="sm" className={classes.icons}>
       <Link to={`mailto:${VITE_EMAIL}`} showArrow={false} tooltip="Email us">
         <FaEnvelope />
