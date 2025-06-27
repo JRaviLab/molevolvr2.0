@@ -22,11 +22,7 @@ const Analysis = () => {
   const { id = "Analysis" } = useParams();
 
   /** start analysis lookup */
-  const {
-    data: analysis,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: analysis, status } = useQuery({
     queryKey: ["analysis", id],
     queryFn: () => getAnalysis(id),
   });
@@ -57,12 +53,12 @@ const Analysis = () => {
           Analysis
         </Heading>
 
-        {isLoading && (
+        {status === "pending" && (
           <Alert type="loading">
             Loading analysis <strong>{id}</strong>
           </Alert>
         )}
-        {isError && (
+        {status === "error" && (
           <Alert type="error">
             Error loading analysis <strong>{id}</strong>
           </Alert>

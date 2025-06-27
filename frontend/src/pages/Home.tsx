@@ -53,7 +53,8 @@ export const examples = [
 ] satisfies Analysis[];
 
 const Home = () => {
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  /** app stats */
+  const { data: stats, status: status } = useQuery({
     queryKey: ["stats"],
     queryFn: getStats,
   });
@@ -156,7 +157,8 @@ const Home = () => {
           Stats
         </Heading>
 
-        {statsLoading && <Alert type="loading">Loading Stats</Alert>}
+        {status === "pending" && <Alert type="loading">Loading stats</Alert>}
+        {status === "error" && <Alert type="error">Error loading stats</Alert>}
 
         {stats && (
           <Flex gap="lg">

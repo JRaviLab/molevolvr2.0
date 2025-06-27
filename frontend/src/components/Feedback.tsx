@@ -66,12 +66,11 @@ const Feedback = () => {
     .join("\n\n");
 
   /** submit feedback action */
-  const { mutate, data, isIdle, isPending, isError, isSuccess, reset } =
-    useMutation({
-      mutationKey: ["feedback"],
-      mutationFn: (params: Parameters<typeof submitFeedback>) =>
-        submitFeedback(...params),
-    });
+  const { mutate, data, status, reset } = useMutation({
+    mutationKey: ["feedback"],
+    mutationFn: (params: Parameters<typeof submitFeedback>) =>
+      submitFeedback(...params),
+  });
 
   /** on form submit */
   const onSubmit = async (event: FormEvent) => {
@@ -85,8 +84,8 @@ const Feedback = () => {
     <Dialog
       title="Feedback"
       onChange={(open) => {
-        if (open && (isSuccess || isError)) {
-          if (isSuccess) setFeedback(null);
+        if (open && (status === "success" || status === "error")) {
+          if (status === "success") setFeedback(null);
           reset();
         }
       }}
@@ -137,16 +136,16 @@ const Feedback = () => {
 
           <Alert
             type={
-              isPending
+              status === "pending"
                 ? "loading"
-                : isError
+                : status === "error"
                   ? "error"
-                  : isSuccess
+                  : status === "success"
                     ? "success"
                     : "info"
             }
           >
-            {isIdle && (
+            {status === "idle" && (
               <>
                 Submitting will start a <strong>public discussion</strong> on{" "}
                 <Link to={VITE_ISSUES}>our GitHub issue tracker</Link> with{" "}
@@ -154,8 +153,8 @@ const Feedback = () => {
                 to it once it's created.
               </>
             )}
-            {isPending && "Submitting feedback"}
-            {isError && (
+            {status === "pending" && "Submitting feedback"}
+            {status === "error" && (
               <>
                 Error submitting feedback. Contact us directly:{" "}
                 <Link
@@ -166,7 +165,7 @@ const Feedback = () => {
                 .
               </>
             )}
-            {isSuccess && data.link && (
+            {status === "success" && data.link && (
               <>
                 Submitted feedback!{" "}
                 <Link to={data.link}>{shortenUrl(data.link)}</Link>
@@ -199,7 +198,7 @@ const Feedback = () => {
               />
             </Flex>
 
-            {isIdle && (
+            {status === "idle" && (
               <Button
                 className={classes.middle}
                 text="Submit"

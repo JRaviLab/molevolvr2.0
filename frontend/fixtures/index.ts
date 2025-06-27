@@ -18,7 +18,7 @@ const delay = () => sleep(random(1000, 3000));
 export const handlers = [
   http.get("*/stats", async () => {
     await delay();
-    HttpResponse.json(stats);
+    return HttpResponse.json(stats);
   }),
 
   http.get("*/analysis/:id", async ({ params }) => {
