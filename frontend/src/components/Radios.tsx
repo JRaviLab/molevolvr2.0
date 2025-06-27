@@ -77,18 +77,13 @@ const Radios = <O extends Option>({
   }, [value]);
 
   return (
-    <Flex
-      direction="column"
-      hAlign="left"
-      role="group"
-      className={classes.container}
-    >
+    <Flex column hAlign="left" role="group" className={classes.container}>
       <legend className={classes.label}>
         {label}
         {tooltip && <Help tooltip={tooltip} />}
       </legend>
 
-      <Flex direction="column" gap="xs" hAlign="stretch">
+      <Flex column gap="xs" hAlign="stretch">
         {options.map((option, index) => (
           <Flex
             tag="label"
@@ -117,15 +112,8 @@ const Radios = <O extends Option>({
             )}
 
             {/* text content */}
-            <Flex direction="column" hAlign="left" gap="sm">
-              <span
-                className={clsx(
-                  "primary",
-                  selectedWFallback === option.id && classes.checked,
-                )}
-              >
-                {option.primary}
-              </span>
+            <Flex column hAlign="left" gap="sm">
+              <span className="primary">{option.primary}</span>
               {option.secondary && (
                 <span className="secondary">{option.secondary}</span>
               )}

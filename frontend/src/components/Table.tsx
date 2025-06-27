@@ -276,11 +276,8 @@ const Table = <Datum extends object>({
   });
 
   return (
-    <Flex
-      direction="column"
-      className={expanded ? classes.expanded : classes.collapsed}
-    >
-      <div className={classes.scroll}>
+    <Flex column className={expanded ? classes.expanded : classes.collapsed}>
+      <div className="table-wrapper">
         {/* table */}
         <table
           className={classes.table}
@@ -320,9 +317,7 @@ const Table = <Datum extends object>({
                             <button
                               type="button"
                               className={classes["header-button"]}
-                              data-active={
-                                header.column.getIsSorted() ? "" : undefined
-                              }
+                              data-active={header.column.getIsSorted()}
                               onClick={header.column.getToggleSortingHandler()}
                             >
                               {header.column.getIsSorted() ? (
@@ -352,9 +347,7 @@ const Table = <Datum extends object>({
                               <button
                                 type="button"
                                 className={classes["header-button"]}
-                                data-active={
-                                  header.column.getIsFiltered() ? "" : undefined
-                                }
+                                data-active={header.column.getIsFiltered()}
                               >
                                 <FaFilter />
                               </button>

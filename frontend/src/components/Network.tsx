@@ -605,7 +605,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
 
   return (
-    <Flex direction="column" full>
+    <Flex column full>
       <div
         ref={ref}
         className={clsx("card", classes.network, expanded && classes.expanded)}
@@ -613,7 +613,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
       >
         {/* panel */}
         <Flex
-          direction="column"
+          column
           hAlign="left"
           vAlign="top"
           className={classes.panel}
@@ -622,7 +622,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
           {selectedItems.length ? (
             /** show info about selected nodes/edges */
             <>
-              <Flex direction="column" hAlign="left" gap="sm">
+              <Flex column hAlign="left" gap="sm">
                 <strong>Selected items</strong>
                 {selectedItems.map((node, index) => (
                   <Fragment key={index}>
@@ -656,7 +656,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
           ) : (
             /** if nothing selected, show color key */
             <>
-              <Flex direction="column" hAlign="left" gap="sm">
+              <Flex column hAlign="left" gap="sm">
                 <div>
                   <strong>Nodes</strong>{" "}
                   <span className="secondary">
@@ -672,7 +672,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
                 />
               </Flex>
 
-              <Flex direction="column" hAlign="left" gap="sm">
+              <Flex column hAlign="left" gap="sm">
                 <div>
                   <strong>Edges</strong>{" "}
                   <span className="secondary">

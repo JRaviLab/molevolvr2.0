@@ -1,25 +1,15 @@
 import { useRef, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
 import clsx from "clsx";
+import { useAtomValue } from "jotai";
 import { debounce } from "lodash";
-import {
-  useClickOutside,
-  useEventListener,
-  useMutationObserver,
-} from "@reactuses/core";
+import { useClickOutside, useEventListener } from "@reactuses/core";
+import { headingsAtom } from "@/components/Heading";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
 import { firstInView, isCovering, scrollTo } from "@/util/dom";
 import { sleep } from "@/util/misc";
 import classes from "./TableOfContents.module.css";
-
-/** all used heading elements */
-const headingSelector = "h1, h2, h3, h4";
-
-/** get all used heading elements */
-const getHeadings = () => [
-  ...document.querySelectorAll<HTMLHeadingElement>(headingSelector),
-];
 
 /**
  * check if covering something important and run func to close. debounce to
@@ -45,12 +35,10 @@ const TableOfContents = () => {
   const [open, setOpen] = useState(window.innerWidth > 1500);
 
   /** full heading details */
-  const [headings, setHeadings] = useState<
-    { text: string; id: string; level: number }[]
-  >([]);
+  const headings = useAtomValue(headingsAtom);
 
-  /** active heading id (first in view) */
-  const [activeId, setActiveId] = useState("");
+  /** active index */
+  const [active, setActive] = useState(0);
 
   /** click off to close */
   useClickOutside(ref, async () => {
@@ -62,10 +50,12 @@ const TableOfContents = () => {
   /** on window scroll */
   useEventListener("scroll", () => {
     /** get active heading */
-    setActiveId(firstInView(getHeadings())?.id || "");
+    setActive(firstInView(headings.map((h) => h.ref)));
+
     if (open) {
       /** if covering something important, close */
       debouncedIsCovering(ref.current, () => setOpen(false));
+
       /** prevent jitter when pinch-zoomed in */
       if (window.visualViewport?.scale === 1)
         /** scroll active toc item into view */
@@ -75,26 +65,6 @@ const TableOfContents = () => {
         });
     }
   });
-
-  useMutationObserver(
-    () => {
-      /** read headings from page */
-      setHeadings(
-        getHeadings().map((heading) => ({
-          text: heading.innerText,
-          id: heading.id,
-          level: parseInt(heading.tagName.slice(1)) || 0,
-        })),
-      );
-    },
-    /** listen to changes on page */
-    document.documentElement,
-    /** only listen for elements added/removed */
-    {
-      subtree: true,
-      childList: true,
-    },
-  );
 
   /** if not much value in showing toc, hide */
   if (headings.length <= 1) return <></>;
@@ -125,18 +95,19 @@ const TableOfContents = () => {
       {/* links */}
       {open && (
         <div ref={listRef} className={classes.list}>
-          {headings.map((heading, index) => (
+          {headings.map(({ id, level, text, icon }, index) => (
             <Link
               key={index}
-              ref={heading.id === activeId ? activeRef : undefined}
-              data-active={heading.id === activeId ? "" : undefined}
+              ref={active === index ? activeRef : undefined}
               className={classes.link}
-              to={{ hash: "#" + heading.id }}
+              data-active={active === index}
+              to={{ hash: "#" + id }}
               replace
-              style={{ paddingLeft: 10 * heading.level }}
-              onClick={() => scrollTo("#" + heading.id)}
+              style={{ paddingLeft: 20 * (level - 0.5) }}
+              onClick={() => scrollTo("#" + id)}
             >
-              {heading.text}
+              {icon && <span className={classes["link-icon"]}>{icon}</span>}
+              <span className={classes["link-text"]}>{text}</span>
             </Link>
           ))}
         </div>
