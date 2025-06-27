@@ -34,7 +34,7 @@ import {
   FaTableCells,
 } from "react-icons/fa6";
 import { PiSquaresFourFill } from "react-icons/pi";
-import { mapValues, sample, uniq } from "lodash";
+import { mapValues, sample, startCase, uniq } from "lodash";
 import { useElementSize } from "@reactuses/core";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
@@ -50,6 +50,7 @@ import Heatmap from "@/components/Heatmap";
 import IPR from "@/components/IPR";
 import Legend from "@/components/Legend";
 import Link from "@/components/Link";
+import { types } from "@/components/Mark";
 import Meta from "@/components/Meta";
 import MSA from "@/components/MSA";
 import { clustalColors, clustalType } from "@/components/msa-clustal";
@@ -670,10 +671,11 @@ const SectionAlert = () => (
         Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua.
       </Alert>
-      <Alert type="loading">Loading</Alert>
-      <Alert type="success">Success</Alert>
-      <Alert type="warning">Warning</Alert>
-      <Alert type="error">Error</Alert>
+      {Object.keys(types).map((type) => (
+        <Alert key={type} type={type as keyof typeof types}>
+          {startCase(type)}
+        </Alert>
+      ))}
     </Flex>
   </Section>
 );

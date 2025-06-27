@@ -112,13 +112,13 @@ export const mergeTo = (a: To, b: To) => {
 
   /** preserve parts of url */
   const path = {
-    /** use old path unless new one defined */
-    pathname: b.pathname !== "/" ? b.pathname : a.pathname,
+    /** use old path unless new one defined or to root */
+    pathname:
+      b.pathname !== "/" || (b.pathname === "/" && !b.search && !b.hash)
+        ? b.pathname
+        : a.pathname,
     search: mergeSearch(a.search, b.search),
-    /**
-     * keep old hash unless new one defined. use new one (even if blank) if path
-     * changed).
-     */
+    /** keep old hash unless new one defined. always use new if path changed. */
     hash: b.hash || b.pathname !== a.pathname ? b.hash : a.hash,
   };
 

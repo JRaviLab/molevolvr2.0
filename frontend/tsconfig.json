@@ -17,7 +17,7 @@
     "strict": true,
     "target": "ESNext"
   },
-  "include": ["src", "fixtures"],
+  "include": ["src", "fixtures", "./_env.d.ts"],
   "references": [
     {
       "path": "./tsconfig.node.json"

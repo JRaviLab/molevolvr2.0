@@ -16,6 +16,7 @@
   min-width: 40px;
   min-height: 40px;
   padding: 0;
+  border-radius: 999px;
 }
 
 .hollow {

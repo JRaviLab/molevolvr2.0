@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { onlyText } from "react-children-utilities";
+import { createPortal } from "react-dom";
 import {
   FaCircleCheck,
   FaCircleExclamation,
@@ -45,8 +46,11 @@ type Toast = {
 const Toasts = () => {
   const toasts = useAtomValue(toastsAtom);
 
-  return (
+  if (toasts.length === 0) return null;
+
+  return createPortal(
     <Flex
+      className={classes.toasts}
       column
       hAlign="stretch"
       gap="sm"
@@ -68,7 +72,8 @@ const Toasts = () => {
           </button>
         </div>
       ))}
-    </Flex>
+    </Flex>,
+    document.body,
   );
 };
 

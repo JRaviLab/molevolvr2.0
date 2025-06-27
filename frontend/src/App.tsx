@@ -18,6 +18,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import TableOfContents from "@/components/TableOfContents";
+import Toasts from "@/components/Toasts";
 import ViewCorner from "@/components/ViewCorner";
 import About from "@/pages/About";
 import Analysis from "@/pages/Analysis";
@@ -53,19 +54,20 @@ const Layout = () => {
   scrollToHash(hash, hashChanged, restChanged);
 
   return (
-    <IconContext.Provider
-      value={{ className: "icon", attr: { "aria-hidden": true } }}
-    >
-      <Header />
-      <main>
-        {toc && <TableOfContents />}
-        <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <IconContext.Provider
+        value={{ className: "icon", attr: { "aria-hidden": true } }}
+      >
+        <Header />
+        <main>
+          {toc && <TableOfContents />}
           <Outlet />
-        </QueryClientProvider>
-      </main>
-      <Footer />
-      <ViewCorner />
-    </IconContext.Provider>
+        </main>
+        <Footer />
+        <Toasts />
+        <ViewCorner />
+      </IconContext.Provider>
+    </QueryClientProvider>
   );
 };
 
@@ -132,7 +134,7 @@ const router = createBrowserRouter(routes, {
 });
 
 /** query client */
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 /** scroll to target of url hash on page */
 const scrollToHash = async (
