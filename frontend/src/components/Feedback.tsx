@@ -59,7 +59,7 @@ const Feedback = () => {
   const body = [{ name, username, email }, details, { feedback }]
     .map((group) =>
       Object.entries(group)
-        .map(([key, value]) => [`**${startCase(key)}**`, value || "-"])
+        .map(([key, value]) => [`**${startCase(key)}**`, value || "\\-"])
         .flat()
         .join("\n"),
     )
@@ -102,7 +102,7 @@ const Feedback = () => {
             <TextBox
               label="GitHub Username"
               placeholder="@yourname"
-              tooltip="Optional. So we can tag you in the discussion and you can follow it."
+              tooltip="Optional. So we can tag you in the post and you can follow it."
               value={username || ""}
               onChange={setUsername}
             />
@@ -147,7 +147,7 @@ const Feedback = () => {
           >
             {status === "idle" && (
               <>
-                Submitting will start a <strong>public discussion</strong> on{" "}
+                Submitting will start a <strong>public post</strong> on{" "}
                 <Link to={VITE_ISSUES}>our GitHub issue tracker</Link> with{" "}
                 <strong>all of the information above</strong>. You'll get a link
                 to it once it's created.

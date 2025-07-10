@@ -11,7 +11,6 @@ import {
   RouterProvider,
   useLocation,
 } from "react-router";
-import { isEmpty } from "lodash";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -28,6 +27,7 @@ import Testbed from "@/pages/Testbed";
 import { getDocBbox, glow, scrollTo } from "@/util/dom";
 import { useChanged } from "@/util/hooks";
 import { sleep, waitFor, waitForStable } from "@/util/misc";
+import { redirectPath, redirectState } from "@/util/url";
 
 /** app entrypoint */
 const App = () => <RouterProvider router={router} />;
@@ -74,15 +74,12 @@ export const routes = [
         element: <Home />,
         loader: async () => {
           /** handle 404 redirect */
-          const path = window.sessionStorage.redirectPath || "";
-          const state = JSON.parse(window.sessionStorage.redirectState || "{}");
-          if (!isEmpty(state)) window.history.replaceState(state, "");
-          if (path) {
-            console.debug("Redirecting to:", path);
-            console.debug("With state:", state);
-            window.sessionStorage.removeItem("redirectPath");
-            window.sessionStorage.removeItem("redirectState");
-            return redirect(path);
+          if (redirectState !== null)
+            window.history.replaceState(redirectState, "");
+          if (redirectPath) {
+            console.debug("Redirecting to:", redirectPath);
+            console.debug("With state:", redirectState);
+            return redirect(redirectPath);
           } else return null;
         },
       },
