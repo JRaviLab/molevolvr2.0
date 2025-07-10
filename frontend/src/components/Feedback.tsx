@@ -51,7 +51,7 @@ const Feedback = () => {
 
   /** issue title */
   const title = truncate(
-    ["Feedback", name || username || "anon."].join(" - "),
+    [name || username, feedback].filter(Boolean).join(" - "),
     { length: 250 },
   );
 
