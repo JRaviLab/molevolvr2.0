@@ -24,17 +24,23 @@ const { VITE_EMAIL, VITE_ISSUES } = import.meta.env;
 /** feedback form on every page. singleton. */
 const Feedback = () => {
   /** form state, saved to local storage */
-  const [name, setName] = useLocalStorage("feedback-name", "");
+  let [name, setName] = useLocalStorage("feedback-name", "");
   let [username, setUsername] = useLocalStorage("feedback-username", "");
-  const [email, setEmail] = useLocalStorage("feedback-email", "");
-  const [feedback, setFeedback] = useLocalStorage("feedback-body", "");
+  let [email, setEmail] = useLocalStorage("feedback-email", "");
+  let [feedback, setFeedback] = useLocalStorage("feedback-body", "");
+
+  /** set fallbacks */
+  name ||= "";
+  username ||= "";
+  email ||= "";
+  feedback ||= "";
 
   const { pathname, search, hash } = useLocation();
   const { browser, engine, os, device, cpu } = userAgent;
 
   /** validate username */
   if (username && username.length > 0)
-    username = username.replaceAll(/^@*/g, "@") || "";
+    username = username.replaceAll(/^@*/g, "@");
 
   /** extra details to include in report */
   const details = mapValues(
@@ -49,17 +55,22 @@ const Feedback = () => {
     (value) => value.filter(Boolean).join(" "),
   );
 
-  /** issue title */
+  /** feedback title */
   const title = truncate(
-    [name || username, feedback].filter(Boolean).join(" - "),
+    [name.trim() || username.trim(), feedback.trim()]
+      .filter(Boolean)
+      .join(" - "),
     { length: 250 },
   );
 
-  /** issue body */
+  /** feedback body */
   const body = [{ name, username, email }, details, { feedback }]
     .map((group) =>
       Object.entries(group)
-        .map(([key, value]) => [`**${startCase(key)}**`, value || "\\-"])
+        .map(([key, value]) => [
+          `**${startCase(key)}**`,
+          value.trim() ? value.trim() : "\\-",
+        ])
         .flat()
         .join("\n"),
     )
@@ -76,7 +87,7 @@ const Feedback = () => {
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
-    /** submit issue */
+    /** submit feedback */
     mutate([title, body]);
   };
 
@@ -96,21 +107,21 @@ const Feedback = () => {
               label="Name"
               placeholder="Your Name"
               tooltip="Optional. So we know who you are."
-              value={name || ""}
+              value={name}
               onChange={setName}
             />
             <TextBox
               label="GitHub Username"
               placeholder="@yourname"
               tooltip="Optional. So we can tag you in the post and you can follow it."
-              value={username || ""}
+              value={username}
               onChange={setUsername}
             />
             <TextBox
               label="Email"
               placeholder="your.name@email.com"
               tooltip="Optional. So we can contact you directly if needed."
-              value={email || ""}
+              value={email}
               onChange={setEmail}
             />
           </div>
@@ -121,7 +132,7 @@ const Feedback = () => {
             placeholder="Questions, suggestions, bugs, etc."
             required
             multi
-            value={feedback || ""}
+            value={feedback}
             onChange={setFeedback}
           />
 
@@ -148,7 +159,7 @@ const Feedback = () => {
             {status === "idle" && (
               <>
                 Submitting will start a <strong>public post</strong> on{" "}
-                <Link to={VITE_ISSUES}>our GitHub issue tracker</Link> with{" "}
+                <Link to={VITE_ISSUES}>our GitHub feedback tracker</Link> with{" "}
                 <strong>all of the information above</strong>. You'll get a link
                 to it once it's created.
               </>
