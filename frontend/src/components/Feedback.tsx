@@ -193,17 +193,17 @@ const Feedback = () => {
                 tooltip="Download a screenshot of the current page"
                 onClick={async () => {
                   close();
-                  await downloadJpg(document.body, ["screenshot.jpg"]);
+                  await downloadJpg(document.body, ["screenshot"]);
                   open();
                 }}
               />
               <Help
                 tooltip={
                   <div>
-                    A screenshot of the current page can help us troubleshoot
-                    issues. Currently, we can't <i>automatically</i> attach a
-                    screenshot with your feedback, so you'll have to download
-                    and attach/send it manually.
+                    Downloads a screenshot of the current page, which can help
+                    us troubleshoot issues. Currently, we can't{" "}
+                    <i>automatically</i> attach a screenshot with your feedback,
+                    so you'll have to download and attach/send it manually.
                   </div>
                 }
               />
