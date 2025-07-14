@@ -180,23 +180,23 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
           const y = maxR - (index + 1) * (h + gapSize);
 
           return (
-            <Fragment key={index}>
-              <rect
-                fill={node.data.color}
-                x={x}
-                y={y - h / 2}
-                width={panelWidth}
-                height={h}
-              />
-              <NodeTooltip {...node.data}>
+            <NodeTooltip key={index} {...node.data}>
+              <g>
+                <rect
+                  fill={node.data.color}
+                  x={x}
+                  y={y - h / 2}
+                  width={panelWidth}
+                  height={h}
+                />
                 <text x={x + gapSize} y={y} tabIndex={0}>
                   {truncateWidth(
                     node.data.label || "-",
                     panelWidth - 2 * gapSize,
                   )}
                 </text>
-              </NodeTooltip>
-            </Fragment>
+              </g>
+            </NodeTooltip>
           );
         })}
       </g>
