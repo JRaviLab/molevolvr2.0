@@ -8,7 +8,7 @@ import {
 } from "react";
 import { drag, scaleLinear, select, zoom, zoomIdentity } from "d3";
 import type { D3DragEvent, D3ZoomEvent } from "d3";
-import { clamp, inRange, mapValues, range, uniq } from "lodash";
+import { clamp, inRange, mapValues, range } from "lodash";
 import Chart from "@/components/Chart";
 import Help from "@/components/Help";
 import Legend from "@/components/Legend";
@@ -158,8 +158,8 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
           scaleLinear().domain([0, sequence.length]).range([0, width]),
         );
 
-        /** seq char width */
-        const charWidth = scaleX(1) - scaleX(0);
+        /** seq char cell width */
+        const cellWidth = scaleX(1) - scaleX(0);
 
         /** start/end positions in view */
         let startPosition = Math.floor(scaleX.invert(0));
@@ -167,22 +167,43 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
         startPosition = clamp(startPosition, 0, sequence.length);
         endPosition = clamp(endPosition, 0, sequence.length);
 
-        /** skip position labels based on zoom */
+        /** skip position ticks based on zoom */
         const skip =
           [1, 2, 5, 10, 20, 50, 100].find(
-            (skip) => skip * charWidth > 3 * rowHeight,
+            /** find first skip where cells width exceeds a few font chars */
+            (skip) => skip * cellWidth > 4 * fontSize,
           ) ?? 1;
 
         /** position ticks */
-        let ticks = range(startPosition, endPosition).filter(
-          (position) => position % skip === 0,
-        );
-        ticks = uniq([startPosition, ...ticks, endPosition - 1]);
+        const ticks = range(startPosition, endPosition)
+          .filter(
+            (position) =>
+              /** skip by multiple */
+              position % skip === 0 ||
+              /** always include start/end */
+              position === startPosition ||
+              position === endPosition - 1,
+          )
+          /** compute tick props */
+          .map((position) => {
+            const text = String(position + 1);
+            const w = getWidth(text);
+            let x = scaleX(position + 0.5);
+            x = clamp(x, w / 2, width - w / 2);
+            return { position, text, x, w };
+          });
 
-        if ((ticks.at(1) ?? 0) - (ticks.at(0) ?? 0) < 0.5 * skip)
-          ticks.splice(1, 1);
-        if ((ticks.at(-1) ?? 0) - (ticks.at(-2) ?? 0) < skip)
-          ticks.splice(-2, 1);
+        /** remove one of two overlapping ticks */
+        const removeOverlapping = (ai: number, bi: number, ri: number) => {
+          const a = ticks.at(ai);
+          const b = ticks.at(bi);
+          if (a && b && ticks.length > 2 && a.x + a.w / 2 >= b.x - b.w / 2)
+            ticks.splice(ri, 1);
+        };
+        /** if second tick overlaps first, remove second */
+        removeOverlapping(0, 1, 1);
+        /** if penultimate tick overlaps last, remove penultimate */
+        removeOverlapping(-2, -1, -2);
 
         /** update pan limit */
         zoomBehavior
@@ -292,9 +313,9 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                       transform={`translate(${scaleX(index + 0.5)}, 0)`}
                     >
                       <rect
-                        x={-charWidth / 2}
+                        x={-cellWidth / 2}
                         y={-rowHeight / 2}
-                        width={charWidth}
+                        width={cellWidth}
                         height={rowHeight}
                         fill={theme["--light-gray"]}
                         opacity={index % 2 === 0 ? 0.25 : 0.5}
@@ -303,7 +324,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                         x={0}
                         y={0}
                         fill={theme["--black"]}
-                        transform={`scale(${clamp(charWidth / fontSize, 0, 1)})`}
+                        transform={`scale(${clamp(cellWidth / fontSize, 0, 1)})`}
                         textAnchor="middle"
                       >
                         {char}
@@ -311,23 +332,18 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                     </g>
                   ))}
                 </g>
-                const
+
                 <g
                   className={classes["no-mouse"]}
                   fill={theme["--black"]}
                   textAnchor="middle"
                   transform={`translate(0, ${-0.5 * (rowHeight + rowGap)})`}
                 >
-                  {ticks.map((position) => {
-                    let x = scaleX(position + 0.5);
-                    const w = getWidth(String(position + 1));
-                    x = clamp(x, w / 2, width - w / 2);
-                    return (
-                      <text key={position} x={x} y={0}>
-                        {position + 1}
-                      </text>
-                    );
-                  })}
+                  {ticks.map(({ position, text, x }) => (
+                    <text key={position} x={x} y={0}>
+                      {text}
+                    </text>
+                  ))}
                 </g>
                 {/* tracks */}
                 <g>
