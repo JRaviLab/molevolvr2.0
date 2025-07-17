@@ -1,12 +1,21 @@
-import { api, request } from "@/api";
+import type { Endpoints } from "@octokit/types";
+import { request } from "@/api";
+
+/** cloud func */
+const api = "https://feedback-663400428685.europe-west1.run.app";
+
+/** response type for creating new issue */
+type Response =
+  Endpoints["POST /repos/{owner}/{repo}/issues"]["response"]["data"];
 
 /** feedback form */
-export const submitFeedback = async (title: string, body: string) =>
-  request<{ link: string }>(
-    `${api}/feedback`,
+export const submitFeedback = async (title: string, body: string) => {
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
+  const created = await request<Response>(
+    `${api}/submit`,
     {},
-    {
-      method: "POST",
-      body: JSON.stringify({ title, body }),
-    },
+    { method: "POST", headers, body: JSON.stringify({ title, body }) },
   );
+  return { link: created.html_url };
+};
