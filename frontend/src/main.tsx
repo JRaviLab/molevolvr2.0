@@ -1,13 +1,15 @@
 import "@/util/seed";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { url } from "@/util/url";
 import App from "./App";
 
 const { MODE, BASE_URL } = import.meta.env;
 
 console.debug({ env: import.meta.env });
 
-const mock = true;
+/** whether to mock network requests with fake responses */
+const mock = url.searchParams.get("mock") === "false" ? false : true;
 
 (async () => {
   /** mock network/api calls */
