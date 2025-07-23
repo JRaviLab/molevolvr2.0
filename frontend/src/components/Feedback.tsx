@@ -81,6 +81,8 @@ const Feedback = () => {
     mutationKey: ["feedback"],
     mutationFn: (params: Parameters<typeof submitFeedback>) =>
       submitFeedback(...params),
+    retry: 3,
+    retryDelay: (retry) => 2 * retry * 1000,
   });
 
   /** on form submit */

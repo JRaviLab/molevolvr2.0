@@ -2,8 +2,8 @@ const functions = require("@google-cloud/functions-framework");
 const { Octokit } = require("octokit");
 
 /** settings */
-const owner = "vincerubinetti";
-const repo = "test";
+const owner = "JRaviLab";
+const repo = "molevolvr2.0";
 const labels = ["feedback"];
 const auth = process.env.GITHUB_TOKEN;
 
