@@ -13,7 +13,7 @@ export const submitFeedback = async (title: string, body: string) => {
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
   const created = await request<Response>(
-    `${api}/submit`,
+    api,
     {},
     { method: "POST", headers, body: JSON.stringify({ title, body }) },
   );

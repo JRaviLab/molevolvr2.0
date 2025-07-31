@@ -7,8 +7,8 @@ const repo = "molevolvr2.0";
 const labels = ["feedback"];
 const auth = process.env.GITHUB_TOKEN;
 
-/** endpoint */
-functions.http("submit", async (request, response) => {
+/** entry point */
+functions.http("entrypoint", async (request, response) => {
   response.set("Access-Control-Allow-Origin", "*");
   response.set("Access-Control-Allow-Methods", "OPTIONS, POST");
   response.set("Access-Control-Allow-Headers", "Accept, Content-Type");
