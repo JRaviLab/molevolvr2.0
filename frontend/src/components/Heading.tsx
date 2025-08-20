@@ -3,10 +3,10 @@ import type { JSX, ReactElement, ReactNode } from "react";
 import { FaLink } from "react-icons/fa6";
 import clsx from "clsx";
 import { atom, useSetAtom } from "jotai";
-import { kebabCase } from "lodash";
 import Badge from "@/components/Badge";
 import Link from "@/components/Link";
 import { renderText } from "@/util/dom";
+import { slugify } from "@/util/string";
 import classes from "./Heading.module.css";
 
 type Props = {
@@ -50,7 +50,7 @@ const Heading = ({
   const Tag: keyof JSX.IntrinsicElements = `h${level}`;
 
   /** url-compatible, "slugified" id */
-  const id = kebabCase(anchor ?? renderText(children));
+  const id = anchor ?? slugify(renderText(children));
 
   /** icon or badge */
   let iconElement: ReactNode = null;

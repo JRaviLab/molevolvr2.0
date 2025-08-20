@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import { onlyText } from "react-children-utilities";
 import { createPortal } from "react-dom";
 import {
   FaCircleCheck,
@@ -12,6 +11,7 @@ import clsx from "clsx";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
 import Flex from "@/components/Flex";
+import { renderText } from "@/util/dom";
 import { sleep } from "@/util/misc";
 import classes from "./Toasts.module.css";
 
@@ -111,7 +111,7 @@ const toast = async (
   await sleep();
 
   /** timeout before close, in ms */
-  const timeout = 1000 * types[type].timeout + 10 * onlyText(content).length;
+  const timeout = 1000 * types[type].timeout + 10 * renderText(content).length;
 
   const newToast = {
     id: id ?? uniqueId(),

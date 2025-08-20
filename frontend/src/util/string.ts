@@ -8,6 +8,15 @@ export const shortenUrl = (value: string) => {
   }
 };
 
+/** make string url-safe */
+export const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9]+/g, " ")
+    .replaceAll(/\s+/g, " ")
+    .trim()
+    .replaceAll(" ", "-");
+
 /** format number to string */
 export const formatNumber = (value: number | undefined, compact = false) => {
   if (value === undefined) return "-";
@@ -47,6 +56,6 @@ export const makeLabel = (string: string) =>
     new DOMParser().parseFromString(string, "text/html").body.textContent || ""
   ).replaceAll(/\s+/g, " ");
 
-/** trim white-space */
+/** trim white-space, multi-line */
 export const trim = (string: string) =>
   string.replaceAll(/^\s+/gm, "").replaceAll(/\s+$/gm, "");

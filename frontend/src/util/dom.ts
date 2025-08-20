@@ -1,5 +1,4 @@
-import { cloneElement } from "react";
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
 import { sleep, waitFor } from "@/util/misc";
 
@@ -42,28 +41,9 @@ export const scrollTo = async (
 
 /** get text content of react node */
 export const renderText = (node: ReactNode) =>
-  onlyText(
-    deepMap(node, (child) =>
-      /** check react fiber structure */
-      typeof child === "object" &&
-      child !== null &&
-      "type" in child &&
-      child.type &&
-      typeof child.props === "object" &&
-      child.props !== null &&
-      "children" in child.props &&
-      typeof child.props.children === "string"
-        ? cloneElement(child as ReactElement<{ children: string }>, {
-            ...child.props,
-            /**
-             * if children is string, add padding on either side to separate
-             * elements
-             */
-            children: ` ${child.props.children} `,
-          })
-        : child,
-    ),
-  )
+  /** map all children to text */
+  deepMap(node, (node) => ` ${onlyText(node)} `)
+    .join("")
     /** collapse spaces */
     .replaceAll(/\s+/g, " ")
     .trim();
