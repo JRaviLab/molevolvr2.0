@@ -1,4 +1,3 @@
-import type { FormEvent } from "react";
 import { FaDownload, FaRegComment, FaRegPaperPlane } from "react-icons/fa6";
 import { useLocation } from "react-router";
 import { Fragment } from "react/jsx-runtime";
@@ -11,6 +10,7 @@ import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import Dialog from "@/components/Dialog";
 import Flex from "@/components/Flex";
+import Form from "@/components/Form";
 import Help from "@/components/Help";
 import Link from "@/components/Link";
 import TextBox from "@/components/TextBox";
@@ -85,13 +85,8 @@ const Feedback = () => {
     retryDelay: (retry) => 2 * retry * 1000,
   });
 
-  /** on form submit */
-  const onSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-
-    /** submit feedback */
-    mutate([title, body]);
-  };
+  /** submit feedback */
+  const onSubmit = async () => mutate([title, body]);
 
   return (
     <Dialog
@@ -103,7 +98,7 @@ const Feedback = () => {
         }
       }}
       content={(close, open) => (
-        <form className={classes.form} onSubmit={onSubmit}>
+        <Form onSubmit={onSubmit}>
           <div className={classes.fields}>
             <TextBox
               label="Name"
@@ -220,7 +215,7 @@ const Feedback = () => {
               />
             )}
           </Flex>
-        </form>
+        </Form>
       )}
     >
       <Button icon={<FaRegComment />} tooltip="Give us feedback" />

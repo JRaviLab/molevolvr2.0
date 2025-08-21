@@ -1,6 +1,7 @@
 import { createContext, useContext, useId } from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useEventListener } from "@reactuses/core";
 import { checkboxKeySuffix } from "@/components/CheckBox";
 
 export type FormData = Record<
@@ -23,6 +24,8 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
   /** unique id to link form and controls */
   const id = useId();
 
+  usePreventImplicitSubmit();
+
   return (
     <>
       {/* enable useForm in any child inputs */}
@@ -34,8 +37,10 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
           id={id}
           style={{ display: "contents" }}
           onSubmit={(event) => {
-            /** get data from form */
+            /** prevent page navigation */
             event.preventDefault();
+
+            /** get data from form */
             const form = event.currentTarget;
             const formData = new FormData(form);
 
@@ -85,3 +90,20 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
 };
 
 export default Form;
+
+/** prevent implicit form submit */
+const usePreventImplicitSubmit = () => {
+  useEventListener("keydown", (event) => {
+    const { key, target } = event;
+    /** only on enter key */
+    if (key !== "Enter") return;
+    /** only on elements */
+    if (!(target instanceof Element)) return;
+    /** only on inputs */
+    if (!target.matches("input")) return;
+    /** allow enter press on submit button to still work */
+    if (target.matches("[type='submit']")) return;
+    /** prevent submit */
+    event.preventDefault();
+  });
+};
