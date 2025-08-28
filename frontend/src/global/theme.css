@@ -36,6 +36,8 @@
   /** deep */
   --deep: hsl(285, 20%, 65%);
   --deep-light: hsl(285, 20%, 45%);
+
+  /** pale */
   --pale: hsl(285, 15%, 20%);
 
   /** grays */

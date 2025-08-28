@@ -30,6 +30,7 @@ import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
 import Section from "@/components/Section";
 import Tile from "@/components/Tile";
+import Viz from "@/pages/Viz";
 import { formatNumber } from "@/util/string";
 import classes from "./Home.module.css";
 
@@ -64,6 +65,8 @@ const Home = () => {
       <Meta title="Home" />
 
       <Section fill>
+        <Viz />
+
         <Heading level={1} className="sr-only">
           Home
         </Heading>
