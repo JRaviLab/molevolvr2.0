@@ -1,96 +1,84 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { clamp, random, range } from "lodash";
-import { useDebounce, useElementSize, useInterval } from "@reactuses/core";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentProps,
+} from "react";
+import { extent } from "d3";
+import { map, random, range } from "lodash";
+import { useInterval } from "@reactuses/core";
 import { dist } from "@/util/math";
 import classes from "./Viz.module.css";
 
 /** dist between points */
 const gap = 30;
 /** size of points */
-const size = 5;
+const size = 4;
 /** size of links */
-const thickness = size / 3;
-/** number of animation steps */
-const steps = 10;
-/** multiples of gap to offset */
-const offset = 5;
-/** max rows of points */
-const max = 10;
-/** ms between each animation step */
-const interval = 2000;
-/** duration of each animation step */
-const duration = 1000;
+const thickness = 1.5;
+/** size of grid shape, in multiples of gap */
+const grid = 5;
 /** min/max distance to link points */
 const minDist = gap * 0.5;
 const maxDist = gap * 1.5;
+/** number of animation moves */
+const moves = 10;
+/** amount to offset, in multiples of gap */
+const offset = 4;
+/** total duration of animation */
+const duration = moves * 1500;
 
 /** fun bg visualization */
 const Viz = () => {
-  const ref = useRef(null);
+  const ref = useRef<SVGSVGElement>(null);
 
-  /** current unique animation */
+  /** unique animation key */
   const [key, setKey] = useState(0);
 
-  /** current animation time */
-  const [time, setTime] = useState(-0.5);
-
-  /** move time forward */
-  const tickTime = useCallback(() => setTime((time) => time + 0.5), []);
-
-  /** reset animation */
-  const reset = useCallback(() => {
-    setTime(-0.5);
+  /** force regeneration of objects */
+  const regenerate = useCallback(async () => {
+    /** inc key */
     setKey((key) => key + 1);
   }, []);
 
-  /** increment time */
-  useInterval(() => (time > steps - 1 ? reset() : tickTime()), interval / 2);
-
-  /** container size */
-  const [_width, _height] = useElementSize(ref);
-  const width = useDebounce(_width, 100);
-  const height = useDebounce(_height, 100);
-
-  /** reset on resize */
-  useEffect(() => {
-    reset();
-  }, [reset, width, height]);
-
-  /** generate objects to draw */
-  const { points, links } = useMemo(() => {
-    /** suppress hooks warning, regenerate when key changes */
+  /** generate objects to show */
+  const { points, links, viewBox } = useMemo(() => {
+    /** suppress eslint hooks warning. regenerate when key changes. */
     void key;
 
-    /** grid rows */
-    const rows = Math.min(Math.floor(height / gap), max);
-    /** grid cols */
-    const cols = Math.min(Math.floor(width / gap), max);
+    const fallback = { points: [], links: [], viewBox: [0, 0, 1, 1] };
+    const svg = ref.current;
+    if (!svg) return fallback;
 
-    /** generate points in grid */
-    const points = range(rows)
-      .map((row) =>
-        range(cols).map((col) => ({
-          /** animation steps */
-          steps: [{ x: col, y: row }],
-        })),
-      )
-      .flat();
+    /** get view size */
+    const { width, height } = svg.getBoundingClientRect();
+
+    if (!width || !height) return fallback;
+
+    /** generate points */
+    const points =
+      /** generate grid */
+      range(-grid, grid + 1)
+        .map((x) => range(-grid, grid + 1).map((y) => ({ x, y })))
+        .flat()
+        /** make shape */
+        .filter((point) => dist(point) < grid)
+        /** format for animation */
+        .map((point) => ({ steps: [{ ...point, a: 1 }] }));
 
     /* alternate shuffling by row/col */
     let col = true;
 
-    for (let repeat = 0; repeat < 99; repeat++) {
+    for (let step = 0; step < moves - 1; step++) {
       /* map of coordinate to offset */
       const offsets: Record<number, number> = {};
-      /* axis to alternate direction by */
+      /* direction to alternate direction by */
       const alternateAxis = col ? "y" : "x";
-      /* axis to offset in */
+      /* direction to offset in */
       const offsetAxis = col ? "x" : "y";
 
       for (const point of points) {
-        /** number of steps */
-        if (point.steps.length >= steps) break;
-
         /** latest step */
         const step = point.steps.at(-1);
         if (!step) continue;
@@ -109,22 +97,15 @@ const Viz = () => {
         point.steps.push(newStep);
       }
 
-      /* flip axis */
+      /* flip direction */
       col = !col;
     }
 
-    /** center points in view */
-    const xOffset = (width - (cols - 1) * gap) / 2;
-    const yOffset = (height - (rows - 1) * gap) / 2;
-
+    /** scale positions */
     for (const { steps } of points) {
       for (const step of steps) {
-        /** indices to real steps */
         step.x *= gap;
         step.y *= gap;
-        /** center points in view */
-        step.x += xOffset;
-        step.y += yOffset;
       }
 
       /** reverse movement */
@@ -138,7 +119,7 @@ const Viz = () => {
       .filter((pair) => pair !== null);
 
     /** link points */
-    const links = range(steps).map((step) =>
+    const links = range(moves).map((step) =>
       pairs
         .filter(({ a, b }) => {
           const aStep = a.steps[step];
@@ -148,8 +129,8 @@ const Viz = () => {
           return d < maxDist && d > minDist;
         })
         .map(({ a, b }) => ({
-          a: a.steps[step],
-          b: b.steps[step],
+          a: a.steps[step] ?? { x: 0, y: 0, a: 1 },
+          b: b.steps[step] ?? { x: 0, y: 0, a: 1 },
         })),
     );
 
@@ -158,47 +139,93 @@ const Viz = () => {
       while (step.length > points.length * 1.5)
         step.splice(random(0, step.length - 1), 1);
 
-    return { points, links };
-  }, [key, width, height]);
+    /** fade points in/out */
+    for (const { steps } of points) {
+      const first = steps.at(0);
+      const last = steps.at(-1);
+      if (!first || !last) continue;
+      steps.unshift({ ...first, a: 0 });
+      steps.push({ ...last, a: 0 });
+    }
 
-  /** current step from animation time */
-  const step = clamp(Math.round(time), 0, steps - 1);
+    /** add empty start/end keyframes to keep in sync with points */
+    links.unshift([]);
+    links.push([]);
 
-  /** if time outside of animation bound */
-  const outside = time < 0 || time > steps - 1;
+    /** fit view to final shape */
+    const xs = points.map(({ steps }) => steps.at(-1)?.x ?? 0);
+    const ys = points.map(({ steps }) => steps.at(-1)?.y ?? 0);
+    const [minX = 0, maxX = 0] = extent(xs);
+    const [minY = 0, maxY = 0] = extent(ys);
+    const viewBox = [
+      minX - gap,
+      minY - gap,
+      maxX - minX + 2 * gap,
+      maxY - minY + 2 * gap,
+    ];
+
+    return { points, links, viewBox };
+  }, [key]);
+
+  /** regenerate after animation complete */
+  useInterval(regenerate, duration - 100, { immediate: true });
 
   return (
-    <svg ref={ref} className={classes.viz}>
-      {!outside &&
-        links[step]?.map(({ a, b }, index) => (
-          <line
-            key={[index, step].join("-")}
-            className={classes.link}
-            x1={a?.x}
-            y1={a?.y}
-            x2={b?.x}
-            y2={b?.y}
-            strokeWidth={thickness}
-            style={{
-              animationDuration: `${duration / 2}ms`,
-              animationDelay: `${duration}ms`,
-            }}
-          />
-        ))}
+    <svg
+      ref={ref}
+      key={key}
+      className={classes.viz}
+      viewBox={viewBox.join(" ")}
+    >
+      {/* links */}
+      {links.map((step, stepIndex) =>
+        step.map(({ a, b }, pairIndex) => {
+          /** length of each animation step */
+          const stepDuration = duration / (moves + 2 - 1);
 
+          return (
+            <line
+              key={[stepIndex, pairIndex].join("-")}
+              className={classes.link}
+              x1={a.x}
+              y1={a.y}
+              x2={b.x}
+              y2={b.y}
+              strokeWidth={thickness}
+              opacity={0}
+            >
+              <animate
+                attributeName="opacity"
+                dur={`${stepDuration}ms`}
+                calcMode="spline"
+                fill="freeze"
+                begin={`${(stepIndex - 0.5) * stepDuration}ms`}
+                keySplines={Array(4).fill("0.75 0 0.25 1").join(";")}
+                values={[0, 0, 1, 0, 0].join(";")}
+              />
+            </line>
+          );
+        }),
+      )}
+
+      {/* points */}
       {points.map(({ steps }, index) => {
-        const { x = 0, y = 0 } = steps[step] ?? {};
+        /** animation properties */
+        const props = (attr: string): ComponentProps<"animate"> => ({
+          attributeName: attr,
+          dur: `${duration}ms`,
+          calcMode: "spline",
+          keySplines: Array(steps.length - 1)
+            .fill("0.75 0 0.25 1")
+            .join(";"),
+        });
+
         return (
-          <circle
-            key={index}
-            className={classes.point}
-            r={size}
-            style={{
-              opacity: outside ? 0 : 1,
-              translate: `${x}px ${y}px`,
-              transitionDuration: `${duration}ms`,
-            }}
-          />
+          <circle key={index} className={classes.point} r={size}>
+            <animate {...props("cx")} values={map(steps, "x").join(";")} />
+            <animate {...props("cy")} values={map(steps, "y").join(";")} />
+            <animate {...props("opacity")} values={map(steps, "a").join(";")} />
+          </circle>
         );
       })}
     </svg>

@@ -27,7 +27,5 @@ export const round = (
 ) => Math[method](value / multiple) * multiple;
 
 /** distance */
-export const dist = (
-  a: { x: number; y: number },
-  b: { x: number; y: number },
-) => Math.hypot(b.x - a.x, b.y - a.y);
+export const dist = (a = { x: 0, y: 0 }, b = { x: 0, y: 0 }) =>
+  Math.hypot(b.x - a.x, b.y - a.y);
