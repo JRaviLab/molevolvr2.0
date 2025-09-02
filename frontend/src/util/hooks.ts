@@ -3,14 +3,14 @@ import { useAtomValue } from "jotai";
 import { isEqual } from "lodash";
 import { useEventListener } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
-import { getTheme, getWidth, truncateWidth } from "@/util/dom";
+import { getTheme, getWidth, truncateWidth, type Theme } from "@/util/dom";
 import { getFilename, type Filename } from "@/util/download";
 import { sleep } from "@/util/misc";
 
 /** get theme CSS variables */
 export const useTheme = () => {
   /** set of theme variable keys and values */
-  const [theme, setTheme] = useState<Record<`--${string}`, string>>({});
+  const [theme, setTheme] = useState<Theme>({});
 
   /** dark mode state */
   const darkMode = useAtomValue(darkModeAtom);

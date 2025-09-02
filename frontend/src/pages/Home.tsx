@@ -18,6 +18,7 @@ import {
 } from "react-icons/fa6";
 import { LuShapes } from "react-icons/lu";
 import { TbBinaryTree } from "react-icons/tb";
+import { useMediaQuery } from "@reactuses/core";
 import { useQuery } from "@tanstack/react-query";
 import { getStats } from "@/api/stats";
 import type { Analysis } from "@/api/types";
@@ -30,7 +31,7 @@ import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
 import Section from "@/components/Section";
 import Tile from "@/components/Tile";
-import Viz from "@/pages/Viz";
+import Viz from "@/pages/viz/Viz";
 import { formatNumber } from "@/util/string";
 import classes from "./Home.module.css";
 
@@ -60,12 +61,15 @@ const Home = () => {
     queryFn: getStats,
   });
 
+  /** no animations */
+  const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+
   return (
     <>
       <Meta title="Home" />
 
       <Section fill>
-        <Viz />
+        {!reduceMotion && <Viz />}
 
         <Heading level={1} className="sr-only">
           Home

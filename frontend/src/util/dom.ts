@@ -2,8 +2,10 @@ import type { ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
 import { sleep, waitFor } from "@/util/misc";
 
+export type Theme = Record<`--${string}`, string>;
+
 /** https://stackoverflow.com/a/78994961/2180570 */
-export const getTheme = () => {
+export const getTheme = (): Theme => {
   const styles = window.getComputedStyle(document.documentElement);
   return Object.fromEntries(
     Array.from(document.styleSheets)
