@@ -10,7 +10,11 @@ export const redirectState = JSON.parse(
 window.sessionStorage.removeItem("redirectPath");
 window.sessionStorage.removeItem("redirectState");
 
-/** get url from address bar or redirect */
+/** url from address bar */
 const { origin, href } = window.location;
+
 /** url at app load time (not reactive) */
-export const url = new URL(redirectPath ? origin + redirectPath : href);
+export const url = new URL(
+  /** from address bar or redirect */
+  redirectPath ? origin + redirectPath : href,
+);

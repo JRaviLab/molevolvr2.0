@@ -27,12 +27,14 @@ const Feedback = () => {
   let [name, setName] = useLocalStorage("feedback-name", "");
   let [username, setUsername] = useLocalStorage("feedback-username", "");
   let [email, setEmail] = useLocalStorage("feedback-email", "");
+  let [subject, setSubject] = useLocalStorage("feedback-subject", "");
   let [feedback, setFeedback] = useLocalStorage("feedback-body", "");
 
   /** set fallbacks */
   name ||= "";
   username ||= "";
   email ||= "";
+  subject ||= "";
   feedback ||= "";
 
   const { pathname, search, hash } = useLocation();
@@ -57,10 +59,10 @@ const Feedback = () => {
 
   /** feedback title */
   const title = truncate(
-    [name.trim() || username.trim(), feedback.trim()]
+    [name.trim() || username.trim(), subject.trim() || feedback.trim()]
       .filter(Boolean)
-      .join(" - "),
-    { length: 250 },
+      .join(" | "),
+    { length: 100 },
   );
 
   /** feedback body */
@@ -93,7 +95,10 @@ const Feedback = () => {
       title="Feedback"
       onChange={(open) => {
         if (open && (status === "success" || status === "error")) {
-          if (status === "success") setFeedback(null);
+          if (status === "success") {
+            setSubject(null);
+            setFeedback(null);
+          }
           reset();
         }
       }}
@@ -122,6 +127,14 @@ const Feedback = () => {
               onChange={setEmail}
             />
           </div>
+
+          <TextBox
+            className="full"
+            label="Subject"
+            placeholder="Subject"
+            value={subject}
+            onChange={setSubject}
+          />
 
           <TextBox
             className="full"
