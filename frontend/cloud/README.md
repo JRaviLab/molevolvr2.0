@@ -1,0 +1,22 @@
+# SETUP
+
+- Create Google Cloud project
+  - Give project descriptive name
+  - Create service account with just permissions to build container images
+  - Create service account with just permissions to run cloud funcs
+  - Update `deploy.sh` vars as appropriate
+- Generate GitHub fine-grained personal access token under appropriate account
+  - In org that owns repo, to ensure token can be scoped to specific repos:
+    - Enable `Allow access via fine-grained personal access tokens` in settings
+    - Invite account to be member
+  - Increase expiration as desired
+  - In `Resource owner` dropdown, select org not account
+  - Grant access to only relevant repos
+  - Grant only necessary permissions
+  - Store generated token in password vault
+- Deploy cloud func
+  - Create `/frontend/.env.local` file, make sure it is NOT TRACKED BY GIT, and add contents `GITHUB_TOKEN=TOKENVALUE`
+  - Install `gcloud` CLI tool
+  - [Authenticate CLI](https://cloud.google.com/docs/authentication/gcloud)
+  - From `/frontend`, run `./cloud/deploy.sh func-name`
+  - Copy function URL into `frontend/src/api` as appropriate

@@ -2,7 +2,7 @@ import type { Endpoints } from "@octokit/types";
 import { request } from "@/api";
 
 /** cloud func */
-const api = "https://molevolvr-feedback-211339212967.us-central1.run.app";
+const api = "https://molevolvr-feedback-158418777815.us-central1.run.app";
 
 /** response type for creating new issue */
 type Response =
