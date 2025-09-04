@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { random, range } from "lodash";
 import { useElementSize } from "@reactuses/core";
-import { isDesktop } from "@/util/browser";
 import type { Theme } from "@/util/dom";
 import { useTheme } from "@/util/hooks";
 import { dist } from "@/util/math";
@@ -24,8 +23,6 @@ const delay = 0.5;
 
 /** gsap settings */
 gsap.defaults({ ease: "power1.inOut" });
-/** save some battery */
-if (!isDesktop) gsap.ticker.fps(30);
 
 /** fun bg visualization */
 const Viz = () => {
