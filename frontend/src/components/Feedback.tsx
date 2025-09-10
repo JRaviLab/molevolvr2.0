@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { mapValues, startCase, truncate } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
 import { useMutation } from "@tanstack/react-query";
-import { submitFeedback } from "@/api/feedback";
+import { createIssue } from "@/api/issue";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import Dialog from "@/components/Dialog";
@@ -19,7 +19,7 @@ import { downloadJpg } from "@/util/download";
 import { shortenUrl } from "@/util/string";
 import classes from "./Feedback.module.css";
 
-const { VITE_EMAIL, VITE_ISSUES } = import.meta.env;
+const { VITE_EMAIL, VITE_ISSUES, VITE_ORG, VITE_REPO_NAME } = import.meta.env;
 
 /** feedback form on every page. singleton. */
 const Feedback = () => {
@@ -81,14 +81,23 @@ const Feedback = () => {
   /** submit feedback action */
   const { mutate, data, status, reset } = useMutation({
     mutationKey: ["feedback"],
-    mutationFn: (params: Parameters<typeof submitFeedback>) =>
-      submitFeedback(...params),
+    mutationFn: (params: Parameters<typeof createIssue>) =>
+      createIssue(...params),
     retry: 3,
     retryDelay: (retry) => 2 * retry * 1000,
   });
 
   /** submit feedback */
-  const onSubmit = async () => mutate([title, body]);
+  const onSubmit = async () =>
+    mutate([
+      {
+        owner: VITE_ORG,
+        repo: VITE_REPO_NAME,
+        title,
+        body,
+        labels: ["feedback"],
+      },
+    ]);
 
   return (
     <Dialog
