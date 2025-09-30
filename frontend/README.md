@@ -2,7 +2,7 @@
 
 This project was scaffolded using Vite, and has the following key features:
 
-- React 18
+- React 19
 - TypeScript, for static type checking
 - ESLint, for code quality
 - Prettier, for code formatting

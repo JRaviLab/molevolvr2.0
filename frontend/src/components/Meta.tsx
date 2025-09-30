@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { truncate } from "lodash";
 
 type Props = {
@@ -11,48 +10,35 @@ type Props = {
   description?: string;
 };
 
+/** get site-wide meta */
 const { VITE_TITLE, VITE_DESCRIPTION } = import.meta.env;
+const site = { title: VITE_TITLE, description: VITE_DESCRIPTION };
 
 /**
- * set specific metadata for current page (overrides site-wide metadata in
- * .env), akin to react-helmet
+ * set specific metadata for current page (overrides site-wide metadata in.env),
+ * akin to react-helmet
  */
-export const Meta = ({ title, description }: Props) => {
-  /** set title */
-  useEffect(() => {
-    /** concat title string from parts */
-    const string = [title]
-      .flat()
-      .concat(VITE_TITLE)
-      .map((part) => truncate(part.trim(), { length: 25, separator: " " }))
-      .filter(Boolean)
-      .join(" | ");
+export const Meta = (page: Props) => {
+  /** concat title string from parts */
+  const title = [page.title]
+    .flat()
+    .concat(site.title)
+    .map((part) => truncate(part.trim(), { length: 25, separator: " " }))
+    .filter(Boolean)
+    .join(" | ");
 
-    /** set attributes */
-    document.title = string;
-    document
-      .querySelector("meta[name='title']")
-      ?.setAttribute("content", string);
-    document
-      .querySelector("meta[property='og:title']")
-      ?.setAttribute("content", string);
-  }, [title]);
+  /** get page-specific, or fall back to site-wide */
+  const description = (page.description || site.description).trim();
 
-  /** set description */
-  useEffect(() => {
-    /** get page-specific, or fall back to site-wide */
-    const string = (description || VITE_DESCRIPTION).trim();
-
-    /** set attributes */
-    document
-      .querySelector("meta[name='description']")
-      ?.setAttribute("content", string);
-    document
-      .querySelector("meta[property='og:description']")
-      ?.setAttribute("content", string);
-  }, [description]);
-
-  return <></>;
+  return (
+    <>
+      <title>{title}</title>
+      <meta name="title" content={title} />
+      <meta property="og:title" content={title} />
+      <meta name="description" content={description} />
+      <meta property="og:description" content={description} />
+    </>
+  );
 };
 
 export default Meta;

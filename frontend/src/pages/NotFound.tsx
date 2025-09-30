@@ -5,7 +5,7 @@ import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
 import Section from "@/components/Section";
 
-const NotFoundPage = () => {
+const NotFound = () => {
   return (
     <>
       <Meta title="Not Found" />
@@ -23,4 +23,4 @@ const NotFoundPage = () => {
   );
 };
 
-export default NotFoundPage;
+export default NotFound;

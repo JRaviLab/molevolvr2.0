@@ -34,7 +34,6 @@
     "cytoscape-klay": "^3.1.4",
     "cytoscape-spread": "^3.0.0",
     "d3": "^7.9.0",
-    "eslint": "^9.30.1",
     "gsap": "^3.13.0",
     "html-to-image": "^1.11.13",
     "javascript-time-ago": "^2.5.11",

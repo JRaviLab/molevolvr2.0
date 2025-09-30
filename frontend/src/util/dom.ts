@@ -76,6 +76,7 @@ export const firstInView = (elements: HTMLElement[]) => {
 
   return 0;
 };
+
 /** shrink width to wrapped text https://stackoverflow.com/questions/14596213 */
 export const shrinkWrap = (
   element: HTMLElement | null,
