@@ -11,7 +11,7 @@ WORKDIR /app
 # install dependencies for dev and prod into temp directories
 FROM base AS install
 
-COPY package.json bun.lockb /temp/dev/
+COPY package.json bun.lock /temp/dev/
 RUN cd /temp/dev/ && \
     bun install --frozen-lockfile
 
@@ -34,7 +34,7 @@ COPY . .
 # run the app in hot-reloading development mode
 # set up vite to accept connections on any interface, e.g. from outside the
 # container, and to always run on port 5173)
-CMD [ "vite", "--host", "--port", "5173" ]
+CMD [ "vite", "--host", "--port", "5173", "--no-open" ]
 
 
 # -----------------------------------------------------------
