@@ -1,5 +1,6 @@
 volumes:
   pgdata:
+  galaxy-data:
 
 services:
   backend:
@@ -49,3 +50,28 @@ services:
       timeout: 60s
       retries: 5
       start_period: 80s
+
+  galaxy:
+    image: bgruening/galaxy-stable:latest
+    container_name: galaxy
+    restart: unless-stopped
+    ports:
+      - "8092:80"            # Galaxy UI available on http://localhost:8092
+    volumes:
+      - galaxy-data:/export  # Persistent Galaxy database, configs, tools, histories
+    env_file:
+      - .env
+    environment:
+      # Disable the first-use wizard for easier deployment
+      GALAXY_CONFIG_ALLOW_USER_DELETION: "true"
+      GALAXY_CONFIG_ADMIN_USERS: "admin@example.com"
+      # Optional: expose Galaxy’s FTP directory (useful for large uploads)
+      GALAXY_CONFIG_FTP_UPLOAD_DIR: "/export/ftp"
+      # Optional: configure database connection (default is SQLite)
+      GALAXY_CONFIG_DATABASE_CONNECTION: >-
+        postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/galaxy
+    # Optional: increase memory for Pulsar/job runners if needed
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 8G

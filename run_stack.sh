@@ -42,6 +42,42 @@ function open_browser() {
     fi
 }
 
+# ================================================================
+# == set up .env file
+# ================================================================
+
+# helper that replaces an environment variable in .env with a random secret if it is missing
+# args:
+#  $1: the environment variable name to check
+#  $2: the length of the random secret to generate (default: 16)
+replace_env_var_with_secret() {
+    local field="$1"
+    local length="${2:-16}"
+    if grep -q -e "^${field}=$" .env; then
+        echo "Filling in missing ${field} value in .env"
+        sed -E "s|^(${field}=)(.*)|\1$(openssl rand -hex ${length})|g" .env > .env.tmp
+        mv .env.tmp .env
+    fi
+}
+
+# if .env doesn't exist, copy it from .env.TEMPLATE
+if [ ! -f .env ]; then
+    cp .env.TEMPLATE .env
+    echo "Created .env file from .env.TEMPLATE"
+fi
+
+# replace any missing secret environment variables with random secrets
+replace_env_var_with_secret POSTGRES_PASSWORD
+replace_env_var_with_secret MARIADB_PASSWORD
+replace_env_var_with_secret MARIADB_ROOT_PASSWORD
+replace_env_var_with_secret DJANGO_ADMIN_PASSWORD 12
+replace_env_var_with_secret DJANGO_SECRET_KEY 32
+
+# load contents of .env into the environment
+set -a
+source .env
+set +a
+
 
 # ===========================================================================
 # === target env resolution and other env/cmd setup for launching the stack
@@ -51,12 +87,6 @@ function open_browser() {
 DO_CLEAR="0"
 # command to run after the stack has launched
 POST_LAUNCH_CMD=":"
-
-# source the .env file and export its contents
-# among other things, we'll use the DEFAULT_ENV var in it to set the target env
-set -a
-source .env
-set +a
 
 # check if the first argument is a valid target env, and if not attempt
 # to infer it
@@ -70,12 +100,12 @@ case $1 in
         # resolve the target env
         HOSTNAME=$(hostname)
         
-        if [[ "${HOSTNAME}" = "jravilab" ]]; then
-            TARGET_ENV="prod"
-            STRATEGY="via hostname ${HOSTNAME}"
-        elif [[ ! -z "${DEFAULT_ENV}" ]]; then
+        if [[ ! -z "${DEFAULT_ENV}" ]]; then
             TARGET_ENV="${DEFAULT_ENV}"
             STRATEGY="via DEFAULT_ENV"
+        elif [[ "${HOSTNAME}" = "jravilab" ]]; then
+            TARGET_ENV="prod"
+            STRATEGY="via hostname ${HOSTNAME}"
         else
             echo -e \
                 "ERROR: No valid target env specified, and could not infer" \
@@ -98,7 +128,8 @@ case ${TARGET_ENV} in
         ;;
     "dev")
         DEFAULT_ARGS="up -d"
-        COMPOSE_CMD="docker compose -f docker-compose.yml -f docker-compose.slurm.yml -f docker-compose.dev.yml"
+        # COMPOSE_CMD="docker compose -f docker-compose.yml -f docker-compose.slurm.yml -f docker-compose.dev.yml"
+        COMPOSE_CMD="docker compose -f docker-compose.yml -f docker-compose.dev.yml"
         DO_CLEAR="1"
         # watch the logs after, since we detached after bringing up the stack
         POST_LAUNCH_CMD="${COMPOSE_CMD} logs -f"
