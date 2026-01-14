@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { random, range } from "lodash";
 import { useElementSize } from "@reactuses/core";
+import type { Theme } from "@/util/dom";
+import { useTheme } from "@/util/hooks";
 import { dist } from "@/util/math";
 import Shape from "./shape.svg?raw";
 
@@ -13,6 +15,8 @@ const spacing = 20;
 const size = 3;
 /** number of shuffle steps */
 const steps = 10;
+/** max number of grid cells to shuffle by */
+const offset = 5;
 /** shuffle animation duration, in seconds */
 const duration = 1;
 /** pause between shuffles, in seconds */
@@ -35,9 +39,11 @@ const Viz = () => {
   /** canvas client size */
   const [width, height] = useElementSize(canvas);
 
+  /** reactive CSS vars */
+  const theme = useTheme();
+
   useEffect(() => {
     if (!canvas.current) return;
-
     ctx.current?.resetTransform();
     /** resolution scale */
     const scale = window.devicePixelRatio;
@@ -55,19 +61,19 @@ const Viz = () => {
   /** generate/regenerate objects and start/restart animations */
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const loop = () => setObjects(generate([Shape], width, height, loop));
+      const loop = () => setObjects(generate([Shape], loop));
       loop();
     });
     return () => ctx.revert();
-  }, [width, height]);
+  }, []);
 
   /** hook up draw func to gsap timer */
   useEffect(() => {
     const frame = () =>
-      draw(canvas.current, ctx.current, width, height, objects);
+      draw(canvas.current, ctx.current, width, height, objects, theme);
     gsap.ticker.add(frame);
     return () => gsap.ticker.remove(frame);
-  }, [width, height, objects]);
+  }, [width, height, objects, theme]);
 
   return (
     <canvas
@@ -80,12 +86,7 @@ const Viz = () => {
 export default Viz;
 
 /** generate objects to draw and animations for each object */
-const generate = (
-  svgs: string[],
-  width: number,
-  height: number,
-  onComplete: () => void,
-) => {
+const generate = (svgs: string[], onComplete: () => void) => {
   /** combined timeline for entire animation */
   const combinedTimeline = gsap.timeline({ onComplete });
 
@@ -153,7 +154,7 @@ const generate = (
         col -= Math.round(w / gap / 2);
         row -= Math.round(h / gap / 2);
         /** current state */
-        const point = { col, row, alpha: 0, color: 0 };
+        const point = { col, row, alpha: 0 };
         /** animation */
         const steps = [{ ...point }];
         return { ...point, steps };
@@ -161,12 +162,6 @@ const generate = (
 
     /** remove from doc */
     svg.remove();
-
-    /** number of grid cells to shuffle by */
-    const offset = Math.min(
-      Math.round(width / spacing / 2),
-      Math.round(height / spacing / 2),
-    );
 
     /* alternate shuffling by row/col */
     let flip = true;
@@ -289,6 +284,7 @@ const draw = (
   width: number,
   height: number,
   objects: Objects,
+  theme: Theme,
 ) => {
   if (!canvas || !ctx) return;
 
@@ -296,8 +292,8 @@ const draw = (
   ctx.clearRect(-width / 2, -height / 2, width, height);
 
   /** static styles */
-  ctx.fillStyle = "black";
-  ctx.strokeStyle = "black";
+  ctx.fillStyle = theme["--color-deep"] ?? "";
+  ctx.strokeStyle = theme["--color-deep"] ?? "";
   ctx.lineWidth = size / 2;
 
   /** draw links */
