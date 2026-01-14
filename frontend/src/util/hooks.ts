@@ -3,8 +3,10 @@ import { useAtomValue } from "jotai";
 import { isEqual } from "lodash";
 import { useEventListener } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
-import { getTheme, getWidth, truncateWidth, type Theme } from "@/util/dom";
-import { getFilename, type Filename } from "@/util/download";
+import { getTheme, getWidth, truncateWidth } from "@/util/dom";
+import type { Theme } from "@/util/dom";
+import { getFilename } from "@/util/download";
+import type { Filename } from "@/util/download";
 import { sleep } from "@/util/misc";
 
 /** get theme CSS variables */

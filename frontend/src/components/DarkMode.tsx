@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { FaRegMoon, FaRegSun } from "react-icons/fa6";
 import { getDefaultStore, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
@@ -18,8 +19,10 @@ update();
 getDefaultStore().sub(darkModeAtom, update);
 /** using useEffect in toggle component causes FOUC b/c have to wait for render */
 
+type Props = ComponentProps<"button">;
+
 /** dark mode toggle */
-export const DarkMode = () => {
+export const DarkMode = ({ className }: Props) => {
   const [darkMode, setDarkMode] = useAtom(darkModeAtom);
 
   return (
@@ -29,6 +32,7 @@ export const DarkMode = () => {
         role="switch"
         aria-checked={darkMode}
         onClick={() => setDarkMode(!darkMode)}
+        className={className}
       >
         {darkMode ? <FaRegSun /> : <FaRegMoon />}
       </button>

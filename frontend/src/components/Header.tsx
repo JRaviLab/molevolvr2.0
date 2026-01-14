@@ -35,6 +35,9 @@ const Header = () => {
     doc.style.scrollPaddingTop = height + "px";
   }, [height]);
 
+  const buttonClass =
+    "rounded p-2 tracking-wide hover:bg-current/10 leading-none";
+
   return (
     <header
       ref={ref}
@@ -42,7 +45,10 @@ const Header = () => {
     >
       <div className="flex items-center gap-2">
         <Logo className="size-8" />
-        <Link to="/" className="text-lg tracking-wider uppercase">
+        <Link
+          to="/"
+          className={clsx("text-lg tracking-wider uppercase", buttonClass)}
+        >
           {import.meta.env.VITE_TITLE}
         </Link>
       </div>
@@ -53,7 +59,7 @@ const Header = () => {
           onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-controls="nav"
-          className="md:hidden"
+          className={clsx("md:hidden", buttonClass)}
         >
           {open ? <FaXmark /> : <FaBars />}
         </button>
@@ -63,7 +69,7 @@ const Header = () => {
       <nav
         id="nav"
         className={clsx(
-          "flex items-center gap-2 *:rounded *:p-2 *:tracking-wide *:hover:bg-current/10 max-md:w-full max-md:flex-col max-md:items-end",
+          "flex items-center gap-2 max-md:w-full max-md:flex-col max-md:items-end",
           !open && "max-md:hidden",
         )}
       >
@@ -71,12 +77,13 @@ const Header = () => {
           <Link
             key={to}
             to={to}
-            className={clsx(pathname === to && "bg-current/10")}
+            className={clsx(pathname === to && "bg-current/10", buttonClass)}
           >
             {name}
           </Link>
         ))}
-        <DarkMode />
+
+        <DarkMode className={buttonClass} />
       </nav>
     </header>
   );

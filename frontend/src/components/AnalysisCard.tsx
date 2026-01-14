@@ -1,7 +1,8 @@
 import type { Analysis } from "@/api/types";
 import Ago from "@/components/Ago";
 import Link from "@/components/Link";
-import Mark, { type Type } from "@/components/Mark";
+import Mark from "@/components/Mark";
+import type { Type } from "@/components/Mark";
 
 type Props = {
   analysis: Analysis;

@@ -16,11 +16,15 @@ import type {
   NodeSingular,
   RandomLayoutOptions,
 } from "cytoscape";
-import avsdf, { type AvsdfLayoutOptions } from "cytoscape-avsdf";
+import avsdf from "cytoscape-avsdf";
+import type { AvsdfLayoutOptions } from "cytoscape-avsdf";
 import cola from "cytoscape-cola";
-import dagre, { type DagreLayoutOptions } from "cytoscape-dagre";
-import fcose, { type FcoseLayoutOptions } from "cytoscape-fcose";
-import klay, { type KlayLayoutOptions } from "cytoscape-klay";
+import dagre from "cytoscape-dagre";
+import type { DagreLayoutOptions } from "cytoscape-dagre";
+import fcose from "cytoscape-fcose";
+import type { FcoseLayoutOptions } from "cytoscape-fcose";
+import klay from "cytoscape-klay";
+import type { KlayLayoutOptions } from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
 import {
