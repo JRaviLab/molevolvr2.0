@@ -1,4 +1,4 @@
-import { cloneElement, useEffect, useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import type { ReactElement, ReactNode } from "react";
 import { FaCircleDot, FaRegCircle } from "react-icons/fa6";
 import { usePrevious } from "@reactuses/core";
@@ -115,8 +115,7 @@ const Radios = <O extends Option>({
             </div>
 
             {/* icon */}
-            {option.icon &&
-              cloneElement(option.icon, { className: "text-dark-gray" })}
+            {option.icon && <div className="text-dark-gray">{option.icon}</div>}
           </label>
         ))}
       </div>

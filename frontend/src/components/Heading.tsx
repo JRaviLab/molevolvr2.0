@@ -1,4 +1,4 @@
-import { cloneElement, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { JSX, ReactElement, ReactNode } from "react";
 import clsx from "clsx";
 import { atom, useSetAtom } from "jotai";
@@ -54,7 +54,7 @@ const Heading = ({
   let iconElement: ReactNode = null;
   if (typeof icon === "string") iconElement = <Badge>{icon}</Badge>;
   if (typeof icon === "object" && typeof icon.type === "function")
-    iconElement = cloneElement(icon, { className: "text-deep" });
+    iconElement = <div className="text-deep-light">{icon}</div>;
 
   const setHeadings = useSetAtom(headingsAtom);
 

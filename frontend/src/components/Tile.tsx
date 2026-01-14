@@ -1,4 +1,4 @@
-import { cloneElement, type ReactElement, type ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 type Props = {
   /** icon element */
@@ -13,7 +13,7 @@ type Props = {
 const Tile = ({ icon, primary, secondary }: Props) => {
   return (
     <div className="text-deep flex w-min flex-col items-center gap-2 text-center">
-      {cloneElement(icon, { className: "size-8 mb-2" })}
+      <div className="mb-2 size-8">{icon}</div>
       <div className="text-lg leading-none font-medium">{primary}</div>
       <div className="text-dark-gray">{secondary}</div>
     </div>

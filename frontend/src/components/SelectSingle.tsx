@@ -1,5 +1,4 @@
 import {
-  cloneElement,
   Fragment,
   useEffect,
   useState,
@@ -158,17 +157,18 @@ const SelectSingle = <O extends Option>({
                   )}
                 />
                 {/* text */}
-                <span className="flex grow-2 items-center">
+                <span className="flex grow-2 items-center leading-none">
                   {option.primary}
                 </span>
-                <span className="text-gray flex grow items-center justify-end justify-self-end text-right text-sm">
+                <span className="text-gray flex grow items-center justify-end justify-self-end text-right text-sm leading-none">
                   {option.secondary}
                 </span>
                 {/* icon */}
-                {option.icon &&
-                  cloneElement(option.icon, {
-                    className: "text- justify-self-end",
-                  })}
+                {option.icon && (
+                  <div className="text-gray justify-self-end">
+                    {option.icon}
+                  </div>
+                )}
               </li>
             )}
           </ListboxOption>
