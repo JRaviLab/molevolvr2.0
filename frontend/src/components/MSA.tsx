@@ -118,7 +118,7 @@ const MSA = ({
                 >
                   {/* labels col */}
                   <g textAnchor="end" transform={`translate(${-rowHeight}, 0)`}>
-                    <g fill={theme["--gray"]}>
+                    <g fill={theme["--color-gray"]}>
                       <text x={0} y={-1.5 * rowHeight}>
                         Combined
                       </text>
@@ -126,7 +126,7 @@ const MSA = ({
                         Position
                       </text>
                     </g>
-                    <g fill={theme["--black"]}>
+                    <g fill={theme["--color-black"]}>
                       {panelTracks.map((track, trackIndex) => (
                         <Tooltip key={trackIndex} content={track.label}>
                           <text
@@ -143,10 +143,10 @@ const MSA = ({
 
                   {/* combined row */}
                   <g
-                    fill={theme["--black"]}
+                    fill={theme["--color-black"]}
                     textAnchor="middle"
                     transform={`translate(0, ${-2 * rowHeight})`}
-                    style={{ fontFamily: theme["--mono"] }}
+                    style={{ fontFamily: theme["--color-mono"] }}
                   >
                     {panelCombined.map((col, colIndex) => {
                       let accumulatedPercent = 0;
@@ -187,7 +187,7 @@ const MSA = ({
 
                   {/* ticks row */}
                   <g
-                    fill={theme["--black"]}
+                    fill={theme["--color-black"]}
                     textAnchor="middle"
                     transform={`translate(0, ${-1 * rowHeight})`}
                     style={{ fontSize: 0.75 * fontSize }}
@@ -210,9 +210,9 @@ const MSA = ({
 
                   {/* tracks */}
                   <g
-                    fill={theme["--black"]}
+                    fill={theme["--color-black"]}
                     textAnchor="middle"
-                    style={{ fontFamily: theme["--mono"] }}
+                    style={{ fontFamily: theme["--color-mono"] }}
                   >
                     {panelTracks.map(({ sequence }, trackIndex) => {
                       return (
