@@ -608,7 +608,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
         ref={ref}
         className={clsx(
           "card grid w-full grid-cols-[max-content_auto]",
-          expanded && "h-[75dvh]! w-[calc(100dvw---spacing(40))]!",
+          expanded && "h-[75dvh]! w-[calc(100dvw---spacing(20))]!",
         )}
         style={{ aspectRatio: expanded ? "" : aspectRatio }}
       >

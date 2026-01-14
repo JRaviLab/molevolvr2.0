@@ -12,6 +12,7 @@ import {
   Dialog as Root,
   DialogTitle as Title,
 } from "@headlessui/react";
+import Button from "@/components/Button";
 
 type Props = {
   /** title of dialog */
@@ -55,20 +56,26 @@ const Dialog = ({
       <Root open={isOpen} onClose={close}>
         <div className="fixed inset-0 z-30 flex items-center justify-center p-8">
           <Content as={Fragment}>
-            <div className="shadow-overlay relative flex max-h-full w-(--content) max-w-full flex-col gap-4 rounded bg-white p-4">
-              <Title>{title}</Title>
-              <Description className="sr-only">{title}</Description>
-              <button
-                className="text-gray absolute top-2 right-2 p-2"
-                onClick={close}
-              >
-                <FaCircleXmark />
-              </button>
-              <div className="flex w-full flex-col gap-4 overflow-y-auto">
+            <div className="shadow-overlay relative flex max-h-full w-(--content) max-w-full flex-col rounded bg-white">
+              {/* top */}
+              <div className="z-10 flex items-center justify-center p-2 shadow">
+                <Title>{title}</Title>
+                <Description className="sr-only">{title}</Description>
+                <Button
+                  design="hollow"
+                  tooltip="Close dialog"
+                  icon={<FaCircleXmark />}
+                  className="text-gray"
+                  onClick={close}
+                />
+              </div>
+              {/* middle */}
+              <div className="flex w-full flex-col gap-4 overflow-y-auto p-4">
                 {typeof content === "function" ? content(close, open) : content}
               </div>
+              {/* bottom */}
               {bottomContent && (
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="z-10 flex flex-wrap items-center justify-center gap-4 shadow">
                   {typeof bottomContent === "function"
                     ? bottomContent(close, open)
                     : bottomContent}

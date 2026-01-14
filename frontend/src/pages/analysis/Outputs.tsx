@@ -6,7 +6,6 @@ import {
 import { LuShapes } from "react-icons/lu";
 import { TbBinaryTree } from "react-icons/tb";
 import Heading from "@/components/Heading";
-import Section from "@/components/Section";
 import Tabs, { Tab } from "@/components/Tabs";
 import DomainArch from "@/pages/analysis/outputs/DomainArch";
 import Homology from "@/pages/analysis/outputs/Homology";
@@ -15,7 +14,7 @@ import Summary from "@/pages/analysis/outputs/Summary";
 
 const Outputs = () => {
   return (
-    <Section>
+    <section>
       <Heading level={2} icon={<FaArrowRightFromBracket />}>
         Outputs
       </Heading>
@@ -34,7 +33,7 @@ const Outputs = () => {
           <Homology />
         </Tab>
       </Tabs>
-    </Section>
+    </section>
   );
 };
 

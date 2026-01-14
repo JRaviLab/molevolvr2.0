@@ -13,6 +13,8 @@ type Base = {
   flip?: boolean;
   /** look */
   design?: "normal" | "hollow" | "critical";
+  /** sizing */
+  size?: "compact" | "normal";
   /** class on button */
   className?: string;
 };
@@ -48,6 +50,7 @@ const Button = ({
   icon,
   flip = false,
   design = "normal",
+  size = "normal",
   className,
   tooltip,
   ...props
@@ -67,7 +70,8 @@ const Button = ({
 
   /** class name string */
   const _class = clsx(
-    "p-3 gap-4",
+    "gap-2",
+    size === "compact" ? "p-1" : "p-3",
     !!icon && !text ? "rounded-full" : "rounded",
     {
       "text-accent hover:text-deep": design === "hollow",

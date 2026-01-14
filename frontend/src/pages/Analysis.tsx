@@ -7,7 +7,6 @@ import type { Analysis as _Analysis } from "@/api/types";
 import Alert from "@/components/Alert";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
-import Section from "@/components/Section";
 import Actions from "@/pages/analysis/Actions";
 import Inputs from "@/pages/analysis/Inputs";
 import Outputs from "@/pages/analysis/Outputs";
@@ -48,7 +47,7 @@ const Analysis = () => {
     <>
       <Meta title="Analysis" />
 
-      <Section>
+      <section>
         <Heading level={1} icon={<FaMagnifyingGlassChart />}>
           Analysis
         </Heading>
@@ -63,7 +62,7 @@ const Analysis = () => {
             Error loading analysis <strong>{id}</strong>
           </Alert>
         )}
-      </Section>
+      </section>
     </>
   );
 };

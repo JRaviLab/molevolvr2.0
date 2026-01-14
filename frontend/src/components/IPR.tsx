@@ -366,16 +366,16 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                             <Tooltip
                               key={featureIndex}
                               content={
-                                <div className="mini-table">
-                                  <span>Name</span>
-                                  <span>{label ?? id}</span>
-                                  <span>Type</span>
-                                  <span>{type}</span>
-                                  <span>Range</span>
-                                  <span>
+                                <dl>
+                                  <dt>Name</dt>
+                                  <dd>{label ?? id}</dd>
+                                  <dt>Type</dt>
+                                  <dd>{type}</dd>
+                                  <dt>Range</dt>
+                                  <dd>
                                     {start}-{end}
-                                  </span>
-                                </div>
+                                  </dd>
+                                </dl>
                               }
                             >
                               <g tabIndex={0} role="graphics-symbol">

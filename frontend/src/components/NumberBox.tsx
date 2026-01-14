@@ -81,12 +81,13 @@ const NumberBox = ({
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <Group className="text-accent hover:text-deep flex border-b-2 border-current transition-all">
+          <Group className="text-accent hover:text-deep flex border-b-2 border-current">
             <Button slot="decrement">
               <FaMinus />
             </Button>
+            {/* Poppins unfortunately doesn't support tabular nums */}
             <Input
-              className="field-sizing-content grow px-2 py-1 text-center tabular-nums"
+              className="field-sizing-content grow px-2 py-1 text-center font-mono"
               form={form}
               onBlurCapture={(event) => {
                 /** https://github.com/adobe/react-spectrum/discussions/6261 */

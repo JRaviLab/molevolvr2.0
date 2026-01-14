@@ -4,11 +4,11 @@ import { FaRegCopy, FaXmark } from "react-icons/fa6";
 import clsx from "clsx";
 import { useElementBounding } from "@reactuses/core";
 import Asterisk from "@/components/Asterisk";
+import Button from "@/components/Button";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
-import classes from "./TextBox.module.css";
 
 type Props = Base & (Single | Multi);
 
@@ -66,44 +66,38 @@ const TextBox = ({
   /** unique id for component instance */
   const id = useId();
 
-  /** side element */
-  let sideElement: ReactNode = "";
+  /** side elements */
+  let sideElements: ReactNode = "";
   if (text || value)
-    sideElement = (
-      <div ref={sideRef} className={classes.side}>
+    sideElements = (
+      <>
         {multi && (
-          <button
-            className={classes["side-button"]}
-            type="button"
+          <Button
+            design="hollow"
+            className="rounded-none"
+            tooltip="Copy text"
+            icon={<FaRegCopy />}
             onClick={async () => {
               await window.navigator.clipboard.writeText(text);
               toast("Copied text", "success");
             }}
-            aria-label="Copy text"
-          >
-            <FaRegCopy />
-          </button>
+          />
         )}
-        <button
-          className={classes["side-button"]}
-          type="button"
+        <Button
+          design="hollow"
+          className="rounded-none"
+          tooltip="Clear text"
+          icon={<FaXmark />}
           onClick={() => {
             if (ref.current) ref.current.value = "";
             onChange?.("");
             setText("");
           }}
-          aria-label="Clear text"
-        >
-          <FaXmark />
-        </button>
-      </div>
+        />
+      </>
     );
   else if (icon)
-    sideElement = (
-      <div ref={sideRef} className={classes.side}>
-        <div className={classes["side-button"]}>{icon}</div>
-      </div>
-    );
+    sideElements = <div className="grid place-items-center">{icon}</div>;
 
   /** extra padding needed for side element */
   const sidePadding = useElementBounding(sideRef).width;
@@ -116,7 +110,7 @@ const TextBox = ({
     <textarea
       ref={ref}
       id={id}
-      className={classes.textarea}
+      className="hover:border-accent border-off-white min-h-[4lh] grow resize rounded border-2 bg-white p-2"
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
       value={value}
       onChange={(event) => {
@@ -130,7 +124,7 @@ const TextBox = ({
     <input
       ref={ref}
       id={id}
-      className={clsx(classes.input, sideElement && classes["input-side"])}
+      className="hover:border-accent border-off-white grow rounded border-2 bg-white p-2"
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
       value={value}
       onChange={(event) => {
@@ -143,9 +137,18 @@ const TextBox = ({
   );
 
   return (
-    <div className={clsx(className, classes.container, classes[layout])}>
+    <div
+      className={clsx(
+        "flex max-w-full grow gap-4",
+        {
+          "items-center": layout === "horizontal",
+          "flex-col": layout === "vertical",
+        },
+        className,
+      )}
+    >
       {(label || props.required) && (
-        <label className={classes.label} htmlFor={id}>
+        <label className="flex items-center gap-1" htmlFor={id}>
           {label}
           {tooltip && <Help tooltip={tooltip} />}
           {props.required && <Asterisk />}
@@ -154,11 +157,16 @@ const TextBox = ({
 
       {/* if no label but need tooltip, put it around input */}
       <Tooltip content={!label && tooltip ? tooltip : undefined}>
-        <div className={classes.wrapper}>
+        <div className="relative flex min-w-0 grow">
           {input}
 
           {/* side element */}
-          {sideElement}
+          <div
+            ref={sideRef}
+            className="text-dark-gray absolute top-1.5 right-1.5 bottom-1.5 flex items-start *:size-8"
+          >
+            {sideElements}
+          </div>
         </div>
       </Tooltip>
     </div>

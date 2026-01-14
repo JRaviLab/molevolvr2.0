@@ -1,11 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
 import type { ReactElement, ReactNode } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
+import clsx from "clsx";
 import { kebabCase } from "lodash";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
 import { deleteParam, mergeTo } from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
-import classes from "./Tabs.module.css";
 
 type Props = {
   /**
@@ -49,7 +49,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
 
   return (
     <Root
-      className={classes.root}
+      className="contents"
       value={selected}
       onValueChange={(value) => {
         setSelected(value);
@@ -66,12 +66,17 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
       }}
     >
       {/* tab buttons */}
-      <List className={classes.buttons}>
+      <List className="flex flex-wrap items-center gap-4">
         {tabs.map((tab, index) => (
           <Tooltip key={index} content={tab.tooltip}>
             <Trigger
               value={tab.id}
-              className={classes.button}
+              className={clsx(
+                "hover:text-deep hover:border-deep cursor-pointer gap-2 border-b-2 p-2",
+                tab.id === selected
+                  ? "text-accent border-accent"
+                  : "text-dark-gray border-light-gray",
+              )}
               data-active={tab.id === selected}
             >
               {tab.text}
@@ -86,7 +91,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
         <Content
           key={index}
           value={tab.id}
-          className={classes.content}
+          className="contents data-[state='inactive']:hidden"
           forceMount
         >
           {tab.children}

@@ -26,7 +26,6 @@ import Alert from "@/components/Alert";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";
 import FeatureCard from "@/components/FeatureCard";
-import Flex from "@/components/Flex";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
 import Tile from "@/components/Tile";
@@ -73,11 +72,11 @@ const Home = () => {
           Home
         </Heading>
 
-        <p className="text-center text-xl text-balance">
+        <p className="narrow text-center text-xl text-balance">
           {import.meta.env.VITE_DESCRIPTION}
         </p>
 
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-4">
           <Button to="/new-analysis" text="New Analysis" icon={<FaPlus />} />
           <Button
             to="/load-analysis"
@@ -93,11 +92,11 @@ const Home = () => {
           Examples
         </Heading>
 
-        <p className="primary center">
+        <p className="font-medium">
           See what MolEvolvR results look like without inputting anything
         </p>
 
-        <div className="full cols-3 grid">
+        <div className="grid-layout">
           {examples.map((example, index) => (
             <AnalysisCard key={index} analysis={example} />
           ))}
@@ -109,9 +108,9 @@ const Home = () => {
           Overview
         </Heading>
 
-        <p className="primary center">Select your inputs...</p>
+        <p className="font-medium">Select your inputs...</p>
 
-        <Flex breakpoint={900}>
+        <div className="flex items-center justify-center gap-4 max-md:flex-col">
           <FeatureCard
             title="Construct protein family"
             badge={<FaScrewdriverWrench />}
@@ -129,11 +128,11 @@ const Home = () => {
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
           />
-        </Flex>
+        </div>
 
-        <p className="primary center">...then view your results...</p>
+        <p className="font-medium">...then view your results...</p>
 
-        <Flex>
+        <div className="flex items-center justify-center gap-4 max-md:flex-col">
           <FeatureCard
             title="Domain architecture"
             badge={<FaBarsStaggered />}
@@ -157,7 +156,7 @@ const Home = () => {
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
           />
-        </Flex>
+        </div>
       </section>
 
       <section>
@@ -169,7 +168,7 @@ const Home = () => {
         {status === "error" && <Alert type="error">Error loading stats</Alert>}
 
         {stats && (
-          <Flex gap="lg">
+          <div className="flex flex-wrap items-center justify-center gap-8">
             <Tile
               icon={<FaPersonRunning />}
               primary={formatNumber(stats.running, true)}
@@ -185,7 +184,7 @@ const Home = () => {
               primary={formatNumber(stats.proteins, true)}
               secondary="Proteins Processed"
             />
-          </Flex>
+          </div>
         )}
       </section>
 
@@ -203,14 +202,14 @@ const Home = () => {
           analysis, summarization, and visualization.
         </p>
 
-        <Flex>
+        <div className="flex flex-wrap items-center justify-center gap-4">
           <Button
             to="https://biorxiv.org/link-to-paper"
             text="Read the Paper"
             icon={<FaRegNewspaper />}
           />
           <Button to="/about" text="Learn More" icon={<FaCircleInfo />} />
-        </Flex>
+        </div>
       </section>
 
       <section>

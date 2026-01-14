@@ -109,7 +109,7 @@ const SelectMulti = <O extends Option>({
                   {({ focus, selected }) => (
                     <li
                       className={clsx(
-                        "flex max-w-[calc(100dvw--spacing(20))] cursor-pointer items-center gap-2 p-2 transition-all",
+                        "flex max-w-[calc(100dvw--spacing(20))] cursor-pointer items-center gap-2 p-2",
                         focus && "bg-off-white",
                       )}
                     >

@@ -1,9 +1,7 @@
 import { FaPencil, FaRegTrashCan } from "react-icons/fa6";
 import { useMutation } from "@tanstack/react-query";
 import Button from "@/components/Button";
-import Flex from "@/components/Flex";
 import Heading from "@/components/Heading";
-import Section from "@/components/Section";
 import { useAnalysis } from "@/pages/Analysis";
 
 const Actions = () => {
@@ -26,12 +24,12 @@ const Actions = () => {
   });
 
   return (
-    <Section>
+    <section>
       <Heading level={2} className="sr-only">
         Actions
       </Heading>
 
-      <Flex>
+      <div>
         <Button
           text="Duplicate and Edit"
           icon={<FaPencil />}
@@ -43,8 +41,8 @@ const Actions = () => {
           design="critical"
           onClick={() => _delete()}
         />
-      </Flex>
-    </Section>
+      </div>
+    </section>
   );
 };
 

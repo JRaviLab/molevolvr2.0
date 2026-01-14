@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import {
   FaCircleCheck,
@@ -7,25 +7,31 @@ import {
   FaTriangleExclamation,
   FaXmark,
 } from "react-icons/fa6";
-import clsx from "clsx";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
-import Flex from "@/components/Flex";
+import Button from "@/components/Button";
 import { renderText } from "@/util/dom";
 import { sleep } from "@/util/misc";
-import classes from "./Toasts.module.css";
 
 /** available categories of toasts and associated styles */
 const types = {
-  info: { color: "var(--deep)", icon: <FaCircleInfo />, timeout: 5 },
-  success: { color: "var(--success)", icon: <FaCircleCheck />, timeout: 3 },
+  info: {
+    color: "var(--color-info)",
+    icon: <FaCircleInfo />,
+    timeout: 5,
+  },
+  success: {
+    color: "var(--color-success)",
+    icon: <FaCircleCheck />,
+    timeout: 3,
+  },
   warning: {
-    color: "var(--warning)",
+    color: "var(--color-warning)",
     icon: <FaCircleExclamation />,
     timeout: 5,
   },
   error: {
-    color: "var(--error)",
+    color: "var(--color-error)",
     icon: <FaTriangleExclamation />,
     timeout: 20,
   },
@@ -49,30 +55,33 @@ const Toasts = () => {
   if (toasts.length === 0) return null;
 
   return createPortal(
-    <Flex
-      className={classes.toasts}
-      column
-      hAlign="stretch"
-      gap="sm"
+    <div
+      className="fixed right-0 bottom-0 z-40 flex flex-col gap-4 p-4"
       role="region"
       aria-label="Notifications"
     >
       {toasts.map((toast, index) => (
         <div
           key={index}
-          className={clsx("card", classes.toast)}
-          style={{ "--color": types[toast.type].color } as CSSProperties}
+          className="card grid grid-cols-[min-content_1fr_min-content] items-center"
+          style={{ color: types[toast.type].color }}
         >
-          {types[toast.type].icon}
-          <div role={toast.type === "error" ? "alert" : "status"}>
+          <div className="p-4">{types[toast.type].icon}</div>
+          <div
+            className="text-black"
+            role={toast.type === "error" ? "alert" : "status"}
+          >
             {toast.content}
           </div>
-          <button onClick={() => removeToast(toast.id)}>
-            <FaXmark />
-          </button>
+          <Button
+            design="hollow"
+            icon={<FaXmark />}
+            tooltip="Dismiss notification"
+            onClick={() => removeToast(toast.id)}
+          />
         </div>
       ))}
-    </Flex>,
+    </div>,
     document.body,
   );
 };

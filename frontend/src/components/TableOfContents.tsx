@@ -5,12 +5,12 @@ import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { debounce } from "lodash";
 import { useClickOutside, useEventListener } from "@reactuses/core";
+import Button from "@/components/Button";
 import { headingsAtom } from "@/components/Heading";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
 import { firstInView, isCovering, scrollTo } from "@/util/dom";
 import { sleep } from "@/util/misc";
-import classes from "./TableOfContents.module.css";
 
 /**
  * check if covering something important and run func to close. debounce to
@@ -82,44 +82,52 @@ const TableOfContents = () => {
     return <></>;
 
   return (
-    <aside ref={ref} className={classes.table} aria-label="Table of contents">
-      <div className={classes.heading}>
+    <aside
+      ref={ref}
+      className="fixed z-30 flex max-w-60 flex-col bg-white shadow"
+      aria-label="Table of contents"
+    >
+      <div className="flex items-center gap-4">
         {/* top text */}
         {open && (
-          <span className={clsx("primary", classes.title)}>
-            Table Of Contents
-          </span>
+          <span className="grow p-3 font-medium">Table Of Contents</span>
         )}
 
         {/* toggle button */}
         <Tooltip content={open ? "Close" : "Table of contents"}>
-          <button
-            type="button"
-            className={classes.button}
+          <Button
+            design="hollow"
+            className="rounded-none"
+            icon={open ? <FaXmark /> : <FaBars />}
+            tooltip={open ? "Close" : "Table of contents"}
             aria-expanded={open}
             onClick={() => setOpen(!open)}
-          >
-            {open ? <FaXmark /> : <FaBars />}
-          </button>
+          ></Button>
         </Tooltip>
       </div>
 
       {/* links */}
       {open && (
-        <div ref={listRef} className={classes.list}>
+        <div
+          ref={listRef}
+          className="flex max-h-[40dvh] flex-col overflow-y-auto"
+        >
           {headings.map(({ id, level, text, icon }, index) => (
             <Link
               key={index}
               ref={active === index ? activeRef : undefined}
-              className={classes.link}
+              className={clsx(
+                "hover:text-deep hover:bg-off-white flex items-center gap-2 p-1",
+                active === index && "bg-off-white text-deep",
+              )}
               data-active={active === index}
               to={{ hash: "#" + id }}
               replace
               style={{ paddingLeft: 20 * (level - 0.5) }}
               onClick={() => scrollTo("#" + id)}
             >
-              {icon && <span className={classes["link-icon"]}>{icon}</span>}
-              <span className={classes["link-text"]}>{text}</span>
+              {icon && <span className="opacity-25">{icon}</span>}
+              <span className="grow truncate py-1">{text}</span>
             </Link>
           ))}
         </div>

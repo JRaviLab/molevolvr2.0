@@ -1,5 +1,4 @@
 import type { ReactElement, ReactNode, Ref } from "react";
-import clsx from "clsx";
 import {
   Arrow,
   Content,
@@ -9,7 +8,6 @@ import {
   Trigger,
 } from "@radix-ui/react-tooltip";
 import { renderText, shrinkWrap } from "@/util/dom";
-import classes from "./Tooltip.module.css";
 
 type Props = {
   ref?: Ref<HTMLButtonElement>;
@@ -46,11 +44,11 @@ const Tooltip = ({ ref, content, children, ...props }: Props) => {
                */
               shrinkWrap(el, 0, -3);
             }}
-            className={clsx(["dark", classes.content])}
+            className="dark z-30 flex max-w-80 flex-col gap-2 rounded bg-white p-4 leading-relaxed text-black"
             side="top"
           >
             {content}
-            <Arrow className={classes.arrow} />
+            <Arrow className="fill-off-white scale-110" />
           </Content>
         </Portal>
       </Root>

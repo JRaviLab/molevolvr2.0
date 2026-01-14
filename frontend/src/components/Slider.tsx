@@ -89,7 +89,7 @@ const Slider = ({
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <SliderTrack className="bg-gray text-accent group-hover:text-deep m-2 box-content h-1 min-w-40 cursor-pointer rounded-full bg-clip-content p-2 transition-all">
+          <SliderTrack className="bg-gray text-accent group-hover:text-deep m-2 box-content h-1 min-w-40 cursor-pointer rounded-full bg-clip-content p-2">
             {/* fill */}
             <div
               className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-current"
@@ -104,10 +104,10 @@ const Slider = ({
               }}
             />
 
-            <div className="absolute -top-full left-0 -translate-x-1/2 translate-y-1 whitespace-nowrap opacity-0 transition-all group-focus-within:opacity-50 group-hover:opacity-50">
+            <div className="absolute -top-full left-0 -translate-x-1/2 translate-y-1 whitespace-nowrap opacity-0 group-focus-within:opacity-50 group-hover:opacity-50">
               {formatNumber(min, true)}
             </div>
-            <div className="absolute -top-full right-0 translate-x-1/2 translate-y-1 whitespace-nowrap opacity-0 transition-all group-focus-within:opacity-50 group-hover:opacity-50">
+            <div className="absolute -top-full right-0 translate-x-1/2 translate-y-1 whitespace-nowrap opacity-0 group-focus-within:opacity-50 group-hover:opacity-50">
               {formatNumber(max, true)}
             </div>
 
@@ -117,7 +117,7 @@ const Slider = ({
                 index={index}
                 className="top-1/2 size-4 cursor-pointer rounded-full bg-current outline-offset-2 outline-current focus-within:outline-2"
               >
-                <div className="absolute top-full left-1/2 -translate-x-1/2 translate-y-1 text-center whitespace-nowrap transition-all">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 translate-y-1 text-center whitespace-nowrap">
                   {formatNumber(value, true)}
                 </div>
               </SliderThumb>

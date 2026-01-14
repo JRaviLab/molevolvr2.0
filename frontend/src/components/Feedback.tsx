@@ -110,7 +110,7 @@ const Feedback = () => {
       }}
       content={(close, open) => (
         <Form onSubmit={onSubmit}>
-          <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(--spacing(40),1fr))] items-end gap-4">
+          <div className="grid-layout">
             <TextBox
               label="Name"
               placeholder="Your Name"
@@ -200,7 +200,7 @@ const Feedback = () => {
             )}
           </Alert>
 
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-8">
             <div className="flex flex-wrap gap-2">
               <Button
                 text="Screenshot"

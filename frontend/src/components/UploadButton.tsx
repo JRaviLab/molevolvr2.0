@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import type { ChangeEvent, ComponentProps, DragEvent } from "react";
 import clsx from "clsx";
 import Button from "@/components/Button";
-import classes from "./UploadButton.module.css";
 
 type Props = {
   /**
@@ -54,7 +53,10 @@ const UploadButton = ({ onUpload, accept = [], tooltip, ...props }: Props) => {
     <span>
       <Button
         {...props}
-        className={clsx({ [classes.drag!]: drag })}
+        className={clsx({
+          "outline-accent outline-2 outline-offset-2 outline-dashed *:pointer-events-none":
+            drag,
+        })}
         tooltip={
           <>
             {tooltip}Choose or drag & drop a{" "}

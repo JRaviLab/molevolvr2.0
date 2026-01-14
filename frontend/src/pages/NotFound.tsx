@@ -3,14 +3,13 @@ import { MdBrokenImage } from "react-icons/md";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
-import Section from "@/components/Section";
 
 const NotFound = () => {
   return (
     <>
       <Meta title="Not Found" />
 
-      <Section>
+      <section>
         <Heading level={1} icon={<MdBrokenImage />}>
           Not Found
         </Heading>
@@ -18,7 +17,7 @@ const NotFound = () => {
         <p>The page you're looking for doesn't exist!</p>
 
         <Button to="/" text="To Home Page" icon={<FaArrowLeft />} flip />
-      </Section>
+      </section>
     </>
   );
 };

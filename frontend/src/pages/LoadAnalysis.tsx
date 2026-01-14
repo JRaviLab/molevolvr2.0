@@ -4,11 +4,9 @@ import { useLocalStorage } from "@reactuses/core";
 import type { Analysis } from "@/api/types";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";
-import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
-import Section from "@/components/Section";
 import TextBox from "@/components/TextBox";
 import analyses from "../../fixtures/analyses.json";
 
@@ -24,7 +22,7 @@ const LoadAnalysis = () => {
     <>
       <Meta title="Load Analysis" />
 
-      <Section>
+      <section>
         <Heading level={1} icon={<FaArrowRight />}>
           Load Analysis
         </Heading>
@@ -35,22 +33,22 @@ const LoadAnalysis = () => {
             else window.alert("Please enter an analysis id");
           }}
         >
-          <Flex className="narrow">
+          <div className="narrow">
             <TextBox placeholder="Analysis ID" name="id" />
             <Button text="Lookup" icon={<FaArrowRight />} type="submit" />
-          </Flex>
+          </div>
         </Form>
-      </Section>
+      </section>
 
-      <Section>
+      <section>
         <Heading level={2} icon={<FaClockRotateLeft />}>
           History
         </Heading>
 
-        <p className="primary center">Analyses submitted on this device</p>
+        <p>Analyses submitted on this device</p>
 
         {!!history?.length && (
-          <div className="grid full gap-md cols-3">
+          <div className="full gap-md cols-3 grid">
             {history.map((analysis, index) => (
               <AnalysisCard key={index} analysis={analysis} />
             ))}
@@ -58,18 +56,18 @@ const LoadAnalysis = () => {
         )}
 
         {/* empty */}
-        {!history?.length && <div className="placeholder">Nothing yet!</div>}
+        {!history?.length && <div>Nothing yet!</div>}
 
         {/* for testing */}
-        <Flex>
+        <div>
           For testing:
           <Button
             text="Add Fakes"
             onClick={() => setHistory(analyses as Analysis[])}
           />
           <Button text="Clear" onClick={() => setHistory([])} />
-        </Flex>
-      </Section>
+        </div>
+      </section>
     </>
   );
 };

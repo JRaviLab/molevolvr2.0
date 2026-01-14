@@ -18,11 +18,7 @@ const Footer = () => (
 
     <p>
       A project of the{" "}
-      <Link
-        to={VITE_LAB_WEBSITE}
-        showArrow={false}
-        className="text-accent-light"
-      >
+      <Link to={VITE_LAB_WEBSITE} showArrow={false} className="text-white">
         {VITE_LAB_NAME}
       </Link>{" "}
       &copy; 2025

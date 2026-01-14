@@ -1,11 +1,8 @@
-import type { ReactElement, ReactNode } from "react";
-import clsx from "clsx";
-import Flex from "@/components/Flex";
-import classes from "./Tile.module.css";
+import { cloneElement, type ReactElement, type ReactNode } from "react";
 
 type Props = {
   /** icon element */
-  icon: ReactElement;
+  icon: ReactElement<{ className?: string }>;
   /** primary content */
   primary: ReactNode;
   /** secondary content */
@@ -15,13 +12,11 @@ type Props = {
 /** big icon and primary and secondary content/text */
 const Tile = ({ icon, primary, secondary }: Props) => {
   return (
-    <Flex column className={classes.tile}>
-      {icon}
-      <div>
-        <div className={clsx("bold", classes.primary)}>{primary}</div>
-        <div className="secondary">{secondary}</div>
-      </div>
-    </Flex>
+    <div className="text-deep flex w-min flex-col items-center gap-2 text-center">
+      {cloneElement(icon, { className: "size-8 mb-2" })}
+      <div className="text-lg leading-none font-medium">{primary}</div>
+      <div className="text-dark-gray">{secondary}</div>
+    </div>
   );
 };
 

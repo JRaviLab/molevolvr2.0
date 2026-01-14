@@ -145,14 +145,14 @@ const Heatmap = ({
             <Tooltip
               key={[colIndex, rowIndex].join("-")}
               content={
-                <div className="mini-table">
-                  <span>Value</span>
-                  <span>{col}</span>
-                  <span>{x.label}</span>
-                  <span>{x.labels[colIndex]}</span>
-                  <span>{y.label}</span>
-                  <span>{y.labels[colIndex]}</span>
-                </div>
+                <dl>
+                  <dt>Value</dt>
+                  <dd>{col}</dd>
+                  <dt>{x.label}</dt>
+                  <dd>{x.labels[colIndex]}</dd>
+                  <dt>{y.label}</dt>
+                  <dd>{y.labels[colIndex]}</dd>
+                </dl>
               }
             >
               <rect

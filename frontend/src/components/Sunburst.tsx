@@ -11,7 +11,6 @@ import type { Filename } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
 import { tau } from "@/util/math";
 import { formatNumber } from "@/util/string";
-import classes from "./Sunburst.module.css";
 
 /** thickness of rings */
 const ringSize = 30;
@@ -273,11 +272,11 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
   const arcLength = radius * Math.abs(end - angle) * tau - 2 * gapSize;
 
   return (
-    <g className={classes.segment} opacity={selected === false ? 0.25 : 1}>
+    <g className="cursor-pointer" opacity={selected === false ? 0.25 : 1}>
       {/* shape */}
       <NodeTooltip {...data}>
         <path
-          className={classes.shape}
+          className="stroke-black stroke-2 outline-none [stroke-opacity:0] hover:[stroke-opacity:1] focus-visible:[stroke-opacity:1]"
           fill={color}
           d={fill}
           tabIndex={0}
@@ -301,9 +300,9 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
       <path id={id} fill="none" d={stroke} />
       {/* text */}
       <text
-        className={classes.label}
+        className="pointer-events-none"
         textAnchor="middle"
-        fill={theme["--black"]}
+        fill={theme["--color-black"]}
       >
         <textPath href={`#${id}`} startOffset="50%">
           {truncateWidth(label || "-", arcLength)}
@@ -323,16 +322,16 @@ const NodeTooltip = ({
 }: Omit<Derived, "children"> & { children: ReactElement }) => (
   <Tooltip
     content={
-      <div className="mini-table">
-        <div>Name</div>
-        <div>{label}</div>
-        <div>Value</div>
-        <div>{formatNumber(value)}</div>
-        <div>Percent</div>
-        <div>{formatPercent(percent)}</div>
-        <div>Type</div>
-        <div>{type}</div>
-      </div>
+      <dl>
+        <dt>Name</dt>
+        <dd>{label}</dd>
+        <dt>Value</dt>
+        <dd>{formatNumber(value)}</dd>
+        <dt>Percent</dt>
+        <dd>{formatPercent(percent)}</dd>
+        <dt>Type</dt>
+        <dd>{type}</dd>
+      </dl>
     }
   >
     {children}

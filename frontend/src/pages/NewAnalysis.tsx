@@ -16,7 +16,6 @@ import type { AnalysisType, InputFormat } from "@/api/types";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
-import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import type { FormData } from "@/components/Form";
 import Heading from "@/components/Heading";
@@ -24,7 +23,6 @@ import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import NumberBox from "@/components/NumberBox";
 import Radios from "@/components/Radios";
-import Section from "@/components/Section";
 import SelectSingle from "@/components/SelectSingle";
 import type { Option } from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
@@ -212,13 +210,13 @@ const NewAnalysis = () => {
       <Meta title="New Analysis" />
 
       <Form onSubmit={onSubmit}>
-        <Section>
+        <section>
           <Heading level={1} icon={<FaPlus />}>
             New Analysis
           </Heading>
-        </Section>
+        </section>
 
-        <Section>
+        <section>
           <Heading level={2} icon={<FaArrowRightToBracket />}>
             Input
           </Heading>
@@ -233,7 +231,7 @@ const NewAnalysis = () => {
               name="inputFormat"
             />
 
-            <Flex column hAlign="left">
+            <div column hAlign="left">
               <SelectSingle
                 label="What format is your input in?"
                 layout="vertical"
@@ -253,7 +251,7 @@ const NewAnalysis = () => {
                   How to get the right output from InterProScan
                 </Link>
               )}
-            </Flex>
+            </div>
           </div>
 
           {/* list input */}
@@ -309,7 +307,7 @@ const NewAnalysis = () => {
           )}
 
           {/* controls */}
-          <Flex>
+          <div>
             <UploadButton
               text="Upload"
               icon={<FaUpload />}
@@ -331,10 +329,10 @@ const NewAnalysis = () => {
               accept={accept}
             />
             <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
-          </Flex>
+          </div>
 
           {inputType === "external" && (
-            <Flex column>
+            <div column>
               <CheckBox
                 label={
                   <span>
@@ -369,16 +367,16 @@ const NewAnalysis = () => {
                   />
                 </>
               )}
-            </Flex>
+            </div>
           )}
-        </Section>
+        </section>
 
-        <Section>
+        <section>
           <Heading level={2} icon={<FaGear />}>
             Options
           </Heading>
 
-          <Flex gap="lg" vAlign="top">
+          <div gap="lg" vAlign="top">
             <Radios
               label="What type of analyses do you want to run?"
               tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
@@ -396,7 +394,7 @@ const NewAnalysis = () => {
             />
 
             {["homology-domain", "homology"].includes(analysisType) && (
-              <Flex column hAlign="left">
+              <div column hAlign="left">
                 <div className="primary">BLAST Parameters</div>
 
                 <SelectSingle
@@ -421,18 +419,18 @@ const NewAnalysis = () => {
                   step={0.000001}
                   name="blastECutoff"
                 />
-              </Flex>
+              </div>
             )}
-          </Flex>
+          </div>
 
           <CheckBox
             label="Split by domain"
             tooltip="Split input proteins by domain, and run analyses on each part separately"
             name="splitByDomain"
           />
-        </Section>
+        </section>
 
-        <Section>
+        <section>
           <Heading level={2} icon={<FaRegPaperPlane />}>
             Submit
           </Heading>
@@ -474,7 +472,7 @@ const NewAnalysis = () => {
             design="critical"
             type="submit"
           />
-        </Section>
+        </section>
       </Form>
     </>
   );

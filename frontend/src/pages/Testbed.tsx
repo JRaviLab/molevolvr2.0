@@ -43,7 +43,6 @@ import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
 import Collapsible from "@/components/Collapsible";
 import Dialog from "@/components/Dialog";
-import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Heatmap from "@/components/Heatmap";
@@ -101,29 +100,31 @@ const TestbedPage = () => {
       <section>
         <Heading level={1}>Testbed</Heading>
 
-        <div className="mini-table">
-          <span>Fake Analysis ID</span>
-          <span>{analysis}</span>
-          <span>Seed</span>
-          <Link to={`?seed=${seed}`}>{seed}</Link>
-        </div>
+        <dl>
+          <dt>Fake Analysis ID</dt>
+          <dd>{analysis}</dd>
+          <dt>Seed</dt>
+          <dd>
+            <Link to={`?seed=${seed}`}>{seed}</Link>
+          </dd>
+        </dl>
       </section>
 
       {/* complex components */}
 
-      {/* <SectionLegend />
+      <SectionLegend />
       <SectionUpset />
       <SectionSunburst />
       <SectionHeatmap />
       <SectionTree />
       <SectionNetwork />
       <SectionMSA />
-      <SectionIPR /> */}
+      <SectionIPR />
 
       {/* formatting */}
 
-      {/* <SectionElements />
-      <SectionHeading /> */}
+      <SectionElements />
+      <SectionHeading />
 
       {/* generic components */}
 
@@ -145,11 +146,7 @@ const TestbedPage = () => {
       <SectionTooltip />
       <SectionPopover />
       <SectionDialog />
-
-      {/* misc */}
-
       <SectionForm />
-      <SectionCSS />
     </>
   );
 };
@@ -169,40 +166,32 @@ const SectionElements = () => {
       </Heading>
 
       {/* main color palette */}
-      <Flex gap="none">
+      <div className="flex flex-wrap">
         {Object.entries(useTheme())
-          .filter(
-            ([, value]) => value.startsWith("#") || value.startsWith("hsl"),
-          )
+          .filter(([key]) => key.startsWith("--color"))
           .map(([variable], index) => (
             <Tooltip key={index} content={variable}>
               <div
+                className="size-10"
+                style={{ background: `var(${variable})` }}
                 aria-hidden
-                style={{
-                  width: 50,
-                  height: 50,
-                  background: `var(${variable})`,
-                }}
               />
             </Tooltip>
           ))}
-      </Flex>
+      </div>
 
       {/* color maps */}
       {[lightColorMap, darkColorMap].map((colors, index) => (
-        <Flex key={index} gap="none">
+        <div key={index} className="flex flex-wrap">
           {colors.map((color, index) => (
             <div
               key={index}
+              className="size-10"
+              style={{ background: color }}
               aria-hidden
-              style={{
-                width: 50,
-                height: 50,
-                background: color,
-              }}
             />
           ))}
-        </Flex>
+        </div>
       ))}
 
       <p>
@@ -222,26 +211,22 @@ const SectionElements = () => {
         donec.
       </p>
 
-      <div className="mini-table">
-        <span>Prop 1</span>
-        <span>123</span>
-        <span>Prop 2</span>
-        <span>abc</span>
-        <span>Prop 3</span>
-        <span>xyz</span>
-      </div>
+      <dl>
+        <dt>Prop 1</dt>
+        <dd>123</dd>
+        <dt>Prop 2</dt>
+        <dd>abc</dd>
+        <dt>Prop 3</dt>
+        <dd>xyz</dd>
+      </dl>
 
       {/* always format values with util functions as appropriate */}
-      <p className="center">
+      <p className="text-center">
         {formatNumber(123456)}
         <br />
         {formatNumber(1234567, true)}
         <br />
         {formatDate(new Date())}
-      </p>
-
-      <p className="narrow center primary">
-        Key sentence at start of section, maybe a brief 1-2 sentence description
       </p>
 
       <hr />
@@ -278,6 +263,33 @@ popup.style.width = "100%";
 popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 `}
       </pre>
+
+      <table>
+        <thead>
+          <tr>
+            <th>A</th>
+            <th>B</th>
+            <th>C</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
   );
 };
@@ -421,7 +433,7 @@ const SectionLink = () => (
       Link
     </Heading>
 
-    <p>
+    <p className="flex gap-4">
       <Link to="/">Internal Link</Link>
       <br />
       <Link to="https://medschool.cuanschutz.edu/dbmi">External Link</Link>
@@ -435,7 +447,7 @@ const SectionButton = () => (
       Button
     </Heading>
 
-    <Flex>
+    <div className="flex flex-wrap gap-4">
       <Button
         to="/about"
         text="As Link"
@@ -468,7 +480,7 @@ const SectionButton = () => (
         design="critical"
         tooltip="Tooltip"
       />
-    </Flex>
+    </div>
   </section>
 );
 
@@ -478,7 +490,7 @@ const SectionTextBox = () => (
       Text Box
     </Heading>
 
-    <div className="grid">
+    <div className="grid-layout">
       <TextBox label="Label" placeholder="Search" onChange={logChange} />
       <TextBox
         label="Label"
@@ -509,7 +521,7 @@ const SectionSelect = () => (
       Select
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <SelectSingle
         label="Single"
         tooltip="Tooltip"
@@ -540,7 +552,7 @@ const SectionSelect = () => (
         }
         onChange={logChange}
       />
-    </Flex>
+    </div>
   </section>
 );
 
@@ -565,7 +577,7 @@ const SectionSlider = () => (
       Slider
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <Slider label="Single" min={0} max={100} step={1} onChange={logChange} />
       <Slider
         layout="horizontal"
@@ -576,7 +588,7 @@ const SectionSlider = () => (
         step={100}
         onChange={logChange}
       />
-    </Flex>
+    </div>
   </section>
 );
 
@@ -586,7 +598,7 @@ const SectionNumberBox = () => (
       Number Box
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <NumberBox
         label="Vertical"
         min={0}
@@ -604,7 +616,7 @@ const SectionNumberBox = () => (
         onChange={logChange}
         tooltip="Tooltip"
       />
-    </Flex>
+    </div>
   </section>
 );
 
@@ -643,11 +655,11 @@ const SectionAgo = () => (
       Ago
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <Ago date={new Date()} />
       <Ago date="Nov 12 2023" />
       <Ago date="Jun 1 2020" />
-    </Flex>
+    </div>
   </section>
 );
 
@@ -657,7 +669,7 @@ const SectionAlert = () => (
       Alert
     </Heading>
 
-    <Flex column>
+    <div className="flex flex-col items-center gap-4">
       <Alert>
         Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua.
@@ -667,7 +679,7 @@ const SectionAlert = () => (
           {startCase(type)}
         </Alert>
       ))}
-    </Flex>
+    </div>
   </section>
 );
 
@@ -709,7 +721,7 @@ const SectionToast = () => (
       Toast
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <Button
         text="Unique Toast"
         onClick={() =>
@@ -725,7 +737,7 @@ const SectionToast = () => (
           toast(`ABC`, sample(["info", "success", "warning", "error"]), "abc");
         }}
       />
-    </Flex>
+    </div>
   </section>
 );
 
@@ -754,7 +766,7 @@ const SectionTile = () => (
       Tile
     </Heading>
 
-    <Flex gap="lg">
+    <div className="flex gap-8">
       <Tile
         icon={<FaRegHourglass />}
         primary={formatNumber(1234)}
@@ -770,7 +782,7 @@ const SectionTile = () => (
         primary={formatNumber(99999)}
         secondary="Analyses"
       />
-    </Flex>
+    </div>
   </section>
 );
 
@@ -808,7 +820,7 @@ const SectionTooltip = () => (
       Tooltip
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <Tooltip content="Minimal, non-interactive help or contextual info">
         <span className="text-tooltip" tabIndex={0} role="button">
           Plain content
@@ -826,7 +838,7 @@ const SectionTooltip = () => (
           Rich content
         </span>
       </Tooltip>
-    </Flex>
+    </div>
   </section>
 );
 
@@ -843,21 +855,19 @@ const SectionPopover = () => (
             <Link to="https://medschool.cuanschutz.edu/dbmi">Interactive</Link>{" "}
             content
           </p>
-          <Flex>
-            <Button text="Save" />
-            <SelectSingle
-              layout="horizontal"
-              label="Select"
-              options={
-                [
-                  { id: "csv", primary: "CSV" },
-                  { id: "tsv", primary: "TSV" },
-                  { id: "pdf", primary: "PDF" },
-                ] as const
-              }
-              onChange={logChange}
-            />
-          </Flex>
+          <Button text="Save" />
+          <SelectSingle
+            layout="horizontal"
+            label="Select"
+            options={
+              [
+                { id: "csv", primary: "CSV" },
+                { id: "tsv", primary: "TSV" },
+                { id: "pdf", primary: "PDF" },
+              ] as const
+            }
+            onChange={logChange}
+          />
         </>
       }
     >
@@ -947,7 +957,7 @@ const SectionDialog = () => (
         </>
       }
       bottomContent={(close) => (
-        <Flex>
+        <>
           <SelectSingle
             layout="horizontal"
             label="Select"
@@ -975,7 +985,7 @@ const SectionDialog = () => (
               close();
             }}
           />
-        </Flex>
+        </>
       )}
     >
       <Tooltip content="Click to open">
@@ -992,7 +1002,7 @@ const SectionForm = () => (
     </Heading>
 
     <Form onSubmit={console.debug}>
-      <div className="full grid">
+      <div className="grid-layout">
         <TextBox label="Email" name="email" type="email" autoComplete="email" />
         <TextBox label="Description" multi name="description" required />
         <NumberBox label="Age" name="age" />
@@ -1043,40 +1053,5 @@ const SectionForm = () => (
       <CheckBox label="I consent" name="consent" required />
       <Button type="submit" text="Submit" design="critical" />
     </Form>
-  </section>
-);
-
-/* (for CSS inspection/testing; not typically used directly) */
-const SectionCSS = () => (
-  <section>
-    <button>Test</button>
-    <input aria-label="suppress lighthouse" name="suppress lighthouse" />
-    <textarea aria-label="suppress lighthouse" name="suppress lighthouse" />
-    <table>
-      <thead>
-        <tr>
-          <th>A</th>
-          <th>B</th>
-          <th>C</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-        </tr>
-        <tr>
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-        </tr>
-        <tr>
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-        </tr>
-      </tbody>
-    </table>
   </section>
 );

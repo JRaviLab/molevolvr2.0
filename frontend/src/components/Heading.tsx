@@ -1,5 +1,6 @@
 import { cloneElement, useEffect, useRef } from "react";
 import type { JSX, ReactElement, ReactNode } from "react";
+import clsx from "clsx";
 import { atom, useSetAtom } from "jotai";
 import Badge from "@/components/Badge";
 import Link from "@/components/Link";
@@ -91,8 +92,8 @@ const Heading = ({
   });
 
   return (
-    <Link to={"#" + id} className="w-full">
-      <Tag id={id} ref={ref} className={className}>
+    <Link to={"#" + id} className={clsx("w-full", className)}>
+      <Tag id={id} ref={ref}>
         {iconElement}
         {children}
       </Tag>
