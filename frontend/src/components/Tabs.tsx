@@ -66,7 +66,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
       }}
     >
       {/* tab buttons */}
-      <List className="flex flex-wrap items-center gap-4">
+      <List className="flex flex-wrap items-center justify-center gap-4">
         {tabs.map((tab, index) => (
           <Tooltip key={index} content={tab.tooltip}>
             <Trigger

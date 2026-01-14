@@ -73,11 +73,9 @@ const Button = ({
     "gap-2",
     size === "compact" ? "p-1" : "p-3",
     !!icon && !text ? "rounded-full" : "rounded",
-    {
-      "text-accent hover:text-deep": design === "hollow",
-      "bg-accent text-white hover:bg-deep outline-accent": design === "normal",
-      "bg-black text-white hover:bg-deep outline-black": design === "critical",
-    },
+    design === "hollow" && "text-accent hover:text-deep",
+    design === "normal" && "bg-accent text-white hover:bg-deep outline-accent",
+    design === "critical" && "bg-black text-white hover:bg-deep outline-black",
     className,
   );
 

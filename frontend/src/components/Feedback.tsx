@@ -135,7 +135,6 @@ const Feedback = () => {
           </div>
 
           <TextBox
-            className="full"
             label="Subject"
             placeholder="Subject"
             value={subject}
@@ -143,7 +142,6 @@ const Feedback = () => {
           />
 
           <TextBox
-            className="full"
             label="Feedback"
             placeholder="Questions, suggestions, bugs, etc."
             required

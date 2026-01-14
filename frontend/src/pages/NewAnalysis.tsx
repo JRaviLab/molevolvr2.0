@@ -36,7 +36,6 @@ import blastExample from "./examples/blast.tsv?raw";
 import fastaExample from "./examples/fasta.txt?raw";
 import interproscanExample from "./examples/interproscan.tsv?raw";
 import msaExample from "./examples/msa.txt?raw";
-import classes from "./NewAnalysis.module.css";
 
 /** high-level category of inputs */
 const inputTypes = [
@@ -222,7 +221,7 @@ const NewAnalysis = () => {
           </Heading>
 
           {/* input questions */}
-          <div className={classes.questions}>
+          <div className="grid w-full grid-cols-2 items-start gap-8 max-md:grid-cols-1">
             <Radios
               label="What do you want to input?"
               options={inputTypes}
@@ -231,7 +230,7 @@ const NewAnalysis = () => {
               name="inputFormat"
             />
 
-            <div column hAlign="left">
+            <div className="flex flex-col gap-4">
               <SelectSingle
                 label="What format is your input in?"
                 layout="vertical"
@@ -242,14 +241,18 @@ const NewAnalysis = () => {
               />
               {/* external data help links */}
               {inputFormat === "blast" && (
-                <Link to="/help#blast" newTab>
-                  How to get the right output from BLAST
-                </Link>
+                <p>
+                  <Link to="/help#blast" newTab>
+                    How to get the right output from BLAST
+                  </Link>
+                </p>
               )}
               {inputFormat === "interproscan" && (
-                <Link to="/help#interproscan" newTab>
-                  How to get the right output from InterProScan
-                </Link>
+                <p>
+                  <Link to="/help#interproscan" newTab>
+                    How to get the right output from InterProScan
+                  </Link>
+                </p>
               )}
             </div>
           </div>
@@ -257,7 +260,7 @@ const NewAnalysis = () => {
           {/* list input */}
           {inputType === "list" && (
             <TextBox
-              className="full"
+              className="w-full"
               label={
                 <>
                   {
@@ -266,7 +269,7 @@ const NewAnalysis = () => {
                   }{" "}
                   input
                   {!isEmpty(stats) && (
-                    <span className="secondary">
+                    <span className="text-dark-gray">
                       (
                       {Object.entries(stats)
                         .map(([key, value]) => `${value} ${startCase(key)}`)
@@ -307,7 +310,7 @@ const NewAnalysis = () => {
           )}
 
           {/* controls */}
-          <div>
+          <div className="flex items-center gap-4">
             <UploadButton
               text="Upload"
               icon={<FaUpload />}
@@ -332,7 +335,7 @@ const NewAnalysis = () => {
           </div>
 
           {inputType === "external" && (
-            <div column>
+            <div className="flex flex-col gap-4">
               <CheckBox
                 label={
                   <span>
@@ -348,7 +351,6 @@ const NewAnalysis = () => {
               {!haveQuerySequences && (
                 <>
                   <TextBox
-                    className="full"
                     label="Query Sequence"
                     placeholder={placeholders.accnum}
                     multi
@@ -360,6 +362,7 @@ const NewAnalysis = () => {
                     text="Upload Query Sequence Accession Numbers"
                     icon={<FaUpload />}
                     design="hollow"
+                    className="self-center"
                     onUpload={async (file) =>
                       setQuerySequenceInput(await file.text())
                     }
@@ -376,7 +379,7 @@ const NewAnalysis = () => {
             Options
           </Heading>
 
-          <div gap="lg" vAlign="top">
+          <div className="flex flex-wrap gap-8">
             <Radios
               label="What type of analyses do you want to run?"
               tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
@@ -394,8 +397,8 @@ const NewAnalysis = () => {
             />
 
             {["homology-domain", "homology"].includes(analysisType) && (
-              <div column hAlign="left">
-                <div className="primary">BLAST Parameters</div>
+              <div className="flex flex-col gap-8">
+                <div className="font-medium">BLAST Parameters</div>
 
                 <SelectSingle
                   label="Homology search database"
@@ -436,7 +439,7 @@ const NewAnalysis = () => {
           </Heading>
 
           <TextBox
-            className="narrow"
+            className="w-140"
             label="Analysis Name"
             placeholder="New Analysis"
             value={name}
@@ -446,7 +449,7 @@ const NewAnalysis = () => {
           />
 
           <TextBox
-            className="narrow"
+            className="w-140"
             label={
               <>
                 <FaRegBell /> Email me updates on this analysis
@@ -458,7 +461,7 @@ const NewAnalysis = () => {
             onChange={setEmail}
           />
 
-          <Alert>
+          <Alert className="w-140">
             An analysis takes <strong>several hours to run</strong>!{" "}
             <Link to="/about" newTab>
               Learn more

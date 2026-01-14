@@ -9,7 +9,10 @@ const Alert = ({
   ...props
 }: ComponentProps<typeof Mark>) => {
   return (
-    <Mark className={clsx("rounded bg-current/10 p-4", className)} {...props}>
+    <Mark
+      className={clsx("max-w-full rounded bg-current/10 p-4", className)}
+      {...props}
+    >
       <p className="text-black">{children}</p>
     </Mark>
   );

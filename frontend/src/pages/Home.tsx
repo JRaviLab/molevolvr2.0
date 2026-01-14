@@ -72,7 +72,7 @@ const Home = () => {
           Home
         </Heading>
 
-        <p className="narrow text-center text-xl text-balance">
+        <p className="max-w-150 text-center text-xl text-balance">
           {import.meta.env.VITE_DESCRIPTION}
         </p>
 

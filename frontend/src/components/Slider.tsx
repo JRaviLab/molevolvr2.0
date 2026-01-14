@@ -68,10 +68,11 @@ const Slider = ({
 
   return (
     <RACSlider
-      className={clsx("group flex gap-4", {
-        "items-center": layout === "horizontal",
-        "flex-col items-start": layout === "vertical",
-      })}
+      className={clsx(
+        "group flex gap-4",
+        layout === "horizontal" && "items-center",
+        layout === "vertical" && "flex-col items-start",
+      )}
       defaultValue={(value ?? multi) ? [min, max] : min}
       value={value}
       minValue={min}

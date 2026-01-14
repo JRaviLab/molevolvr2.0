@@ -140,10 +140,8 @@ const TextBox = ({
     <div
       className={clsx(
         "flex max-w-full grow gap-4",
-        {
-          "items-center": layout === "horizontal",
-          "flex-col": layout === "vertical",
-        },
+        layout === "horizontal" && "items-center",
+        layout === "vertical" && "flex-col",
         className,
       )}
     >
@@ -157,7 +155,7 @@ const TextBox = ({
 
       {/* if no label but need tooltip, put it around input */}
       <Tooltip content={!label && tooltip ? tooltip : undefined}>
-        <div className="relative flex min-w-0 grow">
+        <div className="relative flex min-w-0 grow items-start">
           {input}
 
           {/* side element */}

@@ -29,7 +29,7 @@ const Actions = () => {
         Actions
       </Heading>
 
-      <div>
+      <div className="flex flex-wrap items-center justify-center gap-4">
         <Button
           text="Duplicate and Edit"
           icon={<FaPencil />}

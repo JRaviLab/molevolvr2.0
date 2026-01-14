@@ -33,7 +33,7 @@ const LoadAnalysis = () => {
             else window.alert("Please enter an analysis id");
           }}
         >
-          <div className="narrow">
+          <div className="flex flex-wrap justify-center gap-4">
             <TextBox placeholder="Analysis ID" name="id" />
             <Button text="Lookup" icon={<FaArrowRight />} type="submit" />
           </div>
@@ -45,10 +45,10 @@ const LoadAnalysis = () => {
           History
         </Heading>
 
-        <p>Analyses submitted on this device</p>
+        <p className="font-medium">Analyses submitted on this device</p>
 
         {!!history?.length && (
-          <div className="full gap-md cols-3 grid">
+          <div className="grid-layout">
             {history.map((analysis, index) => (
               <AnalysisCard key={index} analysis={analysis} />
             ))}
@@ -59,7 +59,7 @@ const LoadAnalysis = () => {
         {!history?.length && <div>Nothing yet!</div>}
 
         {/* for testing */}
-        <div>
+        <div className="flex flex-wrap items-center gap-4">
           For testing:
           <Button
             text="Add Fakes"

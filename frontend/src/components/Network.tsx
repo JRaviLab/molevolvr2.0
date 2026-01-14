@@ -607,7 +607,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
       <div
         ref={ref}
         className={clsx(
-          "card grid w-full grid-cols-[max-content_auto]",
+          "grid w-full grid-cols-[max-content_auto] rounded bg-white shadow",
           expanded && "h-[75dvh]! w-[calc(100dvw---spacing(20))]!",
         )}
         style={{ aspectRatio: expanded ? "" : aspectRatio }}
@@ -654,7 +654,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
               <div className="flex flex-col items-start gap-4">
                 <div>
                   <strong>Nodes</strong>{" "}
-                  <span className="secondary">
+                  <span className="text-dark-gray">
                     {formatNumber(nodes.length)}
                   </span>
                 </div>
@@ -670,7 +670,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
               <div className="flex flex-col items-start gap-4">
                 <div>
                   <strong>Edges</strong>{" "}
-                  <span className="secondary">
+                  <span className="text-dark-gray">
                     {formatNumber(edges.length)}
                   </span>
                 </div>

@@ -58,10 +58,11 @@ const NumberBox = ({
   return (
     <NumberField
       ref={ref}
-      className={clsx("flex gap-4", {
-        "items-center": layout === "horizontal",
-        "flex-col items-start": layout === "vertical",
-      })}
+      className={clsx(
+        "flex gap-4",
+        layout === "horizontal" && "items-center",
+        layout === "vertical" && "flex-col items-start",
+      )}
       minValue={min}
       maxValue={max}
       step={step}

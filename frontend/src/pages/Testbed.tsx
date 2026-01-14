@@ -203,14 +203,6 @@ const SectionElements = () => {
         risus. Amet luctus venenatis lectus magna.
       </p>
 
-      <p className="narrow">
-        Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt.
-        Turpis nunc eget lorem dolor sed viverra ipsum nunc aliquet. Ullamcorper
-        dignissim cras tincidunt lobortis feugiat vivamus at augue. Blandit
-        cursus risus at ultrices mi tempus. Odio aenean sed adipiscing diam
-        donec.
-      </p>
-
       <dl>
         <dt>Prop 1</dt>
         <dd>123</dd>
@@ -339,7 +331,7 @@ const SectionLegend = () => {
         Legend
       </Heading>
 
-      <div ref={ref} className="card w-100 resize overflow-auto p-4">
+      <div ref={ref} className="w-100 resize overflow-auto rounded p-4 shadow">
         <Legend entries={entries} x={0} y={0} w={width} />
       </div>
     </section>
@@ -490,7 +482,7 @@ const SectionTextBox = () => (
       Text Box
     </Heading>
 
-    <div className="grid-layout">
+    <div className="grid w-full grid-cols-2 gap-8 max-md:grid-cols-1">
       <TextBox label="Label" placeholder="Search" onChange={logChange} />
       <TextBox
         label="Label"
@@ -1002,7 +994,7 @@ const SectionForm = () => (
     </Heading>
 
     <Form onSubmit={console.debug}>
-      <div className="grid-layout">
+      <div className="grid w-full grid-cols-2 gap-8 max-md:grid-cols-1">
         <TextBox label="Email" name="email" type="email" autoComplete="email" />
         <TextBox label="Description" multi name="description" required />
         <NumberBox label="Age" name="age" />

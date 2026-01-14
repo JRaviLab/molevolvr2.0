@@ -82,12 +82,16 @@
     @apply flex min-h-dvh flex-col;
   }
 
+  #app {
+    @apply contents;
+  }
+
   main {
     @apply flex grow flex-col;
   }
 
   section {
-    @apply even:bg-alt-white relative z-0 flex flex-col items-center gap-(--gap) bg-white px-[max(var(--gap),(100%-var(--content))/2)] py-(--gap) [--gap:--spacing(12)] max-md:[--gap:--spacing(8)] max-sm:[--gap:--spacing(4)];
+    @apply even:bg-alt-white relative z-0 flex flex-col items-center gap-12 bg-white px-[max(var(--pad),(100%-var(--content))/2)] py-(--pad) [--pad:--spacing(12)] max-md:[--pad:--spacing(8)] max-sm:[--pad:--spacing(4)];
   }
 
   h1,
@@ -235,10 +239,6 @@
   [aria-disabled="true"] {
     @apply cursor-not-allowed opacity-50 grayscale;
   }
-}
-
-@utility narrow {
-  @apply max-w-[calc(var(--content)/2)];
 }
 
 @utility grid-layout {
