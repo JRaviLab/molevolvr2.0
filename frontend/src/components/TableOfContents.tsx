@@ -126,7 +126,7 @@ const TableOfContents = () => {
               style={{ paddingLeft: 20 * (level - 0.5) }}
               onClick={() => scrollTo("#" + id)}
             >
-              {icon && <span className="opacity-25">{icon}</span>}
+              {icon && <span className="text-deep-light">{icon}</span>}
               <span className="grow truncate py-1">{text}</span>
             </Link>
           ))}
