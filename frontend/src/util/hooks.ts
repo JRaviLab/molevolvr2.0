@@ -33,10 +33,23 @@ export const useTheme = () => {
 
 /** reactive text size and funcs, re-calced on theme change (including font load) */
 export const useTextSize = () => {
-  const theme = useTheme();
+  /** computed styles */
+  const [styles, setStyles] = useState<CSSStyleDeclaration>(
+    window.getComputedStyle(document.documentElement),
+  );
 
-  const fontSize = parseFloat(theme["--font-size"]!) || 16;
-  const fontFamily = theme["--sans"]!;
+  /** update computed styles */
+  const update = useCallback(() => {
+    setStyles(window.getComputedStyle(document.documentElement));
+  }, []);
+
+  /** when document done loading */
+  useEventListener("load", update, window);
+  /** when fonts done loading */
+  useEventListener("loadingdone", update, document.fonts);
+
+  const fontSize = parseFloat(styles.fontSize) || 16;
+  const fontFamily = styles.fontFamily || "sans-serif";
 
   return {
     fontSize,

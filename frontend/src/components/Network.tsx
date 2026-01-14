@@ -40,7 +40,6 @@ import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
-import Flex from "@/components/Flex";
 import Legend from "@/components/Legend";
 import SelectSingle from "@/components/SelectSingle";
 import type { Option } from "@/components/SelectSingle";
@@ -52,7 +51,6 @@ import { lerp } from "@/util/math";
 import { sleep } from "@/util/misc";
 import { getShapeMap } from "@/util/shapes";
 import { formatNumber } from "@/util/string";
-import classes from "./Network.module.css";
 
 /** settings */
 const minNodeSize = 30;
@@ -468,14 +466,14 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
     const getNodeLabel = (node: NodeSingular) => node.data().shortLabel;
     const getNodeSize = (node: NodeSingular) => node.data().size;
     const getNodeColor = (node: NodeSingular) =>
-      node.selected() ? (theme["--gray"] ?? "") : node.data().color;
+      node.selected() ? (theme["--color-gray"] ?? "") : node.data().color;
     const getNodeShape = (node: NodeSingular) => node.data().shape;
     const getNodeOpacity = (node: NodeSingular) => (node.active() ? 0.1 : 0);
     const getEdgeLabel = (edge: EdgeSingular) => edge.data().shortLabel;
     const getEdgeSize = (edge: EdgeSingular) => edge.data().size;
     const getEdgeArrowSize = () => 1;
     const getEdgeColor = (edge: EdgeSingular) =>
-      edge.selected() ? (theme["--gray"] ?? "") : edge.data().color;
+      edge.selected() ? (theme["--color-gray"] ?? "") : edge.data().color;
     const getEdgeArrow =
       (directions: Edge["direction"][]) => (edge: EdgeSingular) =>
         directions.includes(edge.data().direction) ? "triangle" : "none";
@@ -490,16 +488,16 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
       "shape-polygon-points": getNodeShape,
       label: getNodeLabel,
       "font-size": fontSize,
-      "font-family": theme["--sans"],
-      color: theme["--black"],
+      "font-family": theme["--font-sans"],
+      color: theme["--color-black"],
       "text-halign": "center",
       "text-valign": "center",
       "text-max-width": getNodeSize,
       "text-wrap": "wrap",
       // "text-outline-width": 1,
-      // "text-outline-color": theme["--white"],
+      // "text-outline-color": theme["--color-white"],
       // "outline-width": 1,
-      // "outline-color": theme["--black"],
+      // "outline-color": theme["--color-black"],
       "underlay-padding": minNodeSize / 4,
       "underlay-opacity": getNodeOpacity,
       "underlay-shape": "ellipse",
@@ -519,13 +517,13 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
       "arrow-scale": getEdgeArrowSize,
       label: getEdgeLabel,
       "font-size": fontSize,
-      "font-family": theme["--sans"],
-      color: theme["--black"],
+      "font-family": theme["--font-sans"],
+      color: theme["--color-black"],
       "text-rotation": "autorotate",
       // "text-outline-width": 1,
-      // "text-outline-color": theme["--white"],
+      // "text-outline-color": theme["--color-white"],
       // "line-outline-width": 1,
-      // "line-outline-color": theme["--black"],
+      // "line-outline-color": theme["--color-black"],
       "underlay-padding": minEdgeSize / 2,
       "underlay-opacity": getEdgeOpacity,
       "underlay-shape": "ellipse",
@@ -605,31 +603,28 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
 
   return (
-    <Flex column full>
+    <div className="flex w-full flex-col items-center gap-4">
       <div
         ref={ref}
-        className={clsx("card", classes.network, expanded && classes.expanded)}
-        style={{ aspectRatio }}
+        className={clsx(
+          "card grid w-full grid-cols-[max-content_auto]",
+          expanded && "h-[75dvh]! w-[calc(100dvw---spacing(40))]!",
+        )}
+        style={{ aspectRatio: expanded ? "" : aspectRatio }}
       >
         {/* panel */}
-        <Flex
-          column
-          hAlign="left"
-          vAlign="top"
-          className={classes.panel}
-          tabIndex={0}
-        >
+        <div className="flex h-0 min-h-full max-w-50 flex-col items-start justify-start gap-8 overflow-x-hidden overflow-y-auto p-4 wrap-anywhere">
           {selectedItems.length ? (
             /** show info about selected nodes/edges */
             <>
-              <Flex column hAlign="left" gap="sm">
+              <div className="flex flex-col items-start gap-4">
                 <strong>Selected items</strong>
                 {selectedItems.map((node, index) => (
                   <Fragment key={index}>
                     <hr />
-                    <div className="mini-table">
-                      <span>Name</span>
-                      <span>{node.label}</span>
+                    <dl>
+                      <dt>Name</dt>
+                      <dd>{node.label}</dd>
                       {Object.entries(
                         omit(node, [
                           "id",
@@ -644,19 +639,19 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
                         ]),
                       ).map(([key, value]) => (
                         <Fragment key={key}>
-                          <span>{startCase(key)}</span>
-                          <span>{value}</span>
+                          <dt>{startCase(key)}</dt>
+                          <dd>{value}</dd>
                         </Fragment>
                       ))}
-                    </div>
+                    </dl>
                   </Fragment>
                 ))}
-              </Flex>
+              </div>
             </>
           ) : (
             /** if nothing selected, show color key */
             <>
-              <Flex column hAlign="left" gap="sm">
+              <div className="flex flex-col items-start gap-4">
                 <div>
                   <strong>Nodes</strong>{" "}
                   <span className="secondary">
@@ -670,9 +665,9 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
                     shape: nodeShapes[type],
                   }))}
                 />
-              </Flex>
+              </div>
 
-              <Flex column hAlign="left" gap="sm">
+              <div className="flex flex-col items-start gap-4">
                 <div>
                   <strong>Edges</strong>{" "}
                   <span className="secondary">
@@ -687,18 +682,18 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
                     stroke: true,
                   }))}
                 />
-              </Flex>
+              </div>
             </>
           )}
-        </Flex>
+        </div>
 
         {/* cytoscape mount container */}
-        <div ref={containerRef} className={classes.container}></div>
+        <div ref={containerRef} className="bg-white *:size-full!"></div>
       </div>
 
       {/* controls */}
-      <Flex gap="lg" gapRatio={0.5}>
-        <Flex>
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-2">
           <Slider
             label="Max Nodes"
             layout="horizontal"
@@ -715,9 +710,9 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
             value={selectedLayout}
             onChange={setSelectedLayout}
           />
-        </Flex>
+        </div>
 
-        <Flex gap="xs">
+        <div className="flex flex-wrap items-center gap-2">
           <Download
             filename={[...filename, "network"]}
             raster={ref}
@@ -758,9 +753,9 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
             tooltip="Full screen"
             onClick={toggleFullscreen}
           />
-        </Flex>
-      </Flex>
-    </Flex>
+        </div>
+      </div>
+    </div>
   );
 };
 

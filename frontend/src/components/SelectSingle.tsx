@@ -19,7 +19,6 @@ import {
 import { usePrevious } from "@reactuses/core";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
-import classes from "./Select.module.css";
 
 type Props<O extends Option> = {
   /** layout of label and control */
@@ -91,7 +90,10 @@ const SelectSingle = <O extends Option>({
 
   return (
     <Listbox
-      className={clsx(classes.container, classes[layout])}
+      className={clsx("flex gap-4", {
+        "items-center": layout === "horizontal",
+        "flex-col items-start": layout === "vertical",
+      })}
       value={selectedWFallback}
       onChange={setSelected}
       name={name}
@@ -99,14 +101,14 @@ const SelectSingle = <O extends Option>({
       as="div"
     >
       {/* label */}
-      <Label className={classes.label}>
+      <Label className="flex items-center gap-1">
         {label}
         {tooltip && <Help tooltip={tooltip} />}
       </Label>
 
       {/* button */}
       <ListboxButton
-        className={classes.button}
+        className="text-accent hover:text-deep grow gap-2 border-b-2 border-current p-2"
         onKeyDown={({ key }) => {
           if (!(key === "ArrowLeft" || key === "ArrowRight")) return;
 
@@ -128,34 +130,43 @@ const SelectSingle = <O extends Option>({
         }}
       >
         {fullSelected?.icon}
-        <span className="truncate">{fullSelected?.primary}</span>
+        <span className="grow truncate">{fullSelected?.primary}</span>
         <FaAngleDown />
       </ListboxButton>
 
       {/* dropdown */}
       <ListboxOptions
-        className={classes.options}
+        className="z-30 min-w-min bg-white shadow"
         anchor={{ to: "bottom start", padding: 10 }}
         modal={false}
       >
         {options.map((option) => (
           <ListboxOption key={option.id} value={option.id} as={Fragment}>
             {({ focus, selected }) => (
-              <li className={classes.option} data-active={focus}>
+              <li
+                className={clsx(
+                  "flex max-w-[calc(100dvw--spacing(20))] cursor-pointer items-center gap-2 p-2 transition-all",
+                  focus && "bg-off-white",
+                )}
+              >
                 {/* check mark */}
                 <VscCircleFilled
-                  className={classes.check}
-                  style={{ opacity: selected ? 1 : 0 }}
+                  className={clsx(
+                    "text-accent",
+                    selected ? "opacity-100" : "opacity-0",
+                  )}
                 />
                 {/* text */}
-                <span className={classes.primary}>{option.primary}</span>
-                <span className={clsx("secondary", classes.secondary)}>
+                <span className="flex grow-2 items-center">
+                  {option.primary}
+                </span>
+                <span className="text-gray flex grow items-center justify-end justify-self-end text-right text-sm">
                   {option.secondary}
                 </span>
                 {/* icon */}
                 {option.icon &&
                   cloneElement(option.icon, {
-                    className: clsx("secondary", classes.icon),
+                    className: "text- justify-self-end",
                   })}
               </li>
             )}

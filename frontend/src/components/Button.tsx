@@ -3,7 +3,6 @@ import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
-import classes from "./Button.module.css";
 
 type Props = Base & Description & (_Link | _Button);
 
@@ -67,9 +66,16 @@ const Button = ({
   );
 
   /** class name string */
-  const _class = clsx(className, classes.button, classes[design], {
-    [classes.square!]: !text && !!icon,
-  });
+  const _class = clsx(
+    "p-3 gap-4",
+    !!icon && !text ? "rounded-full" : "rounded",
+    {
+      "text-accent hover:text-deep": design === "hollow",
+      "bg-accent text-white hover:bg-deep outline-accent": design === "normal",
+      "bg-black text-white hover:bg-deep outline-black": design === "critical",
+    },
+    className,
+  );
 
   /** link to parent form component */
   const form = useForm();

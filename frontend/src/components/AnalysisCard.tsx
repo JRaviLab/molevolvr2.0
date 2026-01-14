@@ -1,9 +1,7 @@
-import clsx from "clsx";
 import type { Analysis } from "@/api/types";
 import Ago from "@/components/Ago";
 import Link from "@/components/Link";
 import Mark, { type Type } from "@/components/Mark";
-import classes from "./AnalysisCard.module.css";
 
 type Props = {
   analysis: Analysis;
@@ -23,13 +21,13 @@ const AnalysisCard = ({
   return (
     <Link
       to={`/analysis/${id}`}
-      className={clsx("card", classes.card)}
+      className="card hover:border-accent flex flex-col items-start gap-2 border-2 border-transparent p-4"
       showArrow={false}
     >
-      <div className="bold">{name}</div>
-      <div className="secondary">{type}</div>
-      {info && <div className="secondary">{info}</div>}
-      {started && <Ago className="secondary" date={started} />}
+      <div className="font-bold">{name}</div>
+      <div className="text-dark-gray">{type}</div>
+      {info && <div className="text-dark-gray">{info}</div>}
+      {started && <Ago className="text-dark-gray" date={started} />}
       {status && <Mark type={statusToMark[status.type]}>{status.info}</Mark>}
     </Link>
   );

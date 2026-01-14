@@ -1,7 +1,4 @@
 import type { ReactNode } from "react";
-import clsx from "clsx";
-import Flex from "@/components/Flex";
-import classes from "./Section.module.css";
 
 type Props = {
   /** highlighted background color */
@@ -20,17 +17,7 @@ type Props = {
  * colors. do not nest sections.
  */
 const Section = ({ fill, full, className, ...props }: Props) => (
-  <Flex
-    tag="section"
-    column
-    gap="lg"
-    vAlign="top"
-    className={clsx(className, classes.section, {
-      [classes.fill!]: fill,
-      [classes.full!]: full,
-    })}
-    {...props}
-  />
+  <section {...props} />
 );
 
 export default Section;

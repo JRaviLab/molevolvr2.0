@@ -1,13 +1,10 @@
 import { cloneElement, useEffect, useRef } from "react";
 import type { JSX, ReactElement, ReactNode } from "react";
-import { FaLink } from "react-icons/fa6";
-import clsx from "clsx";
 import { atom, useSetAtom } from "jotai";
 import Badge from "@/components/Badge";
 import Link from "@/components/Link";
 import { renderText } from "@/util/dom";
 import { slugify } from "@/util/string";
-import classes from "./Heading.module.css";
 
 type Props = {
   /** "indent" level */
@@ -54,10 +51,9 @@ const Heading = ({
 
   /** icon or badge */
   let iconElement: ReactNode = null;
-  if (typeof icon === "string")
-    iconElement = <Badge className={classes.badge}>{icon}</Badge>;
+  if (typeof icon === "string") iconElement = <Badge>{icon}</Badge>;
   if (typeof icon === "object" && typeof icon.type === "function")
-    iconElement = cloneElement(icon, { className: classes.icon });
+    iconElement = cloneElement(icon, { className: "text-deep" });
 
   const setHeadings = useSetAtom(headingsAtom);
 
@@ -95,25 +91,12 @@ const Heading = ({
   });
 
   return (
-    <Tag id={id} ref={ref} className={clsx(className, classes.heading)}>
-      {iconElement}
-
-      {/* content */}
-      <span className={classes.content}>
+    <Link to={"#" + id} className="w-full">
+      <Tag id={id} ref={ref} className={className}>
+        {iconElement}
         {children}
-
-        {/* link to section */}
-        {id && (
-          <Link
-            to={"#" + id}
-            className={classes.anchor}
-            aria-label="Heading link"
-          >
-            <FaLink />
-          </Link>
-        )}
-      </span>
-    </Tag>
+      </Tag>
+    </Link>
   );
 };
 

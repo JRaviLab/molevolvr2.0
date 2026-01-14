@@ -29,11 +29,9 @@ import FeatureCard from "@/components/FeatureCard";
 import Flex from "@/components/Flex";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
-import Section from "@/components/Section";
 import Tile from "@/components/Tile";
 import Viz from "@/pages/viz/Viz";
 import { formatNumber } from "@/util/string";
-import classes from "./Home.module.css";
 
 /** example analyses */
 export const examples = [
@@ -68,15 +66,18 @@ const Home = () => {
     <>
       <Meta title="Home" />
 
-      <Section fill>
+      <section className="bg-pale">
         {!reduceMotion && <Viz />}
 
         <Heading level={1} className="sr-only">
           Home
         </Heading>
 
-        <p className={classes.hero}>{import.meta.env.VITE_DESCRIPTION}</p>
-        <Flex>
+        <p className="text-center text-xl text-balance">
+          {import.meta.env.VITE_DESCRIPTION}
+        </p>
+
+        <div className="flex flex-wrap gap-4">
           <Button to="/new-analysis" text="New Analysis" icon={<FaPlus />} />
           <Button
             to="/load-analysis"
@@ -84,10 +85,10 @@ const Home = () => {
             icon={<FaArrowRight />}
           />
           <Button to="/testbed" text="Testbed" icon={<FaFlaskVial />} />
-        </Flex>
-      </Section>
+        </div>
+      </section>
 
-      <Section>
+      <section>
         <Heading level={2} icon={<FaRegLightbulb />}>
           Examples
         </Heading>
@@ -96,14 +97,14 @@ const Home = () => {
           See what MolEvolvR results look like without inputting anything
         </p>
 
-        <div className="grid full cols-3">
+        <div className="full cols-3 grid">
           {examples.map((example, index) => (
             <AnalysisCard key={index} analysis={example} />
           ))}
         </div>
-      </Section>
+      </section>
 
-      <Section>
+      <section>
         <Heading level={2} icon={<FaRegEye />}>
           Overview
         </Heading>
@@ -157,9 +158,9 @@ const Home = () => {
             }
           />
         </Flex>
-      </Section>
+      </section>
 
-      <Section>
+      <section>
         <Heading level={2} icon={<FaChartSimple />}>
           Stats
         </Heading>
@@ -186,9 +187,9 @@ const Home = () => {
             />
           </Flex>
         )}
-      </Section>
+      </section>
 
-      <Section>
+      <section>
         <Heading level={2} icon={<FaFeatherPointed />}>
           Abstract
         </Heading>
@@ -210,9 +211,9 @@ const Home = () => {
           />
           <Button to="/about" text="Learn More" icon={<FaCircleInfo />} />
         </Flex>
-      </Section>
+      </section>
 
-      <Section fill>
+      <section>
         <Heading level={2} icon={<FaQuoteRight />}>
           Cite
         </Heading>
@@ -229,7 +230,7 @@ const Home = () => {
           bioRxiv 2022 | doi: 10.1101/2022.02.18.461833 | web app:
           https://jravilab.org/molevolvr
         </blockquote>
-      </Section>
+      </section>
     </>
   );
 };

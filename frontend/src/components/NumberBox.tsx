@@ -11,8 +11,8 @@ import { FaMinus, FaPlus } from "react-icons/fa6";
 import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
+import { isFirefox } from "@/util/browser";
 import { preserveScroll } from "@/util/dom";
-import classes from "./NumberBox.module.css";
 
 type Props = {
   /** layout of label and control */
@@ -58,7 +58,10 @@ const NumberBox = ({
   return (
     <NumberField
       ref={ref}
-      className={clsx(classes.container, classes[layout])}
+      className={clsx("flex gap-4", {
+        "items-center": layout === "horizontal",
+        "flex-col items-start": layout === "vertical",
+      })}
       minValue={min}
       maxValue={max}
       step={step}
@@ -73,26 +76,30 @@ const NumberBox = ({
     >
       {({ state }) => (
         <>
-          <Label className={classes.label}>
+          <Label className="flex items-center gap-1">
             {label}
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <Group className={classes.group}>
-            <Button slot="decrement" className={classes.button}>
+          <Group className="text-accent hover:text-deep flex border-b-2 border-current transition-all">
+            <Button slot="decrement">
               <FaMinus />
             </Button>
             <Input
-              className={classes.input}
+              className="field-sizing-content grow px-2 py-1 text-center tabular-nums"
               form={form}
               onBlurCapture={(event) => {
                 /** https://github.com/adobe/react-spectrum/discussions/6261 */
                 if (!event.currentTarget.value.trim())
                   state.setInputValue(String(min));
               }}
-              style={{ minWidth: 10 * (value?.toString()?.length ?? 5) + "px" }}
+              style={{
+                maxWidth: isFirefox
+                  ? state.inputValue.length + 1 + "em"
+                  : undefined,
+              }}
             />
-            <Button slot="increment" className={classes.button}>
+            <Button slot="increment">
               <FaPlus />
             </Button>
           </Group>

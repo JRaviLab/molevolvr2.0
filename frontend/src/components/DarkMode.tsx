@@ -8,8 +8,9 @@ export const darkModeAtom = atomWithStorage("darkMode", false);
 
 /** update root element data attribute that switches css color vars */
 const update = () => {
-  const darkMode = getDefaultStore().get(darkModeAtom);
-  document.documentElement.setAttribute("data-dark", String(darkMode));
+  if (getDefaultStore().get(darkModeAtom))
+    document.documentElement.classList.add("dark");
+  else document.documentElement.classList.remove("dark");
 };
 update();
 
@@ -27,7 +28,6 @@ export const DarkMode = () => {
         type="button"
         role="switch"
         aria-checked={darkMode}
-        style={{ color: "currentColor" }}
         onClick={() => setDarkMode(!darkMode)}
       >
         {darkMode ? <FaRegSun /> : <FaRegMoon />}

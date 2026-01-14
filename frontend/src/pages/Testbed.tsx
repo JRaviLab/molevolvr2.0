@@ -58,7 +58,6 @@ import Network from "@/components/Network";
 import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
 import Radios from "@/components/Radios";
-import Section from "@/components/Section";
 import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
@@ -99,7 +98,7 @@ const TestbedPage = () => {
     <>
       <Meta title="Testbed" />
 
-      <Section>
+      <section>
         <Heading level={1}>Testbed</Heading>
 
         <div className="mini-table">
@@ -108,23 +107,23 @@ const TestbedPage = () => {
           <span>Seed</span>
           <Link to={`?seed=${seed}`}>{seed}</Link>
         </div>
-      </Section>
+      </section>
 
       {/* complex components */}
 
-      <SectionLegend />
+      {/* <SectionLegend />
       <SectionUpset />
       <SectionSunburst />
       <SectionHeatmap />
       <SectionTree />
       <SectionNetwork />
       <SectionMSA />
-      <SectionIPR />
+      <SectionIPR /> */}
 
       {/* formatting */}
 
-      <SectionElements />
-      <SectionHeading />
+      {/* <SectionElements />
+      <SectionHeading /> */}
 
       {/* generic components */}
 
@@ -164,7 +163,7 @@ const SectionElements = () => {
   const darkColorMap = uniq(Object.values(useColorMap(words, "invert")));
 
   return (
-    <Section>
+    <section>
       <Heading level={2} icon={<FaBrush />}>
         Elements
       </Heading>
@@ -279,12 +278,12 @@ popup.style.width = "100%";
 popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 `}
       </pre>
-    </Section>
+    </section>
   );
 };
 
 const SectionHeading = () => (
-  <Section>
+  <section>
     <Heading level={2} icon="X">
       Heading 2
     </Heading>
@@ -294,7 +293,7 @@ const SectionHeading = () => (
     <Heading level={4} icon="Z">
       Heading 4
     </Heading>
-  </Section>
+  </section>
 );
 
 const SectionLegend = () => {
@@ -323,79 +322,70 @@ const SectionLegend = () => {
   );
 
   return (
-    <Section>
+    <section>
       <Heading level={2} icon={<FaShapes />}>
         Legend
       </Heading>
 
-      <div
-        ref={ref}
-        className="card"
-        style={{
-          width: 400,
-          padding: 20,
-          resize: "both",
-          overflow: "auto",
-        }}
-      >
+      <div ref={ref} className="card w-100 resize overflow-auto p-4">
         <Legend entries={entries} x={0} y={0} w={width} />
       </div>
-    </Section>
+    </section>
   );
 };
 
 const SectionUpset = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaFaceSadCry />}>
       Upset
     </Heading>
 
     <Upset title={label()} filename={[analysis]} {...upset} />
-  </Section>
+  </section>
 );
 
 const SectionSunburst = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaChartPie />}>
       Sunburst
     </Heading>
 
     <Sunburst title={label()} filename={[analysis]} data={sunburst} />
-  </Section>
+  </section>
 );
 
 const SectionHeatmap = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<PiSquaresFourFill />}>
       Heatmap
     </Heading>
 
     <Heatmap title={label()} filename={[analysis]} {...heatmap} />
-  </Section>
+  </section>
 );
 
 const SectionTree = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaSitemap />}>
       Tree
     </Heading>
 
     <Tree title={label()} filename={[analysis]} data={tree} />
-  </Section>
+  </section>
 );
 
 const SectionNetwork = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaShareNodes />}>
       Network
     </Heading>
 
     <Network filename={[analysis]} nodes={nodes} edges={edges} />
-  </Section>
+  </section>
 );
 
 const SectionMSA = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaTableCells />}>
       MSA
     </Heading>
@@ -407,11 +397,11 @@ const SectionMSA = () => (
       getType={clustalType}
       colorMap={clustalColors}
     />
-  </Section>
+  </section>
 );
 
 const SectionIPR = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaBarcode />}>
       IPR
     </Heading>
@@ -422,24 +412,25 @@ const SectionIPR = () => (
       sequence={iprSequence}
       tracks={iprTracks}
     />
-  </Section>
+  </section>
 );
 
 const SectionLink = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaLink />}>
       Link
     </Heading>
 
-    <Flex>
+    <p>
       <Link to="/">Internal Link</Link>
+      <br />
       <Link to="https://medschool.cuanschutz.edu/dbmi">External Link</Link>
-    </Flex>
-  </Section>
+    </p>
+  </section>
 );
 
 const SectionButton = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaStop />}>
       Button
     </Heading>
@@ -478,11 +469,11 @@ const SectionButton = () => (
         tooltip="Tooltip"
       />
     </Flex>
-  </Section>
+  </section>
 );
 
 const SectionTextBox = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaFont />}>
       Text Box
     </Heading>
@@ -509,11 +500,11 @@ const SectionTextBox = () => (
         icon={<FaMagnifyingGlass />}
       />
     </div>
-  </Section>
+  </section>
 );
 
 const SectionSelect = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaListCheck />}>
       Select
     </Heading>
@@ -550,11 +541,11 @@ const SectionSelect = () => (
         onChange={logChange}
       />
     </Flex>
-  </Section>
+  </section>
 );
 
 const SectionCheckBox = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegSquareCheck />}>
       Check Box
     </Heading>
@@ -565,11 +556,11 @@ const SectionCheckBox = () => (
       name="accept"
       onChange={logChange}
     />
-  </Section>
+  </section>
 );
 
 const SectionSlider = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaSliders />}>
       Slider
     </Heading>
@@ -586,11 +577,11 @@ const SectionSlider = () => (
         onChange={logChange}
       />
     </Flex>
-  </Section>
+  </section>
 );
 
 const SectionNumberBox = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaHashtag />}>
       Number Box
     </Heading>
@@ -614,11 +605,11 @@ const SectionNumberBox = () => (
         tooltip="Tooltip"
       />
     </Flex>
-  </Section>
+  </section>
 );
 
 const SectionRadios = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegCircleDot />}>
       Radios
     </Heading>
@@ -643,11 +634,11 @@ const SectionRadios = () => (
       }
       onChange={logChange}
     />
-  </Section>
+  </section>
 );
 
 const SectionAgo = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegHourglass />}>
       Ago
     </Heading>
@@ -657,11 +648,11 @@ const SectionAgo = () => (
       <Ago date="Nov 12 2023" />
       <Ago date="Jun 1 2020" />
     </Flex>
-  </Section>
+  </section>
 );
 
 const SectionAlert = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaCircleInfo />}>
       Alert
     </Heading>
@@ -677,11 +668,11 @@ const SectionAlert = () => (
         </Alert>
       ))}
     </Flex>
-  </Section>
+  </section>
 );
 
 const SectionTabs = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegFolder />}>
       Tabs
     </Heading>
@@ -709,11 +700,11 @@ const SectionTabs = () => (
         </ul>
       </Tab>
     </Tabs>
-  </Section>
+  </section>
 );
 
 const SectionToast = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaChampagneGlasses />}>
       Toast
     </Heading>
@@ -735,11 +726,11 @@ const SectionToast = () => (
         }}
       />
     </Flex>
-  </Section>
+  </section>
 );
 
 const SectionCollapsible = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaArrowsUpDown />}>
       Collapsible
     </Heading>
@@ -754,11 +745,11 @@ const SectionCollapsible = () => (
         risus. Amet luctus venenatis lectus magna.
       </p>
     </Collapsible>
-  </Section>
+  </section>
 );
 
 const SectionTile = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<CustomIcon />}>
       Tile
     </Heading>
@@ -780,11 +771,11 @@ const SectionTile = () => (
         secondary="Analyses"
       />
     </Flex>
-  </Section>
+  </section>
 );
 
 const SectionTable = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaTableCells />}>
       Table
     </Heading>
@@ -808,11 +799,11 @@ const SectionTable = () => (
       ]}
       rows={tableData}
     />
-  </Section>
+  </section>
 );
 
 const SectionTooltip = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegMessage />}>
       Tooltip
     </Heading>
@@ -836,11 +827,11 @@ const SectionTooltip = () => (
         </span>
       </Tooltip>
     </Flex>
-  </Section>
+  </section>
 );
 
 const SectionPopover = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaMessage />}>
       Popover
     </Heading>
@@ -874,11 +865,11 @@ const SectionPopover = () => (
         <Button text="Popover" />
       </Tooltip>
     </Popover>
-  </Section>
+  </section>
 );
 
 const SectionDialog = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegWindowMaximize />}>
       Dialog
     </Heading>
@@ -991,17 +982,17 @@ const SectionDialog = () => (
         <Button text="Dialog" />
       </Tooltip>
     </Dialog>
-  </Section>
+  </section>
 );
 
 const SectionForm = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaClipboardList />}>
       Form
     </Heading>
 
     <Form onSubmit={console.debug}>
-      <div className="grid full">
+      <div className="full grid">
         <TextBox label="Email" name="email" type="email" autoComplete="email" />
         <TextBox label="Description" multi name="description" required />
         <NumberBox label="Age" name="age" />
@@ -1052,12 +1043,12 @@ const SectionForm = () => (
       <CheckBox label="I consent" name="consent" required />
       <Button type="submit" text="Submit" design="critical" />
     </Form>
-  </Section>
+  </section>
 );
 
 /* (for CSS inspection/testing; not typically used directly) */
 const SectionCSS = () => (
-  <Section>
+  <section>
     <button>Test</button>
     <input aria-label="suppress lighthouse" name="suppress lighthouse" />
     <textarea aria-label="suppress lighthouse" name="suppress lighthouse" />
@@ -1087,5 +1078,5 @@ const SectionCSS = () => (
         </tr>
       </tbody>
     </table>
-  </Section>
+  </section>
 );

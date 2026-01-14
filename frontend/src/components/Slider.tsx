@@ -9,7 +9,6 @@ import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { formatNumber } from "@/util/string";
-import classes from "./Slider.module.css";
 
 type Props = Base & (Single | Multi);
 
@@ -69,7 +68,10 @@ const Slider = ({
 
   return (
     <RACSlider
-      className={clsx(classes.container, classes[layout])}
+      className={clsx("group flex gap-4", {
+        "items-center": layout === "horizontal",
+        "flex-col items-start": layout === "vertical",
+      })}
       defaultValue={(value ?? multi) ? [min, max] : min}
       value={value}
       minValue={min}
@@ -82,14 +84,15 @@ const Slider = ({
     >
       {({ state }) => (
         <>
-          <Label>
+          <Label className="flex items-center gap-1">
             {label}
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
-          <SliderTrack className={classes.track}>
+
+          <SliderTrack className="bg-gray text-accent group-hover:text-deep m-2 box-content h-1 min-w-40 cursor-pointer rounded-full bg-clip-content p-2 transition-all">
             {/* fill */}
             <div
-              className={classes.fill}
+              className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-current"
               style={{
                 left: multi ? 100 * state.getThumbPercent(0) + "%" : "",
                 width:
@@ -101,19 +104,20 @@ const Slider = ({
               }}
             />
 
-            <div className={classes["secondary-marker"]} style={{ left: "0%" }}>
+            <div className="absolute -top-full left-0 -translate-x-1/2 translate-y-1 whitespace-nowrap opacity-0 transition-all group-focus-within:opacity-50 group-hover:opacity-50">
               {formatNumber(min, true)}
             </div>
-            <div
-              className={classes["secondary-marker"]}
-              style={{ left: "100%" }}
-            >
+            <div className="absolute -top-full right-0 translate-x-1/2 translate-y-1 whitespace-nowrap opacity-0 transition-all group-focus-within:opacity-50 group-hover:opacity-50">
               {formatNumber(max, true)}
             </div>
 
             {state.values.map((value, index) => (
-              <SliderThumb key={index} index={index} className={classes.thumb}>
-                <div className={classes["primary-marker"]}>
+              <SliderThumb
+                key={index}
+                index={index}
+                className="top-1/2 size-4 cursor-pointer rounded-full bg-current outline-offset-2 outline-current focus-within:outline-2"
+              >
+                <div className="absolute top-full left-1/2 -translate-x-1/2 translate-y-1 text-center whitespace-nowrap transition-all">
                   {formatNumber(value, true)}
                 </div>
               </SliderThumb>

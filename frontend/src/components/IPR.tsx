@@ -16,7 +16,6 @@ import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import type { Filename } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
-import classes from "./IPR.module.css";
 
 /** label size */
 const labelWidth = 150;
@@ -132,7 +131,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
     <Chart
       title={title}
       filename={[...filename, "ipr"]}
-      containerProps={{ className: "full" }}
+      containerProps={{ className: "w-full" }}
       controls={[
         <Help
           tooltip={
@@ -227,7 +226,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
           <>
             {/* labels col */}
             <g textAnchor="end" transform={`translate(${-rowHeight}, 0)`}>
-              <g fill={theme["--gray"]}>
+              <g fill={theme["--color-gray"]}>
                 <text x={0} y={-1.5 * (rowHeight + rowGap)}>
                   Sequence
                 </text>
@@ -235,7 +234,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                   Position
                 </text>
               </g>
-              <g fill={theme["--black"]}>
+              <g fill={theme["--color-black"]}>
                 {tracks.map((track, trackIndex) => (
                   <Tooltip key={trackIndex} content={track.label}>
                     <text
@@ -280,7 +279,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                   zoomRef.current = null;
                 };
               }}
-              className={classes.area}
+              className="cursor-grab"
             >
               {/* background */}
               <rect
@@ -288,8 +287,8 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                 y={-2 * (rowHeight + rowGap)}
                 width={width}
                 height={(2 + tracks.length) * (rowHeight + rowGap)}
-                fill={theme["--white"]}
-                stroke={theme["--light-gray"]}
+                fill={theme["--color-white"]}
+                stroke={theme["--color-light-gray"]}
               />
               <clipPath id={clipId}>
                 <rect
@@ -304,7 +303,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
               <g clipPath={`url(#${clipId})`} data-fit-ignore>
                 {/* sequence row */}
                 <g
-                  className={classes["no-mouse"]}
+                  className="pointer-events-none"
                   transform={`translate(0, ${-1.5 * (rowHeight + rowGap)})`}
                 >
                   {sequence.split("").map((char, index) => (
@@ -317,13 +316,13 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                         y={-rowHeight / 2}
                         width={cellWidth}
                         height={rowHeight}
-                        fill={theme["--light-gray"]}
+                        fill={theme["--color-light-gray"]}
                         opacity={index % 2 === 0 ? 0.25 : 0.5}
                       />
                       <text
                         x={0}
                         y={0}
-                        fill={theme["--black"]}
+                        fill={theme["--color-black"]}
                         transform={`scale(${clamp(cellWidth / fontSize, 0, 1)})`}
                         textAnchor="middle"
                       >
@@ -334,8 +333,8 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                 </g>
 
                 <g
-                  className={classes["no-mouse"]}
-                  fill={theme["--black"]}
+                  className="pointer-events-none"
+                  fill={theme["--color-black"]}
                   textAnchor="middle"
                   transform={`translate(0, ${-0.5 * (rowHeight + rowGap)})`}
                 >
@@ -395,7 +394,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                                   <text
                                     x={drawMidX}
                                     y={rowHeight / 2}
-                                    fill={theme["--black"]}
+                                    fill={theme["--color-black"]}
                                     textAnchor="middle"
                                   >
                                     {truncateWidth(label ?? id, drawWidth)}
@@ -431,7 +430,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                   y={0}
                   width={width}
                   height={scrollHeight}
-                  fill={theme["--off-white"]}
+                  fill={theme["--color-off-white"]}
                 />
                 <rect
                   x={scrollX - scrollSpan / 2}
@@ -440,7 +439,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                   height={scrollHeight}
                   rx={scrollHeight / 2}
                   ry={scrollHeight / 2}
-                  fill={theme["--gray"]}
+                  fill={theme["--color-gray"]}
                 />
               </g>
             </g>

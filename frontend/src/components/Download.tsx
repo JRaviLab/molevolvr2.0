@@ -8,7 +8,6 @@ import {
 import { PiBracketsCurlyBold } from "react-icons/pi";
 import { TbPrompt } from "react-icons/tb";
 import Button from "@/components/Button";
-import Flex from "@/components/Flex";
 import Popover from "@/components/Popover";
 import type { Filename, Tabular } from "@/util/download";
 import {
@@ -51,7 +50,7 @@ const Download = ({
   return (
     <Popover
       content={
-        <Flex column hAlign="stretch" gap="xs">
+        <div className="flex flex-col gap-2">
           {raster && (
             <>
               <Button
@@ -118,7 +117,7 @@ const Download = ({
             />
           )}
           {children}
-        </Flex>
+        </div>
       }
     >
       <Button icon={<FaDownload />} design="hollow" tooltip="Download" />

@@ -85,7 +85,7 @@ const MSA = ({
           tooltip="Wrap sequence to stacked panels"
         />,
       ]}
-      containerProps={{ className: "full" }}
+      containerProps={{ className: "w-full" }}
     >
       {({ width }) => {
         /** max num of chars that can fit in width */

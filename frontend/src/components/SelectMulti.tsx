@@ -11,7 +11,6 @@ import {
 } from "@headlessui/react";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
-import classes from "./Select.module.css";
 
 type Props<O extends Option> = {
   /** layout of label and control */
@@ -56,7 +55,10 @@ const SelectMulti = <O extends Option>({
 
   return (
     <Listbox
-      className={clsx(classes.container, classes[layout])}
+      className={clsx("flex gap-4", {
+        "items-center": layout === "horizontal",
+        "flex-col items-start": layout === "vertical",
+      })}
       as="div"
       multiple
       value={value}
@@ -85,38 +87,50 @@ const SelectMulti = <O extends Option>({
         return (
           <>
             {/* label */}
-            <Label className={classes.label}>
+            <Label className="flex items-center gap-1">
               {label}
               {tooltip && <Help tooltip={tooltip} />}
             </Label>
 
             {/* button */}
-            <ListboxButton className={classes.button}>
-              <span className="truncate">{selectedLabel}</span>
+            <ListboxButton className="text-accent hover:text-deep grow gap-2 border-b-2 border-current p-2">
+              <span className="grow truncate">{selectedLabel}</span>
               <FaAngleDown />
             </ListboxButton>
 
             {/* dropdown */}
             <ListboxOptions
-              className={classes.options}
+              className="z-30 min-w-min bg-white shadow"
               anchor={{ to: "bottom start", padding: 10 }}
               modal={false}
             >
               {options.map((option) => (
                 <ListboxOption key={option.id} value={option.id} as={Fragment}>
                   {({ focus, selected }) => (
-                    <li className={classes.option} data-active={focus}>
+                    <li
+                      className={clsx(
+                        "flex max-w-[calc(100dvw--spacing(20))] cursor-pointer items-center gap-2 p-2 transition-all",
+                        focus && "bg-off-white",
+                      )}
+                    >
+                      {/* check mark */}
                       <FaCheck
-                        className={classes.check}
-                        style={{ opacity: selected ? 1 : 0 }}
+                        className={clsx(
+                          "text-accent",
+                          selected ? "opacity-100" : "opacity-0",
+                        )}
                       />
-                      <span className={classes.primary}>{option.primary}</span>
-                      <span className={clsx("secondary", classes.secondary)}>
+                      {/* text */}
+                      <span className="flex grow-2 items-center">
+                        {option.primary}
+                      </span>
+                      <span className="text-gray flex grow items-center justify-end justify-self-end text-right text-sm">
                         {option.secondary}
                       </span>
+                      {/* icon */}
                       {option.icon &&
                         cloneElement(option.icon, {
-                          className: clsx("secondary", classes.icon),
+                          className: "text- justify-self-end",
                         })}
                     </li>
                   )}

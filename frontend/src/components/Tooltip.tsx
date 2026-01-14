@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode, Ref } from "react";
+import clsx from "clsx";
 import {
   Arrow,
   Content,
@@ -45,9 +46,8 @@ const Tooltip = ({ ref, content, children, ...props }: Props) => {
                */
               shrinkWrap(el, 0, -3);
             }}
-            className={classes.content}
+            className={clsx(["dark", classes.content])}
             side="top"
-            data-dark="true"
           >
             {content}
             <Arrow className={classes.arrow} />

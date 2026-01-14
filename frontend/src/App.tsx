@@ -1,8 +1,6 @@
-import "@/global/theme.css";
-import "@/global/styles.css";
-import "@/global/text.css";
-import "@/global/layout.css";
-import "@/global/effects.css";
+import "@/styles.css";
+import "@fontsource-variable/manrope";
+import "@fontsource-variable/jetbrains-mono";
 import { IconContext } from "react-icons";
 import {
   createBrowserRouter,

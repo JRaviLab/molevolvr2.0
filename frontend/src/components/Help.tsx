@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { FaRegCircleQuestion } from "react-icons/fa6";
 import Tooltip from "@/components/Tooltip";
 import { sleep } from "@/util/misc";
-import classes from "./Help.module.css";
 
 type Props = {
   /** tooltip content */
@@ -19,7 +18,7 @@ const Help = ({ tooltip, children }: Props) => (
   <Tooltip content={tooltip}>
     <button
       type="button"
-      className={classes.help}
+      className="text-dark-gray cursor-help"
       onClick={async (event) => {
         const target = event.currentTarget;
         /** force open tooltip */

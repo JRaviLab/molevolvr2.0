@@ -1,12 +1,9 @@
 import { cloneElement, useEffect, useId, useState } from "react";
 import type { ReactElement, ReactNode } from "react";
 import { FaCircleDot, FaRegCircle } from "react-icons/fa6";
-import clsx from "clsx";
 import { usePrevious } from "@reactuses/core";
-import Flex from "@/components/Flex";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
-import classes from "./Radios.module.css";
 
 type Props<O extends Option> = {
   /** label content */
@@ -77,22 +74,17 @@ const Radios = <O extends Option>({
   }, [value]);
 
   return (
-    <Flex column hAlign="left" role="group" className={classes.container}>
-      <legend className={classes.label}>
+    <div role="group" className="flex flex-col items-start gap-4">
+      <legend className="flex items-center gap-2">
         {label}
         {tooltip && <Help tooltip={tooltip} />}
       </legend>
 
-      <Flex column gap="xs" hAlign="stretch">
+      <div className="flex flex-col gap-2">
         {options.map((option, index) => (
-          <Flex
-            tag="label"
-            hAlign="stretch"
-            vAlign="top"
-            wrap={false}
-            gap="sm"
+          <label
             key={index}
-            className={classes.option}
+            className="hover:bg-off-white flex items-start gap-4 p-2"
           >
             <input
               className="sr-only"
@@ -106,29 +98,29 @@ const Radios = <O extends Option>({
 
             {/* check mark */}
             {selectedWFallback === option.id ? (
-              <FaCircleDot className={clsx(classes.check, classes.checked)} />
+              <FaCircleDot className="text-accent" />
             ) : (
-              <FaRegCircle className={classes.check} />
+              <FaRegCircle />
             )}
 
             {/* text content */}
-            <Flex column hAlign="left" gap="sm">
-              <span className="primary">{option.primary}</span>
+            <div className="flex flex-col items-start gap-4">
+              <span>{option.primary}</span>
               {option.secondary && (
-                <span className="secondary">{option.secondary}</span>
+                <span className="text-dark-gray">{option.secondary}</span>
               )}
               {option.tertiary && (
-                <span className="secondary">{option.tertiary}</span>
+                <span className="text-gray">{option.tertiary}</span>
               )}
-            </Flex>
+            </div>
 
             {/* icon */}
             {option.icon &&
-              cloneElement(option.icon, { className: classes.icon })}
-          </Flex>
+              cloneElement(option.icon, { className: "text-dark-gray" })}
+          </label>
         ))}
-      </Flex>
-    </Flex>
+      </div>
+    </div>
   );
 };
 
