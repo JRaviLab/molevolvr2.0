@@ -1,18 +1,18 @@
 import { useCallback, useMemo, useState } from "react";
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import {
-  FaAngleLeft,
-  FaAngleRight,
-  FaAnglesLeft,
-  FaAnglesRight,
-  FaDownload,
-  FaFilter,
-  FaMagnifyingGlass,
-  FaSort,
-  FaSortDown,
-  FaSortUp,
-} from "react-icons/fa6";
-import { MdFilterAltOff } from "react-icons/md";
+  LuArrowDown,
+  LuArrowDownUp,
+  LuArrowUp,
+  LuChevronLeft,
+  LuChevronRight,
+  LuChevronsLeft,
+  LuChevronsRight,
+  LuDownload,
+  LuFilter,
+  LuFilterX,
+  LuSearch,
+} from "react-icons/lu";
 import clsx from "clsx";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
@@ -301,7 +301,7 @@ const Table = <Datum extends object>({
                     {...getCol(header.column.id)?.attrs}
                   >
                     {header.isPlaceholder ? null : (
-                      <div className="[&_button]:text-light-gray [&_button]:hover:text-deep [&_button]: flex items-center justify-start [&_button]:p-1">
+                      <div className="[&_button]:text-gray [&_button]:hover:text-deep [&_button]: flex items-center justify-start [&_button]:p-1">
                         {/* header label */}
                         <span className="mr-2">
                           {flexRender(
@@ -320,17 +320,16 @@ const Table = <Datum extends object>({
                           <Tooltip content="Sort this column">
                             <button
                               type="button"
-                              data-active={header.column.getIsSorted()}
                               onClick={header.column.getToggleSortingHandler()}
                             >
                               {header.column.getIsSorted() ? (
                                 header.column.getIsSorted() === "asc" ? (
-                                  <FaSortUp />
+                                  <LuArrowUp />
                                 ) : (
-                                  <FaSortDown />
+                                  <LuArrowDown />
                                 )
                               ) : (
-                                <FaSort />
+                                <LuArrowDownUp />
                               )}
                             </button>
                           </Tooltip>
@@ -354,7 +353,7 @@ const Table = <Datum extends object>({
                                     "text-accent",
                                 )}
                               >
-                                <FaFilter />
+                                <LuFilter />
                               </button>
                             </Tooltip>
                           </Popover>
@@ -417,7 +416,7 @@ const Table = <Datum extends object>({
             design="hollow"
             size="compact"
             tooltip="First page"
-            icon={<FaAnglesLeft />}
+            icon={<LuChevronsLeft />}
             aria-disabled={!table.getCanPreviousPage()}
             onClick={() => table.setPageIndex(0)}
           />
@@ -425,7 +424,7 @@ const Table = <Datum extends object>({
             design="hollow"
             size="compact"
             tooltip="Previous page"
-            icon={<FaAngleLeft />}
+            icon={<LuChevronLeft />}
             aria-disabled={!table.getCanPreviousPage()}
             onClick={table.previousPage}
           />
@@ -450,7 +449,7 @@ const Table = <Datum extends object>({
             design="hollow"
             size="compact"
             tooltip="Next page"
-            icon={<FaAngleRight />}
+            icon={<LuChevronRight />}
             aria-disabled={!table.getCanNextPage()}
             onClick={table.nextPage}
           />
@@ -458,7 +457,7 @@ const Table = <Datum extends object>({
             design="hollow"
             size="compact"
             tooltip="Last page"
-            icon={<FaAnglesRight />}
+            icon={<LuChevronsRight />}
             aria-disabled={!table.getCanNextPage()}
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
           />
@@ -490,7 +489,7 @@ const Table = <Datum extends object>({
         <TextBox
           className="max-w-30"
           placeholder="Search"
-          icon={<FaMagnifyingGlass />}
+          icon={<LuSearch />}
           value={search}
           onChange={setSearch}
           tooltip="Search entire table for plain text or regex"
@@ -500,7 +499,7 @@ const Table = <Datum extends object>({
         <div className="flex flex-wrap items-center gap-1">
           {/* clear filters */}
           <Button
-            icon={<MdFilterAltOff />}
+            icon={<LuFilterX />}
             design="hollow"
             tooltip="Clear all filters"
             onClick={() => {
@@ -511,7 +510,7 @@ const Table = <Datum extends object>({
           {/* download */}
           <Button
             design="hollow"
-            icon={<FaDownload />}
+            icon={<LuDownload />}
             tooltip="Download table data as .csv"
             onClick={() => {
               /** get col defs that are visible */
@@ -662,7 +661,7 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
       placeholder="Search"
       value={(column.getFilterValue() as string | undefined) ?? ""}
       onChange={column.setFilterValue}
-      icon={<FaMagnifyingGlass />}
+      icon={<LuSearch />}
     />
   );
 };

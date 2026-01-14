@@ -1,15 +1,14 @@
-import { FaExchangeAlt } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa6";
 import {
-  FaBook,
-  FaCommentDots,
-  FaDoorOpen,
-  FaGithub,
-  FaMicroscope,
-  FaPenNib,
-  FaRegComment,
-  FaRegEnvelope,
-  FaUsers,
-} from "react-icons/fa6";
+  LuArrowLeftRight,
+  LuBook,
+  LuDoorOpen,
+  LuMail,
+  LuMessageCircleMore,
+  LuMicroscope,
+  LuPenTool,
+  LuUsers,
+} from "react-icons/lu";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Link from "@/components/Link";
@@ -85,13 +84,13 @@ const About = () => {
       <Meta title="About" />
 
       <section>
-        <Heading level={1} icon={<FaPenNib />}>
+        <Heading level={1} icon={<LuPenTool />}>
           About
         </Heading>
       </section>
 
       <section className="items-stretch">
-        <Heading level={2} icon={<FaCommentDots />}>
+        <Heading level={2} icon={<LuMessageCircleMore />}>
           FAQs
         </Heading>
 
@@ -249,7 +248,7 @@ const About = () => {
       </section>
 
       <section>
-        <Heading level={2} icon={<FaDoorOpen />}>
+        <Heading level={2} icon={<LuDoorOpen />}>
           Behind MolEvolvR
         </Heading>
 
@@ -308,7 +307,7 @@ const About = () => {
       </section>
 
       <section className="items-stretch">
-        <Heading level={2} icon={<FaBook />}>
+        <Heading level={2} icon={<LuBook />}>
           Case studies
         </Heading>
 
@@ -436,7 +435,7 @@ const About = () => {
       </section>
 
       <section>
-        <Heading level={2} icon={<FaUsers />}>
+        <Heading level={2} icon={<LuUsers />}>
           Team
         </Heading>
 
@@ -456,7 +455,7 @@ const About = () => {
                   <td>
                     {email && (
                       <Link to={`mailto:${email}`}>
-                        <FaRegEnvelope />
+                        <LuMail />
                         {email}
                       </Link>
                     )}
@@ -490,7 +489,7 @@ const About = () => {
       </section>
 
       <section>
-        <Heading level={2} icon={<FaExchangeAlt />}>
+        <Heading level={2} icon={<LuArrowLeftRight />}>
           Compatibility
         </Heading>
 
@@ -523,29 +522,29 @@ const About = () => {
       </section>
 
       <section>
-        <Heading level={2} icon={<FaRegEnvelope />}>
+        <Heading level={2} icon={<LuMail />}>
           Contact
         </Heading>
 
         <p>
           <strong>Before contacting us privately</strong>, we prefer that you
-          use the <FaRegComment /> feedback form in the corner of every page, or{" "}
-          <Link to={VITE_ISSUES}>create a GitHub issue</Link>. This helps us
-          keep better track of work, and lets other people benefit from the
-          discussion.
+          use the <LuMessageCircleMore /> feedback form in the corner of every
+          page, or <Link to={VITE_ISSUES}>create a GitHub issue</Link>. This
+          helps us keep better track of work, and lets other people benefit from
+          the discussion.
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4">
           <Button
             to={`mailto:${VITE_EMAIL}`}
             text={VITE_EMAIL}
-            icon={<FaRegEnvelope />}
+            icon={<LuMail />}
           />
 
           <Button
             to={VITE_LAB_WEBSITE}
             text={VITE_LAB_NAME}
-            icon={<FaMicroscope />}
+            icon={<LuMicroscope />}
             tooltip={`${VITE_LAB_NAME} website`}
           />
 

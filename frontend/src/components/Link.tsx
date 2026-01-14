@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
+import { LuExternalLink } from "react-icons/lu";
 import {
   resolvePath,
   Link as RouterLink,
@@ -58,7 +58,7 @@ const Link = ({
     /** "external" plain link */
     <a ref={ref} href={to} target={target} className={_class} {...props}>
       {children}
-      {_showArrow && <FaArrowUpRightFromSquare />}
+      {_showArrow && <LuExternalLink />}
     </a>
   ) : (
     /** "internal" router link */
@@ -74,7 +74,7 @@ const Link = ({
       {...props}
     >
       {children}
-      {_showArrow && <FaArrowUpRightFromSquare />}
+      {_showArrow && <LuExternalLink />}
     </RouterLink>
   );
 

@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from "react";
 import type { ReactElement, ReactNode } from "react";
-import { FaCircleDot, FaRegCircle } from "react-icons/fa6";
+import { LuCircle, LuCircleCheckBig } from "react-icons/lu";
 import { usePrevious } from "@reactuses/core";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -98,9 +98,9 @@ const Radios = <O extends Option>({
 
             {/* check mark */}
             {selectedWFallback === option.id ? (
-              <FaCircleDot className="text-accent" />
+              <LuCircleCheckBig className="text-accent" />
             ) : (
-              <FaRegCircle />
+              <LuCircle />
             )}
 
             {/* text content */}

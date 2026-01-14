@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import type { ReactNode } from "react";
-import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
+import { LuChevronDown, LuChevronUp } from "react-icons/lu";
 import clsx from "clsx";
 import Tooltip from "@/components/Tooltip";
 
@@ -33,7 +33,7 @@ const Collapsible = ({ text, tooltip, children }: Props) => {
           aria-controls={open ? id : undefined}
         >
           {text}
-          {open ? <FaAngleUp /> : <FaAngleDown />}
+          {open ? <LuChevronUp /> : <LuChevronDown />}
         </button>
       </Tooltip>
 

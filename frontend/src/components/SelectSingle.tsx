@@ -5,7 +5,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
-import { FaAngleDown } from "react-icons/fa6";
+import { LuChevronDown } from "react-icons/lu";
 import { VscCircleFilled } from "react-icons/vsc";
 import clsx from "clsx";
 import {
@@ -131,7 +131,7 @@ const SelectSingle = <O extends Option>({
       >
         {fullSelected?.icon}
         <span className="grow truncate">{fullSelected?.primary}</span>
-        <FaAngleDown />
+        <LuChevronDown />
       </ListboxButton>
 
       {/* dropdown */}

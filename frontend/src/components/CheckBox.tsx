@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { FaRegSquare, FaRegSquareCheck } from "react-icons/fa6";
+import { LuSquare, LuSquareCheck } from "react-icons/lu";
 import Asterisk from "@/components/Asterisk";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -61,9 +61,9 @@ const CheckBox = ({
         required={required}
       />
       {checked ? (
-        <FaRegSquareCheck className="text-accent group-hover:text-deep size-5" />
+        <LuSquareCheck className="text-accent group-hover:text-deep size-5" />
       ) : (
-        <FaRegSquare className="text-accent group-hover:text-deep size-5" />
+        <LuSquare className="text-accent group-hover:text-deep size-5" />
       )}
       {label}
       {tooltip && <Help tooltip={tooltip} />}

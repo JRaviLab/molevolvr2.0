@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { FaBorderTopLeft, FaExpand, FaPrint } from "react-icons/fa6";
+import { LuCrop, LuMaximize, LuPrinter } from "react-icons/lu";
 import clsx from "clsx";
 import { clamp } from "lodash";
 import { useDebounce, useElementSize, useFullscreen } from "@reactuses/core";
@@ -195,7 +195,7 @@ const Chart = ({
               target.style.height = "";
             }}
           >
-            <FaBorderTopLeft />
+            <LuCrop />
           </button>
         </Tooltip>
       </div>
@@ -222,7 +222,7 @@ const Chart = ({
         <div className="flex flex-wrap items-center justify-center gap-2">
           {/* fullscreen */}
           <Button
-            icon={<FaExpand />}
+            icon={<LuMaximize />}
             design="hollow"
             tooltip="Full screen"
             onClick={toggleFullscreen}
@@ -238,7 +238,7 @@ const Chart = ({
             json={json}
           >
             <Button
-              icon={<FaPrint />}
+              icon={<LuPrinter />}
               text="PDF"
               onClick={print}
               tooltip="Print as pdf"

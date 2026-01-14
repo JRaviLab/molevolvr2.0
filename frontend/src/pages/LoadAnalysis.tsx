@@ -1,4 +1,4 @@
-import { FaArrowRight, FaClockRotateLeft } from "react-icons/fa6";
+import { LuArrowRight, LuHistory } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "@reactuses/core";
 import type { Analysis } from "@/api/types";
@@ -23,7 +23,7 @@ const LoadAnalysis = () => {
       <Meta title="Load Analysis" />
 
       <section>
-        <Heading level={1} icon={<FaArrowRight />}>
+        <Heading level={1} icon={<LuArrowRight />}>
           Load Analysis
         </Heading>
 
@@ -35,13 +35,13 @@ const LoadAnalysis = () => {
         >
           <div className="flex flex-wrap justify-center gap-4">
             <TextBox placeholder="Analysis ID" name="id" />
-            <Button text="Lookup" icon={<FaArrowRight />} type="submit" />
+            <Button text="Lookup" icon={<LuArrowRight />} type="submit" />
           </div>
         </Form>
       </section>
 
       <section>
-        <Heading level={2} icon={<FaClockRotateLeft />}>
+        <Heading level={2} icon={<LuHistory />}>
           History
         </Heading>
 

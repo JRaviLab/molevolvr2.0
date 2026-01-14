@@ -1,22 +1,22 @@
 import {
-  FaArrowRight,
-  FaBarsStaggered,
-  FaChartSimple,
-  FaCircleInfo,
-  FaDna,
-  FaFeatherPointed,
-  FaFlaskVial,
-  FaMicroscope,
-  FaPersonRunning,
-  FaPlus,
-  FaQuoteRight,
-  FaRegEye,
-  FaRegLightbulb,
-  FaRegNewspaper,
-  FaScrewdriverWrench,
-  FaUpload,
-} from "react-icons/fa6";
-import { LuShapes } from "react-icons/lu";
+  LuArrowRight,
+  LuChartNoAxesGantt,
+  LuChartScatter,
+  LuDna,
+  LuEye,
+  LuFeather,
+  LuFlaskConical,
+  LuInfo,
+  LuLightbulb,
+  LuMicroscope,
+  LuMonitorCheck,
+  LuNewspaper,
+  LuPlus,
+  LuQuote,
+  LuShapes,
+  LuUpload,
+  LuWrench,
+} from "react-icons/lu";
 import { TbBinaryTree } from "react-icons/tb";
 import { useMediaQuery } from "@reactuses/core";
 import { useQuery } from "@tanstack/react-query";
@@ -77,18 +77,18 @@ const Home = () => {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <Button to="/new-analysis" text="New Analysis" icon={<FaPlus />} />
+          <Button to="/new-analysis" text="New Analysis" icon={<LuPlus />} />
           <Button
             to="/load-analysis"
             text="Load Analysis"
-            icon={<FaArrowRight />}
+            icon={<LuArrowRight />}
           />
-          <Button to="/testbed" text="Testbed" icon={<FaFlaskVial />} />
+          <Button to="/testbed" text="Testbed" icon={<LuFlaskConical />} />
         </div>
       </section>
 
       <section>
-        <Heading level={2} icon={<FaRegLightbulb />}>
+        <Heading level={2} icon={<LuLightbulb />}>
           Examples
         </Heading>
 
@@ -104,7 +104,7 @@ const Home = () => {
       </section>
 
       <section>
-        <Heading level={2} icon={<FaRegEye />}>
+        <Heading level={2} icon={<LuEye />}>
           Overview
         </Heading>
 
@@ -113,7 +113,7 @@ const Home = () => {
         <div className="flex items-center justify-center gap-4 max-md:flex-col">
           <FeatureCard
             title="Construct protein family"
-            badge={<FaScrewdriverWrench />}
+            badge={<LuWrench />}
             content={
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
@@ -123,7 +123,7 @@ const Home = () => {
 
           <FeatureCard
             title="Load your own proteins"
-            badge={<FaUpload />}
+            badge={<LuUpload />}
             content={
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
@@ -135,7 +135,7 @@ const Home = () => {
         <div className="flex items-center justify-center gap-4 max-md:flex-col">
           <FeatureCard
             title="Domain architecture"
-            badge={<FaBarsStaggered />}
+            badge={<LuChartNoAxesGantt />}
             content={
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
@@ -160,7 +160,7 @@ const Home = () => {
       </section>
 
       <section>
-        <Heading level={2} icon={<FaChartSimple />}>
+        <Heading level={2} icon={<LuChartScatter />}>
           Stats
         </Heading>
 
@@ -170,17 +170,17 @@ const Home = () => {
         {stats && (
           <div className="flex flex-wrap items-center justify-center gap-8">
             <Tile
-              icon={<FaPersonRunning />}
+              icon={<LuMonitorCheck />}
               primary={formatNumber(stats.running, true)}
               secondary="Analyses Running"
             />
             <Tile
-              icon={<FaMicroscope />}
+              icon={<LuMicroscope />}
               primary={formatNumber(stats.performed, true)}
               secondary="Analyses Performed"
             />
             <Tile
-              icon={<FaDna />}
+              icon={<LuDna />}
               primary={formatNumber(stats.proteins, true)}
               secondary="Proteins Processed"
             />
@@ -189,7 +189,7 @@ const Home = () => {
       </section>
 
       <section>
-        <Heading level={2} icon={<FaFeatherPointed />}>
+        <Heading level={2} icon={<LuFeather />}>
           Abstract
         </Heading>
 
@@ -206,14 +206,14 @@ const Home = () => {
           <Button
             to="https://biorxiv.org/link-to-paper"
             text="Read the Paper"
-            icon={<FaRegNewspaper />}
+            icon={<LuNewspaper />}
           />
-          <Button to="/about" text="Learn More" icon={<FaCircleInfo />} />
+          <Button to="/about" text="Learn More" icon={<LuInfo />} />
         </div>
       </section>
 
       <section>
-        <Heading level={2} icon={<FaQuoteRight />}>
+        <Heading level={2} icon={<LuQuote />}>
           Cite
         </Heading>
 

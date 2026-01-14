@@ -7,7 +7,7 @@ import {
   Label,
   NumberField,
 } from "react-aria-components";
-import { FaMinus, FaPlus } from "react-icons/fa6";
+import { LuMinus, LuPlus } from "react-icons/lu";
 import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -84,7 +84,7 @@ const NumberBox = ({
 
           <Group className="text-accent hover:text-deep flex border-b-2 border-current">
             <Button slot="decrement">
-              <FaMinus />
+              <LuMinus />
             </Button>
             {/* Poppins unfortunately doesn't support tabular nums */}
             <Input
@@ -102,7 +102,7 @@ const NumberBox = ({
               }}
             />
             <Button slot="increment">
-              <FaPlus />
+              <LuPlus />
             </Button>
           </Group>
         </>

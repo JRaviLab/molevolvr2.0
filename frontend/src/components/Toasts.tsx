@@ -1,41 +1,12 @@
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
-import {
-  FaCircleCheck,
-  FaCircleExclamation,
-  FaCircleInfo,
-  FaTriangleExclamation,
-  FaXmark,
-} from "react-icons/fa6";
+import { LuX } from "react-icons/lu";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
 import Button from "@/components/Button";
+import { types } from "@/components/Mark";
 import { renderText } from "@/util/dom";
 import { sleep } from "@/util/misc";
-
-/** available categories of toasts and associated styles */
-const types = {
-  info: {
-    color: "var(--color-info)",
-    icon: <FaCircleInfo />,
-    timeout: 5,
-  },
-  success: {
-    color: "var(--color-success)",
-    icon: <FaCircleCheck />,
-    timeout: 3,
-  },
-  warning: {
-    color: "var(--color-warning)",
-    icon: <FaCircleExclamation />,
-    timeout: 5,
-  },
-  error: {
-    color: "var(--color-error)",
-    icon: <FaTriangleExclamation />,
-    timeout: 20,
-  },
-};
 
 type Toast = {
   /** id/name to de-duplicate by */
@@ -46,6 +17,16 @@ type Toast = {
   content: ReactNode;
   /** close timer */
   timer: number;
+};
+
+/** timeout for each toast type */
+const timeouts: Record<keyof typeof types, number> = {
+  info: 5,
+  loading: 5,
+  success: 3,
+  warning: 5,
+  error: 20,
+  analyzing: 5,
 };
 
 /** list of "toasts" (notifications) in corner of screen. singleton. */
@@ -75,7 +56,7 @@ const Toasts = () => {
           </div>
           <Button
             design="hollow"
-            icon={<FaXmark />}
+            icon={<LuX />}
             tooltip="Dismiss notification"
             onClick={() => removeToast(toast.id)}
           />
@@ -120,7 +101,7 @@ const toast = async (
   await sleep();
 
   /** timeout before close, in ms */
-  const timeout = 1000 * types[type].timeout + 10 * renderText(content).length;
+  const timeout = 1000 * timeouts[type] + 10 * renderText(content).length;
 
   const newToast = {
     id: id ?? uniqueId(),

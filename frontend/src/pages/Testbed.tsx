@@ -1,39 +1,39 @@
 import { useMemo, useRef } from "react";
 import {
-  FaArrowRight,
-  FaArrowsUpDown,
-  FaBarcode,
-  FaBars,
-  FaBeerMugEmpty,
-  FaBrush,
-  FaCat,
-  FaChampagneGlasses,
-  FaChartPie,
-  FaCircleInfo,
-  FaClipboardList,
-  FaFaceSadCry,
-  FaFont,
-  FaHashtag,
-  FaHorse,
-  FaLink,
-  FaListCheck,
-  FaMagnifyingGlass,
-  FaMessage,
-  FaPalette,
-  FaRegCircleDot,
-  FaRegFolder,
-  FaRegHourglass,
-  FaRegMessage,
-  FaRegSquareCheck,
-  FaRegWindowMaximize,
-  FaShapes,
-  FaShareNodes,
-  FaSitemap,
-  FaSliders,
-  FaStop,
-  FaTableCells,
-} from "react-icons/fa6";
-import { PiSquaresFourFill } from "react-icons/pi";
+  LuAppWindowMac,
+  LuArrowRight,
+  LuArrowUpDown,
+  LuBeer,
+  LuBrush,
+  LuChartPie,
+  LuCircleCheckBig,
+  LuDog,
+  LuFolder,
+  LuFrown,
+  LuGrid3X3,
+  LuHash,
+  LuHourglass,
+  LuInfo,
+  LuLink,
+  LuListCheck,
+  LuMenu,
+  LuMessageSquare,
+  LuMessageSquareDot,
+  LuNetwork,
+  LuPalette,
+  LuRows3,
+  LuSearch,
+  LuShapes,
+  LuSlidersHorizontal,
+  LuSquare,
+  LuSquareCheck,
+  LuTable,
+  LuTableCellsMerge,
+  LuTableColumnsSplit,
+  LuType,
+  LuWaypoints,
+  LuWine,
+} from "react-icons/lu";
 import { mapValues, sample, startCase, uniq } from "lodash";
 import { useElementSize } from "@reactuses/core";
 import CustomIcon from "@/assets/custom-icon.svg?react";
@@ -161,7 +161,7 @@ const SectionElements = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<FaBrush />}>
+      <Heading level={2} icon={<LuBrush />}>
         Elements
       </Heading>
 
@@ -327,7 +327,7 @@ const SectionLegend = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<FaShapes />}>
+      <Heading level={2} icon={<LuShapes />}>
         Legend
       </Heading>
 
@@ -340,7 +340,7 @@ const SectionLegend = () => {
 
 const SectionUpset = () => (
   <section>
-    <Heading level={2} icon={<FaFaceSadCry />}>
+    <Heading level={2} icon={<LuFrown />}>
       Upset
     </Heading>
 
@@ -350,7 +350,7 @@ const SectionUpset = () => (
 
 const SectionSunburst = () => (
   <section>
-    <Heading level={2} icon={<FaChartPie />}>
+    <Heading level={2} icon={<LuChartPie />}>
       Sunburst
     </Heading>
 
@@ -360,7 +360,7 @@ const SectionSunburst = () => (
 
 const SectionHeatmap = () => (
   <section>
-    <Heading level={2} icon={<PiSquaresFourFill />}>
+    <Heading level={2} icon={<LuGrid3X3 />}>
       Heatmap
     </Heading>
 
@@ -370,7 +370,7 @@ const SectionHeatmap = () => (
 
 const SectionTree = () => (
   <section>
-    <Heading level={2} icon={<FaSitemap />}>
+    <Heading level={2} icon={<LuNetwork />}>
       Tree
     </Heading>
 
@@ -380,7 +380,7 @@ const SectionTree = () => (
 
 const SectionNetwork = () => (
   <section>
-    <Heading level={2} icon={<FaShareNodes />}>
+    <Heading level={2} icon={<LuWaypoints />}>
       Network
     </Heading>
 
@@ -390,7 +390,7 @@ const SectionNetwork = () => (
 
 const SectionMSA = () => (
   <section>
-    <Heading level={2} icon={<FaTableCells />}>
+    <Heading level={2} icon={<LuTableColumnsSplit />}>
       MSA
     </Heading>
 
@@ -406,7 +406,7 @@ const SectionMSA = () => (
 
 const SectionIPR = () => (
   <section>
-    <Heading level={2} icon={<FaBarcode />}>
+    <Heading level={2} icon={<LuTableCellsMerge />}>
       IPR
     </Heading>
 
@@ -421,7 +421,7 @@ const SectionIPR = () => (
 
 const SectionLink = () => (
   <section>
-    <Heading level={2} icon={<FaLink />}>
+    <Heading level={2} icon={<LuLink />}>
       Link
     </Heading>
 
@@ -435,7 +435,7 @@ const SectionLink = () => (
 
 const SectionButton = () => (
   <section>
-    <Heading level={2} icon={<FaStop />}>
+    <Heading level={2} icon={<LuSquare />}>
       Button
     </Heading>
 
@@ -444,7 +444,7 @@ const SectionButton = () => (
         to="/about"
         text="As Link"
         design="hollow"
-        icon={<FaArrowRight />}
+        icon={<LuArrowRight />}
         tooltip="Tooltip"
       />
       <Button to="/about" text="As Link" tooltip="Tooltip" />
@@ -463,7 +463,7 @@ const SectionButton = () => (
       <Button
         onClick={() => window.alert("Hello World")}
         text="As Button"
-        icon={<FaArrowRight />}
+        icon={<LuArrowRight />}
         tooltip="Tooltip"
       />
       <Button
@@ -478,18 +478,13 @@ const SectionButton = () => (
 
 const SectionTextBox = () => (
   <section>
-    <Heading level={2} icon={<FaFont />}>
+    <Heading level={2} icon={<LuType />}>
       Text Box
     </Heading>
 
     <div className="grid w-full grid-cols-2 gap-8 max-md:grid-cols-1">
       <TextBox label="Label" placeholder="Search" onChange={logChange} />
-      <TextBox
-        label="Label"
-        placeholder="Search"
-        multi
-        icon={<FaMagnifyingGlass />}
-      />
+      <TextBox label="Label" placeholder="Search" multi icon={<LuSearch />} />
       <TextBox
         layout="horizontal"
         label="Label"
@@ -501,7 +496,7 @@ const SectionTextBox = () => (
         label="Label"
         placeholder="Search"
         multi
-        icon={<FaMagnifyingGlass />}
+        icon={<LuSearch />}
       />
     </div>
   </section>
@@ -509,7 +504,7 @@ const SectionTextBox = () => (
 
 const SectionSelect = () => (
   <section>
-    <Heading level={2} icon={<FaListCheck />}>
+    <Heading level={2} icon={<LuListCheck />}>
       Select
     </Heading>
 
@@ -538,7 +533,7 @@ const SectionSelect = () => (
               id: "c",
               primary: "Dolor",
               secondary: "123",
-              icon: <FaHorse />,
+              icon: <LuDog />,
             },
           ] as const
         }
@@ -550,7 +545,7 @@ const SectionSelect = () => (
 
 const SectionCheckBox = () => (
   <section>
-    <Heading level={2} icon={<FaRegSquareCheck />}>
+    <Heading level={2} icon={<LuSquareCheck />}>
       Check Box
     </Heading>
 
@@ -565,7 +560,7 @@ const SectionCheckBox = () => (
 
 const SectionSlider = () => (
   <section>
-    <Heading level={2} icon={<FaSliders />}>
+    <Heading level={2} icon={<LuSlidersHorizontal />}>
       Slider
     </Heading>
 
@@ -586,7 +581,7 @@ const SectionSlider = () => (
 
 const SectionNumberBox = () => (
   <section>
-    <Heading level={2} icon={<FaHashtag />}>
+    <Heading level={2} icon={<LuHash />}>
       Number Box
     </Heading>
 
@@ -614,7 +609,7 @@ const SectionNumberBox = () => (
 
 const SectionRadios = () => (
   <section>
-    <Heading level={2} icon={<FaRegCircleDot />}>
+    <Heading level={2} icon={<LuCircleCheckBig />}>
       Radios
     </Heading>
 
@@ -632,7 +627,7 @@ const SectionRadios = () => (
           {
             id: "third",
             primary: "Primar lorem ipsum",
-            icon: <FaCat />,
+            icon: <LuDog />,
           },
         ] as const
       }
@@ -643,7 +638,7 @@ const SectionRadios = () => (
 
 const SectionAgo = () => (
   <section>
-    <Heading level={2} icon={<FaRegHourglass />}>
+    <Heading level={2} icon={<LuHourglass />}>
       Ago
     </Heading>
 
@@ -657,7 +652,7 @@ const SectionAgo = () => (
 
 const SectionAlert = () => (
   <section>
-    <Heading level={2} icon={<FaCircleInfo />}>
+    <Heading level={2} icon={<LuInfo />}>
       Alert
     </Heading>
 
@@ -677,26 +672,26 @@ const SectionAlert = () => (
 
 const SectionTabs = () => (
   <section>
-    <Heading level={2} icon={<FaRegFolder />}>
+    <Heading level={2} icon={<LuFolder />}>
       Tabs
     </Heading>
 
     <Tabs syncWithUrl="tab" defaultValue="drinks">
-      <Tab text="Animals" icon={<FaCat />} tooltip="Tooltip">
+      <Tab text="Animals" icon={<LuDog />} tooltip="Tooltip">
         <ul>
           <li>Cat</li>
           <li>Dog</li>
           <li>Bird</li>
         </ul>
       </Tab>
-      <Tab text="Drinks" icon={<FaBeerMugEmpty />} tooltip="Tooltip">
+      <Tab text="Drinks" icon={<LuBeer />} tooltip="Tooltip">
         <ul>
           <li>Soda</li>
           <li>Beer</li>
           <li>Water</li>
         </ul>
       </Tab>
-      <Tab text="Colors" icon={<FaPalette />}>
+      <Tab text="Colors" icon={<LuPalette />}>
         <ul>
           <li>Red</li>
           <li>Purple</li>
@@ -709,7 +704,7 @@ const SectionTabs = () => (
 
 const SectionToast = () => (
   <section>
-    <Heading level={2} icon={<FaChampagneGlasses />}>
+    <Heading level={2} icon={<LuWine />}>
       Toast
     </Heading>
 
@@ -735,7 +730,7 @@ const SectionToast = () => (
 
 const SectionCollapsible = () => (
   <section>
-    <Heading level={2} icon={<FaArrowsUpDown />}>
+    <Heading level={2} icon={<LuArrowUpDown />}>
       Collapsible
     </Heading>
 
@@ -760,7 +755,7 @@ const SectionTile = () => (
 
     <div className="flex gap-8">
       <Tile
-        icon={<FaRegHourglass />}
+        icon={<LuHourglass />}
         primary={formatNumber(1234)}
         secondary="Sequences"
       />
@@ -770,7 +765,7 @@ const SectionTile = () => (
         secondary="Proteins"
       />
       <Tile
-        icon={<FaBars />}
+        icon={<LuMenu />}
         primary={formatNumber(99999)}
         secondary="Analyses"
       />
@@ -780,7 +775,7 @@ const SectionTile = () => (
 
 const SectionTable = () => (
   <section>
-    <Heading level={2} icon={<FaTableCells />}>
+    <Heading level={2} icon={<LuTable />}>
       Table
     </Heading>
 
@@ -808,7 +803,7 @@ const SectionTable = () => (
 
 const SectionTooltip = () => (
   <section>
-    <Heading level={2} icon={<FaRegMessage />}>
+    <Heading level={2} icon={<LuMessageSquare />}>
       Tooltip
     </Heading>
 
@@ -836,7 +831,7 @@ const SectionTooltip = () => (
 
 const SectionPopover = () => (
   <section>
-    <Heading level={2} icon={<FaMessage />}>
+    <Heading level={2} icon={<LuMessageSquareDot />}>
       Popover
     </Heading>
 
@@ -872,7 +867,7 @@ const SectionPopover = () => (
 
 const SectionDialog = () => (
   <section>
-    <Heading level={2} icon={<FaRegWindowMaximize />}>
+    <Heading level={2} icon={<LuAppWindowMac />}>
       Dialog
     </Heading>
 
@@ -989,7 +984,7 @@ const SectionDialog = () => (
 
 const SectionForm = () => (
   <section>
-    <Heading level={2} icon={<FaClipboardList />}>
+    <Heading level={2} icon={<LuRows3 />}>
       Form
     </Heading>
 
@@ -1019,7 +1014,7 @@ const SectionForm = () => (
                 id: "c",
                 primary: "Dolor",
                 secondary: "123",
-                icon: <FaHorse />,
+                icon: <LuDog />,
               },
             ] as const
           }
@@ -1035,7 +1030,7 @@ const SectionForm = () => (
                 id: "c",
                 primary: "Dolor",
                 secondary: "123",
-                icon: <FaHorse />,
+                icon: <LuDog />,
               },
             ] as const
           }

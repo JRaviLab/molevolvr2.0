@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { FaRegMoon, FaRegSun } from "react-icons/fa6";
+import { LuMoon, LuSun } from "react-icons/lu";
 import { getDefaultStore, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import Tooltip from "@/components/Tooltip";
@@ -34,7 +34,7 @@ export const DarkMode = ({ className }: Props) => {
         onClick={() => setDarkMode(!darkMode)}
         className={className}
       >
-        {darkMode ? <FaRegSun /> : <FaRegMoon />}
+        {darkMode ? <LuSun /> : <LuMoon />}
       </button>
     </Tooltip>
   );

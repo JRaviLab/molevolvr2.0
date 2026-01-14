@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FaBars, FaXmark } from "react-icons/fa6";
+import { LuMenu, LuX } from "react-icons/lu";
 import { useLocation } from "react-router";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
@@ -98,7 +98,7 @@ const TableOfContents = () => {
           <Button
             design="hollow"
             className="rounded-none"
-            icon={open ? <FaXmark /> : <FaBars />}
+            icon={open ? <LuX /> : <LuMenu />}
             tooltip={open ? "Close" : "Table of contents"}
             aria-expanded={open}
             onClick={() => setOpen(!open)}
@@ -126,7 +126,7 @@ const TableOfContents = () => {
               style={{ paddingLeft: 20 * (level - 0.5) }}
               onClick={() => scrollTo("#" + id)}
             >
-              {icon && <span className="text-deep-light">{icon}</span>}
+              {icon && <span className="text-deep-light flex">{icon}</span>}
               <span className="grow truncate py-1">{text}</span>
             </Link>
           ))}

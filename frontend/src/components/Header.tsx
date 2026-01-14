@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FaBars, FaXmark } from "react-icons/fa6";
+import { LuMenu, LuX } from "react-icons/lu";
 import { useLocation } from "react-router";
 import clsx from "clsx";
 import { useElementSize } from "@reactuses/core";
@@ -61,7 +61,7 @@ const Header = () => {
           aria-controls="nav"
           className={clsx("md:hidden", buttonClass)}
         >
-          {open ? <FaXmark /> : <FaBars />}
+          {open ? <LuX /> : <LuMenu />}
         </button>
       </Tooltip>
 

@@ -1,4 +1,4 @@
-import { FaDownload, FaRegComment, FaRegPaperPlane } from "react-icons/fa6";
+import { LuDownload, LuMessageCircleMore, LuSend } from "react-icons/lu";
 import { useLocation } from "react-router";
 import { Fragment } from "react/jsx-runtime";
 import { mapValues, startCase, truncate } from "lodash";
@@ -202,7 +202,7 @@ const Feedback = () => {
             <div className="flex flex-wrap gap-2">
               <Button
                 text="Screenshot"
-                icon={<FaDownload />}
+                icon={<LuDownload />}
                 design="hollow"
                 tooltip="Download a screenshot of the current page"
                 onClick={async () => {
@@ -224,13 +224,13 @@ const Feedback = () => {
             </div>
 
             {status === "idle" && (
-              <Button text="Submit" icon={<FaRegPaperPlane />} type="submit" />
+              <Button text="Submit" icon={<LuSend />} type="submit" />
             )}
           </div>
         </Form>
       )}
     >
-      <Button icon={<FaRegComment />} tooltip="Give us feedback" />
+      <Button icon={<LuMessageCircleMore />} tooltip="Give us feedback" />
     </Dialog>
   );
 };

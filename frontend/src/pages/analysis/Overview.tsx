@@ -1,4 +1,4 @@
-import { FaMagnifyingGlassChart } from "react-icons/fa6";
+import { LuFileChartPie } from "react-icons/lu";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
 import Heading from "@/components/Heading";
@@ -9,7 +9,7 @@ const Overview = () => {
 
   return (
     <section>
-      <Heading level={1} icon={<FaMagnifyingGlassChart />}>
+      <Heading level={1} icon={<LuFileChartPie />}>
         {name}
       </Heading>
 

@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { FaCropSimple, FaExpand } from "react-icons/fa6";
+import { LuCrop, LuMaximize } from "react-icons/lu";
 import clsx from "clsx";
 import cytoscape from "cytoscape";
 import type {
@@ -738,7 +738,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
           />
 
           <Button
-            icon={<FaCropSimple />}
+            icon={<LuCrop />}
             design="hollow"
             tooltip="Fit view to contents"
             onClick={fit}
@@ -752,7 +752,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
           />
 
           <Button
-            icon={<FaExpand />}
+            icon={<LuMaximize />}
             design="hollow"
             tooltip="Full screen"
             onClick={toggleFullscreen}

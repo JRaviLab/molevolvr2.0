@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import type { ReactElement, ReactNode } from "react";
-import { FaAngleDown, FaCheck } from "react-icons/fa6";
+import { LuCheck, LuChevronDown } from "react-icons/lu";
 import clsx from "clsx";
 import {
   Label,
@@ -96,7 +96,7 @@ const SelectMulti = <O extends Option>({
             {/* button */}
             <ListboxButton className="text-accent hover:text-deep grow gap-2 border-b-2 border-current p-2">
               <span className="grow truncate">{selectedLabel}</span>
-              <FaAngleDown />
+              <LuChevronDown />
             </ListboxButton>
 
             {/* dropdown */}
@@ -115,7 +115,7 @@ const SelectMulti = <O extends Option>({
                       )}
                     >
                       {/* check mark */}
-                      <FaCheck
+                      <LuCheck
                         className={clsx(
                           "text-accent",
                           selected ? "opacity-100" : "opacity-0",

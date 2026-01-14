@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaAngleUp } from "react-icons/fa6";
+import { LuChevronUp } from "react-icons/lu";
 import { useEventListener } from "@reactuses/core";
 import Button from "@/components/Button";
 import Feedback from "@/components/Feedback";
@@ -13,7 +13,7 @@ const ViewCorner = () => {
       {scrolled && (
         <Button
           className="shadow"
-          icon={<FaAngleUp />}
+          icon={<LuChevronUp />}
           tooltip="Scroll to top of page"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />

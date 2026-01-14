@@ -216,7 +216,7 @@
   }
 
   .icon {
-    @apply inline-block h-[1em] w-[unset];
+    @apply inline-block h-[1.1em] w-[unset];
   }
 
   :not(html) ::-webkit-scrollbar {

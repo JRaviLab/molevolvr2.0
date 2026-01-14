@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import {
-  FaArrowRightToBracket,
-  FaGear,
-  FaLightbulb,
-  FaPlus,
-  FaRegBell,
-  FaRegPaperPlane,
-  FaUpload,
-} from "react-icons/fa6";
+  LuArrowRightToLine,
+  LuBell,
+  LuCog,
+  LuLightbulb,
+  LuPlus,
+  LuSend,
+  LuUpload,
+} from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { parse } from "csv-parse/browser/esm/sync";
 import { isEmpty, startCase } from "lodash";
@@ -210,13 +210,13 @@ const NewAnalysis = () => {
 
       <Form onSubmit={onSubmit}>
         <section>
-          <Heading level={1} icon={<FaPlus />}>
+          <Heading level={1} icon={<LuPlus />}>
             New Analysis
           </Heading>
         </section>
 
         <section>
-          <Heading level={2} icon={<FaArrowRightToBracket />}>
+          <Heading level={2} icon={<LuArrowRightToLine />}>
             Input
           </Heading>
 
@@ -313,7 +313,7 @@ const NewAnalysis = () => {
           <div className="flex items-center gap-4">
             <UploadButton
               text="Upload"
-              icon={<FaUpload />}
+              icon={<LuUpload />}
               onUpload={async (file, filename, extension) => {
                 if (!name) setName(startCase(filename));
                 const contents = await file.text();
@@ -331,7 +331,7 @@ const NewAnalysis = () => {
               }}
               accept={accept}
             />
-            <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
+            <Button text="Example" icon={<LuLightbulb />} onClick={onExample} />
           </div>
 
           {inputType === "external" && (
@@ -360,7 +360,7 @@ const NewAnalysis = () => {
                   />
                   <UploadButton
                     text="Upload Query Sequence Accession Numbers"
-                    icon={<FaUpload />}
+                    icon={<LuUpload />}
                     design="hollow"
                     className="self-center"
                     onUpload={async (file) =>
@@ -375,7 +375,7 @@ const NewAnalysis = () => {
         </section>
 
         <section>
-          <Heading level={2} icon={<FaGear />}>
+          <Heading level={2} icon={<LuCog />}>
             Options
           </Heading>
 
@@ -434,7 +434,7 @@ const NewAnalysis = () => {
         </section>
 
         <section>
-          <Heading level={2} icon={<FaRegPaperPlane />}>
+          <Heading level={2} icon={<LuSend />}>
             Submit
           </Heading>
 
@@ -452,7 +452,7 @@ const NewAnalysis = () => {
             className="w-140"
             label={
               <>
-                <FaRegBell /> Email me updates on this analysis
+                <LuBell /> Email me updates on this analysis
               </>
             }
             placeholder="my-email@xyz.com"
@@ -471,7 +471,7 @@ const NewAnalysis = () => {
 
           <Button
             text="Submit"
-            icon={<FaRegPaperPlane />}
+            icon={<LuSend />}
             design="critical"
             type="submit"
           />

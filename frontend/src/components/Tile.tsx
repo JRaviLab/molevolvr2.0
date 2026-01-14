@@ -13,7 +13,7 @@ type Props = {
 const Tile = ({ icon, primary, secondary }: Props) => {
   return (
     <div className="text-deep flex w-min flex-col items-center gap-2 text-center">
-      <div className="mb-2 size-8">{icon}</div>
+      <div className="mb-2 flex text-2xl">{icon}</div>
       <div className="text-lg leading-none font-medium">{primary}</div>
       <div className="text-dark-gray">{secondary}</div>
     </div>
