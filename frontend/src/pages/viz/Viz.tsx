@@ -6,7 +6,6 @@ import type { Theme } from "@/util/dom";
 import { useTheme } from "@/util/hooks";
 import { dist } from "@/util/math";
 import Shape from "./shape.svg?raw";
-import classes from "./Viz.module.css";
 
 /** number of rows/cols of points */
 const rows = 30;
@@ -26,6 +25,9 @@ gsap.defaults({ ease: "power1.inOut" });
 
 /** fun bg visualization */
 const Viz = () => {
+  // disable until mem leak fixed (need to use gsap react hook)
+  return;
+
   const canvas = useRef<HTMLCanvasElement>(null);
   const ctx = useRef<CanvasRenderingContext2D>(null);
 
@@ -72,7 +74,12 @@ const Viz = () => {
     return () => gsap.ticker.remove(frame);
   }, [width, height, objects, theme]);
 
-  return <canvas ref={canvas} className={classes.viz} />;
+  return (
+    <canvas
+      ref={canvas}
+      className="absolute inset-0 -z-10 size-full place-self-center opacity-10"
+    />
+  );
 };
 
 export default Viz;

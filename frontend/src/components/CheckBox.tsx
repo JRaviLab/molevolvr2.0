@@ -2,11 +2,9 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { FaRegSquare, FaRegSquareCheck } from "react-icons/fa6";
 import Asterisk from "@/components/Asterisk";
-import Flex from "@/components/Flex";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { preserveScroll } from "@/util/dom";
-import classes from "./CheckBox.module.css";
 
 type Props = {
   /** label content */
@@ -47,7 +45,7 @@ const CheckBox = ({
   }, [value]);
 
   return (
-    <Flex tag="label" gap="sm" wrap={false} className={classes.container}>
+    <label className="group hover:bg-off-white p-2">
       <input
         type="checkbox"
         className="sr-only"
@@ -63,14 +61,14 @@ const CheckBox = ({
         required={required}
       />
       {checked ? (
-        <FaRegSquareCheck className={classes.check} />
+        <FaRegSquareCheck className="text-accent group-hover:text-deep size-5" />
       ) : (
-        <FaRegSquare className={classes.check} />
+        <FaRegSquare className="text-accent group-hover:text-deep size-5" />
       )}
       {label}
       {tooltip && <Help tooltip={tooltip} />}
       {required && <Asterisk />}
-    </Flex>
+    </label>
   );
 };
 

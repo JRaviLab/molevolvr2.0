@@ -1,6 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
 import { Arrow, Content, Portal, Root, Trigger } from "@radix-ui/react-popover";
-import classes from "./Popover.module.css";
 
 type Props = {
   /** content of popup */
@@ -16,7 +15,7 @@ const Popover = ({ content, children }: Props) => {
       <Trigger asChild>{children}</Trigger>
       <Portal>
         <Content
-          className={classes.content}
+          className="shadow-overlay z-30 flex max-w-100 flex-col gap-4 rounded bg-white p-4"
           side="top"
           onFocusCapture={(event) => {
             /** https://github.com/radix-ui/primitives/issues/2248 */
@@ -24,7 +23,7 @@ const Popover = ({ content, children }: Props) => {
           }}
         >
           {content}
-          <Arrow className={classes.arrow} />
+          <Arrow className="fill-white" />
         </Content>
       </Portal>
     </Root>

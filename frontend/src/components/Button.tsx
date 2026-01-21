@@ -3,7 +3,6 @@ import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
-import classes from "./Button.module.css";
 
 type Props = Base & Description & (_Link | _Button);
 
@@ -14,6 +13,8 @@ type Base = {
   flip?: boolean;
   /** look */
   design?: "normal" | "hollow" | "critical";
+  /** sizing */
+  size?: "compact" | "normal";
   /** class on button */
   className?: string;
 };
@@ -49,6 +50,7 @@ const Button = ({
   icon,
   flip = false,
   design = "normal",
+  size = "normal",
   className,
   tooltip,
   ...props
@@ -67,9 +69,15 @@ const Button = ({
   );
 
   /** class name string */
-  const _class = clsx(className, classes.button, classes[design], {
-    [classes.square!]: !text && !!icon,
-  });
+  const _class = clsx(
+    "gap-2",
+    size === "compact" ? "p-1" : "p-3",
+    !!icon && !text ? "rounded-full" : "rounded",
+    design === "hollow" && "text-accent hover:text-deep",
+    design === "normal" && "bg-accent text-white hover:bg-deep outline-accent",
+    design === "critical" && "bg-black text-white hover:bg-deep outline-black",
+    className,
+  );
 
   /** link to parent form component */
   const form = useForm();

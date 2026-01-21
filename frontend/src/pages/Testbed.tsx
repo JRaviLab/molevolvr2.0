@@ -43,7 +43,6 @@ import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
 import Collapsible from "@/components/Collapsible";
 import Dialog from "@/components/Dialog";
-import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Heatmap from "@/components/Heatmap";
@@ -58,7 +57,6 @@ import Network from "@/components/Network";
 import NumberBox from "@/components/NumberBox";
 import Popover from "@/components/Popover";
 import Radios from "@/components/Radios";
-import Section from "@/components/Section";
 import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
@@ -99,16 +97,18 @@ const TestbedPage = () => {
     <>
       <Meta title="Testbed" />
 
-      <Section>
+      <section>
         <Heading level={1}>Testbed</Heading>
 
-        <div className="mini-table">
-          <span>Fake Analysis ID</span>
-          <span>{analysis}</span>
-          <span>Seed</span>
-          <Link to={`?seed=${seed}`}>{seed}</Link>
-        </div>
-      </Section>
+        <dl>
+          <dt>Fake Analysis ID</dt>
+          <dd>{analysis}</dd>
+          <dt>Seed</dt>
+          <dd>
+            <Link to={`?seed=${seed}`}>{seed}</Link>
+          </dd>
+        </dl>
+      </section>
 
       {/* complex components */}
 
@@ -146,11 +146,7 @@ const TestbedPage = () => {
       <SectionTooltip />
       <SectionPopover />
       <SectionDialog />
-
-      {/* misc */}
-
       <SectionForm />
-      <SectionCSS />
     </>
   );
 };
@@ -164,46 +160,38 @@ const SectionElements = () => {
   const darkColorMap = uniq(Object.values(useColorMap(words, "invert")));
 
   return (
-    <Section>
+    <section>
       <Heading level={2} icon={<FaBrush />}>
         Elements
       </Heading>
 
       {/* main color palette */}
-      <Flex gap="none">
+      <div className="flex flex-wrap">
         {Object.entries(useTheme())
-          .filter(
-            ([, value]) => value.startsWith("#") || value.startsWith("hsl"),
-          )
+          .filter(([key]) => key.startsWith("--color"))
           .map(([variable], index) => (
             <Tooltip key={index} content={variable}>
               <div
+                className="size-10"
+                style={{ background: `var(${variable})` }}
                 aria-hidden
-                style={{
-                  width: 50,
-                  height: 50,
-                  background: `var(${variable})`,
-                }}
               />
             </Tooltip>
           ))}
-      </Flex>
+      </div>
 
       {/* color maps */}
       {[lightColorMap, darkColorMap].map((colors, index) => (
-        <Flex key={index} gap="none">
+        <div key={index} className="flex flex-wrap">
           {colors.map((color, index) => (
             <div
               key={index}
+              className="size-10"
+              style={{ background: color }}
               aria-hidden
-              style={{
-                width: 50,
-                height: 50,
-                background: color,
-              }}
             />
           ))}
-        </Flex>
+        </div>
       ))}
 
       <p>
@@ -215,34 +203,22 @@ const SectionElements = () => {
         risus. Amet luctus venenatis lectus magna.
       </p>
 
-      <p className="narrow">
-        Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt.
-        Turpis nunc eget lorem dolor sed viverra ipsum nunc aliquet. Ullamcorper
-        dignissim cras tincidunt lobortis feugiat vivamus at augue. Blandit
-        cursus risus at ultrices mi tempus. Odio aenean sed adipiscing diam
-        donec.
-      </p>
-
-      <div className="mini-table">
-        <span>Prop 1</span>
-        <span>123</span>
-        <span>Prop 2</span>
-        <span>abc</span>
-        <span>Prop 3</span>
-        <span>xyz</span>
-      </div>
+      <dl>
+        <dt>Prop 1</dt>
+        <dd>123</dd>
+        <dt>Prop 2</dt>
+        <dd>abc</dd>
+        <dt>Prop 3</dt>
+        <dd>xyz</dd>
+      </dl>
 
       {/* always format values with util functions as appropriate */}
-      <p className="center">
+      <p className="text-center">
         {formatNumber(123456)}
         <br />
         {formatNumber(1234567, true)}
         <br />
         {formatDate(new Date())}
-      </p>
-
-      <p className="narrow center primary">
-        Key sentence at start of section, maybe a brief 1-2 sentence description
       </p>
 
       <hr />
@@ -279,12 +255,39 @@ popup.style.width = "100%";
 popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 `}
       </pre>
-    </Section>
+
+      <table>
+        <thead>
+          <tr>
+            <th>A</th>
+            <th>B</th>
+            <th>C</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
   );
 };
 
 const SectionHeading = () => (
-  <Section>
+  <section>
     <Heading level={2} icon="X">
       Heading 2
     </Heading>
@@ -294,7 +297,7 @@ const SectionHeading = () => (
     <Heading level={4} icon="Z">
       Heading 4
     </Heading>
-  </Section>
+  </section>
 );
 
 const SectionLegend = () => {
@@ -323,79 +326,70 @@ const SectionLegend = () => {
   );
 
   return (
-    <Section>
+    <section>
       <Heading level={2} icon={<FaShapes />}>
         Legend
       </Heading>
 
-      <div
-        ref={ref}
-        className="card"
-        style={{
-          width: 400,
-          padding: 20,
-          resize: "both",
-          overflow: "auto",
-        }}
-      >
+      <div ref={ref} className="w-100 resize overflow-auto rounded p-4 shadow">
         <Legend entries={entries} x={0} y={0} w={width} />
       </div>
-    </Section>
+    </section>
   );
 };
 
 const SectionUpset = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaFaceSadCry />}>
       Upset
     </Heading>
 
     <Upset title={label()} filename={[analysis]} {...upset} />
-  </Section>
+  </section>
 );
 
 const SectionSunburst = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaChartPie />}>
       Sunburst
     </Heading>
 
     <Sunburst title={label()} filename={[analysis]} data={sunburst} />
-  </Section>
+  </section>
 );
 
 const SectionHeatmap = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<PiSquaresFourFill />}>
       Heatmap
     </Heading>
 
     <Heatmap title={label()} filename={[analysis]} {...heatmap} />
-  </Section>
+  </section>
 );
 
 const SectionTree = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaSitemap />}>
       Tree
     </Heading>
 
     <Tree title={label()} filename={[analysis]} data={tree} />
-  </Section>
+  </section>
 );
 
 const SectionNetwork = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaShareNodes />}>
       Network
     </Heading>
 
     <Network filename={[analysis]} nodes={nodes} edges={edges} />
-  </Section>
+  </section>
 );
 
 const SectionMSA = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaTableCells />}>
       MSA
     </Heading>
@@ -407,11 +401,11 @@ const SectionMSA = () => (
       getType={clustalType}
       colorMap={clustalColors}
     />
-  </Section>
+  </section>
 );
 
 const SectionIPR = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaBarcode />}>
       IPR
     </Heading>
@@ -422,29 +416,30 @@ const SectionIPR = () => (
       sequence={iprSequence}
       tracks={iprTracks}
     />
-  </Section>
+  </section>
 );
 
 const SectionLink = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaLink />}>
       Link
     </Heading>
 
-    <Flex>
+    <p className="flex gap-4">
       <Link to="/">Internal Link</Link>
+      <br />
       <Link to="https://medschool.cuanschutz.edu/dbmi">External Link</Link>
-    </Flex>
-  </Section>
+    </p>
+  </section>
 );
 
 const SectionButton = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaStop />}>
       Button
     </Heading>
 
-    <Flex>
+    <div className="flex flex-wrap gap-4">
       <Button
         to="/about"
         text="As Link"
@@ -477,17 +472,17 @@ const SectionButton = () => (
         design="critical"
         tooltip="Tooltip"
       />
-    </Flex>
-  </Section>
+    </div>
+  </section>
 );
 
 const SectionTextBox = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaFont />}>
       Text Box
     </Heading>
 
-    <div className="grid">
+    <div className="grid w-full grid-cols-2 gap-8 max-md:grid-cols-1">
       <TextBox label="Label" placeholder="Search" onChange={logChange} />
       <TextBox
         label="Label"
@@ -509,16 +504,16 @@ const SectionTextBox = () => (
         icon={<FaMagnifyingGlass />}
       />
     </div>
-  </Section>
+  </section>
 );
 
 const SectionSelect = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaListCheck />}>
       Select
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <SelectSingle
         label="Single"
         tooltip="Tooltip"
@@ -549,12 +544,12 @@ const SectionSelect = () => (
         }
         onChange={logChange}
       />
-    </Flex>
-  </Section>
+    </div>
+  </section>
 );
 
 const SectionCheckBox = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegSquareCheck />}>
       Check Box
     </Heading>
@@ -565,16 +560,16 @@ const SectionCheckBox = () => (
       name="accept"
       onChange={logChange}
     />
-  </Section>
+  </section>
 );
 
 const SectionSlider = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaSliders />}>
       Slider
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <Slider label="Single" min={0} max={100} step={1} onChange={logChange} />
       <Slider
         layout="horizontal"
@@ -585,17 +580,17 @@ const SectionSlider = () => (
         step={100}
         onChange={logChange}
       />
-    </Flex>
-  </Section>
+    </div>
+  </section>
 );
 
 const SectionNumberBox = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaHashtag />}>
       Number Box
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <NumberBox
         label="Vertical"
         min={0}
@@ -613,12 +608,12 @@ const SectionNumberBox = () => (
         onChange={logChange}
         tooltip="Tooltip"
       />
-    </Flex>
-  </Section>
+    </div>
+  </section>
 );
 
 const SectionRadios = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegCircleDot />}>
       Radios
     </Heading>
@@ -643,30 +638,30 @@ const SectionRadios = () => (
       }
       onChange={logChange}
     />
-  </Section>
+  </section>
 );
 
 const SectionAgo = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegHourglass />}>
       Ago
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <Ago date={new Date()} />
       <Ago date="Nov 12 2023" />
       <Ago date="Jun 1 2020" />
-    </Flex>
-  </Section>
+    </div>
+  </section>
 );
 
 const SectionAlert = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaCircleInfo />}>
       Alert
     </Heading>
 
-    <Flex column>
+    <div className="flex flex-col items-center gap-4">
       <Alert>
         Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua.
@@ -676,12 +671,12 @@ const SectionAlert = () => (
           {startCase(type)}
         </Alert>
       ))}
-    </Flex>
-  </Section>
+    </div>
+  </section>
 );
 
 const SectionTabs = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegFolder />}>
       Tabs
     </Heading>
@@ -709,16 +704,16 @@ const SectionTabs = () => (
         </ul>
       </Tab>
     </Tabs>
-  </Section>
+  </section>
 );
 
 const SectionToast = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaChampagneGlasses />}>
       Toast
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <Button
         text="Unique Toast"
         onClick={() =>
@@ -734,12 +729,12 @@ const SectionToast = () => (
           toast(`ABC`, sample(["info", "success", "warning", "error"]), "abc");
         }}
       />
-    </Flex>
-  </Section>
+    </div>
+  </section>
 );
 
 const SectionCollapsible = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaArrowsUpDown />}>
       Collapsible
     </Heading>
@@ -754,16 +749,16 @@ const SectionCollapsible = () => (
         risus. Amet luctus venenatis lectus magna.
       </p>
     </Collapsible>
-  </Section>
+  </section>
 );
 
 const SectionTile = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<CustomIcon />}>
       Tile
     </Heading>
 
-    <Flex gap="lg">
+    <div className="flex gap-8">
       <Tile
         icon={<FaRegHourglass />}
         primary={formatNumber(1234)}
@@ -779,12 +774,12 @@ const SectionTile = () => (
         primary={formatNumber(99999)}
         secondary="Analyses"
       />
-    </Flex>
-  </Section>
+    </div>
+  </section>
 );
 
 const SectionTable = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaTableCells />}>
       Table
     </Heading>
@@ -808,16 +803,16 @@ const SectionTable = () => (
       ]}
       rows={tableData}
     />
-  </Section>
+  </section>
 );
 
 const SectionTooltip = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegMessage />}>
       Tooltip
     </Heading>
 
-    <Flex>
+    <div className="flex gap-8">
       <Tooltip content="Minimal, non-interactive help or contextual info">
         <span className="text-tooltip" tabIndex={0} role="button">
           Plain content
@@ -835,12 +830,12 @@ const SectionTooltip = () => (
           Rich content
         </span>
       </Tooltip>
-    </Flex>
-  </Section>
+    </div>
+  </section>
 );
 
 const SectionPopover = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaMessage />}>
       Popover
     </Heading>
@@ -852,21 +847,19 @@ const SectionPopover = () => (
             <Link to="https://medschool.cuanschutz.edu/dbmi">Interactive</Link>{" "}
             content
           </p>
-          <Flex>
-            <Button text="Save" />
-            <SelectSingle
-              layout="horizontal"
-              label="Select"
-              options={
-                [
-                  { id: "csv", primary: "CSV" },
-                  { id: "tsv", primary: "TSV" },
-                  { id: "pdf", primary: "PDF" },
-                ] as const
-              }
-              onChange={logChange}
-            />
-          </Flex>
+          <Button text="Save" />
+          <SelectSingle
+            layout="horizontal"
+            label="Select"
+            options={
+              [
+                { id: "csv", primary: "CSV" },
+                { id: "tsv", primary: "TSV" },
+                { id: "pdf", primary: "PDF" },
+              ] as const
+            }
+            onChange={logChange}
+          />
         </>
       }
     >
@@ -874,11 +867,11 @@ const SectionPopover = () => (
         <Button text="Popover" />
       </Tooltip>
     </Popover>
-  </Section>
+  </section>
 );
 
 const SectionDialog = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaRegWindowMaximize />}>
       Dialog
     </Heading>
@@ -956,7 +949,7 @@ const SectionDialog = () => (
         </>
       }
       bottomContent={(close) => (
-        <Flex>
+        <>
           <SelectSingle
             layout="horizontal"
             label="Select"
@@ -984,24 +977,24 @@ const SectionDialog = () => (
               close();
             }}
           />
-        </Flex>
+        </>
       )}
     >
       <Tooltip content="Click to open">
         <Button text="Dialog" />
       </Tooltip>
     </Dialog>
-  </Section>
+  </section>
 );
 
 const SectionForm = () => (
-  <Section>
+  <section>
     <Heading level={2} icon={<FaClipboardList />}>
       Form
     </Heading>
 
     <Form onSubmit={console.debug}>
-      <div className="grid full">
+      <div className="grid w-full grid-cols-2 gap-8 max-md:grid-cols-1">
         <TextBox label="Email" name="email" type="email" autoComplete="email" />
         <TextBox label="Description" multi name="description" required />
         <NumberBox label="Age" name="age" />
@@ -1052,40 +1045,5 @@ const SectionForm = () => (
       <CheckBox label="I consent" name="consent" required />
       <Button type="submit" text="Submit" design="critical" />
     </Form>
-  </Section>
-);
-
-/* (for CSS inspection/testing; not typically used directly) */
-const SectionCSS = () => (
-  <Section>
-    <button>Test</button>
-    <input aria-label="suppress lighthouse" name="suppress lighthouse" />
-    <textarea aria-label="suppress lighthouse" name="suppress lighthouse" />
-    <table>
-      <thead>
-        <tr>
-          <th>A</th>
-          <th>B</th>
-          <th>C</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-        </tr>
-        <tr>
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-        </tr>
-        <tr>
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-        </tr>
-      </tbody>
-    </table>
-  </Section>
+  </section>
 );

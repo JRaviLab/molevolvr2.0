@@ -1,7 +1,6 @@
 import { FaDownload, FaRegComment, FaRegPaperPlane } from "react-icons/fa6";
 import { useLocation } from "react-router";
 import { Fragment } from "react/jsx-runtime";
-import clsx from "clsx";
 import { mapValues, startCase, truncate } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
 import { useMutation } from "@tanstack/react-query";
@@ -9,7 +8,6 @@ import { createIssue } from "@/api/issue";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import Dialog from "@/components/Dialog";
-import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import Help from "@/components/Help";
 import Link from "@/components/Link";
@@ -17,7 +15,6 @@ import TextBox from "@/components/TextBox";
 import { userAgent } from "@/util/browser";
 import { downloadJpg } from "@/util/download";
 import { shortenUrl } from "@/util/string";
-import classes from "./Feedback.module.css";
 
 const { VITE_EMAIL, VITE_ISSUES, VITE_ORG, VITE_REPO_NAME } = import.meta.env;
 
@@ -113,7 +110,7 @@ const Feedback = () => {
       }}
       content={(close, open) => (
         <Form onSubmit={onSubmit}>
-          <div className={classes.fields}>
+          <div className="grid-layout">
             <TextBox
               label="Name"
               placeholder="Your Name"
@@ -138,7 +135,6 @@ const Feedback = () => {
           </div>
 
           <TextBox
-            className="full"
             label="Subject"
             placeholder="Subject"
             value={subject}
@@ -146,7 +142,6 @@ const Feedback = () => {
           />
 
           <TextBox
-            className="full"
             label="Feedback"
             placeholder="Questions, suggestions, bugs, etc."
             required
@@ -155,14 +150,14 @@ const Feedback = () => {
             onChange={setFeedback}
           />
 
-          <div className={clsx("mini-table", classes.details)}>
+          <dl>
             {Object.entries(details).map(([key, value]) => (
               <Fragment key={key}>
-                <div>{key}</div>
-                <div>{value}</div>
+                <dt>{key}</dt>
+                <dd>{value}</dd>
               </Fragment>
             ))}
-          </div>
+          </dl>
 
           <Alert
             type={
@@ -203,8 +198,8 @@ const Feedback = () => {
             )}
           </Alert>
 
-          <Flex gap="lg" gapRatio={0.5}>
-            <Flex gap="sm">
+          <div className="flex flex-wrap items-center justify-between gap-8">
+            <div className="flex flex-wrap gap-2">
               <Button
                 text="Screenshot"
                 icon={<FaDownload />}
@@ -226,17 +221,12 @@ const Feedback = () => {
                   </div>
                 }
               />
-            </Flex>
+            </div>
 
             {status === "idle" && (
-              <Button
-                className={classes.middle}
-                text="Submit"
-                icon={<FaRegPaperPlane />}
-                type="submit"
-              />
+              <Button text="Submit" icon={<FaRegPaperPlane />} type="submit" />
             )}
-          </Flex>
+          </div>
         </Form>
       )}
     >

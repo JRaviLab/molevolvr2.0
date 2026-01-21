@@ -1,8 +1,5 @@
 import type { ReactNode } from "react";
-import clsx from "clsx";
 import Badge from "@/components/Badge";
-import Flex from "@/components/Flex";
-import classes from "./FeatureCard.module.css";
 
 type Props = {
   /** top content */
@@ -16,13 +13,13 @@ type Props = {
 /** card with title, badge, and text/image */
 const FeatureCard = ({ title, badge, content }: Props) => {
   return (
-    <Flex column className={clsx("card", classes.card)}>
-      <Flex wrap={false} gap="sm" className={clsx("full", classes.title)}>
-        <span className="primary">{title}</span>
-        {badge && <Badge className={classes.badge}>{badge}</Badge>}
-      </Flex>
+    <div className="flex flex-col gap-4 rounded bg-white p-4 shadow">
+      <div className="flex items-center gap-2">
+        <span className="grow font-medium">{title}</span>
+        {badge && <Badge>{badge}</Badge>}
+      </div>
       {content}
-    </Flex>
+    </div>
   );
 };
 

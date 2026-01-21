@@ -8,7 +8,6 @@ import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
 import type { Filename } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
-import classes from "./Heatmap.module.css";
 
 /** width/height of cells */
 const cellSize = 30;
@@ -140,29 +139,33 @@ const Heatmap = ({
       ]}
     >
       {/* cells */}
-      <g className={classes.cells}>
+      <g className="group">
         {data.map((row, rowIndex) =>
           row.map((col, colIndex) => (
             <Tooltip
               key={[colIndex, rowIndex].join("-")}
               content={
-                <div className="mini-table">
-                  <span>Value</span>
-                  <span>{col}</span>
-                  <span>{x.label}</span>
-                  <span>{x.labels[colIndex]}</span>
-                  <span>{y.label}</span>
-                  <span>{y.labels[colIndex]}</span>
-                </div>
+                <dl>
+                  <dt>Value</dt>
+                  <dd>{col}</dd>
+                  <dt>{x.label}</dt>
+                  <dd>{x.labels[colIndex]}</dd>
+                  <dt>{y.label}</dt>
+                  <dd>{y.labels[colIndex]}</dd>
+                </dl>
               }
             >
               <rect
-                className={classes.cell}
+                className="stroke-transparent stroke-5 outline-none hover:stroke-black focus-visible:stroke-black [.group:has(&:focus)_&:not(:focus)]:opacity-25"
                 x={xScale(colIndex) ?? 0}
                 y={yScale(rowIndex) ?? 0}
                 width={xScale.bandwidth() ?? 0}
                 height={yScale.bandwidth() ?? 0}
-                fill={col ? colorScale(valueScale(col)) : theme["--light-gray"]}
+                fill={
+                  col
+                    ? colorScale(valueScale(col))
+                    : theme["--color-light-gray"]
+                }
                 tabIndex={0}
                 role="graphics-symbol"
               />
@@ -172,7 +175,7 @@ const Heatmap = ({
       </g>
 
       {/* x axis tick labels */}
-      <g fill={theme["--black"]}>
+      <g fill={theme["--color-black"]}>
         {x.labels.map((label, index) => (
           <Tooltip content={label} key={index}>
             <text
@@ -190,7 +193,7 @@ const Heatmap = ({
       </g>
 
       {/* y axis tick labels */}
-      <g fill={theme["--black"]} textAnchor="end">
+      <g fill={theme["--color-black"]} textAnchor="end">
         {y.labels.map((label, index) => (
           <Tooltip content={label} key={index}>
             <text
@@ -209,9 +212,9 @@ const Heatmap = ({
 
       {/* main axis labels */}
       <g
-        fill={theme["--black"]}
+        fill={theme["--color-black"]}
         textAnchor="middle"
-        style={{ fontWeight: theme["--medium"] }}
+        style={{ fontWeight: theme["--color-medium"] }}
       >
         <text
           transform={[
@@ -235,7 +238,7 @@ const Heatmap = ({
 
       {/* legend */}
       <g
-        fill={theme["--black"]}
+        fill={theme["--color-black"]}
         transform={`translate(${width + 3 * cellSize}, ${0.5 * height - 0.5 * legendHeight})`}
       >
         {/* main label */}
@@ -243,7 +246,7 @@ const Heatmap = ({
           x={0}
           y={-cellSize}
           textAnchor="middle"
-          style={{ fontWeight: theme["--medium"] }}
+          style={{ fontWeight: theme["--color-medium"] }}
         >
           {legend ?? "-"}
         </text>

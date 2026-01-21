@@ -7,13 +7,11 @@ import { clamp } from "lodash";
 import { useDebounce, useElementSize, useFullscreen } from "@reactuses/core";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
-import Flex from "@/components/Flex";
 import Tooltip from "@/components/Tooltip";
 import { isSafari } from "@/util/browser";
 import { getViewBoxFit } from "@/util/dom";
 import type { Filename, Tabular } from "@/util/download";
 import { usePrint, useTextSize, useTheme } from "@/util/hooks";
-import classes from "./Chart.module.css";
 
 type Props = {
   /** title text */
@@ -59,7 +57,7 @@ const Chart = ({
   children,
   onClick,
   containerProps: { className: containerClassName, ...containerProps } = {},
-  svgProps: { className: svgClassName, ...svgProps } = {},
+  svgProps = {},
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -154,10 +152,11 @@ const Chart = ({
     <div
       ref={containerRef}
       className={clsx(
-        "card",
-        classes.container,
+        "relative grid max-w-full resize place-items-center overflow-auto p-4 [&:is([style*='width'],[style*='height'])>.reset-handle]:grid",
+        printing
+          ? "aspect-auto h-screen max-h-none min-h-0 w-auto max-w-none min-w-0 resize-none overflow-visible rounded-none border-0 bg-white p-0 shadow-none"
+          : "rounded bg-white shadow",
         containerClassName,
-        printing && classes.printing,
       )}
       // https://github.com/dequelabs/axe-core/issues/4566
       // eslint-disable-next-line
@@ -165,12 +164,7 @@ const Chart = ({
       onClick={onClick}
       {...containerProps}
     >
-      <svg
-        ref={svgRef}
-        className={clsx(classes.svg, svgClassName)}
-        dominantBaseline="central"
-        {...svgProps}
-      >
+      <svg ref={svgRef} dominantBaseline="central" {...svgProps}>
         {/* title */}
         {title && (
           <text
@@ -189,10 +183,10 @@ const Chart = ({
       </svg>
 
       {/* reset handle */}
-      <div className={classes["reset-anchor"]}>
+      <div className="reset-handle sticky right-2 bottom-2 hidden size-0 place-self-end">
         <Tooltip content="Reset size">
           <button
-            className={classes.reset}
+            className="size-4"
             onClick={() => {
               /** reset resize */
               const target = containerRef.current;
@@ -211,18 +205,21 @@ const Chart = ({
   if (printing) return createPortal(chart, document.body);
 
   return (
-    <Flex column gap="lg" full>
+    <div className="flex w-full flex-col items-center gap-4">
       {chart}
 
       {/* controls */}
-      <Flex>
+      <div className="flex flex-col gap-4">
         {controls?.map((row, index) => (
-          <Flex key={index} gap="sm">
+          <div
+            key={index}
+            className="flex flex-wrap items-center justify-center gap-4"
+          >
             {row}
-          </Flex>
+          </div>
         ))}
 
-        <Flex gap="sm">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {/* fullscreen */}
           <Button
             icon={<FaExpand />}
@@ -247,9 +244,9 @@ const Chart = ({
               tooltip="Print as pdf"
             />
           </Download>
-        </Flex>
-      </Flex>
-    </Flex>
+        </div>
+      </div>
+    </div>
   );
 };
 

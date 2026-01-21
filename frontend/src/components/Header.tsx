@@ -1,25 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import { FaBars, FaXmark } from "react-icons/fa6";
+import { useLocation } from "react-router";
 import clsx from "clsx";
 import { useElementSize } from "@reactuses/core";
 import Logo from "@/assets/logo.svg?react";
 import { DarkMode } from "@/components/DarkMode";
-import Flex from "@/components/Flex";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
 import { round } from "@/util/math";
-import classes from "./Header.module.css";
 
 /** doc element abbrev */
 const doc = document.documentElement;
 
-/** set page scroll as css variable */
-const updateY = () => doc.style.setProperty("--y", round(doc.scrollTop) + "px");
-window.addEventListener("scroll", updateY);
-updateY();
+const links = [
+  { to: "/new-analysis", name: "New Analysis" },
+  { to: "/load-analysis", name: "Load Analysis" },
+  { to: "/about", name: "About" },
+];
 
 /** at top of every page. singleton. */
 const Header = () => {
+  const { pathname } = useLocation();
+
   /** nav menu expanded/collapsed state */
   const [open, setOpen] = useState(false);
 
@@ -33,12 +35,20 @@ const Header = () => {
     doc.style.scrollPaddingTop = height + "px";
   }, [height]);
 
+  const buttonClass =
+    "rounded p-2 tracking-wide hover:bg-current/10 leading-none";
+
   return (
-    <Flex ref={ref} tag="header" hAlign="space" className={classes.header}>
-      {/* logo and text */}
-      <div className={classes.title}>
-        <Logo className={classes.logo} />
-        <Link className={clsx(classes.link, classes["title-link"])} to="/">
+    <header
+      ref={ref}
+      className="bg-deep sticky top-0 z-20 flex flex-wrap items-center justify-between gap-8 p-4 text-white shadow-lg"
+    >
+      <div className="flex items-center gap-2">
+        <Logo className="size-8" />
+        <Link
+          to="/"
+          className={clsx("text-lg tracking-wider uppercase", buttonClass)}
+        >
           {import.meta.env.VITE_TITLE}
         </Link>
       </div>
@@ -46,30 +56,36 @@ const Header = () => {
       {/* nav toggle */}
       <Tooltip content={open ? "Collapse menu" : "Expand menu"}>
         <button
-          type="button"
-          className={classes.toggle}
           onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-controls="nav"
+          className={clsx("md:hidden", buttonClass)}
         >
           {open ? <FaXmark /> : <FaBars />}
         </button>
       </Tooltip>
 
       {/* nav menu */}
-      <nav id="nav" className={classes.nav} data-open={open}>
-        <Link className={classes.link} to="/new-analysis">
-          New Analysis
-        </Link>
-        <Link className={classes.link} to="/load-analysis">
-          Load Analysis
-        </Link>
-        <Link className={classes.link} to="/about">
-          About
-        </Link>
-        <DarkMode />
+      <nav
+        id="nav"
+        className={clsx(
+          "flex items-center gap-2 max-md:w-full max-md:flex-col max-md:items-end",
+          !open && "max-md:hidden",
+        )}
+      >
+        {links.map(({ to, name }) => (
+          <Link
+            key={to}
+            to={to}
+            className={clsx(pathname === to && "bg-current/10", buttonClass)}
+          >
+            {name}
+          </Link>
+        ))}
+
+        <DarkMode className={buttonClass} />
       </nav>
-    </Flex>
+    </header>
   );
 };
 

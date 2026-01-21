@@ -14,7 +14,6 @@ import Chart from "@/components/Chart";
 import Tooltip from "@/components/Tooltip";
 import type { Filename } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
-import classes from "./Upset.module.css";
 
 /** size of cells in main plot area */
 const cellSize = 30;
@@ -143,11 +142,12 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
             row.map((col, colIndex) => (
               <circle
                 key={[colIndex, rowIndex].join("-")}
-                className={classes.cell}
                 cx={(xScale(colIndex) ?? 0) + xScale.bandwidth() / 2}
                 cy={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
                 r={nodeSize}
-                fill={col ? theme["--accent"] : theme["--light-gray"]}
+                fill={
+                  col ? theme["--color-accent"] : theme["--color-light-gray"]
+                }
               />
             )),
           )}
@@ -158,7 +158,7 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
           {links.map(([[col1, row1], [col2, row2]], index) => (
             <line
               key={index}
-              stroke={theme["--accent"]}
+              stroke={theme["--color-accent"]}
               strokeWidth={strokeWidth}
               x1={(xScale(col1) ?? 0) + xScale.bandwidth() / 2}
               y1={(yScale(row1) ?? 0) + yScale.bandwidth() / 2}
@@ -187,7 +187,7 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
         />
 
         {/* bars */}
-        <g fill={theme["--accent"]}>
+        <g fill={theme["--color-accent"]}>
           {x.data.map((col, colIndex) => (
             <Tooltip key={colIndex} content={col.value}>
               <rect
@@ -220,7 +220,7 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
         />
 
         {/* bars */}
-        <g fill={theme["--accent"]}>
+        <g fill={theme["--color-accent"]}>
           {y.data.map((row, rowIndex) => (
             <Fragment key={rowIndex}>
               <Tooltip content={row.value}>
@@ -238,7 +238,7 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
         </g>
 
         {/* labels */}
-        <g fill={theme["--black"]}>
+        <g fill={theme["--color-black"]}>
           {y.data.map((row, rowIndex) => (
             <Tooltip key={rowIndex} content={row.label}>
               <text

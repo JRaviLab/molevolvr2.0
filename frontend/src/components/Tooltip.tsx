@@ -8,7 +8,6 @@ import {
   Trigger,
 } from "@radix-ui/react-tooltip";
 import { renderText, shrinkWrap } from "@/util/dom";
-import classes from "./Tooltip.module.css";
 
 type Props = {
   ref?: Ref<HTMLButtonElement>;
@@ -45,12 +44,11 @@ const Tooltip = ({ ref, content, children, ...props }: Props) => {
                */
               shrinkWrap(el, 0, -3);
             }}
-            className={classes.content}
+            className="dark z-30 flex max-w-80 flex-col gap-2 rounded bg-white p-4 leading-relaxed text-black"
             side="top"
-            data-dark="true"
           >
             {content}
-            <Arrow className={classes.arrow} />
+            <Arrow className="fill-off-white scale-110" />
           </Content>
         </Portal>
       </Root>

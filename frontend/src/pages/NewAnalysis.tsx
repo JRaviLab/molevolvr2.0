@@ -16,7 +16,6 @@ import type { AnalysisType, InputFormat } from "@/api/types";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
-import Flex from "@/components/Flex";
 import Form from "@/components/Form";
 import type { FormData } from "@/components/Form";
 import Heading from "@/components/Heading";
@@ -24,7 +23,6 @@ import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import NumberBox from "@/components/NumberBox";
 import Radios from "@/components/Radios";
-import Section from "@/components/Section";
 import SelectSingle from "@/components/SelectSingle";
 import type { Option } from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
@@ -38,7 +36,6 @@ import blastExample from "./examples/blast.tsv?raw";
 import fastaExample from "./examples/fasta.txt?raw";
 import interproscanExample from "./examples/interproscan.tsv?raw";
 import msaExample from "./examples/msa.txt?raw";
-import classes from "./NewAnalysis.module.css";
 
 /** high-level category of inputs */
 const inputTypes = [
@@ -212,19 +209,19 @@ const NewAnalysis = () => {
       <Meta title="New Analysis" />
 
       <Form onSubmit={onSubmit}>
-        <Section>
+        <section>
           <Heading level={1} icon={<FaPlus />}>
             New Analysis
           </Heading>
-        </Section>
+        </section>
 
-        <Section>
+        <section>
           <Heading level={2} icon={<FaArrowRightToBracket />}>
             Input
           </Heading>
 
           {/* input questions */}
-          <div className={classes.questions}>
+          <div className="grid w-full grid-cols-2 items-start gap-8 max-md:grid-cols-1">
             <Radios
               label="What do you want to input?"
               options={inputTypes}
@@ -233,7 +230,7 @@ const NewAnalysis = () => {
               name="inputFormat"
             />
 
-            <Flex column hAlign="left">
+            <div className="flex flex-col gap-4">
               <SelectSingle
                 label="What format is your input in?"
                 layout="vertical"
@@ -244,22 +241,26 @@ const NewAnalysis = () => {
               />
               {/* external data help links */}
               {inputFormat === "blast" && (
-                <Link to="/help#blast" newTab>
-                  How to get the right output from BLAST
-                </Link>
+                <p>
+                  <Link to="/help#blast" newTab>
+                    How to get the right output from BLAST
+                  </Link>
+                </p>
               )}
               {inputFormat === "interproscan" && (
-                <Link to="/help#interproscan" newTab>
-                  How to get the right output from InterProScan
-                </Link>
+                <p>
+                  <Link to="/help#interproscan" newTab>
+                    How to get the right output from InterProScan
+                  </Link>
+                </p>
               )}
-            </Flex>
+            </div>
           </div>
 
           {/* list input */}
           {inputType === "list" && (
             <TextBox
-              className="full"
+              className="w-full"
               label={
                 <>
                   {
@@ -268,7 +269,7 @@ const NewAnalysis = () => {
                   }{" "}
                   input
                   {!isEmpty(stats) && (
-                    <span className="secondary">
+                    <span className="text-dark-gray">
                       (
                       {Object.entries(stats)
                         .map(([key, value]) => `${value} ${startCase(key)}`)
@@ -309,7 +310,7 @@ const NewAnalysis = () => {
           )}
 
           {/* controls */}
-          <Flex>
+          <div className="flex items-center gap-4">
             <UploadButton
               text="Upload"
               icon={<FaUpload />}
@@ -331,10 +332,10 @@ const NewAnalysis = () => {
               accept={accept}
             />
             <Button text="Example" icon={<FaLightbulb />} onClick={onExample} />
-          </Flex>
+          </div>
 
           {inputType === "external" && (
-            <Flex column>
+            <div className="flex flex-col gap-4">
               <CheckBox
                 label={
                   <span>
@@ -350,7 +351,6 @@ const NewAnalysis = () => {
               {!haveQuerySequences && (
                 <>
                   <TextBox
-                    className="full"
                     label="Query Sequence"
                     placeholder={placeholders.accnum}
                     multi
@@ -362,6 +362,7 @@ const NewAnalysis = () => {
                     text="Upload Query Sequence Accession Numbers"
                     icon={<FaUpload />}
                     design="hollow"
+                    className="self-center"
                     onUpload={async (file) =>
                       setQuerySequenceInput(await file.text())
                     }
@@ -369,16 +370,16 @@ const NewAnalysis = () => {
                   />
                 </>
               )}
-            </Flex>
+            </div>
           )}
-        </Section>
+        </section>
 
-        <Section>
+        <section>
           <Heading level={2} icon={<FaGear />}>
             Options
           </Heading>
 
-          <Flex gap="lg" vAlign="top">
+          <div className="flex flex-wrap gap-8">
             <Radios
               label="What type of analyses do you want to run?"
               tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
@@ -396,8 +397,8 @@ const NewAnalysis = () => {
             />
 
             {["homology-domain", "homology"].includes(analysisType) && (
-              <Flex column hAlign="left">
-                <div className="primary">BLAST Parameters</div>
+              <div className="flex flex-col gap-8">
+                <div className="font-medium">BLAST Parameters</div>
 
                 <SelectSingle
                   label="Homology search database"
@@ -421,24 +422,24 @@ const NewAnalysis = () => {
                   step={0.000001}
                   name="blastECutoff"
                 />
-              </Flex>
+              </div>
             )}
-          </Flex>
+          </div>
 
           <CheckBox
             label="Split by domain"
             tooltip="Split input proteins by domain, and run analyses on each part separately"
             name="splitByDomain"
           />
-        </Section>
+        </section>
 
-        <Section>
+        <section>
           <Heading level={2} icon={<FaRegPaperPlane />}>
             Submit
           </Heading>
 
           <TextBox
-            className="narrow"
+            className="w-140"
             label="Analysis Name"
             placeholder="New Analysis"
             value={name}
@@ -448,7 +449,7 @@ const NewAnalysis = () => {
           />
 
           <TextBox
-            className="narrow"
+            className="w-140"
             label={
               <>
                 <FaRegBell /> Email me updates on this analysis
@@ -460,7 +461,7 @@ const NewAnalysis = () => {
             onChange={setEmail}
           />
 
-          <Alert>
+          <Alert className="w-140">
             An analysis takes <strong>several hours to run</strong>!{" "}
             <Link to="/about" newTab>
               Learn more
@@ -474,7 +475,7 @@ const NewAnalysis = () => {
             design="critical"
             type="submit"
           />
-        </Section>
+        </section>
       </Form>
     </>
   );

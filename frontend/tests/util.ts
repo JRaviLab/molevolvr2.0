@@ -8,6 +8,6 @@ export const sleep = async (ms = 0) =>
 export const log = () => {
   if (process.env.RUNNER_DEBUG)
     test.beforeEach(({ page }) =>
-      page.on("console", (msg) => console.log(msg.text())),
+      page.on("console", (msg) => console.info(msg.text())),
     );
 };

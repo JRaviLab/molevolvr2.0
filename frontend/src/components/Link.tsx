@@ -8,7 +8,6 @@ import {
 } from "react-router";
 import clsx from "clsx";
 import Tooltip from "@/components/Tooltip";
-import classes from "./Link.module.css";
 
 type Props = Base & (_Anchor | _Router);
 
@@ -51,18 +50,15 @@ const Link = ({
   /** whether to show arrow icon */
   const _showArrow = showArrow ?? target;
 
+  /** class name string */
+  const _class = clsx("inline-flex gap-1 items-center", className);
+
   /** full element to render */
   const element = external ? (
     /** "external" plain link */
-    <a
-      ref={ref}
-      href={to}
-      target={target}
-      className={clsx(className, classes.link)}
-      {...props}
-    >
+    <a ref={ref} href={to} target={target} className={_class} {...props}>
       {children}
-      {_showArrow && <FaArrowUpRightFromSquare className={classes.icon} />}
+      {_showArrow && <FaArrowUpRightFromSquare />}
     </a>
   ) : (
     /** "internal" router link */
@@ -74,11 +70,11 @@ const Link = ({
         "state" in props ? props.state : undefined,
       )}
       target={target}
-      className={clsx(className, classes.link)}
+      className={_class}
       {...props}
     >
       {children}
-      {_showArrow && <FaArrowUpRightFromSquare className={classes.icon} />}
+      {_showArrow && <FaArrowUpRightFromSquare />}
     </RouterLink>
   );
 

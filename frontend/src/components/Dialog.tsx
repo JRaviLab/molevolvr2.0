@@ -12,8 +12,7 @@ import {
   Dialog as Root,
   DialogTitle as Title,
 } from "@headlessui/react";
-import Flex from "@/components/Flex";
-import classes from "./Dialog.module.css";
+import Button from "@/components/Button";
 
 type Props = {
   /** title of dialog */
@@ -55,25 +54,34 @@ const Dialog = ({
     <>
       {cloneElement(children, { onClick: open })}
       <Root open={isOpen} onClose={close}>
-        <div className={classes.fullscreen}>
+        <div className="fixed inset-0 z-30 flex items-center justify-center p-8">
           <Content as={Fragment}>
-            <Flex column className={classes.content}>
-              <Title>{title}</Title>
-              <Description className="sr-only">{title}</Description>
-              <button className={classes.close} onClick={close}>
-                <FaCircleXmark />
-              </button>
-              <Flex className={classes.scroll} column vAlign="top" full>
+            <div className="shadow-overlay relative flex max-h-full w-(--content) max-w-full flex-col rounded bg-white">
+              {/* top */}
+              <div className="z-10 flex items-center justify-center p-2 shadow">
+                <Title>{title}</Title>
+                <Description className="sr-only">{title}</Description>
+                <Button
+                  design="hollow"
+                  tooltip="Close dialog"
+                  icon={<FaCircleXmark />}
+                  className="text-gray"
+                  onClick={close}
+                />
+              </div>
+              {/* middle */}
+              <div className="flex w-full flex-col gap-4 overflow-y-auto p-4">
                 {typeof content === "function" ? content(close, open) : content}
-              </Flex>
+              </div>
+              {/* bottom */}
               {bottomContent && (
-                <Flex hAlign="right" full>
+                <div className="z-10 flex flex-wrap items-center justify-center gap-4 shadow">
                   {typeof bottomContent === "function"
                     ? bottomContent(close, open)
                     : bottomContent}
-                </Flex>
+                </div>
               )}
-            </Flex>
+            </div>
           </Content>
         </div>
       </Root>

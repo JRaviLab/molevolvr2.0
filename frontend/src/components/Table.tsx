@@ -13,6 +13,7 @@ import {
   FaSortUp,
 } from "react-icons/fa6";
 import { MdFilterAltOff } from "react-icons/md";
+import clsx from "clsx";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
 import {
@@ -36,7 +37,6 @@ import type {
 import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
-import Flex from "@/components/Flex";
 import Help from "@/components/Help";
 import Popover from "@/components/Popover";
 import SelectMulti from "@/components/SelectMulti";
@@ -48,7 +48,6 @@ import Tooltip from "@/components/Tooltip";
 import { downloadCsv } from "@/util/download";
 import type { Filename } from "@/util/download";
 import { formatDate, formatNumber } from "@/util/string";
-import classes from "./Table.module.css";
 
 type Props<Datum extends object> = {
   cols: _Col<Datum>[];
@@ -276,11 +275,16 @@ const Table = <Datum extends object>({
   });
 
   return (
-    <Flex column className={expanded ? classes.expanded : classes.collapsed}>
-      <div className="table-wrapper">
+    <div
+      className={clsx(
+        "flex flex-col items-center gap-4",
+        expanded ? "w-[calc(100dvw---spacing(40))]" : "max-w-full",
+      )}
+    >
+      <div className="max-w-full overflow-x-auto">
         {/* table */}
         <table
-          className={classes.table}
+          className="w-full max-w-[min(max-content,var(--content))]"
           aria-rowcount={table.getPrePaginationRowModel().rows.length}
           aria-colcount={cols.length}
         >
@@ -297,9 +301,9 @@ const Table = <Datum extends object>({
                     {...getCol(header.column.id)?.attrs}
                   >
                     {header.isPlaceholder ? null : (
-                      <Flex hAlign="left" gap="xs" wrap={false}>
+                      <div className="[&_button]:text-light-gray [&_button]:hover:text-deep [&_button]: flex items-center justify-start [&_button]:p-1">
                         {/* header label */}
-                        <span className={classes["th-label"]}>
+                        <span className="mr-2">
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext(),
@@ -316,7 +320,6 @@ const Table = <Datum extends object>({
                           <Tooltip content="Sort this column">
                             <button
                               type="button"
-                              className={classes["header-button"]}
                               data-active={header.column.getIsSorted()}
                               onClick={header.column.getToggleSortingHandler()}
                             >
@@ -346,15 +349,17 @@ const Table = <Datum extends object>({
                             <Tooltip content="Filter this column">
                               <button
                                 type="button"
-                                className={classes["header-button"]}
-                                data-active={header.column.getIsFiltered()}
+                                className={clsx(
+                                  header.column.getIsFiltered() &&
+                                    "text-accent",
+                                )}
                               >
                                 <FaFilter />
                               </button>
                             </Tooltip>
                           </Popover>
                         ) : null}
-                      </Flex>
+                      </div>
                     )}
                   </th>
                 ))}
@@ -392,7 +397,10 @@ const Table = <Datum extends object>({
               ))
             ) : (
               <tr>
-                <td className={classes.empty} colSpan={cols.length}>
+                <td
+                  className="text-light-gray p-8 text-center"
+                  colSpan={cols.length}
+                >
                   No Rows
                 </td>
               </tr>
@@ -402,63 +410,62 @@ const Table = <Datum extends object>({
       </div>
 
       {/* controls */}
-      <Flex gapRatio={0.5}>
+      <div className="flex flex-wrap items-center justify-center gap-4">
         {/* pagination */}
-        <Flex gap="xs">
-          <button
-            type="button"
-            className={classes["page-button"]}
+        <div className="flex gap-2">
+          <Button
+            design="hollow"
+            size="compact"
+            tooltip="First page"
+            icon={<FaAnglesLeft />}
+            aria-disabled={!table.getCanPreviousPage()}
             onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-            aria-label="First page"
-          >
-            <FaAnglesLeft />
-          </button>
-          <button
-            type="button"
-            className={classes["page-button"]}
+          />
+          <Button
+            design="hollow"
+            size="compact"
+            tooltip="Previous page"
+            icon={<FaAngleLeft />}
+            aria-disabled={!table.getCanPreviousPage()}
             onClick={table.previousPage}
-            disabled={!table.getCanPreviousPage()}
-            aria-label="Previous page"
-          >
-            <FaAngleLeft />
-          </button>
+          />
           <Tooltip content="Jump to page">
-            <button
-              type="button"
-              className={classes["page-text"]}
+            <Button
+              design="hollow"
+              size="compact"
+              text={[
+                "Page",
+                formatNumber(table.getState().pagination.pageIndex + 1),
+                "of",
+                formatNumber(table.getPageCount()),
+              ].join(" ")}
               onClick={() => {
                 const page = parseInt(window.prompt("Jump to page") || "");
                 if (Number.isNaN(page)) return;
                 table.setPageIndex(clamp(page, 1, table.getPageCount()) - 1);
               }}
-            >
-              Page {formatNumber(table.getState().pagination.pageIndex + 1)} of{" "}
-              {formatNumber(table.getPageCount())}
-            </button>
+            />
           </Tooltip>
-          <button
-            type="button"
-            className={classes["page-button"]}
+          <Button
+            design="hollow"
+            size="compact"
+            tooltip="Next page"
+            icon={<FaAngleRight />}
+            aria-disabled={!table.getCanNextPage()}
             onClick={table.nextPage}
-            disabled={!table.getCanNextPage()}
-            aria-label="Next page"
-          >
-            <FaAngleRight />
-          </button>
-          <button
-            type="button"
-            className={classes["page-button"]}
+          />
+          <Button
+            design="hollow"
+            size="compact"
+            tooltip="Last page"
+            icon={<FaAnglesRight />}
+            aria-disabled={!table.getCanNextPage()}
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-            aria-label="Last page"
-          >
-            <FaAnglesRight />
-          </button>
-        </Flex>
+          />
+        </div>
 
         {/* filters */}
-        <Flex gap="md">
+        <div className="flex flex-wrap items-center gap-4">
           {/* per page */}
           <SelectSingle
             label="Rows"
@@ -477,11 +484,11 @@ const Table = <Datum extends object>({
             value={visibleCols}
             onChange={setVisibleCols}
           />
-        </Flex>
+        </div>
 
         {/* table-wide search */}
         <TextBox
-          className={classes.search}
+          className="max-w-30"
           placeholder="Search"
           icon={<FaMagnifyingGlass />}
           value={search}
@@ -490,7 +497,7 @@ const Table = <Datum extends object>({
         />
 
         {/* actions */}
-        <Flex gap="xs">
+        <div className="flex flex-wrap items-center gap-1">
           {/* clear filters */}
           <Button
             icon={<MdFilterAltOff />}
@@ -532,9 +539,9 @@ const Table = <Datum extends object>({
             tooltip={expanded ? "Collapse table" : "Expand table"}
             onClick={() => setExpanded(!expanded)}
           />
-        </Flex>
-      </Flex>
-    </Flex>
+        </div>
+      </div>
+    </div>
   );
 };
 

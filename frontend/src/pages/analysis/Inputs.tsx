@@ -6,7 +6,6 @@ import {
   FaTableCells,
 } from "react-icons/fa6";
 import Heading from "@/components/Heading";
-import Section from "@/components/Section";
 import Tabs, { Tab } from "@/components/Tabs";
 import { useAnalysis } from "@/pages/Analysis";
 import DomainArch from "@/pages/analysis/inputs/DomainArch";
@@ -18,7 +17,7 @@ const Inputs = () => {
   const { status } = useAnalysis();
 
   return (
-    <Section>
+    <section>
       <Heading level={2} icon={<FaArrowRightToBracket />}>
         Inputs
       </Heading>
@@ -43,7 +42,7 @@ const Inputs = () => {
         /** otherwise, just show summary */
         <Summary />
       )}
-    </Section>
+    </section>
   );
 };
 

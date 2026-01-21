@@ -1,7 +1,6 @@
 import { clamp, mapKeys, max, startCase } from "lodash";
 import Tooltip from "@/components/Tooltip";
 import { useTextSize, useTheme } from "@/util/hooks";
-import classes from "./Legend.module.css";
 
 /** entry symbol size */
 const rowHeight = 20;
@@ -92,79 +91,77 @@ const Legend = ({
   rootY -= anchor[1] * rootH;
 
   return (
-    <>
-      <svg
-        x={rootX}
-        y={rootY}
-        width={rootW}
-        height={rootH}
-        viewBox={[0, 0, rootW, rootH].join(" ")}
-        className={classes.legend}
-        style={{ fontSize }}
-        dominantBaseline="central"
-      >
-        {Object.entries(entries).map(
-          ([label, { color, shape, stroke }], index) => {
-            /** wrap to grid of rows/cols */
-            const row = Math.floor(index / cols);
-            const col = index % cols;
-            const x = col * (colWidth + gapSize);
-            const y = row * (rowHeight + gapSize);
+    <svg
+      x={rootX}
+      y={rootY}
+      width={rootW}
+      height={rootH}
+      viewBox={[0, 0, rootW, rootH].join(" ")}
+      className="overflow-visible"
+      style={{ fontSize }}
+      dominantBaseline="central"
+    >
+      {Object.entries(entries).map(
+        ([label, { color, shape, stroke }], index) => {
+          /** wrap to grid of rows/cols */
+          const row = Math.floor(index / cols);
+          const col = index % cols;
+          const x = col * (colWidth + gapSize);
+          const y = row * (rowHeight + gapSize);
 
-            /** scale shape points */
-            shape = shape?.map((p) => rowHeight / 2 + p * (rowHeight / 2));
+          /** scale shape points */
+          shape = shape?.map((p) => rowHeight / 2 + p * (rowHeight / 2));
 
-            return (
-              <g key={index} transform={`translate(${x}, ${y})`}>
-                <g
-                  fill={color}
-                  stroke={theme["--black"]}
-                  strokeWidth={strokeWidth}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  {shape ? (
-                    stroke ? (
-                      <>
-                        <polygon
-                          fill="none"
-                          strokeWidth={5 * strokeWidth}
-                          points={shape.join(" ")}
-                        />
-                        <polygon
-                          fill="none"
-                          stroke={color}
-                          strokeWidth={3 * strokeWidth}
-                          points={shape.join(" ")}
-                        />
-                      </>
-                    ) : (
-                      <polygon points={shape.join(" ")} />
-                    )
+          return (
+            <g key={index} transform={`translate(${x}, ${y})`}>
+              <g
+                fill={color}
+                stroke={theme["--color-black"]}
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {shape ? (
+                  stroke ? (
+                    <>
+                      <polygon
+                        fill="none"
+                        strokeWidth={5 * strokeWidth}
+                        points={shape.join(" ")}
+                      />
+                      <polygon
+                        fill="none"
+                        stroke={color}
+                        strokeWidth={3 * strokeWidth}
+                        points={shape.join(" ")}
+                      />
+                    </>
                   ) : (
-                    <circle
-                      cx={rowHeight / 2}
-                      cy={rowHeight / 2}
-                      r={rowHeight / 2}
-                    />
-                  )}
-                </g>
-                <Tooltip content={label}>
-                  <text
-                    x={labelX}
-                    y={rowHeight / 2}
-                    fill={theme["--black"]}
-                    tabIndex={0}
-                  >
-                    {truncateWidth(label, colWidth - labelX)}
-                  </text>
-                </Tooltip>
+                    <polygon points={shape.join(" ")} />
+                  )
+                ) : (
+                  <circle
+                    cx={rowHeight / 2}
+                    cy={rowHeight / 2}
+                    r={rowHeight / 2}
+                  />
+                )}
               </g>
-            );
-          },
-        )}
-      </svg>
-    </>
+              <Tooltip content={label}>
+                <text
+                  x={labelX}
+                  y={rowHeight / 2}
+                  fill={theme["--color-black"]}
+                  tabIndex={0}
+                >
+                  {truncateWidth(label, colWidth - labelX)}
+                </text>
+              </Tooltip>
+            </g>
+          );
+        },
+      )}
+    </svg>
   );
 };
 

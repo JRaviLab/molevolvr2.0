@@ -19,7 +19,7 @@ const checkPage = (path: string) =>
 
     /** wait for content to load */
     await page.waitForSelector("footer");
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(10000);
 
     /** axe check */
     const check = async () => {

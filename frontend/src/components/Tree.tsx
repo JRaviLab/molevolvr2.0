@@ -9,7 +9,6 @@ import { useColorMap } from "@/util/color";
 import type { Filename } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
-import classes from "./Tree.module.css";
 
 /** grid spacing */
 const size = 30;
@@ -173,9 +172,10 @@ const Tree = ({ title, filename = [], data }: Props) => {
           return (
             <path
               key={index}
-              className={classes.line}
               fill="none"
-              stroke={isSelected ? theme["--accent"] : theme["--black"]}
+              stroke={
+                isSelected ? theme["--color-accent"] : theme["--color-black"]
+              }
               strokeWidth={isSelected ? 2 * lineWidth : lineWidth}
               opacity={isSelected === false ? 0.25 : 1}
               d={
@@ -206,14 +206,14 @@ const Tree = ({ title, filename = [], data }: Props) => {
                     x2={maxY}
                     y1={node.x ?? 0}
                     y2={node.x ?? 0}
-                    stroke={theme["--black"]}
+                    stroke={theme["--color-black"]}
                     strokeWidth={lineWidth}
                     strokeDasharray={[lineWidth, 2 * lineWidth].join(" ")}
                   />
                   <text
                     x={maxY + 0.5 * size}
                     y={node.x ?? 0}
-                    fill={theme["--black"]}
+                    fill={theme["--color-black"]}
                   >
                     {truncateWidth(node.data.label ?? "-", sideWidth)}
                   </text>
@@ -224,36 +224,36 @@ const Tree = ({ title, filename = [], data }: Props) => {
               <Tooltip
                 content={
                   <>
-                    <div className="mini-table">
-                      <span>Name</span>
-                      <span>{node.data.label}</span>
-                      <span>Type</span>
-                      <span>{node.data.type}</span>
+                    <dl>
+                      <dt>Name</dt>
+                      <dd>{node.data.label}</dd>
+                      <dt>Type</dt>
+                      <dd>{node.data.type}</dd>
                       {node.ancestors().length > 1 && (
                         <>
-                          <span>Dist</span>
-                          <span>{node.data.dist?.toFixed(3)}</span>
-                          <span>From root</span>
-                          <span>{node.data.rootDist?.toFixed(3)}</span>
+                          <dt>Dist</dt>
+                          <dd>{node.data.dist?.toFixed(3)}</dd>
+                          <dt>From root</dt>
+                          <dd>{node.data.rootDist?.toFixed(3)}</dd>
                         </>
                       )}
-                    </div>
+                    </dl>
                     <hr />
                     Click to select. Select two to see path between them.
                   </>
                 }
               >
                 <circle
-                  className={classes.node}
+                  className="cursor-help"
                   cx={node.y ?? 0}
                   cy={node.x ?? 0}
                   r={nodeSize}
                   fill={
                     isSelected === false
-                      ? theme["--light-gray"]
+                      ? theme["--color-light-gray"]
                       : colorMap[node.data.type ?? ""]
                   }
-                  stroke={theme["--black"]}
+                  stroke={theme["--color-black"]}
                   strokeWidth={lineWidth}
                   tabIndex={0}
                   role="graphics-symbol"
@@ -279,7 +279,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
       {/* selected */}
       {selectedPath.length > 1 && (
         <g transform={`translate(0, ${maxX + 2 * size})`}>
-          <g fill={theme["--gray"]}>
+          <g fill={theme["--color-gray"]}>
             <text x={0} y={0 * size}>
               From
             </text>
@@ -290,7 +290,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
               Dist.
             </text>
           </g>
-          <g fill={theme["--black"]}>
+          <g fill={theme["--color-black"]}>
             <text x={2 * size} y={0 * size}>
               {truncateWidth(
                 selectedA?.data.label ?? "",

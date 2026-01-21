@@ -11,11 +11,9 @@ import {
   FaUsers,
 } from "react-icons/fa6";
 import Button from "@/components/Button";
-import Flex from "@/components/Flex";
 import Heading from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
-import Section from "@/components/Section";
 import { trim } from "@/util/string";
 
 const team = [
@@ -86,18 +84,18 @@ const About = () => {
     <>
       <Meta title="About" />
 
-      <Section>
+      <section>
         <Heading level={1} icon={<FaPenNib />}>
           About
         </Heading>
-      </Section>
+      </section>
 
-      <Section>
+      <section className="items-stretch">
         <Heading level={2} icon={<FaCommentDots />}>
           FAQs
         </Heading>
 
-        <Flex column full>
+        <div className="flex flex-col gap-4">
           <Heading level={3}>
             How will I know when my analysis is done? Where are my past
             analyses?
@@ -119,9 +117,9 @@ const About = () => {
             device in the{" "}
             <Link to="load-analysis#history">history section</Link>.
           </p>
-        </Flex>
+        </div>
 
-        <Flex column gap="sm" full>
+        <div className="flex flex-col gap-4">
           <Heading level={3}>When can I expect my results?</Heading>
 
           <p>
@@ -140,9 +138,9 @@ const About = () => {
             We try to provide helpful status information for monitoring
             analyses.
           </p>
-        </Flex>
+        </div>
 
-        <Flex column gap="sm" full>
+        <div className="flex flex-col gap-4">
           <Heading level={3}>How do I upload protein sequences?</Heading>
 
           <p>
@@ -247,28 +245,16 @@ const About = () => {
               </pre>
             </li>
           </ul>
-        </Flex>
-      </Section>
+        </div>
+      </section>
 
-      <Section>
+      <section>
         <Heading level={2} icon={<FaDoorOpen />}>
           Behind MolEvolvR
         </Heading>
 
-        <div className="grid cols-2">
-          <Flex column gap="sm">
-            <Heading level={3}>Data sources</Heading>
-
-            <ul>
-              <li>NCBI Taxonomy</li>
-              <li>NCBI GenBank/RefSeq</li>
-              <li>BLAST RefSeq</li>
-              <li>NR DB</li>
-              <li>InterPro</li>
-            </ul>
-          </Flex>
-
-          <Flex column gap="sm">
+        <div className="grid-layout gap-8 [--min:--spacing(100)]">
+          <div className="flex flex-col gap-4">
             <Heading level={3}>Technologies</Heading>
 
             <p>
@@ -305,16 +291,28 @@ const About = () => {
                 which stores job information
               </li>
             </ul>
-          </Flex>
-        </div>
-      </Section>
+          </div>
 
-      <Section>
+          <div className="flex flex-col gap-4">
+            <Heading level={3}>Data sources</Heading>
+
+            <ul>
+              <li>NCBI Taxonomy</li>
+              <li>NCBI GenBank/RefSeq</li>
+              <li>BLAST RefSeq</li>
+              <li>NR DB</li>
+              <li>InterPro</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="items-stretch">
         <Heading level={2} icon={<FaBook />}>
           Case studies
         </Heading>
 
-        <Flex column gap="sm">
+        <div className="flex flex-col gap-4">
           <p>
             The computational methods underlying MolEvolvR have enabled
             understanding fundamental biological systems and protein evolution.
@@ -324,10 +322,10 @@ const About = () => {
             In this section, companion MolEvolvR jobs for proteins studied in
             these publications are provided for users to explore.
           </p>
-        </Flex>
+        </div>
 
-        <div className="grid cols-2">
-          <Flex column gap="sm">
+        <div className="grid-layout gap-8 [--min:--spacing(100)]">
+          <div className="flex flex-col gap-4">
             <Heading level={3}>
               Surface layer proteins in Gram-positive bacteria (Bacillota)
             </Heading>
@@ -345,7 +343,9 @@ const About = () => {
                 </Link>
               </li>
             </ul>
+          </div>
 
+          <div className="flex flex-col gap-4">
             <Heading level={3}>Helicase operators in bacteria</Heading>
 
             <ul>
@@ -361,7 +361,9 @@ const About = () => {
                 </Link>
               </li>
             </ul>
+          </div>
 
+          <div className="flex flex-col gap-4">
             <Heading level={3}>Novel internalin P homologs in Listeria</Heading>
 
             <ul>
@@ -377,9 +379,9 @@ const About = () => {
                 </Link>
               </li>
             </ul>
-          </Flex>
+          </div>
 
-          <Flex column gap="sm">
+          <div className="flex flex-col gap-4">
             <Heading level={3}>
               Staphylococcus aureus sulfur acquisition
             </Heading>
@@ -429,17 +431,17 @@ const About = () => {
                 </Link>
               </li>
             </ul>
-          </Flex>
+          </div>
         </div>
-      </Section>
+      </section>
 
-      <Section>
+      <section>
         <Heading level={2} icon={<FaUsers />}>
           Team
         </Heading>
 
-        <div className="table-wrapper full">
-          <table className="full">
+        <div className="max-w-full overflow-x-auto">
+          <table>
             <thead>
               <tr>
                 <th>Name</th>
@@ -485,15 +487,15 @@ const About = () => {
           scholarship to SZC; NIH NIAID U01AI176414 to JR; NIH NLM T15LM009451
           to EPB.
         </p>
-      </Section>
+      </section>
 
-      <Section>
+      <section>
         <Heading level={2} icon={<FaExchangeAlt />}>
           Compatibility
         </Heading>
 
-        <div className="grid cols-2">
-          <Flex column gap="sm" full>
+        <div className="grid-layout gap-8 [--min:--spacing(100)]">
+          <div className="flex flex-col gap-4">
             <p>This web-app is regularly tested on the following:</p>
 
             <ul>
@@ -501,9 +503,9 @@ const About = () => {
               <li>Windows, MacOS, iOS, Android</li>
               <li>Desktop, tablet, phone/mobile</li>
             </ul>
-          </Flex>
+          </div>
 
-          <Flex column gap="sm" full>
+          <div className="flex flex-col gap-4">
             <p>
               The following are NOT supported, and may result in unexpected look
               or behavior:
@@ -516,11 +518,11 @@ const About = () => {
               </li>
               <li>Browsers without JavaScript enabled</li>
             </ul>
-          </Flex>
+          </div>
         </div>
-      </Section>
+      </section>
 
-      <Section>
+      <section>
         <Heading level={2} icon={<FaRegEnvelope />}>
           Contact
         </Heading>
@@ -533,22 +535,23 @@ const About = () => {
           discussion.
         </p>
 
-        <Button
-          to={`mailto:${VITE_EMAIL}`}
-          text={VITE_EMAIL}
-          icon={<FaRegEnvelope />}
-        />
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          <Button
+            to={`mailto:${VITE_EMAIL}`}
+            text={VITE_EMAIL}
+            icon={<FaRegEnvelope />}
+          />
 
-        <Flex gap="sm">
           <Button
             to={VITE_LAB_WEBSITE}
             text={VITE_LAB_NAME}
             icon={<FaMicroscope />}
             tooltip={`${VITE_LAB_NAME} website`}
           />
+
           <Button to={VITE_LAB_GITHUB} text="GitHub" icon={<FaGithub />} />
-        </Flex>
-      </Section>
+        </div>
+      </section>
     </>
   );
 };
