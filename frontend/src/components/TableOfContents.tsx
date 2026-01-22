@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { LuMenu, LuX } from "react-icons/lu";
 import { useLocation } from "react-router";
 import { useClickOutside, useEventListener } from "@reactuses/core";
@@ -84,7 +84,7 @@ const TableOfContents = () => {
   return (
     <aside
       ref={ref}
-      className="fixed z-30 flex max-w-60 flex-col bg-white shadow-sm"
+      className="fixed z-20 flex max-w-60 flex-col bg-white shadow-sm"
       aria-label="Table of contents"
     >
       <div className="flex items-center gap-4">
@@ -116,9 +116,11 @@ const TableOfContents = () => {
             <Link
               key={index}
               ref={active === index ? activeRef : undefined}
+              style={{ "--level": level } as CSSProperties}
               className={clsx(
                 `
                   flex items-center gap-2 p-1
+                  pl-[calc(var(--level)*--spacing(4))]
                   hover:bg-off-white hover:text-deep
                 `,
                 active === index && "bg-off-white text-deep",
@@ -126,7 +128,6 @@ const TableOfContents = () => {
               data-active={active === index}
               to={{ hash: "#" + id }}
               replace
-              style={{ paddingLeft: 20 * (level - 0.5) }}
               onClick={() => scrollTo("#" + id)}
             >
               {icon && <span className="flex text-deep-light">{icon}</span>}

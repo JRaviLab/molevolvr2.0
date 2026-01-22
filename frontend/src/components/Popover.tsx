@@ -16,7 +16,7 @@ const Popover = ({ content, children }: Props) => {
       <Portal>
         <Content
           className="
-            z-30 flex max-w-100 flex-col gap-4 rounded-sm bg-white p-4
+            z-20 flex max-w-100 flex-col gap-4 rounded-sm bg-white p-4
             shadow-overlay
           "
           side="top"

@@ -29,7 +29,7 @@ export const types = {
   error: { color: "var(--color-error)", icon: <LuTriangleAlert /> },
   analyzing: {
     color: "var(--color-deep-light)",
-    icon: <Logo data-animated style={{ height: "1.5em" }} />,
+    icon: <Logo data-animated className="h-[1.5em]" />,
   },
 };
 

@@ -27,8 +27,6 @@ type Props = {
   max?: number;
   /** inc/dec interval */
   step?: number;
-  /** initial state */
-  defaultValue?: number;
   /** number state */
   value: number;
   /** on number state change */
@@ -43,7 +41,6 @@ const NumberBox = ({
   min = 0,
   max = 100,
   step = 1,
-  defaultValue,
   value,
   onChange,
 }: Props) => {
@@ -63,7 +60,6 @@ const NumberBox = ({
       minValue={min}
       maxValue={max}
       step={step}
-      defaultValue={defaultValue ?? min}
       value={value}
       onChange={(value) => {
         if (ref.current) preserveScroll(ref.current);
@@ -99,9 +95,9 @@ const NumberBox = ({
                   state.setInputValue(String(min));
               }}
               style={{
-                maxWidth: isFirefox
-                  ? state.inputValue.length + 1 + "em"
-                  : undefined,
+                maxWidth:
+                  /** firefox doesn't support field sizing */
+                  isFirefox ? state.inputValue.length + 1 + "em" : undefined,
               }}
             />
             <Button slot="increment">

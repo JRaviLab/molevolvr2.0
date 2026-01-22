@@ -88,7 +88,7 @@ const UploadButton = ({
         ref={ref}
         type="file"
         accept={accept.join(",")}
-        style={{ display: "none" }}
+        className="hidden"
         onChange={onChange}
       />
     </>

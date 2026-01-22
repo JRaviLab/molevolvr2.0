@@ -55,7 +55,7 @@ const Dialog = ({
     <>
       {cloneElement(children, { onClick: open })}
       <Root open={isOpen} onClose={close}>
-        <div className="fixed inset-0 z-30 flex items-center justify-center p-8">
+        <div className="fixed inset-0 z-20 flex items-center justify-center p-8">
           <Content as={Fragment}>
             <div
               className="
@@ -64,7 +64,7 @@ const Dialog = ({
               "
             >
               {/* top */}
-              <div className="z-10 flex items-center justify-center p-2 shadow-sm">
+              <div className="flex items-center justify-center p-2 shadow-sm">
                 <Title>{title}</Title>
                 <Description className="sr-only">{title}</Description>
                 <Button
@@ -75,15 +75,17 @@ const Dialog = ({
                   onClick={close}
                 />
               </div>
+
               {/* middle */}
               <div className="flex w-full flex-col gap-4 overflow-y-auto p-4">
                 {typeof content === "function" ? content(close, open) : content}
               </div>
+
               {/* bottom */}
               {bottomContent && (
                 <div
                   className="
-                    z-10 flex flex-wrap items-center justify-center gap-4
+                    flex flex-wrap items-center justify-center gap-4 p-4
                     shadow-sm
                   "
                 >

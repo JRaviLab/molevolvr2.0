@@ -70,11 +70,10 @@ const Slider = ({
         layout === "horizontal" && "items-center",
         layout === "vertical" && "flex-col items-start",
       )}
-      defaultValue={(value ?? multi) ? [min, max] : min}
-      value={value}
       minValue={min}
       maxValue={max}
       step={Math.min(step, max - min)}
+      value={value}
       onChange={(value) => {
         if (!multi && !Array.isArray(value)) onChange(value);
         if (multi && Array.isArray(value)) onChange(value);

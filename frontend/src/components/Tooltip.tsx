@@ -45,7 +45,7 @@ const Tooltip = ({ ref, content, children, ...props }: Props) => {
               shrinkWrap(el, 0, -3);
             }}
             className="
-              dark z-30 flex max-w-80 flex-col gap-2 rounded-sm bg-white p-4
+              dark z-20 flex max-w-80 flex-col gap-2 rounded-sm bg-white p-4
               leading-relaxed text-black
             "
             side="top"

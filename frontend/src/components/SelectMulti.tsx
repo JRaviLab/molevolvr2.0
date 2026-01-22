@@ -102,7 +102,7 @@ const SelectMulti = <O extends Option>({
 
             {/* dropdown */}
             <ListboxOptions
-              className="z-30 min-w-min bg-white shadow-sm"
+              className="z-20 min-w-min bg-white shadow-sm"
               anchor={{ to: "bottom start", padding: 10 }}
               modal={false}
             >

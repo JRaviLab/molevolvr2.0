@@ -37,7 +37,7 @@ const Toasts = () => {
 
   return createPortal(
     <div
-      className="fixed right-0 bottom-0 z-40 flex flex-col gap-4 p-4"
+      className="fixed right-0 bottom-0 z-30 flex flex-col gap-4 p-4"
       role="region"
       aria-label="Notifications"
     >

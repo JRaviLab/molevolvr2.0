@@ -479,8 +479,8 @@ const Table = <Datum extends object>({
           <SelectSingle
             label="Rows"
             layout="horizontal"
-            value={defaultPerPage}
             options={perPageOptions}
+            value={defaultPerPage}
             onChange={(option) => {
               table.setPageSize(Number(option));
             }}
@@ -497,12 +497,12 @@ const Table = <Datum extends object>({
 
         {/* table-wide search */}
         <TextBox
-          className="max-w-30"
+          className="max-w-30!"
           placeholder="Search"
+          tooltip="Search entire table for plain text or regex"
           icon={<LuSearch />}
           value={search}
           onChange={setSearch}
-          tooltip="Search entire table for plain text or regex"
         />
 
         {/* actions */}
@@ -669,9 +669,9 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
     <TextBox
       label="Filter by text"
       placeholder="Search"
+      icon={<LuSearch />}
       value={(column.getFilterValue() as string | undefined) ?? ""}
       onChange={column.setFilterValue}
-      icon={<LuSearch />}
     />
   );
 };

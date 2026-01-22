@@ -7,7 +7,11 @@ const { VITE_EMAIL, VITE_LAB_NAME, VITE_LAB_WEBSITE, VITE_LAB_GITHUB } =
 
 /** at bottom of every page. singleton. */
 const Footer = () => (
-  <footer className="flex flex-col items-center gap-2 bg-deep p-6 text-white">
+  <footer
+    className="
+      z-10 flex flex-col items-center gap-2 bg-deep p-6 text-white shadow-lg
+    "
+  >
     <div
       className="
         flex gap-2

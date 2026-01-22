@@ -18,7 +18,7 @@
   --color-alt-white: hsl(0, 0%, 98%);
   --color-white: hsl(0, 0%, 100%);
 
-  --color-shadow: #00000010;
+  --color-shadow: #00000020;
   --color-overlay: #00000080;
   --color-info: oklch(75% 0.15 235);
   --color-success: oklch(70% 0.15 160);
@@ -28,7 +28,11 @@
   --content: --spacing(300);
 
   --radius: 5px;
-  --shadow: 0 5px 10px var(--color-shadow), 0 0 4px var(--color-shadow);
+  --shadow-sm: 0 0 0 var(--color-shadow), 0 0 5px var(--color-shadow);
+  --shadow: 0 0 5px var(--color-shadow), 0 0 10px var(--color-shadow);
+  --shadow-lg:
+    0 0 5px var(--color-shadow), 0 0 10px var(--color-shadow),
+    0 0 15px var(--color-shadow);
   --shadow-overlay: 0 0 0 9999px var(--color-overlay);
 
   --font-weight-*: initial;
@@ -161,6 +165,14 @@
 
   label {
     @apply flex cursor-pointer items-center gap-2 rounded;
+  }
+
+  input {
+    @apply min-w-0;
+  }
+
+  textarea {
+    @apply min-w-0;
   }
 
   pre {
