@@ -18,7 +18,7 @@ const Help = ({ tooltip, children }: Props) => (
   <Tooltip content={tooltip}>
     <button
       type="button"
-      className="text-dark-gray cursor-help"
+      className="cursor-help text-dark-gray"
       onClick={async (event) => {
         const target = event.currentTarget;
         /** force open tooltip */

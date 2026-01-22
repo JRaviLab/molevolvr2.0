@@ -1,11 +1,9 @@
+/* eslint-disable */
+
 const functions = require("@google-cloud/functions-framework");
 const { Octokit } = require("octokit");
 
-/**
- * token permissions:
- * contents, read/write
- * pull requests, read/write
- */
+/** token permissions: contents, read/write pull requests, read/write */
 const auth = process.env.GITHUB_TOKEN;
 
 /** entry point */

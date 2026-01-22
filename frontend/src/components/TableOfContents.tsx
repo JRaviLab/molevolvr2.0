@@ -1,15 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { LuMenu, LuX } from "react-icons/lu";
 import { useLocation } from "react-router";
+import { useClickOutside, useEventListener } from "@reactuses/core";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { debounce } from "lodash";
-import { useClickOutside, useEventListener } from "@reactuses/core";
 import Button from "@/components/Button";
 import { headingsAtom } from "@/components/Heading";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
 import { firstInView, isCovering, scrollTo } from "@/util/dom";
+import { useChanged } from "@/util/hooks";
 import { sleep } from "@/util/misc";
 
 /**
@@ -38,9 +39,8 @@ const TableOfContents = () => {
   const [open, setOpen] = useState(false);
 
   /** when path changes, hide/show */
-  useEffect(() => {
+  if (useChanged(pathname))
     setOpen(pathname === "/" ? false : window.innerWidth > 1500);
-  }, [pathname]);
 
   /** full heading details */
   const headings = useAtomValue(headingsAtom);
@@ -84,7 +84,7 @@ const TableOfContents = () => {
   return (
     <aside
       ref={ref}
-      className="fixed z-30 flex max-w-60 flex-col bg-white shadow"
+      className="fixed z-30 flex max-w-60 flex-col bg-white shadow-sm"
       aria-label="Table of contents"
     >
       <div className="flex items-center gap-4">
@@ -117,7 +117,10 @@ const TableOfContents = () => {
               key={index}
               ref={active === index ? activeRef : undefined}
               className={clsx(
-                "hover:text-deep hover:bg-off-white flex items-center gap-2 p-1",
+                `
+                  flex items-center gap-2 p-1
+                  hover:bg-off-white hover:text-deep
+                `,
                 active === index && "bg-off-white text-deep",
               )}
               data-active={active === index}
@@ -126,7 +129,7 @@ const TableOfContents = () => {
               style={{ paddingLeft: 20 * (level - 0.5) }}
               onClick={() => scrollTo("#" + id)}
             >
-              {icon && <span className="text-deep-light flex">{icon}</span>}
+              {icon && <span className="flex text-deep-light">{icon}</span>}
               <span className="grow truncate py-1">{text}</span>
             </Link>
           ))}

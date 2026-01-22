@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { useDeepCompareEffect } from "@reactuses/core";
 import { color, interpolateHsl } from "d3";
 import { useAtomValue } from "jotai";
-import { useDeepCompareEffect } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
 import { getEntries } from "@/util/types";
 import colors from "./colors.json";

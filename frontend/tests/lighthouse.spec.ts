@@ -1,8 +1,8 @@
+import { chromium, test } from "@playwright/test";
 import getPort from "get-port";
 import type { Config } from "lighthouse";
 import type { Browser } from "playwright";
 import { playAudit } from "playwright-lighthouse";
-import { chromium, test } from "@playwright/test";
 import { paths } from "./paths";
 import { log } from "./util";
 

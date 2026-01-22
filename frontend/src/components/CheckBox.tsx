@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { LuSquare, LuSquareCheck } from "react-icons/lu";
 import Asterisk from "@/components/Asterisk";
@@ -12,40 +11,25 @@ type Props = {
   /** tooltip content */
   tooltip?: ReactNode;
   /** checked state */
-  value?: boolean;
+  value: boolean;
   /** on checked state change */
-  onChange?: (value: boolean) => void;
-  /** field name in form data */
-  name?: string;
+  onChange: (value: boolean) => void;
   /** whether must be checked for form to be submitted */
   required?: boolean;
 };
 
-/** mark field name as boolean for nicer parsing of FormData */
-export const checkboxKeySuffix = "-checkbox";
-
 /** simple checkbox with label */
-const CheckBox = ({
-  label,
-  tooltip,
-  value,
-  onChange,
-  name,
-  required,
-}: Props) => {
+const CheckBox = ({ label, tooltip, value, onChange, required }: Props) => {
   /** link to parent form component */
   const form = useForm();
 
-  /** local checked state */
-  const [checked, setChecked] = useState(value ?? false);
-
-  /** update local state from controlled value */
-  useEffect(() => {
-    if (value !== undefined) setChecked(value);
-  }, [value]);
-
   return (
-    <label className="group hover:bg-off-white p-2">
+    <label
+      className="
+        group p-2
+        hover:bg-off-white
+      "
+    >
       <input
         type="checkbox"
         className="sr-only"
@@ -53,17 +37,25 @@ const CheckBox = ({
         onChange={(event) => {
           const value = event.currentTarget.checked;
           preserveScroll(event.currentTarget);
-          onChange?.(value);
-          setChecked(value);
+          onChange(value);
         }}
         form={form}
-        name={name + checkboxKeySuffix}
         required={required}
       />
-      {checked ? (
-        <LuSquareCheck className="text-accent group-hover:text-deep size-5" />
+      {value ? (
+        <LuSquareCheck
+          className="
+            size-5 text-accent
+            group-hover:text-deep
+          "
+        />
       ) : (
-        <LuSquare className="text-accent group-hover:text-deep size-5" />
+        <LuSquare
+          className="
+            size-5 text-accent
+            group-hover:text-deep
+          "
+        />
       )}
       {label}
       {tooltip && <Help tooltip={tooltip} />}

@@ -156,7 +156,12 @@ const Heatmap = ({
               }
             >
               <rect
-                className="stroke-transparent stroke-5 outline-none hover:stroke-black focus-visible:stroke-black [.group:has(&:focus)_&:not(:focus)]:opacity-25"
+                className="
+                  stroke-transparent stroke-5 outline-none
+                  hover:stroke-black
+                  focus-visible:stroke-black
+                  [.group:has(&:focus)_&:not(:focus)]:opacity-25
+                "
                 x={xScale(colIndex) ?? 0}
                 y={yScale(rowIndex) ?? 0}
                 width={xScale.bandwidth() ?? 0}

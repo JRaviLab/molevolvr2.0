@@ -44,7 +44,10 @@ const Toasts = () => {
       {toasts.map((toast, index) => (
         <div
           key={index}
-          className="grid grid-cols-[min-content_1fr_min-content] items-center rounded bg-white shadow"
+          className="
+            grid grid-cols-[min-content_1fr_min-content] items-center rounded-sm
+            bg-white shadow-sm
+          "
           style={{ color: types[toast.type].color }}
         >
           <div className="p-4">{types[toast.type].icon}</div>

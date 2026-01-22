@@ -2,7 +2,6 @@ import { createContext, useContext, useId } from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useEventListener } from "@reactuses/core";
-import { checkboxKeySuffix } from "@/components/CheckBox";
 
 export type FormData = Record<
   string,
@@ -11,7 +10,7 @@ export type FormData = Record<
 
 type Props = {
   /** called when form submitted */
-  onSubmit: (data: FormData) => unknown;
+  onSubmit: () => unknown;
   /** children field elements. can be deeply nested. */
   children: ReactNode;
 };
@@ -35,51 +34,13 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
       {createPortal(
         <form
           id={id}
-          style={{ display: "contents" }}
+          className="contents"
           onSubmit={(event) => {
             /** prevent page navigation */
             event.preventDefault();
 
-            /** get data from form */
-            const form = event.currentTarget;
-            const formData = new FormData(form);
-
-            /**
-             * loop through keys and values to transform form data into nicer
-             * format. don't do fromEntries because keys with same name (e.g. in
-             * multi-select) get overwritten.
-             */
-            const data: FormData = {};
-            for (let key of formData.keys()) {
-              /** determine if checkbox from key name */
-              const isCheckbox = key.endsWith(checkboxKeySuffix);
-
-              const values = formData.getAll(key).map((value) => {
-                /** if we can parse as number, do it */
-                if (
-                  typeof value === "string" &&
-                  value.trim() &&
-                  !Number.isNaN(Number(value))
-                )
-                  return Number(value);
-
-                /** return actual boolean for checkboxes instead of default "on" */
-                if (isCheckbox) return Boolean(value);
-
-                /** return raw (string) value */
-                return String(value);
-              });
-
-              /** remove checkbox marker */
-              if (isCheckbox)
-                key = key.replace(new RegExp(checkboxKeySuffix + "$"), "");
-
-              /** assign single primitive or multi array */
-              data[key] = values.length === 1 ? values[0]! : values;
-            }
-
             /** call callback */
-            onSubmit(data);
+            onSubmit();
           }}
           {...props}
         />,

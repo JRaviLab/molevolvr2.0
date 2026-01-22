@@ -12,7 +12,7 @@ const ViewCorner = () => {
     <div className="fixed right-0 bottom-0 z-30 flex flex-col items-end gap-2 p-2">
       {scrolled && (
         <Button
-          className="shadow"
+          className="shadow-sm"
           icon={<LuChevronUp />}
           tooltip="Scroll to top of page"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

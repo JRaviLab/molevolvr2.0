@@ -61,7 +61,10 @@ const UploadButton = ({
         {...props}
         className={clsx(
           drag &&
-            "outline-accent outline-2 outline-offset-2 outline-dashed *:pointer-events-none",
+            `
+              outline-2 outline-offset-2 outline-accent outline-dashed
+              *:pointer-events-none
+            `,
           className,
         )}
         tooltip={

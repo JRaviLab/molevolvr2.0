@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   LuArrowRightToLine,
   LuBell,
@@ -9,15 +9,14 @@ import {
   LuUpload,
 } from "react-icons/lu";
 import { useNavigate } from "react-router";
+import { useLocalStorage } from "@reactuses/core";
 import { parse } from "csv-parse/browser/esm/sync";
 import { isEmpty, startCase } from "lodash";
-import { useLocalStorage } from "@reactuses/core";
 import type { AnalysisType, InputFormat } from "@/api/types";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
 import Form from "@/components/Form";
-import type { FormData } from "@/components/Form";
 import Heading from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
@@ -51,20 +50,19 @@ const inputTypes = [
   },
 ] as const;
 
+type InputType = (typeof inputTypes)[number]["id"];
+
 /** types of input formats based on input type */
-const inputFormats: Record<
-  (typeof inputTypes)[number]["id"],
-  Option<InputFormat>[]
-> = {
+const inputFormats: Record<InputType, Option<InputFormat>[]> = {
   list: [
     { id: "fasta", primary: "FASTA" },
     { id: "accnum", primary: "Accession Numbers" },
     { id: "msa", primary: "Multiple Sequence Alignment" },
-  ] as const,
+  ],
   external: [
     { id: "blast", primary: "BLAST" },
     { id: "interproscan", primary: "InterProScan" },
-  ] as const,
+  ],
 };
 
 /** placeholders for each input format type */
@@ -128,6 +126,14 @@ const tableCols = [
   "PcPosOrig",
 ];
 
+/** homology databases */
+const homologyDatabases = [
+  { id: "refseq", primary: "RefSeq" },
+  { id: "nr", primary: "nr" },
+] as const;
+
+type HomologyDatabase = (typeof homologyDatabases)[number]["id"];
+
 /** parse text as csv/tsv */
 const parseTable = (
   input: string,
@@ -139,25 +145,33 @@ const parseTable = (
     skip_records_with_error: true,
   });
 
+type TableInput = ReturnType<typeof parseTable> | null;
+
 const NewAnalysis = () => {
   const navigate = useNavigate();
 
-  /** state */
-  const [inputType, setInputType] = useState<(typeof inputTypes)[number]["id"]>(
-    inputTypes[0].id,
-  );
+  /** "input" state */
+  const [inputType, setInputType] = useState<InputType>(inputTypes[0].id);
   const [inputFormat, setInputFormat] = useState<InputFormat>(
     inputFormats.list[0]!.id,
   );
   const [listInput, setListInput] = useState("");
-  const [tableInput, setTableInput] = useState<ReturnType<
-    typeof parseTable
-  > | null>(null);
+  const [tableInput, setTableInput] = useState<TableInput>(null);
   const [querySequenceInput, setQuerySequenceInput] = useState("");
   const [haveQuerySequences, setHaveQuerySequences] = useState(true);
   const [analysisType, setAnalysisType] = useState<AnalysisType>(
-    analysisTypes[0]!.id,
+    analysisTypes[0].id,
   );
+
+  /** "options" state */
+  const [homologyDatabase, setHomologyDatabase] = useState<HomologyDatabase>(
+    homologyDatabases[0].id,
+  );
+  const [maxHits, setMaxHits] = useState(10);
+  const [eCutoff, setECutoff] = useState(0.00001);
+  const [splitByDomain, setSplitByDomain] = useState(false);
+
+  /** "submit" state */
   const [name, setName] = useState("");
   const [email, setEmail] = useLocalStorage("email", "");
 
@@ -191,18 +205,10 @@ const NewAnalysis = () => {
   };
 
   /** submit analysis */
-  const onSubmit = (data: FormData) => {
-    console.debug(data);
+  const onSubmit = () => {
     toast("Analysis submitted", "success");
     navigate("/analysis/d4e5f6");
   };
-
-  /** clear inputs when selected input format changes */
-  useEffect(() => {
-    setListInput("");
-    setTableInput(null);
-    setQuerySequenceInput("");
-  }, [inputFormat]);
 
   return (
     <>
@@ -221,13 +227,17 @@ const NewAnalysis = () => {
           </Heading>
 
           {/* input questions */}
-          <div className="grid w-full grid-cols-2 items-start gap-8 max-md:grid-cols-1">
+          <div
+            className="
+              grid w-full grid-cols-2 items-start gap-8
+              max-md:grid-cols-1
+            "
+          >
             <Radios
               label="What do you want to input?"
               options={inputTypes}
               value={inputType}
               onChange={setInputType}
-              name="inputFormat"
             />
 
             <div className="flex flex-col gap-4">
@@ -236,8 +246,13 @@ const NewAnalysis = () => {
                 layout="vertical"
                 options={inputFormats[inputType]}
                 value={inputFormat}
-                onChange={setInputFormat}
-                name="inputFormat"
+                onChange={(value) => {
+                  setInputFormat(value);
+                  /** clear inputs when selected input format changes */
+                  setListInput("");
+                  setTableInput(null);
+                  setQuerySequenceInput("");
+                }}
               />
               {/* external data help links */}
               {inputFormat === "blast" && (
@@ -286,24 +301,14 @@ const NewAnalysis = () => {
               multi
               value={listInput}
               onChange={setListInput}
-              name="listInput"
             />
           )}
 
           {/* table input */}
           {inputType === "external" && tableInput && (
             <>
-              <TextBox
-                className="sr-only"
-                aria-hidden
-                value={JSON.stringify(tableInput)}
-                name="tableInput"
-              />
               <Table
-                cols={tableCols.map((col) => ({
-                  key: col,
-                  name: col,
-                }))}
+                cols={tableCols.map((col) => ({ key: col, name: col }))}
                 rows={tableInput}
               />
             </>
@@ -356,7 +361,6 @@ const NewAnalysis = () => {
                     multi
                     value={querySequenceInput}
                     onChange={setQuerySequenceInput}
-                    name="querySequenceInput"
                   />
                   <UploadButton
                     text="Upload Query Sequence Accession Numbers"
@@ -393,7 +397,6 @@ const NewAnalysis = () => {
               })}
               value={analysisType}
               onChange={setAnalysisType}
-              name="analysisType"
             />
 
             {["homology-domain", "homology"].includes(analysisType) && (
@@ -402,25 +405,24 @@ const NewAnalysis = () => {
 
                 <SelectSingle
                   label="Homology search database"
-                  options={[
-                    { id: "refseq", primary: "RefSeq" },
-                    { id: "nr", primary: "nr" },
-                  ]}
-                  name="blastHomologyDatabase"
+                  options={homologyDatabases}
+                  value={homologyDatabase}
+                  onChange={setHomologyDatabase}
                 />
                 <Slider
                   label="Max hits"
                   min={10}
                   max={500}
-                  name="blastMaxHits"
+                  value={maxHits}
+                  onChange={setMaxHits}
                 />
                 <NumberBox
                   label="E-value cutoff"
-                  defaultValue={0.00001}
                   min={0}
                   max={1}
                   step={0.000001}
-                  name="blastECutoff"
+                  value={eCutoff}
+                  onChange={setECutoff}
                 />
               </div>
             )}
@@ -429,7 +431,8 @@ const NewAnalysis = () => {
           <CheckBox
             label="Split by domain"
             tooltip="Split input proteins by domain, and run analyses on each part separately"
-            name="splitByDomain"
+            value={splitByDomain}
+            onChange={setSplitByDomain}
           />
         </section>
 
@@ -441,11 +444,10 @@ const NewAnalysis = () => {
           <TextBox
             className="w-140"
             label="Analysis Name"
+            tooltip="Give your analysis a name to remember it by"
             placeholder="New Analysis"
             value={name}
             onChange={setName}
-            tooltip="Give your analysis a name to remember it by"
-            name="name"
           />
 
           <TextBox

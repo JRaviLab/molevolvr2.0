@@ -41,6 +41,7 @@ const Dialog = ({
   children,
 }: Props) => {
   const [isOpen, setOpen] = useState(false);
+
   const open = () => {
     setOpen(true);
     onChange?.(true);
@@ -56,9 +57,14 @@ const Dialog = ({
       <Root open={isOpen} onClose={close}>
         <div className="fixed inset-0 z-30 flex items-center justify-center p-8">
           <Content as={Fragment}>
-            <div className="shadow-overlay relative flex max-h-full w-(--content) max-w-full flex-col rounded bg-white">
+            <div
+              className="
+                relative flex max-h-full w-(--content) max-w-full flex-col
+                rounded-sm bg-white shadow-overlay
+              "
+            >
               {/* top */}
-              <div className="z-10 flex items-center justify-center p-2 shadow">
+              <div className="z-10 flex items-center justify-center p-2 shadow-sm">
                 <Title>{title}</Title>
                 <Description className="sr-only">{title}</Description>
                 <Button
@@ -75,7 +81,12 @@ const Dialog = ({
               </div>
               {/* bottom */}
               {bottomContent && (
-                <div className="z-10 flex flex-wrap items-center justify-center gap-4 shadow">
+                <div
+                  className="
+                    z-10 flex flex-wrap items-center justify-center gap-4
+                    shadow-sm
+                  "
+                >
                   {typeof bottomContent === "function"
                     ? bottomContent(close, open)
                     : bottomContent}

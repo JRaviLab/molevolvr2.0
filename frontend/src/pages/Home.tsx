@@ -110,7 +110,12 @@ const Home = () => {
 
         <p className="font-medium">Select your inputs...</p>
 
-        <div className="flex items-center justify-center gap-4 max-md:flex-col">
+        <div
+          className="
+            flex items-center justify-center gap-4
+            max-md:flex-col
+          "
+        >
           <FeatureCard
             title="Construct protein family"
             badge={<LuWrench />}
@@ -132,7 +137,12 @@ const Home = () => {
 
         <p className="font-medium">...then view your results...</p>
 
-        <div className="flex items-center justify-center gap-4 max-md:flex-col">
+        <div
+          className="
+            flex items-center justify-center gap-4
+            max-md:flex-col
+          "
+        >
           <FeatureCard
             title="Domain architecture"
             badge={<LuChartNoAxesGantt />}

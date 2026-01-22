@@ -2,11 +2,6 @@ import { random, range, sample, startCase, uniqueId } from "lodash";
 import type { Item as SunburstItem } from "@/components/Sunburst";
 import type { Item as TreeItem } from "@/components/Tree";
 
-/** log change to components for testing */
-export const logChange = (...args: unknown[]) => {
-  console.debug(...args);
-};
-
 /** fake analysis id */
 export const analysis = Array(8)
   .fill(null)

@@ -80,9 +80,9 @@ const MSA = ({
       controls={[
         <CheckBox
           label="Wrap"
+          tooltip="Wrap sequence to stacked panels"
           value={wrap}
           onChange={setWrap}
-          tooltip="Wrap sequence to stacked panels"
         />,
       ]}
       containerProps={{ className: "w-full" }}

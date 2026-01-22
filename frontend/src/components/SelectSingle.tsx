@@ -1,13 +1,7 @@
-import {
-  Fragment,
-  useEffect,
-  useState,
-  type ReactElement,
-  type ReactNode,
-} from "react";
+import { Fragment } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { LuChevronDown } from "react-icons/lu";
 import { VscCircleFilled } from "react-icons/vsc";
-import clsx from "clsx";
 import {
   Label,
   Listbox,
@@ -15,7 +9,7 @@ import {
   ListboxOption,
   ListboxOptions,
 } from "@headlessui/react";
-import { usePrevious } from "@reactuses/core";
+import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 
@@ -29,11 +23,9 @@ type Props<O extends Option> = {
   /** pass with "as const" */
   options: readonly O[];
   /** selected option state */
-  value?: O["id"];
+  value: O["id"];
   /** on selected option state change */
-  onChange?: (value: O["id"]) => void;
-  /** field name in form data */
-  name?: string;
+  onChange: (value: O["id"]) => void;
 };
 
 export type Option<ID = string> = {
@@ -55,37 +47,14 @@ const SelectSingle = <O extends Option>({
   value,
   onChange,
   options,
-  name,
 }: Props<O>) => {
-  /** local copy of selected value */
-  const [selected, setSelected] = useState(value);
-
-  /** whether selected option undefined and needs to fallback */
-  const fallback =
-    !selected || !options.find((option) => option.id === selected);
-
-  /** ensure local selected value always defined */
-  const selectedWFallback: O["id"] = fallback ? options[0]!.id : selected;
-
-  /** notify parent when selected changes */
-  const previousSelected = usePrevious(selectedWFallback);
-  useEffect(() => {
-    if (previousSelected && previousSelected !== selectedWFallback)
-      onChange?.(selectedWFallback);
-  }, [selectedWFallback, previousSelected, onChange]);
-
-  /** update local state from controlled value */
-  useEffect(() => {
-    if (value !== undefined) setSelected(value);
-  }, [value]);
-
   /** link to parent form component */
   const form = useForm();
 
-  /** full selected option object */
-  const fullSelected = options.find(
-    (option) => option.id === selectedWFallback,
-  );
+  /** selected index */
+  let index = options.findIndex((option) => option.id === value);
+  /** selected option */
+  const selected = options.find((option) => option.id === value);
 
   return (
     <Listbox
@@ -94,9 +63,8 @@ const SelectSingle = <O extends Option>({
         layout === "horizontal" && "items-center",
         layout === "vertical" && "flex-col items-start",
       )}
-      value={selectedWFallback}
-      onChange={setSelected}
-      name={name}
+      value={value}
+      onChange={onChange}
       form={form}
       as="div"
     >
@@ -108,15 +76,14 @@ const SelectSingle = <O extends Option>({
 
       {/* button */}
       <ListboxButton
-        className="text-accent hover:text-deep grow gap-2 border-b-2 border-current p-2"
+        className="
+          grow gap-2 border-b-2 border-current p-2 text-accent
+          hover:text-deep
+        "
         onKeyDown={({ key }) => {
-          if (!(key === "ArrowLeft" || key === "ArrowRight")) return;
-
-          /** find current selected index */
-          let index = options.findIndex(
-            (option) => option.id === selectedWFallback,
-          );
           if (index === -1) return;
+
+          if (!(key === "ArrowLeft" || key === "ArrowRight")) return;
 
           /** inc/dec selected index */
           if (key === "ArrowLeft" && index > 0) index--;
@@ -125,18 +92,18 @@ const SelectSingle = <O extends Option>({
           /** new selected index */
           const selected = options[index]!;
 
-          /** update local value */
-          setSelected(selected.id);
+          /** update value */
+          onChange(selected.id);
         }}
       >
-        {fullSelected?.icon}
-        <span className="grow truncate">{fullSelected?.primary}</span>
+        {selected?.icon}
+        <span className="grow truncate">{selected?.primary}</span>
         <LuChevronDown />
       </ListboxButton>
 
       {/* dropdown */}
       <ListboxOptions
-        className="z-30 min-w-min bg-white shadow"
+        className="z-30 min-w-min bg-white shadow-sm"
         anchor={{ to: "bottom start", padding: 10 }}
         modal={false}
       >
@@ -145,7 +112,10 @@ const SelectSingle = <O extends Option>({
             {({ focus, selected }) => (
               <li
                 className={clsx(
-                  "flex max-w-[calc(100dvw--spacing(20))] cursor-pointer items-center gap-2 p-2",
+                  `
+                    flex max-w-[calc(100dvw--spacing(20))] cursor-pointer
+                    items-center gap-2 p-2
+                  `,
                   focus && "bg-off-white",
                 )}
               >
@@ -160,12 +130,17 @@ const SelectSingle = <O extends Option>({
                 <span className="flex grow-2 items-center leading-none">
                   {option.primary}
                 </span>
-                <span className="text-gray flex grow items-center justify-end justify-self-end text-right text-sm leading-none">
+                <span
+                  className="
+                    flex grow items-center justify-end justify-self-end
+                    text-right text-sm leading-none text-gray
+                  "
+                >
                   {option.secondary}
                 </span>
                 {/* icon */}
                 {option.icon && (
-                  <div className="text-gray justify-self-end">
+                  <div className="justify-self-end text-gray">
                     {option.icon}
                   </div>
                 )}

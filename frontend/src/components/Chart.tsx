@@ -2,9 +2,9 @@ import { useEffect, useRef } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { LuCrop, LuMaximize, LuPrinter } from "react-icons/lu";
+import { useDebounce, useElementSize, useFullscreen } from "@reactuses/core";
 import clsx from "clsx";
 import { clamp } from "lodash";
-import { useDebounce, useElementSize, useFullscreen } from "@reactuses/core";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
 import Tooltip from "@/components/Tooltip";
@@ -69,8 +69,8 @@ const Chart = ({
   const { fontSize, truncateWidth } = useTextSize();
 
   /** sizes */
-  let [width] = useElementSize(containerRef.current);
-  let [parentWidth] = useElementSize(containerRef.current?.parentElement);
+  let [width] = useElementSize(containerRef);
+  let [parentWidth] = useElementSize(() => containerRef.current?.parentElement);
 
   /** avoid too-frequent layout changes and flashing scrollbar */
   width = useDebounce(width, 50);
@@ -152,14 +152,21 @@ const Chart = ({
     <div
       ref={containerRef}
       className={clsx(
-        "relative grid max-w-full resize place-items-center overflow-auto p-4 [&:is([style*='width'],[style*='height'])>.reset-handle]:grid",
+        `
+          relative grid max-w-full resize place-items-center overflow-auto p-4
+          [&:is([style*='width'],[style*='height'])>.reset-handle]:grid
+        `,
         printing
-          ? "aspect-auto h-screen max-h-none min-h-0 w-auto max-w-none min-w-0 resize-none overflow-visible rounded-none border-0 bg-white p-0 shadow-none"
-          : "rounded bg-white shadow",
+          ? `
+            aspect-auto h-screen max-h-none min-h-0 w-auto max-w-none min-w-0
+            resize-none overflow-visible rounded-none border-0 bg-white p-0
+            shadow-none
+          `
+          : "rounded-sm bg-white shadow-sm",
         containerClassName,
       )}
       // https://github.com/dequelabs/axe-core/issues/4566
-      // eslint-disable-next-line
+
       tabIndex={0}
       onClick={onClick}
       {...containerProps}
@@ -183,7 +190,11 @@ const Chart = ({
       </svg>
 
       {/* reset handle */}
-      <div className="reset-handle sticky right-2 bottom-2 hidden size-0 place-self-end">
+      <div
+        className="
+          reset-handle sticky right-2 bottom-2 hidden size-0 place-self-end
+        "
+      >
         <Tooltip content="Reset size">
           <button
             className="size-4"

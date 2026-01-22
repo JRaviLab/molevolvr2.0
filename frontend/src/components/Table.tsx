@@ -13,8 +13,6 @@ import {
   LuFilterX,
   LuSearch,
 } from "react-icons/lu";
-import clsx from "clsx";
-import { clamp, isEqual, pick, sortBy, sum } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
 import {
   createColumnHelper,
@@ -34,6 +32,8 @@ import type {
   NoInfer,
   SortingState,
 } from "@tanstack/react-table";
+import clsx from "clsx";
+import { clamp, isEqual, pick, sortBy, sum } from "lodash";
 import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
@@ -117,6 +117,8 @@ const Table = <Datum extends object>({
   sort,
   filename = [],
 }: Props<Datum>) => {
+  "use no memo";
+
   /** expanded state */
   const [expanded, setExpanded] = useLocalStorage("table-expanded", false);
 
@@ -238,6 +240,8 @@ const Table = <Datum extends object>({
   );
 
   /** tanstack table api */
+  /** https://github.com/facebook/react/issues/33057 */
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: rows,
     columns,
@@ -301,7 +305,13 @@ const Table = <Datum extends object>({
                     {...getCol(header.column.id)?.attrs}
                   >
                     {header.isPlaceholder ? null : (
-                      <div className="[&_button]:text-gray [&_button]:hover:text-deep [&_button]: flex items-center justify-start [&_button]:p-1">
+                      <div
+                        className="
+                          flex items-center justify-start
+                          [&_button]:p-1 [&_button]:text-gray
+                          [&_button]:hover:text-deep
+                        "
+                      >
                         {/* header label */}
                         <span className="mr-2">
                           {flexRender(
@@ -397,7 +407,7 @@ const Table = <Datum extends object>({
             ) : (
               <tr>
                 <td
-                  className="text-light-gray p-8 text-center"
+                  className="p-8 text-center text-light-gray"
                   colSpan={cols.length}
                 >
                   No Rows

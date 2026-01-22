@@ -1,8 +1,8 @@
-import { useId, useRef, useState } from "react";
+import { useId, useRef } from "react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { FaRegCopy, FaXmark } from "react-icons/fa6";
-import clsx from "clsx";
 import { useElementBounding } from "@reactuses/core";
+import clsx from "clsx";
 import Asterisk from "@/components/Asterisk";
 import Button from "@/components/Button";
 import { useForm } from "@/components/Form";
@@ -22,9 +22,9 @@ type Base = {
   /** hint icon to show on side */
   icon?: ReactElement;
   /** text state */
-  value?: string;
+  value: string;
   /** on text state change */
-  onChange?: (value: string) => void;
+  onChange: (value: string) => void;
   /** class on textbox */
   className?: string;
 };
@@ -34,7 +34,7 @@ type Single = {
   multi?: false;
 } & Pick<
   ComponentProps<"input">,
-  "placeholder" | "type" | "autoComplete" | "name" | "required"
+  "placeholder" | "type" | "autoComplete" | "required"
 >;
 
 type Multi = {
@@ -42,7 +42,7 @@ type Multi = {
   multi: true;
 } & Pick<
   ComponentProps<"textarea">,
-  "placeholder" | "autoComplete" | "name" | "required"
+  "placeholder" | "autoComplete" | "required"
 >;
 
 /** single or multi-line text input box */
@@ -60,15 +60,12 @@ const TextBox = ({
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
   const sideRef = useRef<HTMLDivElement>(null);
 
-  /** local text state */
-  const [text, setText] = useState(value ?? "");
-
   /** unique id for component instance */
   const id = useId();
 
   /** side elements */
   let sideElements: ReactNode = "";
-  if (text || value)
+  if (value)
     sideElements = (
       <>
         {multi && (
@@ -78,7 +75,7 @@ const TextBox = ({
             tooltip="Copy text"
             icon={<FaRegCopy />}
             onClick={async () => {
-              await window.navigator.clipboard.writeText(text);
+              await window.navigator.clipboard.writeText(value);
               toast("Copied text", "success");
             }}
           />
@@ -90,8 +87,7 @@ const TextBox = ({
           icon={<FaXmark />}
           onClick={() => {
             if (ref.current) ref.current.value = "";
-            onChange?.("");
-            setText("");
+            onChange("");
           }}
         />
       </>
@@ -110,13 +106,14 @@ const TextBox = ({
     <textarea
       ref={ref}
       id={id}
-      className="hover:border-accent border-off-white min-h-[4lh] grow resize rounded border-2 bg-white p-2"
+      className="
+        min-h-[4lh] grow resize rounded-sm border-2 border-off-white bg-white
+        p-2
+        hover:border-accent
+      "
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
       value={value}
-      onChange={(event) => {
-        onChange?.(event.target.value);
-        setText(event.target.value);
-      }}
+      onChange={(event) => onChange(event.target.value)}
       form={form}
       {...props}
     />
@@ -124,13 +121,13 @@ const TextBox = ({
     <input
       ref={ref}
       id={id}
-      className="hover:border-accent border-off-white grow rounded border-2 bg-white p-2"
+      className="
+        grow rounded-sm border-2 border-off-white bg-white p-2
+        hover:border-accent
+      "
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
       value={value}
-      onChange={(event) => {
-        onChange?.(event.target.value);
-        setText(event.target.value);
-      }}
+      onChange={(event) => onChange(event.target.value)}
       form={form}
       {...props}
     />
@@ -161,7 +158,11 @@ const TextBox = ({
           {/* side element */}
           <div
             ref={sideRef}
-            className="text-dark-gray absolute top-1.5 right-1.5 bottom-1.5 flex items-start *:size-8"
+            className="
+              absolute top-1.5 right-1.5 bottom-1.5 flex items-start
+              text-dark-gray
+              *:size-8
+            "
           >
             {sideElements}
           </div>

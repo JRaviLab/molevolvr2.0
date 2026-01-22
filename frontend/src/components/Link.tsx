@@ -51,7 +51,7 @@ const Link = ({
   const _showArrow = showArrow ?? target;
 
   /** class name string */
-  const _class = clsx("inline-flex gap-1 items-center", className);
+  const _class = clsx("inline-flex items-center gap-1", className);
 
   /** full element to render */
   const element = external ? (

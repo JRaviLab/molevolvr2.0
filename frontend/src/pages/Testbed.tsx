@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   LuAppWindowMac,
   LuArrowRight,
@@ -21,7 +21,6 @@ import {
   LuMessageSquareDot,
   LuNetwork,
   LuPalette,
-  LuRows3,
   LuSearch,
   LuShapes,
   LuSlidersHorizontal,
@@ -34,8 +33,8 @@ import {
   LuWaypoints,
   LuWine,
 } from "react-icons/lu";
-import { mapValues, sample, startCase, uniq } from "lodash";
 import { useElementSize } from "@reactuses/core";
+import { mapValues, sample, startCase, uniq } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -43,7 +42,6 @@ import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
 import Collapsible from "@/components/Collapsible";
 import Dialog from "@/components/Dialog";
-import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Heatmap from "@/components/Heatmap";
 import IPR from "@/components/IPR";
@@ -76,7 +74,6 @@ import {
   iprSequence,
   iprTracks,
   label,
-  logChange,
   msaTracks,
   nodes,
   sunburst,
@@ -146,7 +143,6 @@ const TestbedPage = () => {
       <SectionTooltip />
       <SectionPopover />
       <SectionDialog />
-      <SectionForm />
     </>
   );
 };
@@ -320,6 +316,7 @@ const SectionLegend = () => {
       mapValues(colorMap, (color, label) => ({
         color,
         shape: shapesMap[label],
+        // eslint-disable-next-line react-hooks/purity
         stroke: Math.random() > 0.75,
       })),
     [colorMap, shapesMap],
@@ -331,7 +328,10 @@ const SectionLegend = () => {
         Legend
       </Heading>
 
-      <div ref={ref} className="w-100 resize overflow-auto rounded p-4 shadow">
+      <div
+        ref={ref}
+        className="w-100 resize overflow-auto rounded-sm p-4 shadow-sm"
+      >
         <Legend entries={entries} x={0} y={0} w={width} />
       </div>
     </section>
@@ -455,186 +455,258 @@ const SectionButton = () => (
         tooltip="Tooltip"
       />
       <Button
-        onClick={() => window.alert("Hello World")}
         text="As Button"
         design="hollow"
         tooltip="Tooltip"
+        onClick={() => window.alert("Hello World")}
       />
       <Button
-        onClick={() => window.alert("Hello World")}
         text="As Button"
         icon={<LuArrowRight />}
         tooltip="Tooltip"
+        onClick={() => window.alert("Hello World")}
       />
       <Button
-        onClick={() => window.alert("Hello World")}
         icon={<CustomIcon />}
         design="critical"
         tooltip="Tooltip"
+        onClick={() => window.alert("Hello World")}
       />
     </div>
   </section>
 );
 
-const SectionTextBox = () => (
-  <section>
-    <Heading level={2} icon={<LuType />}>
-      Text Box
-    </Heading>
+const SectionTextBox = () => {
+  const [value, setValue] = useState("");
 
-    <div className="grid w-full grid-cols-2 gap-8 max-md:grid-cols-1">
-      <TextBox label="Label" placeholder="Search" onChange={logChange} />
-      <TextBox label="Label" placeholder="Search" multi icon={<LuSearch />} />
-      <TextBox
-        layout="horizontal"
-        label="Label"
-        placeholder="Search"
-        onChange={logChange}
-      />
-      <TextBox
-        layout="horizontal"
-        label="Label"
-        placeholder="Search"
-        multi
-        icon={<LuSearch />}
-      />
-    </div>
-  </section>
-);
+  return (
+    <section>
+      <Heading level={2} icon={<LuType />}>
+        Text Box
+      </Heading>
 
-const SectionSelect = () => (
-  <section>
-    <Heading level={2} icon={<LuListCheck />}>
-      Select
-    </Heading>
+      <div
+        className="
+          grid w-full grid-cols-2 gap-8
+          max-md:grid-cols-1
+        "
+      >
+        <TextBox
+          label="Label"
+          tooltip="Tooltip"
+          placeholder="Search"
+          value={value}
+          onChange={setValue}
+        />
+        <TextBox
+          label="Label"
+          tooltip="Tooltip"
+          placeholder="Search"
+          multi
+          icon={<LuSearch />}
+          value={value}
+          onChange={setValue}
+        />
+        <TextBox
+          layout="horizontal"
+          label="Label"
+          tooltip="Tooltip"
+          placeholder="Search"
+          value={value}
+          onChange={setValue}
+        />
+        <TextBox
+          layout="horizontal"
+          label="Label"
+          tooltip="Tooltip"
+          placeholder="Search"
+          multi
+          icon={<LuSearch />}
+          value={value}
+          onChange={setValue}
+        />
+      </div>
+    </section>
+  );
+};
 
-    <div className="flex gap-8">
-      <SelectSingle
-        label="Single"
+const SectionSelect = () => {
+  const singleOptions = [
+    { id: "1", primary: "Lorem" },
+    { id: "2", primary: "Ipsum" },
+    { id: "3", primary: "Dolor" },
+  ] as const;
+
+  const [singleValue, setSingleValue] = useState<
+    (typeof singleOptions)[number]["id"]
+  >(singleOptions[0].id);
+
+  const multiOptions = [
+    { id: "a", primary: "Lorem" },
+    { id: "b", primary: "Ipsum", secondary: "123" },
+    {
+      id: "c",
+      primary: "Dolor",
+      secondary: "123",
+      icon: <LuDog />,
+    },
+  ] as const;
+
+  const [multiValue, setMultiValue] = useState<
+    (typeof multiOptions)[number]["id"][]
+  >([]);
+
+  return (
+    <section>
+      <Heading level={2} icon={<LuListCheck />}>
+        Select
+      </Heading>
+
+      <div className="flex gap-8">
+        <SelectSingle
+          label="Single"
+          tooltip="Tooltip"
+          options={singleOptions}
+          value={singleValue}
+          onChange={setSingleValue}
+        />
+        <SelectMulti
+          layout="horizontal"
+          label="Multi"
+          tooltip="Tooltip"
+          options={multiOptions}
+          value={multiValue}
+          onChange={setMultiValue}
+        />
+      </div>
+    </section>
+  );
+};
+
+const SectionCheckBox = () => {
+  const [value, setValue] = useState(false);
+
+  return (
+    <section>
+      <Heading level={2} icon={<LuSquareCheck />}>
+        Check Box
+      </Heading>
+
+      <CheckBox
+        label="Accept terms and conditions"
         tooltip="Tooltip"
-        options={
-          [
-            { id: "1", primary: "Lorem" },
-            { id: "2", primary: "Ipsum" },
-            { id: "3", primary: "Dolor" },
-          ] as const
-        }
-        onChange={logChange}
+        value={value}
+        onChange={setValue}
       />
-      <SelectMulti
-        layout="horizontal"
-        label="Multi"
+    </section>
+  );
+};
+
+const SectionSlider = () => {
+  const [singleValue, setSingleValue] = useState(0);
+  const [multiValue, setMultiValue] = useState<number[]>([0, 1000]);
+
+  return (
+    <section>
+      <Heading level={2} icon={<LuSlidersHorizontal />}>
+        Slider
+      </Heading>
+
+      <div className="flex gap-8">
+        <Slider
+          label="Single"
+          tooltip="Tooltip"
+          min={0}
+          max={100}
+          step={1}
+          value={singleValue}
+          onChange={setSingleValue}
+        />
+        <Slider
+          layout="horizontal"
+          label="Range"
+          tooltip="Tooltip"
+          multi
+          min={0}
+          max={10000}
+          step={100}
+          value={multiValue}
+          onChange={setMultiValue}
+        />
+      </div>
+    </section>
+  );
+};
+
+const SectionNumberBox = () => {
+  const [value, setValue] = useState(0);
+
+  return (
+    <section>
+      <Heading level={2} icon={<LuHash />}>
+        Number Box
+      </Heading>
+
+      <div className="flex gap-8">
+        <NumberBox
+          label="Vertical"
+          tooltip="Tooltip"
+          min={0}
+          max={100}
+          step={1}
+          value={value}
+          onChange={setValue}
+        />
+        <NumberBox
+          layout="horizontal"
+          label="Horizontal"
+          tooltip="Tooltip"
+          min={-10000}
+          max={10000}
+          step={100}
+          value={value}
+          onChange={setValue}
+        />
+      </div>
+    </section>
+  );
+};
+
+const SectionRadios = () => {
+  const options = [
+    { id: "first", primary: "Primary lorem ipsum" },
+    {
+      id: "second",
+      primary: "Primary lorem ipsum",
+      secondary: "Secondary lorem ipsum",
+    },
+    {
+      id: "third",
+      primary: "Primar lorem ipsum",
+      icon: <LuDog />,
+    },
+  ] as const;
+
+  const [value, setValue] = useState<(typeof options)[number]["id"]>(
+    options[0].id,
+  );
+
+  return (
+    <section>
+      <Heading level={2} icon={<LuCircleCheckBig />}>
+        Radios
+      </Heading>
+
+      <Radios
+        label="Choice"
         tooltip="Tooltip"
-        options={
-          [
-            { id: "a", primary: "Lorem" },
-            { id: "b", primary: "Ipsum", secondary: "123" },
-            {
-              id: "c",
-              primary: "Dolor",
-              secondary: "123",
-              icon: <LuDog />,
-            },
-          ] as const
-        }
-        onChange={logChange}
+        options={options}
+        value={value}
+        onChange={setValue}
       />
-    </div>
-  </section>
-);
-
-const SectionCheckBox = () => (
-  <section>
-    <Heading level={2} icon={<LuSquareCheck />}>
-      Check Box
-    </Heading>
-
-    <CheckBox
-      label="Accept terms and conditions"
-      tooltip="Tooltip"
-      name="accept"
-      onChange={logChange}
-    />
-  </section>
-);
-
-const SectionSlider = () => (
-  <section>
-    <Heading level={2} icon={<LuSlidersHorizontal />}>
-      Slider
-    </Heading>
-
-    <div className="flex gap-8">
-      <Slider label="Single" min={0} max={100} step={1} onChange={logChange} />
-      <Slider
-        layout="horizontal"
-        label="Range"
-        multi
-        min={0}
-        max={10000}
-        step={100}
-        onChange={logChange}
-      />
-    </div>
-  </section>
-);
-
-const SectionNumberBox = () => (
-  <section>
-    <Heading level={2} icon={<LuHash />}>
-      Number Box
-    </Heading>
-
-    <div className="flex gap-8">
-      <NumberBox
-        label="Vertical"
-        min={0}
-        max={100}
-        step={1}
-        onChange={logChange}
-        tooltip="Tooltip"
-      />
-      <NumberBox
-        layout="horizontal"
-        label="Horizontal"
-        min={-10000}
-        max={10000}
-        step={100}
-        onChange={logChange}
-        tooltip="Tooltip"
-      />
-    </div>
-  </section>
-);
-
-const SectionRadios = () => (
-  <section>
-    <Heading level={2} icon={<LuCircleCheckBig />}>
-      Radios
-    </Heading>
-
-    <Radios
-      label="Choice"
-      tooltip="Tooltip"
-      options={
-        [
-          { id: "first", primary: "Primary lorem ipsum" },
-          {
-            id: "second",
-            primary: "Primary lorem ipsum",
-            secondary: "Secondary lorem ipsum",
-          },
-          {
-            id: "third",
-            primary: "Primar lorem ipsum",
-            icon: <LuDog />,
-          },
-        ] as const
-      }
-      onChange={logChange}
-    />
-  </section>
-);
+    </section>
+  );
+};
 
 const SectionAgo = () => (
   <section>
@@ -793,7 +865,7 @@ const SectionTable = () => (
           name: "Long text",
           filterType: "string",
           show: false,
-          render: (cell) => <div className="truncate-5">{cell}</div>,
+          render: (cell) => <div className="line-clamp-5">{cell}</div>,
         },
       ]}
       rows={tableData}
@@ -853,7 +925,8 @@ const SectionPopover = () => (
                 { id: "pdf", primary: "PDF" },
               ] as const
             }
-            onChange={logChange}
+            value="csv"
+            onChange={() => null}
           />
         </>
       }
@@ -955,7 +1028,8 @@ const SectionDialog = () => (
                 { id: "pdf", primary: "PDF" },
               ] as const
             }
-            onChange={logChange}
+            value="csv"
+            onChange={() => null}
           />
           <Button
             text="Nevermind"
@@ -979,66 +1053,5 @@ const SectionDialog = () => (
         <Button text="Dialog" />
       </Tooltip>
     </Dialog>
-  </section>
-);
-
-const SectionForm = () => (
-  <section>
-    <Heading level={2} icon={<LuRows3 />}>
-      Form
-    </Heading>
-
-    <Form onSubmit={console.debug}>
-      <div className="grid w-full grid-cols-2 gap-8 max-md:grid-cols-1">
-        <TextBox label="Email" name="email" type="email" autoComplete="email" />
-        <TextBox label="Description" multi name="description" required />
-        <NumberBox label="Age" name="age" />
-        <Slider label="Cutoff" name="cutoff" />
-        <Slider label="Range" multi name="range" />
-        <Radios
-          label="Order"
-          options={[
-            { id: "one", primary: "One" },
-            { id: "two", primary: "Two" },
-            { id: "three", primary: "Three" },
-          ]}
-          name="order"
-        />
-        <SelectSingle
-          label="Select"
-          options={
-            [
-              { id: "a", primary: "Lorem" },
-              { id: "b", primary: "Ipsum", secondary: "123" },
-              {
-                id: "c",
-                primary: "Dolor",
-                secondary: "123",
-                icon: <LuDog />,
-              },
-            ] as const
-          }
-          name="select-single"
-        />
-        <SelectMulti
-          label="Select"
-          options={
-            [
-              { id: "a", primary: "Lorem" },
-              { id: "b", primary: "Ipsum", secondary: "123" },
-              {
-                id: "c",
-                primary: "Dolor",
-                secondary: "123",
-                icon: <LuDog />,
-              },
-            ] as const
-          }
-          name="select-multi"
-        />
-      </div>
-      <CheckBox label="I consent" name="consent" required />
-      <Button type="submit" text="Submit" design="critical" />
-    </Form>
   </section>
 );

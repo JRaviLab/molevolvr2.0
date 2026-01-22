@@ -276,7 +276,11 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
       {/* shape */}
       <NodeTooltip {...data}>
         <path
-          className="stroke-black stroke-2 outline-none [stroke-opacity:0] hover:[stroke-opacity:1] focus-visible:[stroke-opacity:1]"
+          className="
+            stroke-black stroke-2 outline-none [stroke-opacity:0]
+            hover:[stroke-opacity:1]
+            focus-visible:[stroke-opacity:1]
+          "
           fill={color}
           d={fill}
           tabIndex={0}

@@ -54,7 +54,7 @@ const Heading = ({
   let iconElement: ReactNode = null;
   if (typeof icon === "string") iconElement = <Badge>{icon}</Badge>;
   if (typeof icon === "object" && typeof icon.type === "function")
-    iconElement = <div className="text-deep-light flex">{icon}</div>;
+    iconElement = <div className="flex text-deep-light">{icon}</div>;
 
   const setHeadings = useSetAtom(headingsAtom);
 

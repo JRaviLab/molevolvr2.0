@@ -30,11 +30,9 @@ type Props = {
   /** initial state */
   defaultValue?: number;
   /** number state */
-  value?: number;
+  value: number;
   /** on number state change */
-  onChange?: (value: number) => void;
-  /** field name in form data */
-  name?: string;
+  onChange: (value: number) => void;
 };
 
 /** number input box. use for numeric values that need precise adjustment. */
@@ -48,7 +46,6 @@ const NumberBox = ({
   defaultValue,
   value,
   onChange,
-  name,
 }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -70,9 +67,8 @@ const NumberBox = ({
       value={value}
       onChange={(value) => {
         if (ref.current) preserveScroll(ref.current);
-        onChange?.(value);
+        onChange(value);
       }}
-      name={name}
       formatOptions={{ maximumFractionDigits: 10 }}
     >
       {({ state }) => (
@@ -82,13 +78,20 @@ const NumberBox = ({
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <Group className="text-accent hover:text-deep flex border-b-2 border-current">
+          <Group
+            className="
+              flex border-b-2 border-current text-accent
+              hover:text-deep
+            "
+          >
             <Button slot="decrement">
               <LuMinus />
             </Button>
             {/* Poppins unfortunately doesn't support tabular nums */}
             <Input
-              className="field-sizing-content grow px-2 py-1 text-center font-mono"
+              className="
+                field-sizing-content grow px-2 py-1 text-center font-mono
+              "
               form={form}
               onBlurCapture={(event) => {
                 /** https://github.com/adobe/react-spectrum/discussions/6261 */

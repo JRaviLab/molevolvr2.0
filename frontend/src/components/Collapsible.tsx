@@ -27,7 +27,13 @@ const Collapsible = ({ text, tooltip, children }: Props) => {
       <Tooltip content={tooltip}>
         <button
           type="button"
-          className="text-accent hover:text-deep grid w-full grid-cols-[1fr_max-content_1em_1fr] gap-2 rounded p-2 before:mr-2 before:h-0.5 before:bg-current/25 after:ml-2 after:h-0.5 after:bg-current/25 after:content-['']"
+          className="
+            grid w-full grid-cols-[1fr_max-content_1em_1fr] gap-2 rounded-sm p-2
+            text-accent
+            before:mr-2 before:h-0.5 before:bg-current/25
+            after:ml-2 after:h-0.5 after:bg-current/25 after:content-['']
+            hover:text-deep
+          "
           onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-controls={open ? id : undefined}

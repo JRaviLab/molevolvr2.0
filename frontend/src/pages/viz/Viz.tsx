@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { useElementSize } from "@reactuses/core";
 import { gsap } from "gsap";
 import { random, range } from "lodash";
-import { useElementSize } from "@reactuses/core";
 import type { Theme } from "@/util/dom";
 import { useTheme } from "@/util/hooks";
 import { dist } from "@/util/math";
@@ -78,7 +78,7 @@ const Viz = () => {
   return (
     <canvas
       ref={canvas}
-      className="absolute inset-0 -z-10 size-full place-self-center opacity-10"
+      className="absolute inset-0 -z-10 size-full place-self-center opacity-5"
     />
   );
 };

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { LuArrowRight, LuHistory } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "@reactuses/core";
@@ -8,12 +9,15 @@ import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
 import TextBox from "@/components/TextBox";
+import { toast } from "@/components/Toasts";
 import analyses from "../../fixtures/analyses.json";
 
 export const storageKey = "history";
 
 const LoadAnalysis = () => {
   const navigate = useNavigate();
+
+  const [id, setId] = useState("");
 
   /** analysis history */
   const [history, setHistory] = useLocalStorage<Analysis[]>(storageKey, []);
@@ -28,13 +32,13 @@ const LoadAnalysis = () => {
         </Heading>
 
         <Form
-          onSubmit={(data) => {
-            if (String(data.id).trim()) navigate(`/analysis/${data.id}`);
-            else window.alert("Please enter an analysis id");
+          onSubmit={() => {
+            if (id.trim()) navigate(`/analysis/${id}`);
+            else toast("Please enter an analysis id", "error");
           }}
         >
           <div className="flex flex-wrap justify-center gap-4">
-            <TextBox placeholder="Analysis ID" name="id" />
+            <TextBox placeholder="Analysis ID" value={id} onChange={setId} />
             <Button text="Lookup" icon={<LuArrowRight />} type="submit" />
           </div>
         </Form>

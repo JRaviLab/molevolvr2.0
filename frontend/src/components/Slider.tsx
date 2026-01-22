@@ -25,26 +25,24 @@ type Base = {
   max?: number;
   /** inc/dec interval */
   step?: number;
-  /** field name in form data */
-  name?: string;
 };
 
 type Single = {
   /** single value */
   multi?: false;
   /** number state */
-  value?: number;
+  value: number;
   /** on number state change */
-  onChange?: (value: number) => void;
+  onChange: (value: number) => void;
 };
 
 type Multi = {
   /** multiple values (range) */
   multi: true;
   /** numbers state */
-  value?: number[];
+  value: number[];
   /** on numbers state change */
-  onChange?: (value: number[]) => void;
+  onChange: (value: number[]) => void;
 };
 
 /**
@@ -61,7 +59,6 @@ const Slider = ({
   multi,
   value,
   onChange,
-  name,
 }: Props) => {
   /** link to parent form component */
   const form = useForm();
@@ -79,8 +76,8 @@ const Slider = ({
       maxValue={max}
       step={Math.min(step, max - min)}
       onChange={(value) => {
-        if (!multi && !Array.isArray(value)) onChange?.(value);
-        if (multi && Array.isArray(value)) onChange?.(value);
+        if (!multi && !Array.isArray(value)) onChange(value);
+        if (multi && Array.isArray(value)) onChange(value);
       }}
     >
       {({ state }) => (
@@ -90,10 +87,18 @@ const Slider = ({
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <SliderTrack className="bg-gray text-accent group-hover:text-deep m-2 box-content h-1 min-w-40 cursor-pointer rounded-full bg-clip-content p-2">
+          <SliderTrack
+            className="
+              m-2 box-content h-1 min-w-40 cursor-pointer rounded-full bg-gray
+              bg-clip-content p-2 text-accent
+              group-hover:text-deep
+            "
+          >
             {/* fill */}
             <div
-              className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-current"
+              className="
+                absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-current
+              "
               style={{
                 left: multi ? 100 * state.getThumbPercent(0) + "%" : "",
                 width:
@@ -105,10 +110,24 @@ const Slider = ({
               }}
             />
 
-            <div className="absolute -top-full left-0 -translate-x-1/2 translate-y-1 whitespace-nowrap opacity-0 group-focus-within:opacity-50 group-hover:opacity-50">
+            <div
+              className="
+                absolute -top-full left-0 -translate-x-1/2 translate-y-1
+                whitespace-nowrap opacity-0
+                group-focus-within:opacity-50
+                group-hover:opacity-50
+              "
+            >
               {formatNumber(min, true)}
             </div>
-            <div className="absolute -top-full right-0 translate-x-1/2 translate-y-1 whitespace-nowrap opacity-0 group-focus-within:opacity-50 group-hover:opacity-50">
+            <div
+              className="
+                absolute -top-full right-0 translate-x-1/2 translate-y-1
+                whitespace-nowrap opacity-0
+                group-focus-within:opacity-50
+                group-hover:opacity-50
+              "
+            >
               {formatNumber(max, true)}
             </div>
 
@@ -116,9 +135,18 @@ const Slider = ({
               <SliderThumb
                 key={index}
                 index={index}
-                className="top-1/2 size-4 cursor-pointer rounded-full bg-current outline-offset-2 outline-current focus-within:outline-2"
+                className="
+                  top-1/2 size-4 cursor-pointer rounded-full bg-current
+                  outline-offset-2 outline-current
+                  focus-within:outline-2
+                "
               >
-                <div className="absolute top-full left-1/2 -translate-x-1/2 translate-y-1 text-center whitespace-nowrap">
+                <div
+                  className="
+                    absolute top-full left-1/2 -translate-x-1/2 translate-y-1
+                    text-center whitespace-nowrap
+                  "
+                >
                   {formatNumber(value, true)}
                 </div>
               </SliderThumb>
@@ -135,7 +163,6 @@ const Slider = ({
                 value={value}
                 readOnly
                 form={form}
-                name={name}
               />
             ))}
           </SliderTrack>

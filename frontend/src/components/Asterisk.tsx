@@ -6,7 +6,7 @@ const Asterisk = () => (
   <Tooltip content="Required">
     {/* https://github.com/react-icons/react-icons/issues/336 */}
     <span aria-hidden>
-      <LuAsterisk className="text-error relative -ml-1 -translate-y-2 scale-75" />
+      <LuAsterisk className="relative -ml-1 -translate-y-2 scale-75 text-error" />
     </span>
   </Tooltip>
 );

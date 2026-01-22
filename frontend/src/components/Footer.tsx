@@ -7,8 +7,14 @@ const { VITE_EMAIL, VITE_LAB_NAME, VITE_LAB_WEBSITE, VITE_LAB_GITHUB } =
 
 /** at bottom of every page. singleton. */
 const Footer = () => (
-  <footer className="bg-deep flex flex-col items-center gap-2 p-6 text-white">
-    <div className="*:hover:text-gray flex gap-2 *:p-2">
+  <footer className="flex flex-col items-center gap-2 bg-deep p-6 text-white">
+    <div
+      className="
+        flex gap-2
+        *:p-2
+        *:hover:text-gray
+      "
+    >
       <Link to={`mailto:${VITE_EMAIL}`} showArrow={false} tooltip="Email us">
         <LuMail />
       </Link>

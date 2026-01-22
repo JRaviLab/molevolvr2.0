@@ -1,5 +1,11 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { LuCrop, LuMaximize } from "react-icons/lu";
+import {
+  useDebounceFn,
+  useFullscreen,
+  useLocalStorage,
+  useResizeObserver,
+} from "@reactuses/core";
 import clsx from "clsx";
 import cytoscape from "cytoscape";
 import type {
@@ -27,19 +33,7 @@ import klay from "cytoscape-klay";
 import type { KlayLayoutOptions } from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
-import {
-  debounce,
-  mapValues,
-  omit,
-  orderBy,
-  startCase,
-  truncate,
-} from "lodash";
-import {
-  useFullscreen,
-  useLocalStorage,
-  useResizeObserver,
-} from "@reactuses/core";
+import { mapValues, omit, orderBy, startCase, truncate } from "lodash";
 import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
@@ -595,29 +589,43 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   }, [nodes, edges, layoutParams]);
 
   /** on resize */
-  useResizeObserver(
-    ref,
-    debounce(() => {
-      graphRef.current?.resize();
-      fit();
-    }, 100),
-  );
+  const resize = useDebounceFn(() => {
+    graphRef.current?.resize();
+    fit();
+  });
+  useResizeObserver(ref, resize.run);
 
   /** fullscreen */
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
+
+  /** json download data */
+  const [json, setJson] = useState<object | null>(null);
+
+  useEffect(() => {
+    if (!graphRef.current) return;
+    setJson(graphRef.current.json());
+  }, [nodes, edges]);
 
   return (
     <div className="flex w-full flex-col items-center gap-4">
       <div
         ref={ref}
         className={clsx(
-          "grid w-full grid-cols-[max-content_auto] rounded bg-white shadow",
+          `
+            grid w-full grid-cols-[max-content_auto] rounded-sm bg-white
+            shadow-sm
+          `,
           expanded && "h-[75dvh]! w-[calc(100dvw---spacing(20))]!",
         )}
         style={{ aspectRatio: expanded ? "" : aspectRatio }}
       >
         {/* panel */}
-        <div className="flex h-0 min-h-full max-w-50 flex-col items-start justify-start gap-8 overflow-x-hidden overflow-y-auto p-4 wrap-anywhere">
+        <div
+          className="
+            flex h-0 min-h-full max-w-50 flex-col items-start justify-start
+            gap-8 overflow-x-hidden overflow-y-auto p-4 wrap-anywhere
+          "
+        >
           {selectedItems.length ? (
             /** show info about selected nodes/edges */
             <>
@@ -692,7 +700,13 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
         </div>
 
         {/* cytoscape mount container */}
-        <div ref={containerRef} className="bg-white *:size-full!"></div>
+        <div
+          ref={containerRef}
+          className="
+            bg-white
+            *:size-full!
+          "
+        ></div>
       </div>
 
       {/* controls */}
@@ -734,7 +748,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
                 filename: "edges",
               },
             ]}
-            json={graphRef.current?.json()}
+            json={json}
           />
 
           <Button

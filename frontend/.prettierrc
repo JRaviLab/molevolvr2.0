@@ -1,21 +1,31 @@
 {
-  "plugins": [
-    "@ianvs/prettier-plugin-sort-imports",
-    "./node_modules/prettier-plugin-jsdoc/dist/index.js",
-    "prettier-plugin-css-order",
-    "prettier-plugin-tailwindcss"
-  ],
-  "importOrder": [
-    "^react",
-    "^[a-zA-Z]",
-    "^@[a-zA-Z]",
-    "^@/",
-    "^/",
-    "^./",
-    "^../"
-  ],
-  "importOrderParserPlugins": ["typescript", "jsx", "importAssertions"],
-  "cssDeclarationSorterOrder": "smacss",
-  "jsdocCapitalizeDescription": false,
-  "htmlWhitespaceSensitivity": "strict"
+  "overrides": [
+    {
+      "files": "*.css",
+      "options": {
+        "plugins": ["prettier-plugin-tailwindcss"]
+      }
+    },
+    {
+      "files": "*.*",
+      "options": {
+        "plugins": [
+          "@ianvs/prettier-plugin-sort-imports",
+          "prettier-plugin-jsdoc"
+        ],
+        "importOrder": [
+          "^react",
+          "^@[a-zA-Z]",
+          "^[a-zA-Z]",
+          "^@/",
+          "^/",
+          "^./",
+          "^../"
+        ],
+        "importOrderParserPlugins": ["typescript", "jsx", "importAssertions"],
+        "jsdocCapitalizeDescription": false,
+        "htmlWhitespaceSensitivity": "strict"
+      }
+    }
+  ]
 }
