@@ -4,22 +4,14 @@ import { sleep, waitFor } from "@/util/misc";
 
 export type Theme = Record<`--${string}`, string>;
 
-/** https://stackoverflow.com/a/78994961/2180570 */
+/** get all css variables on root */
 export const getTheme = (): Theme => {
   const styles = window.getComputedStyle(document.documentElement);
+  const vars = Object.values(
+    window.getComputedStyle(document.documentElement),
+  ).filter((value) => value.startsWith("--"));
   return Object.fromEntries(
-    Array.from(document.styleSheets)
-      .flatMap((styleSheet) => {
-        try {
-          return Array.from(styleSheet.cssRules);
-        } catch (error) {
-          return [];
-        }
-      })
-      .filter((cssRule) => cssRule instanceof CSSStyleRule)
-      .flatMap((cssRule) => Array.from(cssRule.style))
-      .filter((style) => style.startsWith("--"))
-      .map((variable) => [variable, styles.getPropertyValue(variable)]),
+    vars.map((key) => [key, styles.getPropertyValue(key).trim()]),
   );
 };
 
@@ -169,6 +161,17 @@ export const scrollTo = async (
   elementOrSection(element).scrollIntoView(options);
 };
 
+/** check if css selector is valid */
+const validSelector = (selector: unknown) => {
+  if (typeof selector !== "string") return false;
+  try {
+    document.querySelector(selector);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 /** scroll to element by selector */
 export const scrollToSelector = async (
   selector: string,
@@ -183,6 +186,15 @@ export const scrollToSelector = async (
 
   /** scroll to element */
   scrollTo(element, options);
+};
+
+/** if element is first child of section, change element to section itself */
+const elementOrSection = <El extends Element>(element: El) => {
+  const section = element.closest("section");
+  return section &&
+    element.matches("section > :first-child, section > :first-child *")
+    ? section
+    : element;
 };
 
 /** find index of first element "in view". model behavior off of wikiwand.com. */
@@ -204,34 +216,8 @@ export const firstInView = (elements: HTMLElement[]) => {
 export const glow = (element: Element) =>
   elementOrSection(element).animate(
     [
-      {
-        boxShadow: "inset 0 0 40px var(--color-accent)",
-        offset: 0,
-      },
-      {
-        boxShadow: "inset 0 0 40px transparent",
-        offset: 1,
-      },
+      { boxShadow: "inset 0 0 40px var(--color-accent)", offset: 0 },
+      { boxShadow: "inset 0 0 40px transparent", offset: 1 },
     ],
     { duration: 2000 },
   );
-
-/** if element is first child of section, change element to section itself */
-const elementOrSection = <El extends Element>(element: El) => {
-  const section = element.closest("section");
-  return section &&
-    element.matches("section > :first-child, section > :first-child *")
-    ? section
-    : element;
-};
-
-/** check if css selector is valid */
-const validSelector = (selector: unknown) => {
-  if (typeof selector !== "string") return false;
-  try {
-    document.querySelector(selector);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};

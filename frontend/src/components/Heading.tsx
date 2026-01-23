@@ -54,7 +54,7 @@ const Heading = ({
   let iconElement: ReactNode = null;
   if (typeof icon === "string") iconElement = <Badge>{icon}</Badge>;
   if (typeof icon === "object" && typeof icon.type === "function")
-    iconElement = <div className="flex text-deep-light">{icon}</div>;
+    iconElement = <div className="flex opacity-25">{icon}</div>;
 
   const setHeadings = useSetAtom(headingsAtom);
 
@@ -92,8 +92,15 @@ const Heading = ({
   });
 
   return (
-    <Link to={"#" + id} className={clsx("[&:hover_*]:text-accent", className)}>
-      <Tag id={id} ref={ref}>
+    <Link to={"#" + id} className={clsx("group", className)}>
+      <Tag
+        id={id}
+        ref={ref}
+        className="
+          text-deep
+          group-hover:text-accent
+        "
+      >
         {iconElement}
         {children}
       </Tag>

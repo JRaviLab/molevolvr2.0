@@ -7,7 +7,7 @@
       }
     },
     {
-      "files": "*.*",
+      "files": "*.!(css)",
       "options": {
         "plugins": [
           "@ianvs/prettier-plugin-sort-imports",

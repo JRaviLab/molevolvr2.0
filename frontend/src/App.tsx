@@ -3,6 +3,7 @@ import "@fontsource/poppins/300.css";
 import "@fontsource/poppins/500.css";
 import "@fontsource/poppins/600.css";
 import "@fontsource-variable/jetbrains-mono";
+import { useEffect } from "react";
 import { IconContext } from "react-icons";
 import {
   createBrowserRouter,
@@ -44,9 +45,11 @@ const Layout = () => {
   /** did hash change */
   const hashChanged = useChanged(hash);
 
-  if (changed)
-    /** if just hash changed, scroll immediately. else, wait for layout shifts */
-    scrollToHash(hash, hashChanged);
+  useEffect(() => {
+    if (changed)
+      /** if just hash changed, scroll immediately. else, wait for layout shifts */
+      scrollToHash(hash, hashChanged);
+  }, [hash, changed, hashChanged]);
 
   return (
     <QueryClientProvider client={queryClient}>

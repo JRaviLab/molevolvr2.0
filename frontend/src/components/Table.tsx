@@ -56,6 +56,7 @@ type Props<Datum extends object> = {
   rows: Datum[];
   sort?: SortingState;
   filename?: Filename;
+  showControls?: boolean;
 };
 
 type Col<
@@ -129,13 +130,17 @@ const Table = <Datum extends object>({
   rows,
   sort,
   filename = [],
+  showControls = true,
 }: Props<Datum>) => {
   "use no memo";
 
   const filterRef = useRef<HTMLDivElement>(null);
 
   /** per page state */
-  const [perPage, setPerPage] = useState<PerPage>(perPageOptions[0].id);
+  let [perPage, setPerPage] = useState<PerPage>(perPageOptions[0].id);
+
+  /** if not showing controls, show max rows */
+  if (!showControls) perPage = perPageOptions[4].id;
 
   /** expanded state */
   const [expanded, setExpanded] = useLocalStorage("table-expanded", false);
@@ -422,137 +427,141 @@ const Table = <Datum extends object>({
       </div>
 
       {/* controls */}
-      <div className="flex flex-wrap items-center justify-center gap-4">
-        {/* pagination */}
-        <div className="flex gap-2">
-          <Button
-            design="hollow"
-            size="compact"
-            tooltip="First page"
-            icon={<LuChevronsLeft />}
-            aria-disabled={!table.getCanPreviousPage()}
-            onClick={() => table.setPageIndex(0)}
-          />
-          <Button
-            design="hollow"
-            size="compact"
-            tooltip="Previous page"
-            icon={<LuChevronLeft />}
-            aria-disabled={!table.getCanPreviousPage()}
-            onClick={table.previousPage}
-          />
-          <Tooltip content="Jump to page">
+      {showControls && (
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          {/* pagination */}
+          <div className="flex gap-2">
             <Button
               design="hollow"
               size="compact"
-              text={[
-                "Page",
-                formatNumber(table.getState().pagination.pageIndex + 1),
-                "of",
-                formatNumber(table.getPageCount()),
-              ].join(" ")}
-              onClick={() => {
-                const page = parseInt(window.prompt("Jump to page") || "");
-                if (Number.isNaN(page)) return;
-                table.setPageIndex(clamp(page, 1, table.getPageCount()) - 1);
+              tooltip="First page"
+              icon={<LuChevronsLeft />}
+              aria-disabled={!table.getCanPreviousPage()}
+              onClick={() => table.setPageIndex(0)}
+            />
+            <Button
+              design="hollow"
+              size="compact"
+              tooltip="Previous page"
+              icon={<LuChevronLeft />}
+              aria-disabled={!table.getCanPreviousPage()}
+              onClick={table.previousPage}
+            />
+            <Tooltip content="Jump to page">
+              <Button
+                design="hollow"
+                size="compact"
+                text={[
+                  "Page",
+                  formatNumber(table.getState().pagination.pageIndex + 1),
+                  "of",
+                  formatNumber(table.getPageCount()),
+                ].join(" ")}
+                onClick={() => {
+                  const page = parseInt(window.prompt("Jump to page") || "");
+                  if (Number.isNaN(page)) return;
+                  table.setPageIndex(clamp(page, 1, table.getPageCount()) - 1);
+                }}
+              />
+            </Tooltip>
+            <Button
+              design="hollow"
+              size="compact"
+              tooltip="Next page"
+              icon={<LuChevronRight />}
+              aria-disabled={!table.getCanNextPage()}
+              onClick={table.nextPage}
+            />
+            <Button
+              design="hollow"
+              size="compact"
+              tooltip="Last page"
+              icon={<LuChevronsRight />}
+              aria-disabled={!table.getCanNextPage()}
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            />
+          </div>
+
+          {/* filters */}
+          <div ref={filterRef} className="flex flex-wrap items-center gap-4">
+            {/* per page */}
+            <SelectSingle
+              label="Rows"
+              options={perPageOptions}
+              value={perPage}
+              onChange={(option) => {
+                const number = Number(option) as PerPage;
+                setPerPage(number);
+                table.setPageSize(number);
+                preserveScroll(filterRef.current);
               }}
             />
-          </Tooltip>
-          <Button
-            design="hollow"
-            size="compact"
-            tooltip="Next page"
-            icon={<LuChevronRight />}
-            aria-disabled={!table.getCanNextPage()}
-            onClick={table.nextPage}
+            {/* visible columns */}
+            <SelectMulti
+              label="Cols"
+              options={visibleOptions}
+              value={visibleCols}
+              onChange={setVisibleCols}
+            />
+          </div>
+
+          {/* table-wide search */}
+          <TextBox
+            placeholder="Search"
+            tooltip="Search entire table (regex)"
+            icon={<LuSearch />}
+            value={search}
+            onChange={setSearch}
           />
-          <Button
-            design="hollow"
-            size="compact"
-            tooltip="Last page"
-            icon={<LuChevronsRight />}
-            aria-disabled={!table.getCanNextPage()}
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-          />
+
+          {/* actions */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* clear filters */}
+            <Button
+              icon={<LuFilterX />}
+              design="hollow"
+              tooltip="Clear all filters"
+              onClick={() => {
+                table.resetColumnFilters();
+                setSearch("");
+              }}
+            />
+            {/* download */}
+            <Button
+              design="hollow"
+              icon={<LuDownload />}
+              tooltip="Download table data as .csv"
+              onClick={() => {
+                /** get col defs that are visible */
+                const defs = visibleCols.map(
+                  (visible) => cols[Number(visible)]!,
+                );
+
+                /** visible keys */
+                const keys = defs.map((def) => def.key);
+
+                /** visible names */
+                const names = defs.map((def) => def.name);
+
+                /** filtered row data */
+                const data = table
+                  .getFilteredRowModel()
+                  .rows.map((row) => Object.values(pick(row.original, keys)));
+
+                /** download */
+                downloadCsv([names, ...data], [...filename, "table"]);
+              }}
+            />
+            {/* expand/collapse */}
+            <Button
+              icon={expanded ? <Collapse /> : <Expand />}
+              design="hollow"
+              tooltip={expanded ? "Collapse table" : "Expand table"}
+              onClick={() => setExpanded(!expanded)}
+            />
+          </div>
         </div>
-
-        {/* filters */}
-        <div ref={filterRef} className="flex flex-wrap items-center gap-4">
-          {/* per page */}
-          <SelectSingle
-            label="Rows"
-            options={perPageOptions}
-            value={perPage}
-            onChange={(option) => {
-              const number = Number(option) as PerPage;
-              setPerPage(number);
-              table.setPageSize(number);
-              preserveScroll(filterRef.current);
-            }}
-          />
-          {/* visible columns */}
-          <SelectMulti
-            label="Cols"
-            options={visibleOptions}
-            value={visibleCols}
-            onChange={setVisibleCols}
-          />
-        </div>
-
-        {/* table-wide search */}
-        <TextBox
-          placeholder="Search"
-          tooltip="Search entire table (regex)"
-          icon={<LuSearch />}
-          value={search}
-          onChange={setSearch}
-        />
-
-        {/* actions */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* clear filters */}
-          <Button
-            icon={<LuFilterX />}
-            design="hollow"
-            tooltip="Clear all filters"
-            onClick={() => {
-              table.resetColumnFilters();
-              setSearch("");
-            }}
-          />
-          {/* download */}
-          <Button
-            design="hollow"
-            icon={<LuDownload />}
-            tooltip="Download table data as .csv"
-            onClick={() => {
-              /** get col defs that are visible */
-              const defs = visibleCols.map((visible) => cols[Number(visible)]!);
-
-              /** visible keys */
-              const keys = defs.map((def) => def.key);
-
-              /** visible names */
-              const names = defs.map((def) => def.name);
-
-              /** filtered row data */
-              const data = table
-                .getFilteredRowModel()
-                .rows.map((row) => Object.values(pick(row.original, keys)));
-
-              /** download */
-              downloadCsv([names, ...data], [...filename, "table"]);
-            }}
-          />
-          {/* expand/collapse */}
-          <Button
-            icon={expanded ? <Collapse /> : <Expand />}
-            design="hollow"
-            tooltip={expanded ? "Collapse table" : "Expand table"}
-            onClick={() => setExpanded(!expanded)}
-          />
-        </div>
-      </div>
+      )}
     </div>
   );
 };

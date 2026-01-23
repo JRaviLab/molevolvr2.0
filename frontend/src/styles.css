@@ -107,7 +107,7 @@
   h2,
   h3,
   h4 {
-    @apply text-deep flex w-full items-center gap-[0.75em] font-sans leading-none;
+    @apply flex w-full items-center gap-[0.75em] leading-normal font-medium;
   }
 
   h1 {
@@ -115,15 +115,15 @@
   }
 
   h2 {
-    @apply justify-center text-center text-2xl font-normal tracking-wider uppercase;
+    @apply justify-center text-center text-2xl tracking-wider uppercase;
   }
 
   h3 {
-    @apply text-xl font-normal tracking-wide;
+    @apply text-xl tracking-wide;
   }
 
   h4 {
-    @apply text-lg font-normal tracking-wide;
+    @apply text-lg tracking-wide;
   }
 
   hr {
@@ -137,7 +137,6 @@
 
   p {
     @apply leading-loose;
-    /* text-box: trim-both cap alphabetic; */
   }
 
   p a {
@@ -190,7 +189,7 @@
   }
 
   dl {
-    @apply grid grid-cols-[repeat(var(--cols),auto)] [--cols:2] max-w-max leading-normal gap-x-4 gap-y-2;
+    @apply grid max-w-max grid-cols-[repeat(var(--cols),auto)] gap-x-4 gap-y-2 leading-normal [--cols:2];
   }
 
   dt {
@@ -199,7 +198,7 @@
 
   dd {
     &:empty {
-      @apply before:content-['-'] before:text-gray;
+      @apply before:text-gray before:content-['-'];
     }
   }
 

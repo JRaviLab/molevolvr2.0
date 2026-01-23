@@ -411,6 +411,7 @@ const About = () => {
             },
           ]}
           rows={team}
+          showControls={false}
         />
 
         <Heading level={3}>Funding</Heading>
