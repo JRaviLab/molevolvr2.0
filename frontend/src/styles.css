@@ -28,11 +28,10 @@
   --content: --spacing(300);
 
   --radius: 5px;
-  --shadow-sm: 0 0 0 var(--color-shadow), 0 0 5px var(--color-shadow);
-  --shadow: 0 0 5px var(--color-shadow), 0 0 10px var(--color-shadow);
-  --shadow-lg:
-    0 0 5px var(--color-shadow), 0 0 10px var(--color-shadow),
-    0 0 15px var(--color-shadow);
+  --shadow-sm: 0 0 2px var(--color-shadow), 0 2px 5px var(--color-shadow);
+  --shadow-md:
+    0 0 5px var(--color-shadow), 0 1px 10px var(--color-shadow),
+    0 2px 15px var(--color-shadow);
   --shadow-overlay: 0 0 0 9999px var(--color-overlay);
 
   --font-weight-*: initial;

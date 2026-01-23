@@ -9,7 +9,7 @@ const { VITE_EMAIL, VITE_LAB_NAME, VITE_LAB_WEBSITE, VITE_LAB_GITHUB } =
 const Footer = () => (
   <footer
     className="
-      z-10 flex flex-col items-center gap-2 bg-deep p-6 text-white shadow-lg
+      z-10 flex flex-col items-center gap-2 bg-deep p-6 text-white shadow-md
       max-md:p-2
     "
   >

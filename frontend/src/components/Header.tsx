@@ -43,7 +43,7 @@ const Header = () => {
       ref={ref}
       className="
         sticky top-0 z-10 flex flex-wrap items-center justify-between gap-8
-        bg-deep p-4 text-white shadow-lg
+        bg-deep p-4 text-white shadow-md
         max-md:p-2
       "
     >

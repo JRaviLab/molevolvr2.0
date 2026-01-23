@@ -296,7 +296,7 @@ const Table = <Datum extends object>({
         expanded ? "w-[calc(100dvw---spacing(40))]" : "max-w-full",
       )}
     >
-      <div className="max-w-full overflow-x-auto rounded-md shadow-md">
+      <div className="max-w-full overflow-x-auto rounded-md shadow-sm">
         {/* table */}
         <table
           className="w-full max-w-[min(max-content,var(--content))]"
