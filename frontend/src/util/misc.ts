@@ -3,7 +3,7 @@ export const sleep = async (ms = 0) =>
   new Promise((resolve) => window.setTimeout(resolve, ms));
 
 /** now shorthand */
-export const now = () => window.performance.now();
+const now = () => window.performance.now();
 
 /** wait for func to return, checking periodically */
 export const waitFor = async <Return>(

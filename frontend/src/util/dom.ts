@@ -23,24 +23,6 @@ export const getTheme = (): Theme => {
   );
 };
 
-/** scroll to element, optionally by selector */
-export const scrollTo = async (
-  selector?: string | Element | null,
-  options: ScrollIntoViewOptions = { behavior: "smooth" },
-) => {
-  if (!selector) return;
-
-  /** wait for element to appear */
-  const element =
-    typeof selector === "string"
-      ? await waitFor(() => document.querySelector(selector))
-      : selector;
-  if (!element) return;
-
-  /** scroll to element */
-  elementOrSection(element).scrollIntoView(options);
-};
-
 /** get text content of react node */
 export const renderText = (node: ReactNode) =>
   /** map all children to text */
@@ -61,21 +43,6 @@ export const renderText = (node: ReactNode) =>
  * render/lifecycle (could be worked around by making it async, but then using
  * this function in situ becomes much more of pain).
  */
-
-/** find index of first element "in view". model behavior off of wikiwand.com. */
-export const firstInView = (elements: HTMLElement[]) => {
-  const offset = parseInt(
-    window.getComputedStyle(document.documentElement).scrollPaddingTop,
-  );
-  for (let index = elements.length - 1; index >= 0; index--)
-    if (
-      elementOrSection(elements[index]!).getBoundingClientRect()?.top <
-      offset + 5
-    )
-      return index;
-
-  return 0;
-};
 
 /** shrink width to wrapped text https://stackoverflow.com/questions/14596213 */
 export const shrinkWrap = (
@@ -135,24 +102,11 @@ export const isCovering = (
   return false;
 };
 
-/** get svg scale factor */
-export const getSvgTransform = (svg: SVGSVGElement) => {
-  /** convert to svg coords */
-  const matrix = (svg.getScreenCTM() || new SVGMatrix()).inverse();
-  /** https://www.w3.org/TR/css-transforms-1/#decomposing-a-2d-matrix */
-  return {
-    w: Math.sqrt(matrix.a ** 2 + matrix.b ** 2),
-    h: Math.sqrt(matrix.c ** 2 + matrix.d ** 2),
-  };
-};
-
 /** get bounding box of svg contents */
 export const getViewBoxFit = (svg: SVGGraphicsElement) => {
   const { x, y, width, height } = svg.getBBox();
   return { x, y, w: width, h: height };
 };
-
-export type ViewBox = ReturnType<typeof getViewBoxFit>;
 
 /** scroll page so that mouse stays at same position in document */
 export const preserveScroll = async (element: Element) => {
@@ -204,20 +158,80 @@ export const getDocBbox = (element: Element) => {
   };
 };
 
+/** scroll to element */
+export const scrollTo = async (
+  element: Element | null | undefined,
+  options: ScrollIntoViewOptions = { behavior: "smooth" },
+) => {
+  if (!element) return;
+  /** scroll to element */
+  elementOrSection(element).scrollIntoView(options);
+};
+
+/** scroll to element by selector */
+export const scrollToSelector = async (
+  selector: string,
+  options: ScrollIntoViewOptions = { behavior: "smooth" },
+) => {
+  if (!validSelector(selector)) return;
+  if (!selector) return;
+
+  /** get element */
+  const element = await waitFor(() => document.querySelector(selector));
+  if (!element) return;
+
+  /** scroll to element */
+  scrollTo(element, options);
+};
+
+/** find index of first element "in view". model behavior off of wikiwand.com. */
+export const firstInView = (elements: HTMLElement[]) => {
+  const offset = parseInt(
+    window.getComputedStyle(document.documentElement).scrollPaddingTop,
+  );
+  for (let index = elements.length - 1; index >= 0; index--)
+    if (
+      elementOrSection(elements[index]!).getBoundingClientRect()?.top <
+      offset + 5
+    )
+      return index;
+
+  return 0;
+};
+
 /** glow element */
-export const glow = (element: Element) =>
+export const glow = (element: Element) => {
+  console.log("hi");
   elementOrSection(element).animate(
     [
-      { boxShadow: "inset 0 0 40px var(--accent)", offset: 0 },
-      { boxShadow: "inset 0 0 40px transparent", offset: 1 },
+      {
+        boxShadow: "inset 0 0 40px var(--color-accent)",
+        offset: 0,
+      },
+      {
+        boxShadow: "inset 0 0 40px transparent",
+        offset: 1,
+      },
     ],
     { duration: 2000 },
   );
+};
 
 /** if element is first child of section, change element to section itself */
-export const elementOrSection = <El extends Element>(element: El) => {
-  const parent = element.parentElement;
-  return parent && element.matches("section > :first-child")
-    ? (parent as HTMLElement)
+const elementOrSection = <El extends Element>(element: El) => {
+  const section = element.closest("section");
+  return section &&
+    element.matches("section > :first-child, section > :first-child *")
+    ? section
     : element;
+};
+
+export const validSelector = (selector: unknown) => {
+  if (typeof selector !== "string") return false;
+  try {
+    document.querySelector(selector);
+    return true;
+  } catch (e) {
+    return false;
+  }
 };

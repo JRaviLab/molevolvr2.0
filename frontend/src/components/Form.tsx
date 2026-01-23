@@ -18,7 +18,16 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
   /** unique id to link form and controls */
   const id = useId();
 
-  usePreventImplicitSubmit();
+  /** prevent implicit form submit from pressing enter on input */
+  useEventListener("keydown", (event) => {
+    if (
+      event.key === "Enter" &&
+      event.target instanceof Element &&
+      event.target.matches("input")
+    )
+      /** prevent submit */
+      event.preventDefault();
+  });
 
   return (
     <>
@@ -33,8 +42,14 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
           onSubmit={(event) => {
             /** prevent page navigation */
             event.preventDefault();
-            /** call callback */
-            onSubmit();
+
+            /** only submit if triggered by a submit button */
+            if (
+              event.nativeEvent instanceof SubmitEvent &&
+              event.nativeEvent.submitter?.matches("button[type='submit']")
+            )
+              /** call callback */
+              onSubmit();
           }}
           {...props}
         />,
@@ -45,29 +60,3 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
 };
 
 export default Form;
-
-/** prevent implicit form submit */
-const usePreventImplicitSubmit = () => {
-  useEventListener("keydown", (event) => {
-    const { key, target } = event;
-    /** only on enter key */
-    if (key !== "Enter") return;
-    /** only on elements */
-    if (!(target instanceof Element)) return;
-    /** only on inputs */
-    if (!target.matches("input")) return;
-    /** only on submit button */
-    if (target.matches("button[type='submit']")) return;
-    /** prevent submit */
-    event.preventDefault();
-  });
-  useEventListener("click", (event) => {
-    const { target } = event;
-    /** only on elements */
-    if (!(target instanceof Element)) return;
-    /** only on submit button */
-    if (target.matches("button[type='submit']")) return;
-    /** prevent submit */
-    event.preventDefault();
-  });
-};

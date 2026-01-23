@@ -39,7 +39,7 @@ type Props = {
   svgProps?: ComponentProps<"svg">;
 };
 
-export type ChildrenProps = {
+type ChildrenProps = {
   /** chart container width */
   width: number;
   /** available (usually page) width */

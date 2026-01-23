@@ -33,14 +33,14 @@ const CheckBox = ({ label, tooltip, value, onChange, required }: Props) => {
       <input
         type="checkbox"
         className="sr-only"
+        form={form}
+        required={required}
         checked={value}
         onChange={(event) => {
           const value = event.currentTarget.checked;
           preserveScroll(event.currentTarget);
           onChange(value);
         }}
-        form={form}
-        required={required}
       />
       {value ? (
         <LuSquareCheck

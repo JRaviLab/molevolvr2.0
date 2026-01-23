@@ -44,7 +44,7 @@ export const Gradient = ({
 
 /** a few pretty color gradient options */
 /** from https://d3js.org/d3-scale-chromatic */
-export const gradients = [
+const gradients = [
   "interpolateRdPu",
   "interpolatePuBuGn",
   "interpolatePuBu",

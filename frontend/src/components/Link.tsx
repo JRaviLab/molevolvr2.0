@@ -122,4 +122,4 @@ export const mergeTo = (a: To, b: To) => {
 };
 
 /** merge state entries */
-export const mergeState = (a: object = {}, b: object = {}) => ({ ...a, ...b });
+const mergeState = (a: object = {}, b: object = {}) => ({ ...a, ...b });

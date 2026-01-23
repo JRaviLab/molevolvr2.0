@@ -12,7 +12,7 @@ import TextBox from "@/components/TextBox";
 import { toast } from "@/components/Toasts";
 import analyses from "../../fixtures/analyses.json";
 
-export const storageKey = "history";
+const storageKey = "history";
 
 const LoadAnalysis = () => {
   const navigate = useNavigate();

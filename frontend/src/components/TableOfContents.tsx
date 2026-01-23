@@ -10,7 +10,12 @@ import Button from "@/components/Button";
 import { headingsAtom } from "@/components/Heading";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
-import { firstInView, isCovering, scrollTo } from "@/util/dom";
+import {
+  firstInView,
+  isCovering,
+  scrollTo,
+  scrollToSelector,
+} from "@/util/dom";
 import { useChanged } from "@/util/hooks";
 import { sleep } from "@/util/misc";
 
@@ -68,10 +73,7 @@ const TableOfContents = () => {
       /** prevent jitter when pinch-zoomed in */
       if (window.visualViewport?.scale === 1)
         /** scroll active toc item into view */
-        scrollTo(activeRef.current ?? listRef.current?.firstElementChild, {
-          behavior: "instant",
-          block: "center",
-        });
+        scrollTo(activeRef.current, { behavior: "instant", block: "center" });
     }
   });
 
@@ -129,7 +131,7 @@ const TableOfContents = () => {
               data-active={active === index}
               to={{ hash: "#" + id }}
               replace
-              onClick={() => scrollTo("#" + id)}
+              onClick={() => scrollToSelector("#" + id)}
             >
               {icon && <span className="flex text-deep-light">{icon}</span>}
               <span className="grow truncate py-1">{text}</span>

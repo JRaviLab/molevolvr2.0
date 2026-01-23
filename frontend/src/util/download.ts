@@ -45,7 +45,7 @@ const download = (
 };
 
 /** make url from blob */
-export const getUrl = (
+const getUrl = (
   /** blob data to download */
   data: BlobPart,
   /** mime type */

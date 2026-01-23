@@ -26,7 +26,7 @@ import NotFound from "@/pages/NotFound";
 import Testbed from "@/pages/Testbed";
 import { getDocBbox, glow, scrollTo } from "@/util/dom";
 import { useChanged } from "@/util/hooks";
-import { sleep, waitFor, waitForStable } from "@/util/misc";
+import { waitFor, waitForStable } from "@/util/misc";
 import { redirectPath, redirectState } from "@/util/url";
 
 /** app entrypoint */
@@ -39,11 +39,14 @@ const Layout = () => {
   /** current route info */
   const { hash, pathname, search } = useLocation();
 
-  /** which parts of route have changed from prev render */
+  /** did any key part of url change */
+  const changed = useChanged({ pathname, search, hash });
+  /** did hash change */
   const hashChanged = useChanged(hash);
-  const restChanged = useChanged({ pathname, search });
 
-  scrollToHash(hash, hashChanged, restChanged);
+  if (changed)
+    /** if just hash changed, scroll immediately. else, wait for layout shifts */
+    scrollToHash(hash, hashChanged);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -64,7 +67,7 @@ const Layout = () => {
 };
 
 /** route definitions */
-export const routes = [
+const routes = [
   {
     path: "/",
     element: <Layout />,
@@ -117,36 +120,19 @@ const router = createBrowserRouter(routes, {
 });
 
 /** query client */
-export const queryClient = new QueryClient();
+const queryClient = new QueryClient();
 
 /** scroll to target of url hash on page */
-const scrollToHash = async (
-  hash: string,
-  hashChanged: boolean,
-  restChanged: boolean,
-) => {
+const scrollToHash = async (hash: string, waitForLayoutShift = true) => {
   if (!hash) return;
-  if (!hashChanged) return;
 
   /** wait for element to appear */
   const element = await waitFor(() => document.querySelector(hash));
   if (!element) return;
 
-  /**
-   * if not just hash changed (indicating we may be on first load of page or
-   * otherwise expecting significant layout changes)
-   */
-  if (restChanged) {
-    /** wait for layout shifts to stabilize */
-    await waitForStable(() => getDocBbox(element).top);
-    /** scroll down a bit to trigger small header */
-    window.scrollBy(0, 100);
-    await sleep();
-  }
+  /** wait for layout shifts to stabilize */
+  if (waitForLayoutShift) await waitForStable(() => getDocBbox(element).top);
 
-  /** scroll to element */
-  scrollTo(hash);
-
-  /** highlight element */
+  scrollTo(element);
   glow(element);
 };

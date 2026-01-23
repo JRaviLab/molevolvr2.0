@@ -92,7 +92,7 @@ const Heading = ({
   });
 
   return (
-    <Link to={"#" + id} className={clsx("w-full", className)}>
+    <Link to={"#" + id} className={clsx("[&:hover_*]:text-accent", className)}>
       <Tag id={id} ref={ref}>
         {iconElement}
         {children}
