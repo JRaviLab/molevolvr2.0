@@ -330,7 +330,9 @@ const SectionLegend = () => {
 
       <div
         ref={ref}
-        className="w-100 resize overflow-auto rounded-sm p-4 shadow-sm"
+        className="
+          w-100 max-w-full resize overflow-auto rounded-sm p-4 shadow-sm
+        "
       >
         <Legend entries={entries} x={0} y={0} w={width} />
       </div>
@@ -485,12 +487,7 @@ const SectionTextBox = () => {
         Text Box
       </Heading>
 
-      <div
-        className="
-          grid w-full grid-cols-2 gap-8
-          max-md:grid-cols-1
-        "
-      >
+      <div className="flex flex-wrap items-start gap-8">
         <TextBox
           label="Label"
           tooltip="Tooltip"
@@ -499,24 +496,6 @@ const SectionTextBox = () => {
           onChange={setValue}
         />
         <TextBox
-          label="Label"
-          tooltip="Tooltip"
-          placeholder="Search"
-          multi
-          icon={<LuSearch />}
-          value={value}
-          onChange={setValue}
-        />
-        <TextBox
-          layout="horizontal"
-          label="Label"
-          tooltip="Tooltip"
-          placeholder="Search"
-          value={value}
-          onChange={setValue}
-        />
-        <TextBox
-          layout="horizontal"
           label="Label"
           tooltip="Tooltip"
           placeholder="Search"
@@ -562,7 +541,7 @@ const SectionSelect = () => {
         Select
       </Heading>
 
-      <div className="flex gap-8">
+      <div className="flex flex-wrap items-start gap-8">
         <SelectSingle
           label="Single"
           tooltip="Tooltip"
@@ -571,7 +550,6 @@ const SectionSelect = () => {
           onChange={setSingleValue}
         />
         <SelectMulti
-          layout="horizontal"
           label="Multi"
           tooltip="Tooltip"
           options={multiOptions}
@@ -612,7 +590,7 @@ const SectionSlider = () => {
         Slider
       </Heading>
 
-      <div className="flex gap-8">
+      <div className="flex flex-wrap items-start gap-8">
         <Slider
           label="Single"
           tooltip="Tooltip"
@@ -623,7 +601,6 @@ const SectionSlider = () => {
           onChange={setSingleValue}
         />
         <Slider
-          layout="horizontal"
           label="Range"
           tooltip="Tooltip"
           multi
@@ -647,7 +624,7 @@ const SectionNumberBox = () => {
         Number Box
       </Heading>
 
-      <div className="flex gap-8">
+      <div className="flex flex-wrap items-start gap-8">
         <NumberBox
           label="Vertical"
           tooltip="Tooltip"
@@ -658,7 +635,6 @@ const SectionNumberBox = () => {
           onChange={setValue}
         />
         <NumberBox
-          layout="horizontal"
           label="Horizontal"
           tooltip="Tooltip"
           min={-10000}
@@ -714,7 +690,7 @@ const SectionAgo = () => (
       Ago
     </Heading>
 
-    <div className="flex gap-8">
+    <div className="flex flex-wrap items-start gap-8">
       <Ago date={new Date()} />
       <Ago date="Nov 12 2023" />
       <Ago date="Jun 1 2020" />
@@ -780,7 +756,7 @@ const SectionToast = () => (
       Toast
     </Heading>
 
-    <div className="flex gap-8">
+    <div className="flex flex-wrap items-start gap-8">
       <Button
         text="Unique Toast"
         onClick={() =>
@@ -825,7 +801,7 @@ const SectionTile = () => (
       Tile
     </Heading>
 
-    <div className="flex gap-8">
+    <div className="flex flex-wrap items-start gap-8">
       <Tile
         icon={<LuHourglass />}
         primary={formatNumber(1234)}
@@ -879,7 +855,7 @@ const SectionTooltip = () => (
       Tooltip
     </Heading>
 
-    <div className="flex gap-8">
+    <div className="flex flex-wrap items-start gap-8">
       <Tooltip content="Minimal, non-interactive help or contextual info">
         <span className="text-tooltip" tabIndex={0} role="button">
           Plain content
@@ -916,7 +892,6 @@ const SectionPopover = () => (
           </p>
           <Button text="Save" />
           <SelectSingle
-            layout="horizontal"
             label="Select"
             options={
               [
@@ -1019,7 +994,6 @@ const SectionDialog = () => (
       bottomContent={(close) => (
         <>
           <SelectSingle
-            layout="horizontal"
             label="Select"
             options={
               [

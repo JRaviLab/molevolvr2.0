@@ -8,15 +8,13 @@ import {
   NumberField,
 } from "react-aria-components";
 import { LuMinus, LuPlus } from "react-icons/lu";
-import clsx from "clsx";
+import { useElementSize } from "@reactuses/core";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { isFirefox } from "@/util/browser";
 import { preserveScroll } from "@/util/dom";
 
 type Props = {
-  /** layout of label and control */
-  layout?: "vertical" | "horizontal";
   /** label content */
   label: ReactNode;
   /** tooltip on help icon */
@@ -35,7 +33,6 @@ type Props = {
 
 /** number input box. use for numeric values that need precise adjustment. */
 const NumberBox = ({
-  layout = "vertical",
   label,
   tooltip,
   min = 0,
@@ -45,6 +42,8 @@ const NumberBox = ({
   onChange,
 }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
+  const group = useRef<HTMLDivElement>(null);
+  const [, height] = useElementSize(group, { box: "border-box" });
 
   /** link to parent form component */
   const form = useForm();
@@ -52,11 +51,7 @@ const NumberBox = ({
   return (
     <NumberField
       ref={ref}
-      className={clsx(
-        "flex gap-4",
-        layout === "horizontal" && "items-center",
-        layout === "vertical" && "flex-col items-start",
-      )}
+      className="contents"
       minValue={min}
       maxValue={max}
       step={step}
@@ -69,12 +64,16 @@ const NumberBox = ({
     >
       {({ state }) => (
         <>
-          <Label className="flex items-center gap-1">
+          <Label
+            className="flex items-center gap-1"
+            style={{ minHeight: height }}
+          >
             {label}
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
           <Group
+            ref={group}
             className="
               flex border-b-2 border-current text-accent
               hover:text-deep
@@ -85,9 +84,7 @@ const NumberBox = ({
             </Button>
             {/* Poppins unfortunately doesn't support tabular nums */}
             <Input
-              className="
-                field-sizing-content grow px-2 py-1 text-center font-mono
-              "
+              className="field-sizing-content px-2 py-1 text-center font-mono"
               form={form}
               onBlurCapture={(event) => {
                 /** https://github.com/adobe/react-spectrum/discussions/6261 */

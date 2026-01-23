@@ -191,9 +191,11 @@ const Chart = ({
 
       {/* reset handle */}
       <div
+        /* eslint-disable better-tailwindcss/no-unknown-classes */
         className="
           reset-handle sticky right-2 bottom-2 hidden size-0 place-self-end
         "
+        /* eslint-enable better-tailwindcss/no-unknown-classes */
       >
         <Tooltip content="Reset size">
           <button

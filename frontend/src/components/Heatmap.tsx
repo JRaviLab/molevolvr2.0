@@ -117,7 +117,6 @@ const Heatmap = ({
           <SelectSingle
             label="Gradient"
             options={gradientOptions(reverse)}
-            layout="horizontal"
             value={gradient}
             onChange={setGradient}
           />

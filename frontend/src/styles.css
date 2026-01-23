@@ -95,7 +95,7 @@
   }
 
   section {
-    @apply even:bg-alt-white relative z-0 flex flex-col items-center gap-12 bg-white px-[max(var(--pad),(100%-var(--content))/2)] py-(--pad) [--pad:--spacing(12)] max-md:[--pad:--spacing(8)] max-sm:[--pad:--spacing(4)];
+    @apply even:bg-alt-white relative z-0 flex flex-col items-center gap-12 bg-white px-[max(var(--pad),(100%-var(--content))/2)] py-(--pad) [--pad:--spacing(12)] max-md:[--pad:--spacing(8)];
   }
 
   h1,
@@ -164,15 +164,15 @@
   }
 
   label {
-    @apply flex cursor-pointer items-center gap-2 rounded;
+    @apply flex cursor-pointer items-center gap-2 rounded leading-normal;
   }
 
   input {
-    @apply min-w-0;
+    @apply min-w-0 leading-normal;
   }
 
   textarea {
-    @apply min-w-0;
+    @apply min-w-0 leading-normal;
   }
 
   pre {
@@ -261,4 +261,10 @@
 
 @utility text-tooltip {
   @apply text-dark-gray cursor-help underline decoration-dashed;
+}
+
+@custom-variant child {
+  & .child {
+    @slot;
+  }
 }

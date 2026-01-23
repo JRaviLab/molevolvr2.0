@@ -243,7 +243,6 @@ const NewAnalysis = () => {
             <div className="flex flex-col gap-4">
               <SelectSingle
                 label="What format is your input in?"
-                layout="vertical"
                 options={inputFormats[inputType]}
                 value={inputFormat}
                 onChange={(value) => {

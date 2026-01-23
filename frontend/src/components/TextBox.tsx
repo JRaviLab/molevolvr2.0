@@ -2,7 +2,6 @@ import { useId, useRef } from "react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { FaRegCopy, FaXmark } from "react-icons/fa6";
 import { useElementBounding } from "@reactuses/core";
-import clsx from "clsx";
 import Asterisk from "@/components/Asterisk";
 import Button from "@/components/Button";
 import { useForm } from "@/components/Form";
@@ -10,24 +9,21 @@ import Help from "@/components/Help";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
 
-type Props = Base & (Single | Multi);
+type Props = Base & (Single | Multi) & Description;
 
 type Base = {
-  /** layout of label and control */
-  layout?: "vertical" | "horizontal";
-  /** label content */
-  label?: ReactNode;
-  /** tooltip on help icon */
-  tooltip?: ReactNode;
   /** hint icon to show on side */
   icon?: ReactElement;
   /** text state */
   value: string;
   /** on text state change */
   onChange: (value: string) => void;
-  /** class on textbox */
-  className?: string;
 };
+
+type Description =
+  /** require label and/or tooltip for accessibility */
+  | { label: ReactNode; tooltip?: ReactNode }
+  | { label?: ReactNode; tooltip: ReactNode };
 
 type Single = {
   /** single line */
@@ -47,20 +43,21 @@ type Multi = {
 
 /** single or multi-line text input box */
 const TextBox = ({
-  layout = "vertical",
   label,
   tooltip,
   multi,
   icon,
   value,
   onChange,
-  className,
   ...props
 }: Props) => {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
   const sideRef = useRef<HTMLDivElement>(null);
 
-  /** unique id for component instance */
+  /** link to parent form component */
+  const form = useForm();
+
+  /** unique id for field */
   const id = useId();
 
   /** side elements */
@@ -98,17 +95,14 @@ const TextBox = ({
   /** extra padding needed for side element */
   const sidePadding = useElementBounding(sideRef).width;
 
-  /** link to parent form component */
-  const form = useForm();
-
   /** input field */
   const input = multi ? (
     <textarea
       ref={ref}
       id={id}
       className="
-        min-h-[4lh] grow resize rounded-sm border-2 border-off-white bg-white
-        p-2
+        min-h-[calc(var(--leading-normal)*3em+--spacing(4)+4px)] grow resize
+        rounded-sm border-2 border-off-white bg-white p-2
         hover:border-accent
       "
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
@@ -134,16 +128,15 @@ const TextBox = ({
   );
 
   return (
-    <div
-      className={clsx(
-        "flex max-w-full grow gap-4",
-        layout === "horizontal" && "items-center",
-        layout === "vertical" && "flex-col",
-        className,
-      )}
-    >
+    <>
       {(label || props.required) && (
-        <label className="flex items-center gap-1" htmlFor={id}>
+        <label
+          className="
+            flex min-h-[calc(var(--leading-normal)*1em+--spacing(4)+4px)]
+            items-center gap-1
+          "
+          htmlFor={id}
+        >
           {label}
           {tooltip && <Help tooltip={tooltip} />}
           {props.required && <Asterisk />}
@@ -152,15 +145,14 @@ const TextBox = ({
 
       {/* if no label but need tooltip, put it around input */}
       <Tooltip content={!label && tooltip ? tooltip : undefined}>
-        <div className="relative flex min-w-0 grow items-start">
+        <div className="relative flex items-start">
           {input}
 
           {/* side element */}
           <div
             ref={sideRef}
             className="
-              absolute top-1.5 right-1.5 bottom-1.5 flex items-start
-              text-dark-gray
+              absolute inset-y-1.5 right-1.5 flex items-start text-dark-gray
               *:size-8
             "
           >
@@ -168,7 +160,7 @@ const TextBox = ({
           </div>
         </div>
       </Tooltip>
-    </div>
+    </>
   );
 };
 

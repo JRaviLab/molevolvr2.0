@@ -478,7 +478,6 @@ const Table = <Datum extends object>({
           {/* per page */}
           <SelectSingle
             label="Rows"
-            layout="horizontal"
             options={perPageOptions}
             value={defaultPerPage}
             onChange={(option) => {
@@ -488,7 +487,6 @@ const Table = <Datum extends object>({
           {/* visible columns */}
           <SelectMulti
             label="Cols"
-            layout="horizontal"
             options={visibleOptions}
             value={visibleCols}
             onChange={setVisibleCols}
@@ -497,7 +495,6 @@ const Table = <Datum extends object>({
 
         {/* table-wide search */}
         <TextBox
-          className="max-w-30!"
           placeholder="Search"
           tooltip="Search entire table for plain text or regex"
           icon={<LuSearch />}

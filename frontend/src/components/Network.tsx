@@ -714,7 +714,6 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
         <div className="flex flex-wrap items-center gap-2">
           <Slider
             label="Max Nodes"
-            layout="horizontal"
             min={1}
             max={100}
             step={1}
@@ -723,7 +722,6 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
           />
           <SelectSingle
             label="Layout"
-            layout="horizontal"
             options={layoutOptions}
             value={selectedLayout}
             onChange={setSelectedLayout}

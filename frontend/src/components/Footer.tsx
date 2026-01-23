@@ -10,6 +10,7 @@ const Footer = () => (
   <footer
     className="
       z-10 flex flex-col items-center gap-2 bg-deep p-6 text-white shadow-lg
+      max-md:p-2
     "
   >
     <div

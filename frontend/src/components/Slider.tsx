@@ -1,11 +1,11 @@
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import {
   Label,
   Slider as RACSlider,
   SliderThumb,
   SliderTrack,
 } from "react-aria-components";
-import clsx from "clsx";
+import { useElementSize } from "@reactuses/core";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { formatNumber } from "@/util/string";
@@ -13,8 +13,6 @@ import { formatNumber } from "@/util/string";
 type Props = Base & (Single | Multi);
 
 type Base = {
-  /** layout of label and control */
-  layout?: "vertical" | "horizontal";
   /** label content */
   label: ReactNode;
   /** tooltip on help icon */
@@ -51,7 +49,6 @@ type Multi = {
  */
 const Slider = ({
   label,
-  layout = "vertical",
   tooltip,
   min = 0,
   max = 100,
@@ -60,16 +57,15 @@ const Slider = ({
   value,
   onChange,
 }: Props) => {
+  const track = useRef<HTMLDivElement>(null);
+  const [, height] = useElementSize(track, { box: "border-box" });
+
   /** link to parent form component */
   const form = useForm();
 
   return (
     <RACSlider
-      className={clsx(
-        "group flex gap-4",
-        layout === "horizontal" && "items-center",
-        layout === "vertical" && "flex-col items-start",
-      )}
+      className="contents"
       minValue={min}
       maxValue={max}
       step={Math.min(step, max - min)}
@@ -81,23 +77,28 @@ const Slider = ({
     >
       {({ state }) => (
         <>
-          <Label className="flex items-center gap-1">
+          <Label
+            className="flex items-center gap-1"
+            style={{ minHeight: height }}
+          >
             {label}
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
           <SliderTrack
+            ref={track}
             className="
-              m-2 box-content h-1 min-w-40 cursor-pointer rounded-full bg-gray
-              bg-clip-content p-2 text-accent
+              group mx-2 flex h-9 min-w-40 cursor-pointer items-center
+              rounded-full text-accent
               group-hover:text-deep
             "
           >
-            {/* fill */}
+            {/* bg fill */}
+            <div className="absolute h-1 w-full rounded-full bg-gray" />
+
+            {/* active fill */}
             <div
-              className="
-                absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-current
-              "
+              className="absolute h-1 rounded-full bg-current"
               style={{
                 left: multi ? 100 * state.getThumbPercent(0) + "%" : "",
                 width:
@@ -109,9 +110,10 @@ const Slider = ({
               }}
             />
 
+            {/* min marker */}
             <div
               className="
-                absolute -top-full left-0 -translate-x-1/2 translate-y-1
+                absolute bottom-full left-0 -translate-x-1/2 translate-y-1
                 whitespace-nowrap opacity-0
                 group-focus-within:opacity-50
                 group-hover:opacity-50
@@ -119,9 +121,11 @@ const Slider = ({
             >
               {formatNumber(min, true)}
             </div>
+
+            {/* max marker */}
             <div
               className="
-                absolute -top-full right-0 translate-x-1/2 translate-y-1
+                absolute right-0 bottom-full translate-x-1/2 translate-y-1
                 whitespace-nowrap opacity-0
                 group-focus-within:opacity-50
                 group-hover:opacity-50
@@ -130,6 +134,7 @@ const Slider = ({
               {formatNumber(max, true)}
             </div>
 
+            {/* thumb and marker */}
             {state.values.map((value, index) => (
               <SliderThumb
                 key={index}

@@ -44,6 +44,7 @@ const Header = () => {
       className="
         sticky top-0 z-10 flex flex-wrap items-center justify-between gap-8
         bg-deep p-4 text-white shadow-lg
+        max-md:p-2
       "
     >
       <div className="flex items-center gap-2">

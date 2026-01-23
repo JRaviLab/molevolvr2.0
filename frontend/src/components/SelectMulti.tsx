@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useRef } from "react";
 import type { ReactElement, ReactNode } from "react";
 import { LuCheck, LuChevronDown } from "react-icons/lu";
 import {
@@ -8,13 +8,12 @@ import {
   ListboxOption,
   ListboxOptions,
 } from "@headlessui/react";
+import { useElementSize } from "@reactuses/core";
 import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 
 type Props<O extends Option> = {
-  /** layout of label and control */
-  layout?: "vertical" | "horizontal";
   /** label content */
   label: ReactNode;
   /** tooltip on help icon */
@@ -41,22 +40,20 @@ export type Option<ID = string> = {
 /** multi select box */
 const SelectMulti = <O extends Option>({
   label,
-  layout = "vertical",
   tooltip,
   value,
   onChange,
   options,
 }: Props<O>) => {
+  const button = useRef<HTMLButtonElement>(null);
+  const [, height] = useElementSize(button, { box: "border-box" });
+
   /** link to parent form component */
   const form = useForm();
 
   return (
     <Listbox
-      className={clsx(
-        "flex gap-4",
-        layout === "horizontal" && "items-center",
-        layout === "vertical" && "flex-col items-start",
-      )}
+      className="contents"
       as="div"
       multiple
       value={value}
@@ -84,15 +81,19 @@ const SelectMulti = <O extends Option>({
         return (
           <>
             {/* label */}
-            <Label className="flex items-center gap-1">
+            <Label
+              className="flex items-center gap-1"
+              style={{ minHeight: height }}
+            >
               {label}
               {tooltip && <Help tooltip={tooltip} />}
             </Label>
 
             {/* button */}
             <ListboxButton
+              ref={button}
               className="
-                grow gap-2 border-b-2 border-current p-2 text-accent
+                gap-2 border-b-2 border-current p-2 text-accent
                 hover:text-deep
               "
             >
