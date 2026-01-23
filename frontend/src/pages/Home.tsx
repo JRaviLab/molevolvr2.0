@@ -65,7 +65,7 @@ const Home = () => {
     <>
       <Meta title="Home" />
 
-      <section className="bg-pale narrow">
+      <section className="min-h-100 justify-center bg-pale narrow">
         {!reduceMotion && <Viz />}
 
         <Heading level={1} className="sr-only">
