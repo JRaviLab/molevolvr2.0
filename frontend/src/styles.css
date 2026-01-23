@@ -90,7 +90,7 @@
     @apply flex min-h-dvh flex-col;
   }
 
-  #app {
+  #root {
     @apply contents;
   }
 

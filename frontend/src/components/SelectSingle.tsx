@@ -93,7 +93,9 @@ const SelectSingle = <O extends Option>({
         }}
       >
         {selected?.icon}
-        <span className="grow truncate py-1">{selected?.primary}</span>
+        <span className="grow truncate py-1 leading-none">
+          {selected?.primary}
+        </span>
         <LuChevronDown />
       </ListboxButton>
 
