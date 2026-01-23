@@ -14,7 +14,6 @@ const thresholds = {
   accessibility: 90,
   "best-practices": 85,
   seo: 70,
-  pwa: 0,
 };
 
 const config: Config = {
