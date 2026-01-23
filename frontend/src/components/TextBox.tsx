@@ -2,6 +2,7 @@ import { useId, useRef } from "react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { FaRegCopy, FaXmark } from "react-icons/fa6";
 import { useElementBounding } from "@reactuses/core";
+import type { RequireAtLeastOne } from "type-fest";
 import Asterisk from "@/components/Asterisk";
 import Button from "@/components/Button";
 import { useForm } from "@/components/Form";
@@ -21,25 +22,22 @@ type Base = {
 };
 
 type Description =
-  /** require label and/or tooltip for accessibility */
-  | { label: ReactNode; tooltip?: ReactNode }
-  | { label?: ReactNode; tooltip: ReactNode };
+  /** require some kind of accessible label */
+  RequireAtLeastOne<{
+    label: ReactNode;
+    tooltip: ReactNode;
+    placeholder: string;
+  }>;
 
 type Single = {
   /** single line */
   multi?: false;
-} & Pick<
-  ComponentProps<"input">,
-  "placeholder" | "type" | "autoComplete" | "required"
->;
+} & Pick<ComponentProps<"input">, "type" | "autoComplete" | "required">;
 
 type Multi = {
   /** multi-line */
   multi: true;
-} & Pick<
-  ComponentProps<"textarea">,
-  "placeholder" | "autoComplete" | "required"
->;
+} & Pick<ComponentProps<"textarea">, "autoComplete" | "required">;
 
 /** single or multi-line text input box */
 const TextBox = ({

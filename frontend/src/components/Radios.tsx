@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { ReactElement, ReactNode } from "react";
 import { LuCircle, LuCircleCheckBig } from "react-icons/lu";
 import { useForm } from "@/components/Form";
@@ -43,6 +44,14 @@ const Radios = <O extends Option>({
   /** link to parent form component */
   const form = useForm();
 
+  /** selected option */
+  const selected = options.find((option) => option.id === value);
+
+  /** auto-select first option if needed */
+  useEffect(() => {
+    if (options.length > 0 && !selected) onChange(options[0]!.id);
+  });
+
   return (
     <div role="group" className="flex flex-col items-start gap-4">
       <legend className="flex items-center gap-2">
@@ -70,13 +79,13 @@ const Radios = <O extends Option>({
 
             {/* check mark */}
             {value === option.id ? (
-              <LuCircleCheckBig className="text-accent" />
+              <LuCircleCheckBig className="h-lh w-[1.1em] text-accent" />
             ) : (
-              <LuCircle />
+              <LuCircle className="h-lh w-[1.1em] text-gray" />
             )}
 
             {/* text content */}
-            <div className="flex flex-col items-start gap-4">
+            <div className="flex flex-col items-start gap-2">
               <span>{option.primary}</span>
               {option.secondary && (
                 <span className="text-dark-gray">{option.secondary}</span>

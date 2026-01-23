@@ -14,13 +14,15 @@ const spacing = 20;
 /** radius of points */
 const size = 3;
 /** number of shuffle steps */
-const steps = 10;
+const steps = 8;
 /** max number of grid cells to shuffle by */
 const offset = 5;
 /** shuffle animation duration, in seconds */
 const duration = 1;
 /** pause between shuffles, in seconds */
 const delay = 0.5;
+/** additional hold on last step, in seconds */
+const hold = 3;
 
 /** gsap settings */
 gsap.defaults({ ease: "power1.inOut" });
@@ -78,7 +80,7 @@ const Viz = () => {
   return (
     <canvas
       ref={canvas}
-      className="absolute inset-0 -z-10 size-full place-self-center opacity-5"
+      className="absolute inset-0 -z-10 size-full place-self-center opacity-10"
     />
   );
 };
@@ -237,7 +239,7 @@ const generate = (svgs: string[], onComplete: () => void) => {
           row,
           alpha: stepIndex === steps - 1 ? 0 : 1,
           duration,
-          delay,
+          delay: delay + (stepIndex === 1 ? hold : 0),
         }),
       );
       /** play reversed to create "coming together" effect */
@@ -260,7 +262,11 @@ const generate = (svgs: string[], onComplete: () => void) => {
           duration: delay,
           delay: duration - delay / 2,
         });
-        timeline.to(link, { alpha: 0, duration: delay });
+        timeline.to(link, {
+          alpha: 0,
+          duration: delay,
+          delay: stepIndex === steps - 2 ? hold : 0,
+        });
         /** add to combined timeline */
         combinedTimeline.add(
           timeline,

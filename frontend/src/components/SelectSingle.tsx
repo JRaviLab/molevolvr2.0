@@ -1,4 +1,4 @@
-import { Fragment, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import type { ReactElement, ReactNode } from "react";
 import { LuChevronDown } from "react-icons/lu";
 import { VscCircleFilled } from "react-icons/vsc";
@@ -57,6 +57,11 @@ const SelectSingle = <O extends Option>({
   /** selected option */
   const selected = options.find((option) => option.id === value);
 
+  /** auto-select first option if needed */
+  useEffect(() => {
+    if (options.length > 0 && !selected) onChange(options[0]!.id);
+  });
+
   return (
     <Listbox
       className="contents"
@@ -88,14 +93,12 @@ const SelectSingle = <O extends Option>({
           if (key === "ArrowRight" && index < options.length - 1) index++;
 
           /** new selected index */
-          const selected = options[index]!;
-
-          /** update value */
-          onChange(selected.id);
+          const selected = options[index];
+          if (selected) onChange(selected.id);
         }}
       >
         {selected?.icon}
-        <span className="grow truncate">{selected?.primary}</span>
+        <span className="grow truncate py-1">{selected?.primary}</span>
         <LuChevronDown />
       </ListboxButton>
 

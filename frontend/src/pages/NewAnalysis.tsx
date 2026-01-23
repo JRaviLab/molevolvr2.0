@@ -240,7 +240,7 @@ const NewAnalysis = () => {
               onChange={setInputType}
             />
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col items-start gap-4">
               <SelectSingle
                 label="What format is your input in?"
                 options={inputFormats[inputType]}
@@ -273,34 +273,35 @@ const NewAnalysis = () => {
 
           {/* list input */}
           {inputType === "list" && (
-            <TextBox
-              className="w-full"
-              label={
-                <>
-                  {
-                    inputFormats[inputType].find((i) => i.id === inputFormat)
-                      ?.primary
-                  }{" "}
-                  input
-                  {!isEmpty(stats) && (
-                    <span className="text-dark-gray">
-                      (
-                      {Object.entries(stats)
-                        .map(([key, value]) => `${value} ${startCase(key)}`)
-                        .join(", ")}
-                      )
-                    </span>
-                  )}
-                </>
-              }
-              placeholder={placeholders[inputFormat]
-                .split("\n")
-                .slice(0, 2)
-                .join("\n")}
-              multi
-              value={listInput}
-              onChange={setListInput}
-            />
+            <div className="flex flex-col self-stretch">
+              <TextBox
+                label={
+                  <>
+                    {
+                      inputFormats[inputType].find((i) => i.id === inputFormat)
+                        ?.primary
+                    }{" "}
+                    input
+                    {!isEmpty(stats) && (
+                      <span className="text-dark-gray">
+                        (
+                        {Object.entries(stats)
+                          .map(([key, value]) => `${value} ${startCase(key)}`)
+                          .join(", ")}
+                        )
+                      </span>
+                    )}
+                  </>
+                }
+                placeholder={placeholders[inputFormat]
+                  .split("\n")
+                  .slice(0, 2)
+                  .join("\n")}
+                multi
+                value={listInput}
+                onChange={setListInput}
+              />
+            </div>
           )}
 
           {/* table input */}
@@ -435,34 +436,36 @@ const NewAnalysis = () => {
           />
         </section>
 
-        <section>
+        <section className="narrow">
           <Heading level={2} icon={<LuSend />}>
             Submit
           </Heading>
 
-          <TextBox
-            className="w-140"
-            label="Analysis Name"
-            tooltip="Give your analysis a name to remember it by"
-            placeholder="New Analysis"
-            value={name}
-            onChange={setName}
-          />
+          <div className="flex flex-col self-stretch">
+            <TextBox
+              label="Analysis Name"
+              tooltip="Give your analysis a name to remember it by"
+              placeholder="New Analysis"
+              value={name}
+              onChange={setName}
+            />
+          </div>
 
-          <TextBox
-            className="w-140"
-            label={
-              <>
-                <LuBell /> Email me updates on this analysis
-              </>
-            }
-            placeholder="my-email@xyz.com"
-            tooltip="We can email you when this analysis starts (so you can keep track of it) and when it finishes."
-            value={email || ""}
-            onChange={setEmail}
-          />
+          <div className="flex flex-col self-stretch">
+            <TextBox
+              label={
+                <>
+                  <LuBell /> Email me updates on this analysis
+                </>
+              }
+              placeholder="my-email@xyz.com"
+              tooltip="We can email you when this analysis starts (so you can keep track of it) and when it finishes."
+              value={email || ""}
+              onChange={setEmail}
+            />
+          </div>
 
-          <Alert className="w-140">
+          <Alert>
             An analysis takes <strong>several hours to run</strong>!{" "}
             <Link to="/about" newTab>
               Learn more

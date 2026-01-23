@@ -97,7 +97,7 @@ const SelectMulti = <O extends Option>({
                 hover:text-deep
               "
             >
-              <span className="grow truncate">{selectedLabel}</span>
+              <span className="grow truncate py-1">{selectedLabel}</span>
               <LuChevronDown />
             </ListboxButton>
 

@@ -65,14 +65,14 @@ const Home = () => {
     <>
       <Meta title="Home" />
 
-      <section className="bg-pale">
+      <section className="bg-pale narrow">
         {!reduceMotion && <Viz />}
 
         <Heading level={1} className="sr-only">
           Home
         </Heading>
 
-        <p className="max-w-150 text-center text-xl text-balance">
+        <p className="text-center text-xl text-balance">
           {import.meta.env.VITE_DESCRIPTION}
         </p>
 
