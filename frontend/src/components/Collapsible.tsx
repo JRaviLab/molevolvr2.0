@@ -26,7 +26,6 @@ const Collapsible = ({ title, tooltip, children }: Props) => {
       {/* trigger */}
       <Tooltip content={tooltip}>
         <button
-          type="button"
           className="
             flex items-center gap-2 rounded-md border border-dashed
             border-light-gray p-2 text-accent

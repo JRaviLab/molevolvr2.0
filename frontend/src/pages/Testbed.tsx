@@ -29,6 +29,7 @@ import {
   LuTable,
   LuTableCellsMerge,
   LuTableColumnsSplit,
+  LuTextCursorInput,
   LuType,
   LuWaypoints,
   LuWine,
@@ -42,6 +43,7 @@ import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
 import Collapsible from "@/components/Collapsible";
 import Dialog from "@/components/Dialog";
+import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Heatmap from "@/components/Heatmap";
 import IPR from "@/components/IPR";
@@ -143,6 +145,7 @@ const TestbedPage = () => {
       <SectionTooltip />
       <SectionPopover />
       <SectionDialog />
+      <SectionForm />
     </>
   );
 };
@@ -1029,5 +1032,21 @@ const SectionDialog = () => (
         <Button text="Dialog" />
       </Tooltip>
     </Dialog>
+  </section>
+);
+
+const SectionForm = () => (
+  <section>
+    <Heading level={2} icon={<LuTextCursorInput />}>
+      Form
+    </Heading>
+
+    <Form onSubmit={() => console.info("Form submitted")}>
+      <div className="flex flex-wrap items-center gap-4">
+        <TextBox label="Name" value="Test" onChange={() => null} />
+        <Button text="Button" />
+        <Button text="Submit" type="submit" />
+      </div>
+    </Form>
   </section>
 );

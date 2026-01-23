@@ -98,159 +98,161 @@ const Feedback = () => {
     ]);
 
   return (
-    <Dialog
-      title="Feedback"
-      onChange={(open) => {
-        if (open && (status === "success" || status === "error")) {
-          if (status === "success") {
-            setSubject(null);
-            setFeedback(null);
-          }
-          reset();
-        }
-      }}
-      content={() => (
-        <Form onSubmit={onSubmit}>
-          <div className="grid-layout">
-            <div className="flex flex-col">
-              <TextBox
-                label="Name"
-                placeholder="Your Name"
-                tooltip="Optional. So we know who you are."
-                value={name}
-                onChange={setName}
-              />{" "}
-            </div>
-            <div className="flex flex-col">
-              <TextBox
-                label="GitHub Username"
-                placeholder="@yourname"
-                tooltip="Optional. So we can tag you in the post and you can follow it."
-                value={username}
-                onChange={setUsername}
-              />
-            </div>
-            <div className="flex flex-col">
-              <TextBox
-                label="Email"
-                placeholder="your.name@email.com"
-                tooltip="Optional. So we can contact you directly if needed."
-                value={email}
-                onChange={setEmail}
-              />
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <TextBox
-              label="Subject"
-              placeholder="Subject"
-              value={subject}
-              onChange={setSubject}
-            />
-          </div>
-          <div className="flex flex-col">
-            <TextBox
-              label="Feedback"
-              placeholder="Questions, suggestions, bugs, etc."
-              required
-              multi
-              value={feedback}
-              onChange={setFeedback}
-            />
-          </div>
-
-          <Collapsible title="Debug Info">
-            <dl
-              className="
-                self-center [--cols:6]
-                max-lg:[--cols:4]
-                max-md:[--cols:2]
-              "
-            >
-              {Object.entries(details).map(([key, value]) => (
-                <Fragment key={key}>
-                  <dt>{key}</dt>
-                  <dd>{value}</dd>
-                </Fragment>
-              ))}
-            </dl>
-          </Collapsible>
-
-          <Alert
-            type={
-              status === "pending"
-                ? "loading"
-                : status === "error"
-                  ? "error"
-                  : status === "success"
-                    ? "success"
-                    : "info"
+    <Form onSubmit={onSubmit}>
+      <Dialog
+        title="Feedback"
+        onChange={(open) => {
+          if (open && (status === "success" || status === "error")) {
+            if (status === "success") {
+              setSubject(null);
+              setFeedback(null);
             }
-          >
-            {status === "idle" && (
-              <>
-                Submitting will start a <strong>public post</strong> on{" "}
-                <Link to={VITE_ISSUES}>our GitHub feedback tracker</Link> with{" "}
-                <strong>all of the information above</strong>. You'll get a link
-                to it once it's created.
-              </>
-            )}
-            {status === "pending" && "Submitting feedback"}
-            {status === "error" && (
-              <>
-                Error submitting feedback. Contact us directly:{" "}
-                <Link
-                  to={`mailto:${VITE_EMAIL}?body=${window.encodeURIComponent(body)}`}
-                >
-                  {VITE_EMAIL}
-                </Link>
-                .
-              </>
-            )}
-            {status === "success" && data.link && (
-              <>
-                Submitted feedback!{" "}
-                <Link to={data.link}>{shortenUrl(data.link)}</Link>
-              </>
-            )}
-          </Alert>
-        </Form>
-      )}
-      bottomContent={
-        <>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              text="Screenshot"
-              icon={<LuDownload />}
-              design="hollow"
-              tooltip="Download a screenshot of the current page"
-              onClick={async () => {
-                close();
-                await downloadJpg(document.body, ["screenshot"]);
-                open();
-              }}
-            />
-            <Help
-              tooltip={
-                <div>
-                  This can help us troubleshoot issues. Currently, we can't{" "}
-                  <i>automatically</i> attach a screenshot with your feedback,
-                  so you'll have to download and attach/send it manually.
-                </div>
+            reset();
+          }
+        }}
+        content={() => (
+          <>
+            <div className="grid-layout">
+              <div className="flex flex-col">
+                <TextBox
+                  label="Name"
+                  placeholder="Your Name"
+                  tooltip="Optional. So we know who you are."
+                  value={name}
+                  onChange={setName}
+                />{" "}
+              </div>
+              <div className="flex flex-col">
+                <TextBox
+                  label="GitHub Username"
+                  placeholder="@yourname"
+                  tooltip="Optional. So we can tag you in the post and you can follow it."
+                  value={username}
+                  onChange={setUsername}
+                />
+              </div>
+              <div className="flex flex-col">
+                <TextBox
+                  label="Email"
+                  placeholder="your.name@email.com"
+                  tooltip="Optional. So we can contact you directly if needed."
+                  value={email}
+                  onChange={setEmail}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <TextBox
+                label="Subject"
+                placeholder="Subject"
+                value={subject}
+                onChange={setSubject}
+              />
+            </div>
+            <div className="flex flex-col">
+              <TextBox
+                label="Feedback"
+                placeholder="Questions, suggestions, bugs, etc."
+                required
+                multi
+                value={feedback}
+                onChange={setFeedback}
+              />
+            </div>
+
+            <Collapsible title="Debug Info">
+              <dl
+                className="
+                  self-center [--cols:6]
+                  max-lg:[--cols:4]
+                  max-md:[--cols:2]
+                "
+              >
+                {Object.entries(details).map(([key, value]) => (
+                  <Fragment key={key}>
+                    <dt>{key}</dt>
+                    <dd>{value}</dd>
+                  </Fragment>
+                ))}
+              </dl>
+            </Collapsible>
+
+            <Alert
+              type={
+                status === "pending"
+                  ? "loading"
+                  : status === "error"
+                    ? "error"
+                    : status === "success"
+                      ? "success"
+                      : "info"
               }
-            />
-          </div>
+            >
+              {status === "idle" && (
+                <>
+                  Submitting will start a <strong>public post</strong> on{" "}
+                  <Link to={VITE_ISSUES}>our GitHub feedback tracker</Link> with{" "}
+                  <strong>all of the information above</strong>. You'll get a
+                  link to it once it's created.
+                </>
+              )}
+              {status === "pending" && "Submitting feedback"}
+              {status === "error" && (
+                <>
+                  Error submitting feedback. Contact us directly:{" "}
+                  <Link
+                    to={`mailto:${VITE_EMAIL}?body=${window.encodeURIComponent(body)}`}
+                  >
+                    {VITE_EMAIL}
+                  </Link>
+                  .
+                </>
+              )}
+              {status === "success" && data.link && (
+                <>
+                  Submitted feedback!{" "}
+                  <Link to={data.link}>{shortenUrl(data.link)}</Link>
+                </>
+              )}
+            </Alert>
+          </>
+        )}
+        bottomContent={
+          <>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                text="Screenshot"
+                icon={<LuDownload />}
+                design="hollow"
+                tooltip="Download a screenshot of the current page"
+                onClick={async () => {
+                  close();
+                  await downloadJpg(document.body, ["screenshot"]);
+                  open();
+                }}
+              />
+              <Help
+                tooltip={
+                  <div>
+                    This can help us troubleshoot issues. Currently, we can't{" "}
+                    <i>automatically</i> attach a screenshot with your feedback,
+                    so you'll have to download and attach/send it manually.
+                  </div>
+                }
+              />
+            </div>
 
-          <div className="grow" />
+            <div className="grow" />
 
-          {status === "idle" && (
-            <Button text="Submit" icon={<LuSend />} type="submit" />
-          )}
-        </>
-      }
-    >
-      <Button icon={<LuMessageCircleMore />} tooltip="Give us feedback" />
-    </Dialog>
+            {status === "idle" && (
+              <Button text="Submit" icon={<LuSend />} type="submit" />
+            )}
+          </>
+        }
+      >
+        <Button icon={<LuMessageCircleMore />} tooltip="Give us feedback" />
+      </Dialog>
+    </Form>
   );
 };
 

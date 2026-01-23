@@ -38,7 +38,6 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
           onSubmit={(event) => {
             /** prevent page navigation */
             event.preventDefault();
-
             /** call callback */
             onSubmit();
           }}
@@ -62,8 +61,17 @@ const usePreventImplicitSubmit = () => {
     if (!(target instanceof Element)) return;
     /** only on inputs */
     if (!target.matches("input")) return;
-    /** allow enter press on submit button to still work */
-    if (target.matches("[type='submit']")) return;
+    /** only on submit button */
+    if (target.matches("button[type='submit']")) return;
+    /** prevent submit */
+    event.preventDefault();
+  });
+  useEventListener("click", (event) => {
+    const { target } = event;
+    /** only on elements */
+    if (!(target instanceof Element)) return;
+    /** only on submit button */
+    if (target.matches("button[type='submit']")) return;
     /** prevent submit */
     event.preventDefault();
   });

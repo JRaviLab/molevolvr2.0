@@ -329,7 +329,6 @@ const Table = <Datum extends object>({
                         {header.column.getCanSort() && (
                           <Tooltip content="Sort this column">
                             <button
-                              type="button"
                               onClick={header.column.getToggleSortingHandler()}
                             >
                               {header.column.getIsSorted() ? (
@@ -356,7 +355,7 @@ const Table = <Datum extends object>({
                             }
                           >
                             <Tooltip content="Filter this column">
-                              <button type="button">
+                              <button>
                                 {header.column.getIsFiltered() ? (
                                   <LuFilterX className="text-accent" />
                                 ) : (

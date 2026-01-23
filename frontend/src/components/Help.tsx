@@ -17,7 +17,6 @@ type Props = {
 const Help = ({ tooltip, children }: Props) => (
   <Tooltip content={tooltip}>
     <button
-      type="button"
       className="cursor-help text-dark-gray"
       onClick={async (event) => {
         const target = event.currentTarget;

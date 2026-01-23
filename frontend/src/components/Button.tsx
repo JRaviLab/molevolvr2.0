@@ -113,7 +113,6 @@ const Button = ({
         <button
           ref={ref as Ref<HTMLButtonElement>}
           className={_class}
-          type="button"
           form={form}
           {...props}
         >

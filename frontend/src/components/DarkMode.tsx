@@ -28,7 +28,6 @@ export const DarkMode = ({ className }: Props) => {
   return (
     <Tooltip content={`Switch to ${darkMode ? "light" : "dark"} mode`}>
       <button
-        type="button"
         role="switch"
         aria-checked={darkMode}
         onClick={() => setDarkMode(!darkMode)}
