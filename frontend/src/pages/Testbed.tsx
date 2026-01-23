@@ -841,7 +841,9 @@ const SectionTable = () => (
           name: "Long text",
           filterType: "string",
           show: false,
-          render: (cell) => <div className="line-clamp-5">{cell}</div>,
+          render: (cell) => (
+            <div className="line-clamp-5 p-1 leading-normal">{cell}</div>
+          ),
         },
       ]}
       rows={tableData}

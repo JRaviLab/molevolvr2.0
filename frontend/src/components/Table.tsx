@@ -334,9 +334,9 @@ const Table = <Datum extends object>({
                             >
                               {header.column.getIsSorted() ? (
                                 header.column.getIsSorted() === "asc" ? (
-                                  <LuArrowUp />
+                                  <LuArrowUp className="text-accent" />
                                 ) : (
-                                  <LuArrowDown />
+                                  <LuArrowDown className="text-accent" />
                                 )
                               ) : (
                                 <LuArrowDownUp />
@@ -356,14 +356,12 @@ const Table = <Datum extends object>({
                             }
                           >
                             <Tooltip content="Filter this column">
-                              <button
-                                type="button"
-                                className={clsx(
-                                  header.column.getIsFiltered() &&
-                                    "text-accent",
+                              <button type="button">
+                                {header.column.getIsFiltered() ? (
+                                  <LuFilterX className="text-accent" />
+                                ) : (
+                                  <LuFilter />
                                 )}
-                              >
-                                <LuFilter />
                               </button>
                             </Tooltip>
                           </Popover>
