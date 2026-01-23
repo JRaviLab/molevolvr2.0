@@ -43,6 +43,7 @@ import SelectSingle from "@/components/SelectSingle";
 import type { Option } from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import { useColorMap } from "@/util/color";
+import { parseFont } from "@/util/dom";
 import type { Filename } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { lerp } from "@/util/math";
@@ -486,7 +487,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
       "shape-polygon-points": getNodeShape,
       label: getNodeLabel,
       "font-size": fontSize,
-      "font-family": theme["--font-sans"],
+      "font-family": parseFont(theme["--font-sans"] ?? "sans-serif"),
       color: theme["--color-black"],
       "text-halign": "center",
       "text-valign": "center",
@@ -515,7 +516,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
       "arrow-scale": getEdgeArrowSize,
       label: getEdgeLabel,
       "font-size": fontSize,
-      "font-family": theme["--font-sans"],
+      "font-family": parseFont(theme["--font-sans"] ?? "sans-serif"),
       color: theme["--color-black"],
       "text-rotation": "autorotate",
       // "text-outline-width": 1,

@@ -15,6 +15,10 @@ export const getTheme = (): Theme => {
   );
 };
 
+/** get first font name from font-family string */
+export const parseFont = (family: string) =>
+  family.split(",")[0]?.replaceAll(/['"]/g, "").trim() || "";
+
 /** get text content of react node */
 export const renderText = (node: ReactNode) =>
   /** map all children to text */
