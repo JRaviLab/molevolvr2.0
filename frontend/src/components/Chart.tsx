@@ -190,28 +190,23 @@ const Chart = ({
       </svg>
 
       {/* reset handle */}
-      <div
-        /* eslint-disable better-tailwindcss/no-unknown-classes */
-        className="
-          reset-handle sticky right-2 bottom-2 hidden size-0 place-self-end
-        "
-        /* eslint-enable better-tailwindcss/no-unknown-classes */
-      >
-        <Tooltip content="Reset size">
-          <button
-            className="size-4"
-            onClick={() => {
-              /** reset resize */
-              const target = containerRef.current;
-              if (!target) return;
-              target.style.width = String(containerProps.style?.width ?? "");
-              target.style.height = "";
-            }}
-          >
-            <LuCrop />
-          </button>
-        </Tooltip>
-      </div>
+      <Tooltip content="Reset size">
+        <Button
+          design="hollow"
+          tooltip="Reset size"
+          icon={<LuCrop />}
+          /* eslint-disable better-tailwindcss/no-unknown-classes */
+          className="reset-handle absolute right-0 bottom-0 hidden"
+          /* eslint-enable better-tailwindcss/no-unknown-classes */
+          onClick={() => {
+            /** reset resize */
+            const target = containerRef.current;
+            if (!target) return;
+            target.style.width = String(containerProps.style?.width ?? "");
+            target.style.height = "";
+          }}
+        />
+      </Tooltip>
     </div>
   );
 

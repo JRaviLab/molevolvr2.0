@@ -3,11 +3,6 @@ import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useEventListener } from "@reactuses/core";
 
-export type FormData = Record<
-  string,
-  string | number | boolean | (string | number | boolean)[]
->;
-
 type Props = {
   /** called when form submitted */
   onSubmit: () => unknown;

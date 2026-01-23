@@ -31,7 +31,7 @@ const Tooltip = ({ ref, content, children, ...props }: Props) => {
     <Provider delayDuration={100} disableHoverableContent>
       <Root>
         {/* allows nesting tooltip within popover https://github.com/radix-ui/primitives/discussions/560#discussioncomment-5325935 */}
-        <Trigger asChild ref={ref} {...props} aria-label={renderText(content)}>
+        <Trigger asChild ref={ref} aria-label={renderText(content)} {...props}>
           {children}
         </Trigger>
 

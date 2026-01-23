@@ -65,10 +65,10 @@ const SelectSingle = <O extends Option>({
   return (
     <Listbox
       className="contents"
+      as="div"
+      form={form}
       value={value}
       onChange={onChange}
-      form={form}
-      as="div"
     >
       {/* label */}
       <Label className="flex items-center gap-1" style={{ minHeight: height }}>

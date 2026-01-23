@@ -1,4 +1,5 @@
-import { useRef, type ReactNode } from "react";
+import { useRef } from "react";
+import type { ReactNode } from "react";
 import {
   Label,
   Slider as RACSlider,
@@ -139,6 +140,7 @@ const Slider = ({
               <SliderThumb
                 key={index}
                 index={index}
+                form={form}
                 className="
                   top-1/2 size-4 cursor-pointer rounded-full bg-current
                   outline-offset-2 outline-current
@@ -154,20 +156,6 @@ const Slider = ({
                   {formatNumber(value, true)}
                 </div>
               </SliderThumb>
-            ))}
-
-            {/* https://github.com/adobe/react-spectrum/issues/4117 */}
-            {state.values.map((value, index) => (
-              <input
-                key={index}
-                className="sr-only"
-                tabIndex={-1}
-                aria-hidden
-                type="number"
-                value={value}
-                readOnly
-                form={form}
-              />
             ))}
           </SliderTrack>
         </>

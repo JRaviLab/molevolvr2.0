@@ -58,7 +58,6 @@ const UploadButton = ({
   return (
     <>
       <Button
-        {...props}
         className={clsx(
           drag &&
             `
@@ -82,6 +81,7 @@ const UploadButton = ({
           event.stopPropagation();
           onDrop(event);
         }}
+        {...props}
       />
 
       <input

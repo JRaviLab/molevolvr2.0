@@ -21,7 +21,7 @@ const Badge = ({ className, children }: Props) => (
       `,
       className,
     )}
-    aria-hidden="true"
+    aria-hidden
   >
     {children}
   </span>

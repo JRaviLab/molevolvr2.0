@@ -60,10 +60,10 @@ const Header = () => {
       {/* nav toggle */}
       <Tooltip content={open ? "Collapse menu" : "Expand menu"}>
         <button
+          className={clsx("md:hidden", _class)}
           onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-controls="nav"
-          className={clsx("md:hidden", _class)}
         >
           {open ? <LuX /> : <LuMenu />}
         </button>

@@ -56,6 +56,7 @@ const SelectMulti = <O extends Option>({
       className="contents"
       as="div"
       multiple
+      form={form}
       value={value}
       onChange={(value) =>
         onChange(
@@ -149,23 +150,6 @@ const SelectMulti = <O extends Option>({
                 </ListboxOption>
               ))}
             </ListboxOptions>
-
-            {/* for FormData */}
-            <select
-              className="sr-only"
-              tabIndex={-1}
-              aria-hidden
-              multiple
-              form={form}
-              value={value}
-              onChange={() => null}
-            >
-              {options.map((option, index) => (
-                <option key={index} value={option.id}>
-                  {option.primary}
-                </option>
-              ))}
-            </select>
           </>
         );
       }}
