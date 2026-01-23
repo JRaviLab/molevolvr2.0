@@ -331,7 +331,7 @@ const SectionLegend = () => {
       <div
         ref={ref}
         className="
-          w-100 max-w-full resize overflow-auto rounded-sm p-4 shadow-sm
+          w-100 max-w-full resize overflow-auto rounded-md p-4 shadow-sm
         "
       >
         <Legend entries={entries} x={0} y={0} w={width} />
@@ -782,7 +782,7 @@ const SectionCollapsible = () => (
       Collapsible
     </Heading>
 
-    <Collapsible text="Expand Me" tooltip="Tooltip">
+    <Collapsible title="Expand Me" tooltip="Tooltip">
       <p>
         Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua. Facilisis sed odio
@@ -941,7 +941,7 @@ const SectionDialog = () => (
                 volutpat convallis taciti quam nam posuere.
               </p>
 
-              <Collapsible text="Collapsible">
+              <Collapsible title="Collapsible">
                 <p>
                   Odio semper orci ante varius porttitor. Ultricies torquent
                   venenatis cursus praesent vel lacus ligula nostra iaculis.

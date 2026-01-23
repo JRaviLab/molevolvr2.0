@@ -73,12 +73,12 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
               value={tab.id}
               className={clsx(
                 `
-                  cursor-pointer gap-2 border-b-2 p-2
-                  hover:border-deep hover:text-deep
+                  cursor-pointer gap-2 border-b border-current p-2
+                  hover:bg-current/5 hover:text-deep
                 `,
                 tab.id === selected
-                  ? "border-accent text-accent"
-                  : "border-light-gray text-dark-gray",
+                  ? "bg-current/5 text-accent"
+                  : `text-dark-gray`,
               )}
               data-active={tab.id === selected}
             >

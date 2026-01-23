@@ -80,7 +80,7 @@ const SelectSingle = <O extends Option>({
       <ListboxButton
         ref={button}
         className="
-          gap-2 border-b-2 border-current p-2 text-accent
+          gap-2 border-b border-current p-2 text-accent
           hover:text-deep
         "
         onKeyDown={({ key }) => {

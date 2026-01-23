@@ -60,7 +60,7 @@ const Dialog = ({
             <div
               className="
                 relative flex max-h-full w-(--content) max-w-full flex-col
-                rounded-sm bg-white shadow-overlay
+                rounded-md bg-white shadow-overlay
               "
             >
               {/* top */}

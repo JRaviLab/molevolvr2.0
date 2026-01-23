@@ -5,8 +5,8 @@ import clsx from "clsx";
 import Tooltip from "@/components/Tooltip";
 
 type Props = {
-  /** text to show in expand/collapse button */
-  text: string;
+  /** content to show in expand/collapse button */
+  title: ReactNode;
   /** tooltip content */
   tooltip?: ReactNode;
   /** panel content */
@@ -14,7 +14,7 @@ type Props = {
 };
 
 /** button with expandable/collapsible content beneath */
-const Collapsible = ({ text, tooltip, children }: Props) => {
+const Collapsible = ({ title, tooltip, children }: Props) => {
   /** unique id for component instance */
   const id = useId();
 
@@ -28,17 +28,15 @@ const Collapsible = ({ text, tooltip, children }: Props) => {
         <button
           type="button"
           className="
-            grid w-full grid-cols-[1fr_max-content_1em_1fr] gap-2 rounded-sm p-2
-            text-accent
-            before:mr-2 before:h-0.5 before:bg-current/25
-            after:ml-2 after:h-0.5 after:bg-current/25 after:content-['']
+            flex items-center gap-2 rounded-md border border-dashed
+            border-light-gray p-2 text-accent
             hover:text-deep
           "
           onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-controls={open ? id : undefined}
         >
-          {text}
+          {title}
           {open ? <LuChevronUp /> : <LuChevronDown />}
         </button>
       </Tooltip>

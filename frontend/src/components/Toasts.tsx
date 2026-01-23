@@ -45,7 +45,7 @@ const Toasts = () => {
         <div
           key={index}
           className="
-            grid grid-cols-[min-content_1fr_min-content] items-center rounded-sm
+            grid grid-cols-[min-content_1fr_min-content] items-center rounded-md
             bg-white shadow-sm
           "
           style={{ color: types[toast.type].color }}

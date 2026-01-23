@@ -13,7 +13,7 @@ type Props = {
 /** card with title, badge, and text/image */
 const FeatureCard = ({ title, badge, content }: Props) => {
   return (
-    <div className="flex flex-col gap-4 rounded-sm bg-white p-4 shadow-sm">
+    <div className="flex flex-col gap-4 rounded-md bg-white p-4 shadow-sm">
       <div className="flex items-center gap-2">
         <span className="grow font-medium">{title}</span>
         {badge && <Badge>{badge}</Badge>}

@@ -100,7 +100,7 @@ const TextBox = ({
       id={id}
       className="
         min-h-[calc(var(--leading-normal)*3em+--spacing(4)+4px)] grow resize
-        rounded-sm border-2 border-off-white bg-white p-2
+        rounded-md border border-light-gray bg-white p-2
         hover:border-accent
       "
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
@@ -114,7 +114,7 @@ const TextBox = ({
       ref={ref}
       id={id}
       className="
-        grow rounded-sm border-2 border-off-white bg-white p-2
+        grow rounded-md border border-light-gray bg-white p-2
         hover:border-accent
       "
       style={{ paddingRight: sidePadding ? sidePadding : "" }}

@@ -23,7 +23,7 @@ const AnalysisCard = ({
     <Link
       to={`/analysis/${id}`}
       className="
-        flex flex-col items-start gap-2 rounded-sm border-2 border-off-white
+        flex flex-col items-start gap-2 rounded-md border border-light-gray
         bg-white p-4
         hover:border-accent
       "

@@ -7,6 +7,7 @@ import { mapValues, startCase, truncate } from "lodash";
 import { createIssue } from "@/api/issue";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
+import Collapsible from "@/components/Collapsible";
 import Dialog from "@/components/Dialog";
 import Form from "@/components/Form";
 import Help from "@/components/Help";
@@ -108,56 +109,72 @@ const Feedback = () => {
           reset();
         }
       }}
-      content={(close, open) => (
+      content={() => (
         <Form onSubmit={onSubmit}>
           <div className="grid-layout">
+            <div className="flex flex-col">
+              <TextBox
+                label="Name"
+                placeholder="Your Name"
+                tooltip="Optional. So we know who you are."
+                value={name}
+                onChange={setName}
+              />{" "}
+            </div>
+            <div className="flex flex-col">
+              <TextBox
+                label="GitHub Username"
+                placeholder="@yourname"
+                tooltip="Optional. So we can tag you in the post and you can follow it."
+                value={username}
+                onChange={setUsername}
+              />
+            </div>
+            <div className="flex flex-col">
+              <TextBox
+                label="Email"
+                placeholder="your.name@email.com"
+                tooltip="Optional. So we can contact you directly if needed."
+                value={email}
+                onChange={setEmail}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col">
             <TextBox
-              label="Name"
-              placeholder="Your Name"
-              tooltip="Optional. So we know who you are."
-              value={name}
-              onChange={setName}
+              label="Subject"
+              placeholder="Subject"
+              value={subject}
+              onChange={setSubject}
             />
+          </div>
+          <div className="flex flex-col">
             <TextBox
-              label="GitHub Username"
-              placeholder="@yourname"
-              tooltip="Optional. So we can tag you in the post and you can follow it."
-              value={username}
-              onChange={setUsername}
-            />
-            <TextBox
-              label="Email"
-              placeholder="your.name@email.com"
-              tooltip="Optional. So we can contact you directly if needed."
-              value={email}
-              onChange={setEmail}
+              label="Feedback"
+              placeholder="Questions, suggestions, bugs, etc."
+              required
+              multi
+              value={feedback}
+              onChange={setFeedback}
             />
           </div>
 
-          <TextBox
-            label="Subject"
-            placeholder="Subject"
-            value={subject}
-            onChange={setSubject}
-          />
-
-          <TextBox
-            label="Feedback"
-            placeholder="Questions, suggestions, bugs, etc."
-            required
-            multi
-            value={feedback}
-            onChange={setFeedback}
-          />
-
-          <dl>
-            {Object.entries(details).map(([key, value]) => (
-              <Fragment key={key}>
-                <dt>{key}</dt>
-                <dd>{value}</dd>
-              </Fragment>
-            ))}
-          </dl>
+          <Collapsible title="Debug Info">
+            <dl
+              className="
+                self-center [--cols:6]
+                max-lg:[--cols:4]
+                max-md:[--cols:2]
+              "
+            >
+              {Object.entries(details).map(([key, value]) => (
+                <Fragment key={key}>
+                  <dt>{key}</dt>
+                  <dd>{value}</dd>
+                </Fragment>
+              ))}
+            </dl>
+          </Collapsible>
 
           <Alert
             type={
@@ -197,38 +214,40 @@ const Feedback = () => {
               </>
             )}
           </Alert>
-
-          <div className="flex flex-wrap items-center justify-between gap-8">
-            <div className="flex flex-wrap gap-2">
-              <Button
-                text="Screenshot"
-                icon={<LuDownload />}
-                design="hollow"
-                tooltip="Download a screenshot of the current page"
-                onClick={async () => {
-                  close();
-                  await downloadJpg(document.body, ["screenshot"]);
-                  open();
-                }}
-              />
-              <Help
-                tooltip={
-                  <div>
-                    Downloads a screenshot of the current page, which can help
-                    us troubleshoot issues. Currently, we can't{" "}
-                    <i>automatically</i> attach a screenshot with your feedback,
-                    so you'll have to download and attach/send it manually.
-                  </div>
-                }
-              />
-            </div>
-
-            {status === "idle" && (
-              <Button text="Submit" icon={<LuSend />} type="submit" />
-            )}
-          </div>
         </Form>
       )}
+      bottomContent={
+        <>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              text="Screenshot"
+              icon={<LuDownload />}
+              design="hollow"
+              tooltip="Download a screenshot of the current page"
+              onClick={async () => {
+                close();
+                await downloadJpg(document.body, ["screenshot"]);
+                open();
+              }}
+            />
+            <Help
+              tooltip={
+                <div>
+                  This can help us troubleshoot issues. Currently, we can't{" "}
+                  <i>automatically</i> attach a screenshot with your feedback,
+                  so you'll have to download and attach/send it manually.
+                </div>
+              }
+            />
+          </div>
+
+          <div className="grow" />
+
+          {status === "idle" && (
+            <Button text="Submit" icon={<LuSend />} type="submit" />
+          )}
+        </>
+      }
     >
       <Button icon={<LuMessageCircleMore />} tooltip="Give us feedback" />
     </Dialog>

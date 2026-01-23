@@ -162,7 +162,7 @@ const Chart = ({
             resize-none overflow-visible rounded-none border-0 bg-white p-0
             shadow-none
           `
-          : "rounded-sm bg-white shadow-sm",
+          : "rounded-md bg-white shadow-sm",
         containerClassName,
       )}
       // https://github.com/dequelabs/axe-core/issues/4566

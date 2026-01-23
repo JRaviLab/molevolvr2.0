@@ -612,7 +612,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
         ref={ref}
         className={clsx(
           `
-            grid w-full grid-cols-[max-content_auto] rounded-sm bg-white
+            grid w-full grid-cols-[max-content_auto] rounded-md bg-white
             shadow-sm
           `,
           expanded && "h-[75dvh]! w-[calc(100dvw---spacing(20))]!",

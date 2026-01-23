@@ -75,7 +75,7 @@ const NumberBox = ({
           <Group
             ref={group}
             className="
-              flex border-b-2 border-current text-accent
+              flex border-b border-current text-accent
               hover:text-deep
             "
           >

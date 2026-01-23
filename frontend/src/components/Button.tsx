@@ -72,7 +72,7 @@ const Button = ({
   const _class = clsx(
     "gap-2",
     size === "compact" ? "p-1" : "p-3",
-    !!icon && !text ? "rounded-full" : "rounded-sm",
+    !!icon && !text ? "rounded-full" : "rounded-md",
     design === "hollow" &&
       `
         text-accent

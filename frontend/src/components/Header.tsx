@@ -35,8 +35,8 @@ const Header = () => {
     doc.style.scrollPaddingTop = height + "px";
   }, [height]);
 
-  const buttonClass =
-    "rounded p-2 tracking-wide hover:bg-current/10 leading-none";
+  const _class =
+    "rounded-md p-2 tracking-wide hover:bg-current/10 leading-none";
 
   return (
     <header
@@ -51,7 +51,7 @@ const Header = () => {
         <Logo className="size-8" />
         <Link
           to="/"
-          className={clsx("text-lg tracking-wider uppercase", buttonClass)}
+          className={clsx("text-lg tracking-wider uppercase", _class)}
         >
           {import.meta.env.VITE_TITLE}
         </Link>
@@ -63,7 +63,7 @@ const Header = () => {
           onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-controls="nav"
-          className={clsx("md:hidden", buttonClass)}
+          className={clsx("md:hidden", _class)}
         >
           {open ? <LuX /> : <LuMenu />}
         </button>
@@ -84,13 +84,13 @@ const Header = () => {
           <Link
             key={to}
             to={to}
-            className={clsx(pathname === to && "bg-current/10", buttonClass)}
+            className={clsx(pathname === to && "bg-current/10", _class)}
           >
             {name}
           </Link>
         ))}
 
-        <DarkMode className={buttonClass} />
+        <DarkMode className={_class} />
       </nav>
     </header>
   );
