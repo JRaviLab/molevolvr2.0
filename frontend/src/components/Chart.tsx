@@ -217,12 +217,9 @@ const Chart = ({
       {chart}
 
       {/* controls */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         {controls?.map((row, index) => (
-          <div
-            key={index}
-            className="flex flex-wrap items-center justify-center gap-4"
-          >
+          <div key={index} className="flex items-center justify-center gap-4">
             {row}
           </div>
         ))}

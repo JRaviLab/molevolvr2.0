@@ -59,9 +59,9 @@ const TextBox = ({
   const id = useId();
 
   /** side elements */
-  let sideElements: ReactNode = "";
+  let side: ReactNode = "";
   if (value)
-    sideElements = (
+    side = (
       <>
         {multi && (
           <Button
@@ -88,7 +88,19 @@ const TextBox = ({
       </>
     );
   else if (icon)
-    sideElements = <div className="grid place-items-center">{icon}</div>;
+    side = (
+      <>
+        {multi && <div />}
+        <div>{icon}</div>
+      </>
+    );
+  else
+    side = (
+      <>
+        {multi && <div />}
+        <div />
+      </>
+    );
 
   /** extra padding needed for side element */
   const sidePadding = useElementBounding(sideRef).width;
@@ -99,8 +111,8 @@ const TextBox = ({
       ref={ref}
       id={id}
       className="
-        min-h-[calc(var(--leading-normal)*3em+--spacing(4)+4px)] grow resize
-        rounded-md border border-light-gray bg-white p-2
+        min-h-[calc(3lh+--spacing(4)+2px)] grow resize rounded-md border
+        border-light-gray bg-white p-2
         hover:border-accent
       "
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
@@ -124,17 +136,10 @@ const TextBox = ({
       {...props}
     />
   );
-
   return (
     <>
       {(label || props.required) && (
-        <label
-          className="
-            flex min-h-[calc(var(--leading-normal)*1em+--spacing(4)+4px)]
-            items-center gap-1
-          "
-          htmlFor={id}
-        >
+        <label className="flex items-center gap-1" htmlFor={id}>
           {label}
           {tooltip && <Help tooltip={tooltip} />}
           {props.required && <Asterisk />}
@@ -145,16 +150,15 @@ const TextBox = ({
       <Tooltip content={!label && tooltip ? tooltip : undefined}>
         <div className="relative flex items-start">
           {input}
-
-          {/* side element */}
           <div
             ref={sideRef}
             className="
-              absolute inset-y-1.5 right-1.5 flex items-start text-dark-gray
-              *:size-8
+              absolute top-0 right-0 flex items-start text-dark-gray
+              *:grid *:size-[calc(var(--leading-normal)*1em+--spacing(4)+2px)]
+              *:place-items-center *:p-0
             "
           >
-            {sideElements}
+            {side}
           </div>
         </div>
       </Tooltip>

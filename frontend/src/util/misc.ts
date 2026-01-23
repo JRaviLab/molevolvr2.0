@@ -9,6 +9,7 @@ const now = () => window.performance.now();
 export const waitFor = async <Return>(
   func: () => Return,
 ): Promise<Return | undefined> => {
+  /** custom exponential backoff */
   const waits = [
     0, 1, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000,
   ];

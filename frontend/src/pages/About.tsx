@@ -13,62 +13,9 @@ import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
+import Table from "@/components/Table";
 import { trim } from "@/util/string";
-
-const team = [
-  {
-    name: "Janani Ravi",
-    email: "janani.ravi@cuanschutz.edu",
-    github: "jananiravi",
-  },
-  {
-    name: "Jacob D Krol",
-    email: "jacob.krol@cuanschutz.edu",
-    github: "jakekrol",
-  },
-  {
-    name: "Joseph T Burke",
-    email: "burkej24@msu.edu",
-    github: "jburke11",
-  },
-  {
-    name: "Samuel Z Chen",
-    email: "chensam2@msu.edu",
-    github: "samuelzornchen",
-  },
-  {
-    name: "Lo Sosinski",
-    email: "sosinsk7@msu.edu",
-    github: "lsosinski",
-  },
-  {
-    name: "Faisal S Alquaddoomi",
-    email: "faisal.alquaddoomi@cuanschutz.edu",
-    github: "falquaddoomi",
-  },
-  {
-    name: "Evan P Brenner",
-    email: "evan.brenner@cuanschutz.edu",
-    github: "epbrenner",
-  },
-  {
-    name: "Vince P Rubinetti",
-    email: "vincent.rubinetti@cuanschutz.edu",
-    github: "vincerubinetti",
-  },
-  {
-    name: "Shaddai Amolitos",
-    email: "shaddai.amolitos@cuanschutz.edu",
-  },
-  {
-    name: "Kellen M Reason",
-    email: "reasonke@msu.edu",
-  },
-  {
-    name: "John B Johnston",
-    email: "johnj@msu.edu",
-  },
-];
+import team from "./team.json";
 
 const {
   VITE_EMAIL,
@@ -439,42 +386,32 @@ const About = () => {
           Team
         </Heading>
 
-        <div className="max-w-full overflow-x-auto">
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>GitHub</th>
-              </tr>
-            </thead>
-            <tbody>
-              {team.map(({ name, email, github }, index) => (
-                <tr key={index}>
-                  <td>{name}</td>
-                  <td>
-                    {email && (
-                      <Link to={`mailto:${email}`}>
-                        <LuMail />
-                        {email}
-                      </Link>
-                    )}
-                  </td>
-                  <td>
-                    {github && (
-                      <Link
-                        to={`https://github.com/${github}`}
-                        showArrow={false}
-                      >
-                        <FaGithub />@{github}
-                      </Link>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          cols={[
+            { key: "name", name: "Name" },
+            {
+              key: "email",
+              name: "Email",
+              render: (cell) => (
+                <Link to={`mailto:${cell}`}>
+                  <LuMail />
+                  {cell}
+                </Link>
+              ),
+            },
+            {
+              key: "github",
+              name: "GitHub",
+              render: (cell) =>
+                cell ? (
+                  <Link to={`https://github.com/${cell}`}>
+                    <FaGithub />@{cell}
+                  </Link>
+                ) : null,
+            },
+          ]}
+          rows={team}
+        />
 
         <Heading level={3}>Funding</Heading>
 

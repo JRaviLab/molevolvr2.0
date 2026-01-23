@@ -80,12 +80,12 @@ const Button = ({
       `,
     design === "normal" &&
       `
-        bg-accent text-white outline-accent
+        bg-accent text-white
         hover:bg-deep
       `,
     design === "critical" &&
       `
-        bg-black text-white outline-black
+        bg-black text-white
         hover:bg-deep
       `,
     className,

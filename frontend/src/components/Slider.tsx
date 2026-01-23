@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import type { ReactNode } from "react";
 import {
   Label,
@@ -6,7 +5,6 @@ import {
   SliderThumb,
   SliderTrack,
 } from "react-aria-components";
-import { useElementSize } from "@reactuses/core";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { formatNumber } from "@/util/string";
@@ -16,6 +14,8 @@ type Props = Base & (Single | Multi);
 type Base = {
   /** label content */
   label: ReactNode;
+  /** whether to fit label height to control height */
+  fitLabel?: boolean;
   /** tooltip on help icon */
   tooltip?: ReactNode;
   /** min value */
@@ -58,9 +58,6 @@ const Slider = ({
   value,
   onChange,
 }: Props) => {
-  const track = useRef<HTMLDivElement>(null);
-  const [, height] = useElementSize(track, { box: "border-box" });
-
   /** link to parent form component */
   const form = useForm();
 
@@ -78,16 +75,12 @@ const Slider = ({
     >
       {({ state }) => (
         <>
-          <Label
-            className="flex items-center gap-1"
-            style={{ minHeight: height }}
-          >
+          <Label className="flex items-center gap-1">
             {label}
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
           <SliderTrack
-            ref={track}
             className="
               group mx-2 flex h-9 min-w-40 cursor-pointer items-center
               rounded-full text-accent
@@ -114,7 +107,7 @@ const Slider = ({
             {/* min marker */}
             <div
               className="
-                absolute bottom-full left-0 -translate-x-1/2 translate-y-1
+                absolute bottom-full left-0 -translate-x-1/2 translate-y-2
                 whitespace-nowrap opacity-0
                 group-focus-within:opacity-50
                 group-hover:opacity-50
@@ -126,7 +119,7 @@ const Slider = ({
             {/* max marker */}
             <div
               className="
-                absolute right-0 bottom-full translate-x-1/2 translate-y-1
+                absolute right-0 bottom-full translate-x-1/2 translate-y-2
                 whitespace-nowrap opacity-0
                 group-focus-within:opacity-50
                 group-hover:opacity-50
@@ -143,7 +136,6 @@ const Slider = ({
                 form={form}
                 className="
                   top-1/2 size-4 cursor-pointer rounded-full bg-current
-                  outline-offset-2 outline-current
                   focus-within:outline-2
                 "
               >

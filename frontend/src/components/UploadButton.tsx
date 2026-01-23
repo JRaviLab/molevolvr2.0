@@ -61,7 +61,7 @@ const UploadButton = ({
         className={clsx(
           drag &&
             `
-              outline-2 outline-offset-2 outline-accent outline-dashed
+              outline-dashed
               *:pointer-events-none
             `,
           className,

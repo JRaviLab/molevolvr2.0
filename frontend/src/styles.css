@@ -78,6 +78,10 @@
 }
 
 @layer components {
+  * {
+    @apply outline-offset-2 outline-black;
+  }
+
   html {
     @apply font-sans leading-none font-normal text-black underline-offset-2;
   }
@@ -124,9 +128,6 @@
 
   hr {
     @apply h-px w-full border-0 bg-current/25;
-  }
-
-  a {
   }
 
   strong,
@@ -243,13 +244,9 @@
     @apply bg-gray rounded-full;
   }
 
-  :not(:focus-visible) {
-    @apply outline-none;
-  }
-
   :focus-visible,
   label:has(input:focus-visible) {
-    @apply outline-2 outline-offset-2 outline-current;
+    @apply outline-2;
   }
 
   [aria-disabled="true"] {

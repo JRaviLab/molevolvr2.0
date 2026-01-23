@@ -109,7 +109,8 @@ export const getViewBoxFit = (svg: SVGGraphicsElement) => {
 };
 
 /** scroll page so that mouse stays at same position in document */
-export const preserveScroll = async (element: Element) => {
+export const preserveScroll = async (element?: Element | null) => {
+  if (!element) return;
   const oldY = element.getBoundingClientRect().top;
   await sleep(0);
   const newY = element.getBoundingClientRect().top;
@@ -176,7 +177,7 @@ export const scrollToSelector = async (
   if (!validSelector(selector)) return;
   if (!selector) return;
 
-  /** get element */
+  /** wait for element to appear */
   const element = await waitFor(() => document.querySelector(selector));
   if (!element) return;
 
@@ -200,8 +201,7 @@ export const firstInView = (elements: HTMLElement[]) => {
 };
 
 /** glow element */
-export const glow = (element: Element) => {
-  console.log("hi");
+export const glow = (element: Element) =>
   elementOrSection(element).animate(
     [
       {
@@ -215,7 +215,6 @@ export const glow = (element: Element) => {
     ],
     { duration: 2000 },
   );
-};
 
 /** if element is first child of section, change element to section itself */
 const elementOrSection = <El extends Element>(element: El) => {
@@ -226,7 +225,8 @@ const elementOrSection = <El extends Element>(element: El) => {
     : element;
 };
 
-export const validSelector = (selector: unknown) => {
+/** check if css selector is valid */
+const validSelector = (selector: unknown) => {
   if (typeof selector !== "string") return false;
   try {
     document.querySelector(selector);

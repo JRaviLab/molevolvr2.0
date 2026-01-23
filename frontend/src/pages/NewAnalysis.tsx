@@ -233,14 +233,16 @@ const NewAnalysis = () => {
               max-md:grid-cols-1
             "
           >
-            <Radios
-              label="What do you want to input?"
-              options={inputTypes}
-              value={inputType}
-              onChange={setInputType}
-            />
+            <div className="flex flex-col items-start gap-2">
+              <Radios
+                label="What do you want to input?"
+                options={inputTypes}
+                value={inputType}
+                onChange={setInputType}
+              />
+            </div>
 
-            <div className="flex flex-col items-start gap-4">
+            <div className="flex flex-col items-start gap-2">
               <SelectSingle
                 label="What format is your input in?"
                 options={inputFormats[inputType]}
@@ -273,7 +275,7 @@ const NewAnalysis = () => {
 
           {/* list input */}
           {inputType === "list" && (
-            <div className="flex flex-col self-stretch">
+            <div className="flex flex-col gap-2 self-stretch">
               <TextBox
                 label={
                   <>
@@ -383,47 +385,51 @@ const NewAnalysis = () => {
             Options
           </Heading>
 
-          <div className="flex flex-wrap gap-8">
-            <Radios
-              label="What type of analyses do you want to run?"
-              tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
-              /** allow specific analysis types based on input format */
-              options={analysisTypes.filter(({ id }) => {
-                if (["fasta", "accnum", "msa"].includes(inputFormat))
-                  return true;
-                if (inputFormat === "blast") return id === "phylogeny-domain";
-                if (inputFormat === "interproscan")
-                  return ["phylogeny-domain", "domain"].includes(id);
-              })}
-              value={analysisType}
-              onChange={setAnalysisType}
-            />
+          <div className="flex flex-wrap justify-between gap-16">
+            <div className="flex flex-col gap-2">
+              <Radios
+                label="What type of analyses do you want to run?"
+                tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
+                /** allow specific analysis types based on input format */
+                options={analysisTypes.filter(({ id }) => {
+                  if (["fasta", "accnum", "msa"].includes(inputFormat))
+                    return true;
+                  if (inputFormat === "blast") return id === "phylogeny-domain";
+                  if (inputFormat === "interproscan")
+                    return ["phylogeny-domain", "domain"].includes(id);
+                })}
+                value={analysisType}
+                onChange={setAnalysisType}
+              />
+            </div>
 
             {["homology-domain", "homology"].includes(analysisType) && (
-              <div className="flex flex-col gap-8">
+              <div className="flex flex-col gap-4">
                 <div className="font-medium">BLAST Parameters</div>
 
-                <SelectSingle
-                  label="Homology search database"
-                  options={homologyDatabases}
-                  value={homologyDatabase}
-                  onChange={setHomologyDatabase}
-                />
-                <Slider
-                  label="Max hits"
-                  min={10}
-                  max={500}
-                  value={maxHits}
-                  onChange={setMaxHits}
-                />
-                <NumberBox
-                  label="E-value cutoff"
-                  min={0}
-                  max={1}
-                  step={0.000001}
-                  value={eCutoff}
-                  onChange={setECutoff}
-                />
+                <div className="grid grid-cols-2 justify-start gap-x-8 gap-y-4">
+                  <SelectSingle
+                    label="Homology search DB"
+                    options={homologyDatabases}
+                    value={homologyDatabase}
+                    onChange={setHomologyDatabase}
+                  />
+                  <Slider
+                    label="Max hits"
+                    min={10}
+                    max={500}
+                    value={maxHits}
+                    onChange={setMaxHits}
+                  />
+                  <NumberBox
+                    label="E-value cutoff"
+                    min={0}
+                    max={1}
+                    step={0.000001}
+                    value={eCutoff}
+                    onChange={setECutoff}
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -441,7 +447,7 @@ const NewAnalysis = () => {
             Submit
           </Heading>
 
-          <div className="flex flex-col self-stretch">
+          <div className="flex flex-col gap-2 self-stretch">
             <TextBox
               label="Analysis Name"
               tooltip="Give your analysis a name to remember it by"
@@ -451,7 +457,7 @@ const NewAnalysis = () => {
             />
           </div>
 
-          <div className="flex flex-col self-stretch">
+          <div className="flex flex-col gap-2 self-stretch">
             <TextBox
               label={
                 <>

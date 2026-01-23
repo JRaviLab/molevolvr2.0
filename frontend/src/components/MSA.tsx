@@ -13,7 +13,7 @@ import { useTextSize, useTheme } from "@/util/hooks";
 /** label size */
 const labelWidth = 150;
 /** seq char width */
-const charWidth = 10;
+const charWidth = 12;
 /** row height */
 const rowHeight = 20;
 /** min chars to show per row */

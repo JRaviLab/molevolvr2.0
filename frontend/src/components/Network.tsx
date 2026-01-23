@@ -711,7 +711,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
 
       {/* controls */}
       <div className="flex flex-wrap items-center gap-4">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
           <Slider
             label="Max Nodes"
             min={1}
@@ -720,6 +720,8 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
             value={maxNodes}
             onChange={setMaxNodes}
           />
+        </div>
+        <div className="flex items-center gap-2">
           <SelectSingle
             label="Layout"
             options={layoutOptions}
@@ -728,6 +730,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
           />
         </div>
 
+        {/* buttons */}
         <div className="flex flex-wrap items-center gap-2">
           <Download
             filename={[...filename, "network"]}

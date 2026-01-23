@@ -8,7 +8,6 @@ import {
   NumberField,
 } from "react-aria-components";
 import { LuMinus, LuPlus } from "react-icons/lu";
-import { useElementSize } from "@reactuses/core";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { isFirefox } from "@/util/browser";
@@ -42,8 +41,6 @@ const NumberBox = ({
   onChange,
 }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
-  const group = useRef<HTMLDivElement>(null);
-  const [, height] = useElementSize(group, { box: "border-box" });
 
   /** link to parent form component */
   const form = useForm();
@@ -57,25 +54,21 @@ const NumberBox = ({
       step={step}
       value={value}
       onChange={(value) => {
-        if (ref.current) preserveScroll(ref.current);
+        preserveScroll(ref.current);
         onChange(value);
       }}
       formatOptions={{ maximumFractionDigits: 10 }}
     >
       {({ state }) => (
         <>
-          <Label
-            className="flex items-center gap-1"
-            style={{ minHeight: height }}
-          >
+          <Label className="flex items-center gap-1">
             {label}
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
           <Group
-            ref={group}
             className="
-              flex border-b border-current text-accent
+              flex justify-between border-b border-current text-accent
               hover:text-deep
             "
           >

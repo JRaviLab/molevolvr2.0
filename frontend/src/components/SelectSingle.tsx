@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useEffect } from "react";
 import type { ReactElement, ReactNode } from "react";
 import { LuChevronDown } from "react-icons/lu";
 import { VscCircleFilled } from "react-icons/vsc";
@@ -9,7 +9,6 @@ import {
   ListboxOption,
   ListboxOptions,
 } from "@headlessui/react";
-import { useElementSize } from "@reactuses/core";
 import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -27,7 +26,7 @@ type Props<O extends Option> = {
   onChange: (value: O["id"]) => void;
 };
 
-export type Option<ID = string> = {
+export type Option<ID = string | number> = {
   /** unique id */
   id: ID;
   /** primary label */
@@ -46,9 +45,6 @@ const SelectSingle = <O extends Option>({
   onChange,
   options,
 }: Props<O>) => {
-  const button = useRef<HTMLButtonElement>(null);
-  const [, height] = useElementSize(button, { box: "border-box" });
-
   /** link to parent form component */
   const form = useForm();
 
@@ -71,14 +67,13 @@ const SelectSingle = <O extends Option>({
       onChange={onChange}
     >
       {/* label */}
-      <Label className="flex items-center gap-1" style={{ minHeight: height }}>
+      <Label className="flex items-center gap-1">
         {label}
         {tooltip && <Help tooltip={tooltip} />}
       </Label>
 
       {/* button */}
       <ListboxButton
-        ref={button}
         className="
           gap-2 border-b border-current p-2 text-accent
           hover:text-deep
@@ -104,7 +99,7 @@ const SelectSingle = <O extends Option>({
 
       {/* dropdown */}
       <ListboxOptions
-        className="z-20 min-w-min bg-white shadow-sm"
+        className="z-20 min-w-(--button-width) bg-white shadow-sm"
         anchor={{ to: "bottom start", padding: 10 }}
         modal={false}
       >

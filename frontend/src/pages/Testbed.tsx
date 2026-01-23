@@ -444,7 +444,7 @@ const SectionButton = () => (
       Button
     </Heading>
 
-    <div className="flex flex-wrap gap-4">
+    <div className="flex flex-wrap items-center gap-4">
       <Button
         to="/about"
         text="As Link"
@@ -490,7 +490,7 @@ const SectionTextBox = () => {
         Text Box
       </Heading>
 
-      <div className="flex flex-wrap items-start gap-8">
+      <div className="flex flex-wrap items-center gap-4">
         <TextBox
           label="Label"
           tooltip="Tooltip"
@@ -544,7 +544,7 @@ const SectionSelect = () => {
         Select
       </Heading>
 
-      <div className="flex flex-wrap items-start gap-8">
+      <div className="flex flex-wrap items-center gap-4">
         <SelectSingle
           label="Single"
           tooltip="Tooltip"
@@ -593,7 +593,7 @@ const SectionSlider = () => {
         Slider
       </Heading>
 
-      <div className="flex flex-wrap items-start gap-8">
+      <div className="flex flex-wrap items-center gap-4">
         <Slider
           label="Single"
           tooltip="Tooltip"
@@ -627,9 +627,9 @@ const SectionNumberBox = () => {
         Number Box
       </Heading>
 
-      <div className="flex flex-wrap items-start gap-8">
+      <div className="flex flex-wrap items-center gap-4">
         <NumberBox
-          label="Vertical"
+          label="Number"
           tooltip="Tooltip"
           min={0}
           max={100}
@@ -638,7 +638,7 @@ const SectionNumberBox = () => {
           onChange={setValue}
         />
         <NumberBox
-          label="Horizontal"
+          label="Big steps"
           tooltip="Tooltip"
           min={-10000}
           max={10000}
@@ -676,13 +676,15 @@ const SectionRadios = () => {
         Radios
       </Heading>
 
-      <Radios
-        label="Choice"
-        tooltip="Tooltip"
-        options={options}
-        value={value}
-        onChange={setValue}
-      />
+      <div className="flex flex-col gap-2">
+        <Radios
+          label="Choice"
+          tooltip="Tooltip"
+          options={options}
+          value={value}
+          onChange={setValue}
+        />
+      </div>
     </section>
   );
 };
@@ -693,7 +695,7 @@ const SectionAgo = () => (
       Ago
     </Heading>
 
-    <div className="flex flex-wrap items-start gap-8">
+    <div className="flex flex-wrap items-center gap-4">
       <Ago date={new Date()} />
       <Ago date="Nov 12 2023" />
       <Ago date="Jun 1 2020" />
@@ -759,7 +761,7 @@ const SectionToast = () => (
       Toast
     </Heading>
 
-    <div className="flex flex-wrap items-start gap-8">
+    <div className="flex flex-wrap gap-4">
       <Button
         text="Unique Toast"
         onClick={() =>
@@ -804,7 +806,7 @@ const SectionTile = () => (
       Tile
     </Heading>
 
-    <div className="flex flex-wrap items-start gap-8">
+    <div className="flex flex-wrap gap-8">
       <Tile
         icon={<LuHourglass />}
         primary={formatNumber(1234)}
@@ -832,8 +834,15 @@ const SectionTable = () => (
 
     <Table
       cols={[
-        { key: "name", name: "Name" },
-        { key: "age", name: "Age", filterType: "number" },
+        {
+          key: "name",
+          name: "Name",
+        },
+        {
+          key: "age",
+          name: "Age",
+          filterType: "number",
+        },
         {
           key: "status",
           name: "Status",
@@ -860,7 +869,7 @@ const SectionTooltip = () => (
       Tooltip
     </Heading>
 
-    <div className="flex flex-wrap items-start gap-8">
+    <div className="flex flex-wrap gap-4">
       <Tooltip content="Minimal, non-interactive help or contextual info">
         <span className="text-tooltip" tabIndex={0} role="button">
           Plain content

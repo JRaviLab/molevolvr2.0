@@ -113,28 +113,24 @@ const Heatmap = ({
       title={title}
       filename={[...filename, "heatmap"]}
       controls={[
-        <>
-          <SelectSingle
-            label="Gradient"
-            options={gradientOptions(reverse)}
-            value={gradient}
-            onChange={setGradient}
-          />
-
-          <CheckBox
-            label="Reverse"
-            tooltip="Reverse gradient direction"
-            value={reverse}
-            onChange={setReverse}
-          />
-
-          <CheckBox
-            label="Swap"
-            tooltip="Swap rows & cols (transpose)"
-            value={swap}
-            onChange={setSwap}
-          />
-        </>,
+        <SelectSingle
+          label="Gradient"
+          options={gradientOptions(reverse)}
+          value={gradient}
+          onChange={setGradient}
+        />,
+        <CheckBox
+          label="Reverse"
+          tooltip="Reverse gradient direction"
+          value={reverse}
+          onChange={setReverse}
+        />,
+        <CheckBox
+          label="Swap"
+          tooltip="Swap rows & cols (transpose)"
+          value={swap}
+          onChange={setSwap}
+        />,
       ]}
     >
       {/* cells */}
@@ -156,7 +152,7 @@ const Heatmap = ({
             >
               <rect
                 className="
-                  stroke-transparent stroke-5 outline-none
+                  stroke-transparent stroke-2 outline-none
                   hover:stroke-black
                   focus-visible:stroke-black
                   [.group:has(&:focus)_&:not(:focus)]:opacity-25

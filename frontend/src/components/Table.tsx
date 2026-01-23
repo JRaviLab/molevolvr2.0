@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import {
   LuArrowDown,
@@ -39,12 +39,14 @@ import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
 import Help from "@/components/Help";
 import Popover from "@/components/Popover";
+import type { Option as OptionMulti } from "@/components/SelectMulti";
 import SelectMulti from "@/components/SelectMulti";
-import type { Option } from "@/components/SelectSingle";
+import type { Option as OptionSingle } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import TextBox from "@/components/TextBox";
 import Tooltip from "@/components/Tooltip";
+import { preserveScroll } from "@/util/dom";
 import { downloadCsv } from "@/util/download";
 import type { Filename } from "@/util/download";
 import { formatDate, formatNumber } from "@/util/string";
@@ -100,10 +102,21 @@ type _Col<Datum extends object> = {
 const colToOption = <Datum extends object>(
   col: Props<Datum>["cols"][number],
   index: number,
-): Option => ({
+): OptionMulti => ({
   id: String(index),
   primary: col.name,
 });
+
+/** per page options */
+const perPageOptions = [
+  { id: 10, primary: formatNumber(10) },
+  { id: 25, primary: formatNumber(25) },
+  { id: 50, primary: formatNumber(50) },
+  { id: 100, primary: formatNumber(100) },
+  { id: 10000, primary: "All" },
+] as const;
+
+type PerPage = (typeof perPageOptions)[number]["id"];
 
 /**
  * table with sorting, filtering, searching, pagination, etc.
@@ -118,6 +131,11 @@ const Table = <Datum extends object>({
   filename = [],
 }: Props<Datum>) => {
   "use no memo";
+
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  /** per page state */
+  const [perPage, setPerPage] = useState<PerPage>(perPageOptions[0].id);
 
   /** expanded state */
   const [expanded, setExpanded] = useLocalStorage("table-expanded", false);
@@ -134,18 +152,6 @@ const Table = <Datum extends object>({
 
   /** table-wide search */
   const [search, setSearch] = useState("");
-
-  /** per page options */
-  const perPageOptions = [
-    { id: "5", primary: formatNumber(5) },
-    { id: "10", primary: formatNumber(10) },
-    { id: "50", primary: formatNumber(50) },
-    { id: "100", primary: formatNumber(100) },
-    { id: "500", primary: formatNumber(500) },
-  ];
-
-  /** initial per page */
-  const defaultPerPage = perPageOptions[1]!.id;
 
   /** get column definition (from props) by id */
   const getCol = useCallback((id: string) => cols[Number(id)], [cols]);
@@ -175,7 +181,7 @@ const Table = <Datum extends object>({
       /** enumerated col */
       if (type === "enum") {
         const cell = row.getValue(columnId) as string;
-        const value = filterValue as Option["id"][];
+        const value = filterValue as OptionMulti["id"][];
         if (!value.length) return true;
         return !!value.find((option) => option === cell);
       }
@@ -183,7 +189,7 @@ const Table = <Datum extends object>({
       /** boolean col */
       if (type === "boolean") {
         const cell = row.getValue(columnId);
-        const value = filterValue as Option["id"];
+        const value = filterValue as OptionSingle["id"];
         if (value === "all") return true;
         else return String(cell) === value;
       }
@@ -258,10 +264,10 @@ const Table = <Datum extends object>({
     columnResizeMode: "onChange",
     /** initial sort, page, etc. state */
     initialState: {
-      sorting: sort ?? [{ id: "0", desc: false }],
+      sorting: sort,
       pagination: {
         pageIndex: 0,
-        pageSize: Number(defaultPerPage),
+        pageSize: Number(perPage),
       },
     },
     /** sync some controls with table state */
@@ -285,7 +291,7 @@ const Table = <Datum extends object>({
         expanded ? "w-[calc(100dvw---spacing(40))]" : "max-w-full",
       )}
     >
-      <div className="max-w-full overflow-x-auto">
+      <div className="max-w-full overflow-x-auto rounded-md shadow-md">
         {/* table */}
         <table
           className="w-full max-w-[min(max-content,var(--content))]"
@@ -471,14 +477,17 @@ const Table = <Datum extends object>({
         </div>
 
         {/* filters */}
-        <div className="flex flex-wrap items-center gap-4">
+        <div ref={filterRef} className="flex flex-wrap items-center gap-4">
           {/* per page */}
           <SelectSingle
             label="Rows"
             options={perPageOptions}
-            value={defaultPerPage}
+            value={perPage}
             onChange={(option) => {
-              table.setPageSize(Number(option));
+              const number = Number(option) as PerPage;
+              setPerPage(number);
+              table.setPageSize(number);
+              preserveScroll(filterRef.current);
             }}
           />
           {/* visible columns */}
@@ -493,14 +502,14 @@ const Table = <Datum extends object>({
         {/* table-wide search */}
         <TextBox
           placeholder="Search"
-          tooltip="Search entire table for plain text or regex"
+          tooltip="Search entire table (regex)"
           icon={<LuSearch />}
           value={search}
           onChange={setSearch}
         />
 
         {/* actions */}
-        <div className="flex flex-wrap items-center gap-1">
+        <div className="flex flex-wrap items-center gap-2">
           {/* clear filters */}
           <Button
             icon={<LuFilterX />}
@@ -565,30 +574,34 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
     const [min = 0, max = 100] = column.getFacetedMinMaxValues() ?? [];
 
     return (
-      <Slider
-        label="Filter by number"
-        min={min}
-        max={max}
-        step={(max - min) / 100}
-        multi
-        value={
-          (column.getFilterValue() as [number, number] | undefined) ?? [
-            min,
-            max,
-          ]
-        }
-        onChange={(value) => {
-          /** return as "unfiltered" if value equals min/max range */
-          column.setFilterValue(isEqual(value, [min, max]) ? undefined : value);
-        }}
-      />
+      <div className="flex flex-col gap-2">
+        <Slider
+          label="Filter by number"
+          min={min}
+          max={max}
+          step={(max - min) / 100}
+          multi
+          value={
+            (column.getFilterValue() as [number, number] | undefined) ?? [
+              min,
+              max,
+            ]
+          }
+          onChange={(value) => {
+            /** return as "unfiltered" if value equals min/max range */
+            column.setFilterValue(
+              isEqual(value, [min, max]) ? undefined : value,
+            );
+          }}
+        />
+      </div>
     );
   }
 
   /** filter as multi-select */
   if (type === "enum") {
     /** get unique values in column */
-    const options: Option[] = sortBy(
+    const options: OptionMulti[] = sortBy(
       Array.from(column.getFacetedUniqueValues().entries()).map(
         ([name, count]) => ({ name, count }),
       ),
@@ -600,27 +613,29 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
     }));
 
     return (
-      <SelectMulti
-        label="Filter by types"
-        options={options}
-        value={
-          (column.getFilterValue() as Option["id"][] | undefined) ??
-          options.map((option) => option.id)
-        }
-        onChange={(value, count) =>
-          /** return as "unfiltered" if all or none are selected */
-          column.setFilterValue(
-            count === "all" || count === "none" ? undefined : value,
-          )
-        }
-      />
+      <div className="flex flex-col gap-2">
+        <SelectMulti
+          label="Filter by types"
+          options={options}
+          value={
+            (column.getFilterValue() as OptionMulti["id"][] | undefined) ??
+            options.map((option) => option.id)
+          }
+          onChange={(value, count) =>
+            /** return as "unfiltered" if all or none are selected */
+            column.setFilterValue(
+              count === "all" || count === "none" ? undefined : value,
+            )
+          }
+        />
+      </div>
     );
   }
 
   /** filter as boolean */
   if (type === "boolean") {
     /** get options */
-    const options: Option[] = [
+    const options: OptionSingle[] = [
       {
         id: "all",
         primary: "All",
@@ -643,30 +658,34 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
     ];
 
     return (
-      <SelectSingle
-        label="Filter by type"
-        options={options}
-        value={
-          (column.getFilterValue() as Option["id"] | undefined) ??
-          options[0]!.id
-        }
-        onChange={(value) =>
-          /** return as "unfiltered" if all are selected */
-          column.setFilterValue(value === "all" ? undefined : value)
-        }
-      />
+      <div className="flex flex-col gap-2">
+        <SelectSingle
+          label="Filter by type"
+          options={options}
+          value={
+            (column.getFilterValue() as OptionSingle["id"] | undefined) ??
+            options[0]!.id
+          }
+          onChange={(value) =>
+            /** return as "unfiltered" if all are selected */
+            column.setFilterValue(value === "all" ? undefined : value)
+          }
+        />
+      </div>
     );
   }
 
   /** filter as text */
   return (
-    <TextBox
-      label="Filter by text"
-      placeholder="Search"
-      icon={<LuSearch />}
-      value={(column.getFilterValue() as string | undefined) ?? ""}
-      onChange={column.setFilterValue}
-    />
+    <div className="flex flex-col gap-2">
+      <TextBox
+        label="Filter by text (regex)"
+        placeholder="Search"
+        icon={<LuSearch />}
+        value={(column.getFilterValue() as string | undefined) ?? ""}
+        onChange={column.setFilterValue}
+      />
+    </div>
   );
 };
 

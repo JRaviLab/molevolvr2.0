@@ -53,7 +53,7 @@ const Radios = <O extends Option>({
   });
 
   return (
-    <div role="group" className="flex flex-col items-start gap-4">
+    <div role="group" className="contents">
       <legend className="flex items-center gap-2">
         {label}
         {tooltip && <Help tooltip={tooltip} />}
