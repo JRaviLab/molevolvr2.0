@@ -2,6 +2,10 @@
 export const sleep = async (ms = 0) =>
   new Promise((resolve) => window.setTimeout(resolve, ms));
 
+/** wait for next animation frame */
+export const waitFrame = () =>
+  new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+
 /** now shorthand */
 const now = () => window.performance.now();
 

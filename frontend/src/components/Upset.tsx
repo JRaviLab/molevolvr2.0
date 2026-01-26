@@ -55,7 +55,6 @@ type Props = {
 
 /** upset plot */
 const Upset = ({ title, filename = [], x, y, data }: Props) => {
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { getWidth, truncateWidth } = useTextSize();

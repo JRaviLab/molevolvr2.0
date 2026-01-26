@@ -44,7 +44,6 @@ const link = line().curve(curveStepBefore);
 
 /** tree/hierarchy plot */
 const Tree = ({ title, filename = [], data }: Props) => {
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { truncateWidth } = useTextSize();

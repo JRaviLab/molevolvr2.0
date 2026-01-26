@@ -66,7 +66,6 @@ const Heatmap = ({
     data = transpose(data);
   }
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { truncateWidth } = useTextSize();

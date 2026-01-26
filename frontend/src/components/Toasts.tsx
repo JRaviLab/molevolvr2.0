@@ -95,7 +95,7 @@ const removeToast = (id: Toast["id"]) => {
 };
 
 /** add toast to global queue */
-const toast = async (
+export const toast = async (
   content: Toast["content"],
   type: Toast["type"] = "info",
   id?: Toast["id"],
@@ -114,5 +114,3 @@ const toast = async (
   };
   addToast(newToast);
 };
-
-export { toast };

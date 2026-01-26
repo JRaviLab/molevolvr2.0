@@ -263,7 +263,6 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   const graphRef = useRef<Core | null>(null);
   const layoutRef = useRef<Layouts | null>(null);
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   /** selected nodes/edges */

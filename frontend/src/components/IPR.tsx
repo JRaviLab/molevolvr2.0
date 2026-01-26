@@ -69,7 +69,6 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
     "mode",
   );
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { fontSize, getWidth, truncateWidth } = useTextSize();

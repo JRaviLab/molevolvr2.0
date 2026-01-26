@@ -41,7 +41,6 @@ const Viz = () => {
   /** canvas client size */
   const [width, height] = useElementSize(canvas);
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   useEffect(() => {

@@ -124,8 +124,6 @@ type TabProps = {
 };
 
 /** use within a Tabs component */
-const Tab = (props: TabProps) => {
+export const Tab = (props: TabProps) => {
   return <Fragment {...props} />;
 };
-
-export { Tab };

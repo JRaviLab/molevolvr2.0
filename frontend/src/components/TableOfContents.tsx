@@ -64,7 +64,7 @@ const TableOfContents = () => {
   /** on window scroll */
   useEventListener("scroll", () => {
     /** get active heading */
-    setActive(firstInView(headings.map((h) => h.ref)));
+    setActive(firstInView(headings.map((heading) => heading.element)));
 
     if (open) {
       /** if covering something important, close */
@@ -115,7 +115,7 @@ const TableOfContents = () => {
           ref={listRef}
           className="flex max-h-[40dvh] flex-col overflow-y-auto"
         >
-          {headings.map(({ id, level, text, icon }, index) => (
+          {headings.map(({ id, level, content, icon }, index) => (
             <Link
               key={index}
               ref={active === index ? activeRef : undefined}
@@ -134,7 +134,7 @@ const TableOfContents = () => {
               onClick={() => scrollToSelector("#" + id)}
             >
               {icon && <span className="flex text-deep-light">{icon}</span>}
-              <span className="grow truncate py-1">{text}</span>
+              <span className="grow truncate py-1">{content}</span>
             </Link>
           ))}
         </div>

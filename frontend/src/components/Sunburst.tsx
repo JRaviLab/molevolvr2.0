@@ -216,7 +216,6 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
   /** unique segment id */
   const id = useId();
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { truncateWidth } = useTextSize();

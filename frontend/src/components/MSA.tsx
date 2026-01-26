@@ -53,7 +53,6 @@ const MSA = ({
   /** whether to wrap sequence to separate "panels" */
   const [wrap, setWrap] = useState(true);
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { fontSize, truncateWidth } = useTextSize();

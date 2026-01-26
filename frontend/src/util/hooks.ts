@@ -4,49 +4,40 @@ import { useAtomValue } from "jotai";
 import { isEqual } from "lodash";
 import { darkModeAtom } from "@/components/DarkMode";
 import { getTheme, getWidth, truncateWidth } from "@/util/dom";
-import type { Theme } from "@/util/dom";
 import { getFilename } from "@/util/download";
 import type { Filename } from "@/util/download";
 import { sleep } from "@/util/misc";
 
-/** get theme CSS variables */
-export const useTheme = () => {
-  /** set of theme variable keys and values */
-  const [theme, setTheme] = useState<Theme>({});
-
-  /** dark mode state */
-  const darkMode = useAtomValue(darkModeAtom);
-
-  /** update theme vars */
-  const update = useCallback(() => setTheme(getTheme()), []);
-
+/** trigger update when anything that could affect theme or styles changes */
+const useCssChange = (update: () => void) => {
   /** update theme variables when dark mode changes */
-  if (useChanged(darkMode)) update();
-
+  if (useChanged(useAtomValue(darkModeAtom))) update();
   /** when document done loading */
   useEventListener("load", update, window);
   /** when fonts done loading */
   useEventListener("loadingdone", update, document.fonts);
+};
 
+/** reactive theme variables */
+export const useTheme = () => {
+  const [theme, setTheme] = useState(getTheme);
+  useCssChange(useCallback(() => setTheme(getTheme()), []));
   return theme;
 };
 
-/** reactive text size and funcs, re-calced on theme change (including font load) */
+/** get styles on root element */
+const getStyles = () => window.getComputedStyle(document.documentElement);
+
+/** reactive root styles */
+export const useStyles = () => {
+  const [styles, setStyles] = useState(getStyles);
+  useCssChange(useCallback(() => setStyles(getStyles()), []));
+  return styles;
+};
+
+/** reactive text size and funcs */
 export const useTextSize = () => {
-  /** computed styles */
-  const [styles, setStyles] = useState<CSSStyleDeclaration>(
-    window.getComputedStyle(document.documentElement),
-  );
-
-  /** update computed styles */
-  const update = useCallback(() => {
-    setStyles(window.getComputedStyle(document.documentElement));
-  }, []);
-
-  /** when document done loading */
-  useEventListener("load", update, window);
-  /** when fonts done loading */
-  useEventListener("loadingdone", update, document.fonts);
+  const styles = useStyles();
 
   const fontSize = parseFloat(styles.fontSize) || 16;
   const fontFamily = styles.fontFamily || "sans-serif";

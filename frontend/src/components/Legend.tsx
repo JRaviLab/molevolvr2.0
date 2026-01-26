@@ -41,7 +41,6 @@ const Legend = ({
   w: rootW = maxEntryWidth,
   anchor = [0, 0],
 }: Props) => {
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { fontSize, getWidth, truncateWidth } = useTextSize();

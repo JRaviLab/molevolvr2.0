@@ -63,7 +63,6 @@ const Chart = ({
   const svgRef = useRef<SVGSVGElement>(null);
   const titleRef = useRef<SVGTextElement>(null);
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { fontSize, truncateWidth } = useTextSize();

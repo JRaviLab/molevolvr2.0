@@ -1,21 +1,30 @@
 import type { ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
-import { sleep, waitFor } from "@/util/misc";
+import { waitFor, waitFrame } from "@/util/misc";
 
 export type Theme = Record<`--${string}`, string>;
 
+/** https://stackoverflow.com/a/78994961/2180570 */
 /** get all css variables on root */
 export const getTheme = (): Theme => {
-  const styles = window.getComputedStyle(document.documentElement);
-  const vars = Object.values(
-    window.getComputedStyle(document.documentElement),
-  ).filter((value) => value.startsWith("--"));
+  const rootStyles = window.getComputedStyle(document.documentElement);
   return Object.fromEntries(
-    vars.map((key) => [key, styles.getPropertyValue(key).trim()]),
+    Array.from(document.styleSheets)
+      .flatMap((styleSheet) => {
+        try {
+          return Array.from(styleSheet.cssRules);
+        } catch (error) {
+          return [];
+        }
+      })
+      .filter((cssRule) => cssRule instanceof CSSStyleRule)
+      .flatMap((cssRule) => Array.from(cssRule.style))
+      .filter((style) => style.startsWith("--"))
+      .map((variable) => [variable, rootStyles.getPropertyValue(variable)]),
   );
 };
 
-/** get first font name from font-family string */
+/** get name from font-family string e.g. 'Arial', sans-serif -> Arial */
 export const parseFont = (family: string) =>
   family.split(",")[0]?.replaceAll(/['"]/g, "").trim() || "";
 
@@ -108,7 +117,7 @@ export const getViewBoxFit = (svg: SVGGraphicsElement) => {
 export const preserveScroll = async (element?: Element | null) => {
   if (!element) return;
   const oldY = element.getBoundingClientRect().top;
-  await sleep(0);
+  await waitFrame();
   const newY = element.getBoundingClientRect().top;
   window.scrollBy({ top: newY - oldY, behavior: "instant" });
 };

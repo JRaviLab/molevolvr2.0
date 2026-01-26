@@ -21,11 +21,11 @@ type Props = {
 };
 
 type Heading = {
-  ref: HTMLHeadingElement;
+  element: HTMLHeadingElement;
   id: string;
   level: number;
   icon?: ReactNode;
-  text: ReactNode;
+  content: ReactNode;
 };
 
 /** global list of headings */
@@ -47,9 +47,6 @@ const Heading = ({
   /** heading tag */
   const Tag: keyof JSX.IntrinsicElements = `h${level}`;
 
-  /** url-compatible, "slugified" id */
-  const id = anchor ?? slugify(renderText(children));
-
   /** icon or badge */
   let iconElement: ReactNode = null;
   if (typeof icon === "string") iconElement = <Badge>{icon}</Badge>;
@@ -58,38 +55,45 @@ const Heading = ({
 
   const setHeadings = useSetAtom(headingsAtom);
 
-  /** on every render */
+  /** url-compatible, "slugified" id */
+  const id = anchor ?? slugify(renderText(children));
+
   useEffect(() => {
     const element = ref.current;
 
-    if (element) {
-      setHeadings((headings) =>
-        headings
-          /** remove heading from list */
-          .filter((heading) => heading.ref !== element)
-          /** add heading to list */
-          .concat([
-            { ref: element, id, level, icon: iconElement, text: children },
-          ])
-          /**
-           * make sure list is in order of document appearance
-           * https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
-           */
-          .sort((a, b) =>
-            a.ref.compareDocumentPosition(b.ref) &
-            Node.DOCUMENT_POSITION_FOLLOWING
-              ? -1
-              : 1,
-          ),
-      );
-    }
+    if (element)
+      /** add heading to list */
+      setHeadings((headings) => {
+        /** find position to insert */
+        const position =
+          headings.findLastIndex(
+            (heading) =>
+              heading.element.compareDocumentPosition(element) &
+              Node.DOCUMENT_POSITION_FOLLOWING,
+          ) + 1;
 
-    return () =>
+        /** this heading */
+        const heading = {
+          element,
+          id,
+          level,
+          icon: iconElement,
+          content: children,
+        };
+
+        /** insert at correct position */
+        headings.splice(position, 0, heading);
+
+        return headings;
+      });
+
+    return () => {
       /** remove heading from list */
       setHeadings((headings) =>
-        headings.filter((heading) => heading.ref !== element),
+        headings.filter((heading) => heading.element !== element),
       );
-  });
+    };
+  }, [id, children, iconElement, level, setHeadings]);
 
   return (
     <Link to={"#" + id} className={clsx("group", className)}>
