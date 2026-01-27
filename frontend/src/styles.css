@@ -99,7 +99,7 @@
 
   section {
     --width: 300;
-    @apply even:bg-alt-white relative z-0 flex flex-col items-center gap-12 bg-white px-[max(var(--pad),(100%---spacing(1)*var(--width))/2)] py-(--pad) [--pad:--spacing(12)] max-md:[--pad:--spacing(8)];
+    @apply even:bg-alt-white relative z-0 flex flex-col items-center gap-12 bg-white px-[max(var(--pad),(100%---spacing(1)*var(--width))/2)] py-(--pad) [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
   }
 
   h1,
@@ -195,10 +195,8 @@
     @apply text-gray;
   }
 
-  dd {
-    &:empty {
-      @apply before:text-gray before:content-['-'];
-    }
+  dd:empty {
+    @apply before:text-gray before:content-['-'];
   }
 
   table {
@@ -211,23 +209,15 @@
 
   th,
   td {
-    @apply p-2;
+    @apply not-last:border-light-gray p-2 not-last:border-r;
   }
 
-  :is(th, td):not(:last-child) {
-    @apply border-light-gray border-r;
-  }
-
-  thead tr:nth-child(odd) {
+  thead tr {
     @apply bg-off-white;
   }
 
-  tr:nth-child(even) {
-    @apply bg-white;
-  }
-
-  tr:nth-child(odd) {
-    @apply bg-alt-white;
+  tr {
+    @apply even:bg-alt-white bg-white;
   }
 
   .icon {
