@@ -70,7 +70,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
   );
 
   const theme = useTheme();
-  const { fontSize, getWidth } = useTextSize();
+  const { fontSize, getWidth, truncateWidth } = useTextSize();
 
   /** unique id for clip path */
   const clipId = useId();
@@ -234,11 +234,15 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
               </g>
               <g fill={theme["--color-black"]}>
                 {tracks.map(({ label }, trackIndex) => (
-                  <Label key={trackIndex} index={trackIndex} label={label} />
+                  <Label
+                    key={trackIndex}
+                    index={trackIndex}
+                    label={label}
+                    truncateWidth={truncateWidth}
+                  />
                 ))}
               </g>
             </g>
-
             {/* main content area */}
             <g
               ref={(el) => {
@@ -305,6 +309,8 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                       scaleX={scaleX}
                       cellWidth={cellWidth}
                       rowHeight={rowHeight}
+                      theme={theme}
+                      fontSize={fontSize}
                     />
                   ))}
                 </g>
@@ -348,6 +354,9 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                               width={width}
                               rowHeight={rowHeight}
                               colorMap={colorMap}
+                              theme={theme}
+                              fontSize={fontSize}
+                              truncateWidth={truncateWidth}
                             />
                           );
                         },
@@ -390,7 +399,6 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                 />
               </g>
             </g>
-
             <Legend
               x={-labelWidth - 2 * rowHeight}
               y={(1 + tracks.length) * (rowHeight + rowGap)}
@@ -411,20 +419,17 @@ export default IPR;
 type LabelProps = {
   index: number;
   label?: string;
+  truncateWidth: ReturnType<typeof useTextSize>["truncateWidth"];
 };
 
 /** track row label */
-const Label = ({ index, label }: LabelProps) => {
-  const { truncateWidth } = useTextSize();
-
-  return (
-    <Tooltip content={label}>
-      <text x={0} y={(index + 0.5) * (rowHeight + rowGap)} tabIndex={0}>
-        {truncateWidth(label ?? "-", labelWidth)}
-      </text>
-    </Tooltip>
-  );
-};
+const Label = ({ index, label, truncateWidth }: LabelProps) => (
+  <Tooltip content={label}>
+    <text x={0} y={(index + 0.5) * (rowHeight + rowGap)} tabIndex={0}>
+      {truncateWidth(label ?? "-", labelWidth)}
+    </text>
+  </Tooltip>
+);
 
 type CharProps = {
   char: string;
@@ -432,35 +437,40 @@ type CharProps = {
   scaleX: (position: number) => number;
   cellWidth: number;
   rowHeight: number;
+  theme: ReturnType<typeof useTheme>;
+  fontSize: ReturnType<typeof useTextSize>["fontSize"];
 };
 
 /** sequence row char */
-const Char = ({ char, position, scaleX, cellWidth, rowHeight }: CharProps) => {
-  const theme = useTheme();
-  const { fontSize } = useTextSize();
-
-  return (
-    <g transform={`translate(${scaleX(position + 0.5)}, 0)`}>
-      <rect
-        x={-cellWidth / 2}
-        y={-rowHeight / 2}
-        width={cellWidth}
-        height={rowHeight}
-        fill={theme["--color-light-gray"]}
-        opacity={position % 2 === 0 ? 0.25 : 0.5}
-      />
-      <text
-        x={0}
-        y={0}
-        fill={theme["--color-black"]}
-        transform={`scale(${clamp(cellWidth / fontSize, 0, 1)})`}
-        textAnchor="middle"
-      >
-        {char}
-      </text>
-    </g>
-  );
-};
+const Char = ({
+  char,
+  position,
+  scaleX,
+  cellWidth,
+  rowHeight,
+  theme,
+  fontSize,
+}: CharProps) => (
+  <g transform={`translate(${scaleX(position + 0.5)}, 0)`}>
+    <rect
+      x={-cellWidth / 2}
+      y={-rowHeight / 2}
+      width={cellWidth}
+      height={rowHeight}
+      fill={theme["--color-light-gray"]}
+      opacity={position % 2 === 0 ? 0.25 : 0.5}
+    />
+    <text
+      x={0}
+      y={0}
+      fill={theme["--color-black"]}
+      transform={`scale(${clamp(cellWidth / fontSize, 0, 1)})`}
+      textAnchor="middle"
+    >
+      {char}
+    </text>
+  </g>
+);
 
 type FeatureProps = {
   id: string;
@@ -471,6 +481,9 @@ type FeatureProps = {
   scaleX: (position: number) => number;
   width: number;
   rowHeight: number;
+  theme: ReturnType<typeof useTheme>;
+  fontSize: ReturnType<typeof useTextSize>["fontSize"];
+  truncateWidth: ReturnType<typeof useTextSize>["truncateWidth"];
   colorMap: ReturnType<typeof useColorMap>;
 };
 
@@ -485,10 +498,10 @@ const Feature = ({
   width,
   rowHeight,
   colorMap,
+  theme,
+  fontSize,
+  truncateWidth,
 }: FeatureProps) => {
-  const theme = useTheme();
-  const { fontSize, truncateWidth } = useTextSize();
-
   /** x in view */
   const drawX = clamp(scaleX(start - 1), 0, width);
   /** width in view */
