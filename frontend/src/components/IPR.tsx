@@ -266,11 +266,11 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                     zoomBehavior.transform(selection, zoomIdentity);
                     setTransform(zoomIdentity);
                   };
-                  if (prevWidth.current !== width) reset();
                   selection.on("dblclick.zoom", (event) => {
                     event.preventDefault();
                     reset();
                   });
+                  if (prevWidth.current !== width) reset();
                   prevWidth.current = width;
                 }
 
@@ -305,10 +305,11 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                   className="pointer-events-none"
                   transform={`translate(0, ${-1.5 * (rowHeight + rowGap)})`}
                 >
-                  {sequence.split("").map((char, index) => (
+                  {/* only draw sequence chars in view */}
+                  {range(startPosition, endPosition).map((position) => (
                     <g
-                      key={index}
-                      transform={`translate(${scaleX(index + 0.5)}, 0)`}
+                      key={position}
+                      transform={`translate(${scaleX(position + 0.5)}, 0)`}
                     >
                       <rect
                         x={-cellWidth / 2}
@@ -316,7 +317,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                         width={cellWidth}
                         height={rowHeight}
                         fill={theme["--color-light-gray"]}
-                        opacity={index % 2 === 0 ? 0.25 : 0.5}
+                        opacity={position % 2 === 0 ? 0.25 : 0.5}
                       />
                       <text
                         x={0}
@@ -325,12 +326,13 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                         transform={`scale(${clamp(cellWidth / fontSize, 0, 1)})`}
                         textAnchor="middle"
                       >
-                        {char}
+                        {sequence[position]}
                       </text>
                     </g>
                   ))}
                 </g>
 
+                {/* ticks row */}
                 <g
                   className="pointer-events-none"
                   fill={theme["--color-black"]}
@@ -343,7 +345,8 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                     </text>
                   ))}
                 </g>
-                {/* tracks */}
+
+                {/* track rows */}
                 <g>
                   {tracks.map((track, trackIndex) => (
                     <g
@@ -352,6 +355,10 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                     >
                       {track.features.map(
                         ({ id, label, type, start, end }, featureIndex) => {
+                          /** don't draw features outside view */
+                          if (end < startPosition + 1 || start > endPosition)
+                            return null;
+
                           /** x in view */
                           const drawX = clamp(scaleX(start - 1), 0, width);
                           /** width in view */

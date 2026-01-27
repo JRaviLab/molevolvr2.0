@@ -92,6 +92,8 @@ import tableData from "../../fixtures/table.json";
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
+  return <SectionIPR />;
+
   return (
     <>
       <Meta title="Testbed" />
