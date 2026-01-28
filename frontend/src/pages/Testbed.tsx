@@ -92,8 +92,6 @@ import tableData from "../../fixtures/table.json";
 
 /** test and example usage of formatting, elements, components, etc. */
 const TestbedPage = () => {
-  return <SectionIPR />;
-
   return (
     <>
       <Meta title="Testbed" />
@@ -775,8 +773,13 @@ const SectionToast = () => (
       <Button
         text="Overwriting Toast"
         onClick={() => {
-          toast(`ABC`, sample(["info", "success", "warning", "error"]), "abc");
-          toast(`ABC`, sample(["info", "success", "warning", "error"]), "abc");
+          toast(
+            <>
+              Toast modified in place <b>{sample(words)}</b>
+            </>,
+            sample(["info", "success", "warning", "error"]),
+            "ABC",
+          );
         }}
       />
     </div>
