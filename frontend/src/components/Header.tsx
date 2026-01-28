@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { LuMenu, LuX } from "react-icons/lu";
 import { useLocation } from "react-router";
 import { useElementSize } from "@reactuses/core";
 import clsx from "clsx";
+import { Menu, X } from "lucide-react";
 import Logo from "@/assets/logo.svg?react";
 import { DarkMode } from "@/components/DarkMode";
 import Link from "@/components/Link";
@@ -65,7 +65,7 @@ const Header = () => {
           aria-expanded={open}
           aria-controls="nav"
         >
-          {open ? <LuX /> : <LuMenu />}
+          {open ? <X /> : <Menu />}
         </button>
       </Tooltip>
 

@@ -1,8 +1,8 @@
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import type { RequireAtLeastOne } from "type-fest";
 import { useId, useRef } from "react";
-import { LuCopy, LuX } from "react-icons/lu";
 import { useElementBounding } from "@reactuses/core";
+import { Copy, X } from "lucide-react";
 import Asterisk from "@/components/Asterisk";
 import Button from "@/components/Button";
 import { useForm } from "@/components/Form";
@@ -68,7 +68,7 @@ const TextBox = ({
             design="hollow"
             className="rounded-none"
             tooltip="Copy text"
-            icon={<LuCopy />}
+            icon={<Copy />}
             onClick={async () => {
               await window.navigator.clipboard.writeText(value);
               toast("Copied text", "success");
@@ -79,7 +79,7 @@ const TextBox = ({
           design="hollow"
           className="rounded-none"
           tooltip="Clear text"
-          icon={<LuX />}
+          icon={<X />}
           onClick={() => {
             if (ref.current) ref.current.value = "";
             onChange("");

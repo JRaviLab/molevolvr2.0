@@ -1,13 +1,13 @@
 import type { ReactNode, RefObject } from "react";
 import type { Filename, Tabular } from "@/util/download";
 import {
-  LuBraces,
-  LuDownload,
-  LuImage,
-  LuSpline,
-  LuTable,
-  LuTerminal,
-} from "react-icons/lu";
+  Braces,
+  DownloadIcon,
+  Image,
+  Spline,
+  Table,
+  Terminal,
+} from "lucide-react";
 import Button from "@/components/Button";
 import Popover from "@/components/Popover";
 import {
@@ -54,7 +54,7 @@ const Download = ({
           {raster && (
             <>
               <Button
-                icon={<LuImage />}
+                icon={<Image />}
                 text="PNG"
                 onClick={async () => {
                   if (!raster.current) return;
@@ -63,7 +63,7 @@ const Download = ({
                 tooltip="High-resolution image"
               />
               <Button
-                icon={<LuImage />}
+                icon={<Image />}
                 text="JPEG"
                 onClick={async () => {
                   if (!raster.current) return;
@@ -75,7 +75,7 @@ const Download = ({
           )}
           {vector && (
             <Button
-              icon={<LuSpline />}
+              icon={<Spline />}
               text="SVG"
               onClick={() => {
                 if (!vector.current) return;
@@ -87,13 +87,13 @@ const Download = ({
           {tabular && (
             <>
               <Button
-                icon={<LuTable />}
+                icon={<Table />}
                 text="TSV"
                 onClick={() => downloadTsv(tabular, filename)}
                 tooltip="Tab-separated data"
               />
               <Button
-                icon={<LuTable />}
+                icon={<Table />}
                 text="CSV"
                 onClick={() => downloadCsv(tabular, filename)}
                 tooltip="Tab-separated data"
@@ -102,7 +102,7 @@ const Download = ({
           )}
           {text && (
             <Button
-              icon={<LuTerminal />}
+              icon={<Terminal />}
               text="Text"
               onClick={() => downloadTxt(text, filename)}
               tooltip="Raw text data"
@@ -110,7 +110,7 @@ const Download = ({
           )}
           {!!json && (
             <Button
-              icon={<LuBraces />}
+              icon={<Braces />}
               text="JSON"
               onClick={() => downloadJson(json, filename)}
               tooltip="JSON data"
@@ -120,7 +120,7 @@ const Download = ({
         </div>
       }
     >
-      <Button icon={<LuDownload />} design="hollow" tooltip="Download" />
+      <Button icon={<DownloadIcon />} design="hollow" tooltip="Download" />
     </Popover>
   );
 };

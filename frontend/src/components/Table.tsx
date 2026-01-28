@@ -9,21 +9,6 @@ import type { Option as OptionMulti } from "@/components/SelectMulti";
 import type { Option as OptionSingle } from "@/components/SelectSingle";
 import type { Filename } from "@/util/download";
 import { useCallback, useMemo, useRef, useState } from "react";
-import {
-  LuArrowDown,
-  LuArrowDownUp,
-  LuArrowUp,
-  LuChevronLeft,
-  LuChevronRight,
-  LuChevronsLeft,
-  LuChevronsRight,
-  LuDownload,
-  LuFilter,
-  LuFilterX,
-  LuFoldHorizontal,
-  LuSearch,
-  LuUnfoldHorizontal,
-} from "react-icons/lu";
 import { useLocalStorage } from "@reactuses/core";
 import {
   createColumnHelper,
@@ -39,6 +24,21 @@ import {
 } from "@tanstack/react-table";
 import clsx from "clsx";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
+import {
+  ArrowDown,
+  ArrowDownUp,
+  ArrowUp,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Download,
+  FilterIcon,
+  FilterX,
+  FoldHorizontal,
+  Search,
+  UnfoldHorizontal,
+} from "lucide-react";
 import Button from "@/components/Button";
 import Help from "@/components/Help";
 import Popover from "@/components/Popover";
@@ -344,12 +344,12 @@ const Table = <Datum extends object>({
                             >
                               {header.column.getIsSorted() ? (
                                 header.column.getIsSorted() === "asc" ? (
-                                  <LuArrowUp className="text-accent" />
+                                  <ArrowUp className="text-accent" />
                                 ) : (
-                                  <LuArrowDown className="text-accent" />
+                                  <ArrowDown className="text-accent" />
                                 )
                               ) : (
-                                <LuArrowDownUp />
+                                <ArrowDownUp />
                               )}
                             </button>
                           </Tooltip>
@@ -368,9 +368,9 @@ const Table = <Datum extends object>({
                             <Tooltip content="Filter this column">
                               <button>
                                 {header.column.getIsFiltered() ? (
-                                  <LuFilterX className="text-accent" />
+                                  <FilterX className="text-accent" />
                                 ) : (
-                                  <LuFilter />
+                                  <FilterIcon />
                                 )}
                               </button>
                             </Tooltip>
@@ -435,7 +435,7 @@ const Table = <Datum extends object>({
               design="hollow"
               size="compact"
               tooltip="First page"
-              icon={<LuChevronsLeft />}
+              icon={<ChevronsLeft />}
               aria-disabled={!table.getCanPreviousPage()}
               onClick={() => table.setPageIndex(0)}
             />
@@ -443,7 +443,7 @@ const Table = <Datum extends object>({
               design="hollow"
               size="compact"
               tooltip="Previous page"
-              icon={<LuChevronLeft />}
+              icon={<ChevronLeft />}
               aria-disabled={!table.getCanPreviousPage()}
               onClick={table.previousPage}
             />
@@ -468,7 +468,7 @@ const Table = <Datum extends object>({
               design="hollow"
               size="compact"
               tooltip="Next page"
-              icon={<LuChevronRight />}
+              icon={<ChevronRight />}
               aria-disabled={!table.getCanNextPage()}
               onClick={table.nextPage}
             />
@@ -476,7 +476,7 @@ const Table = <Datum extends object>({
               design="hollow"
               size="compact"
               tooltip="Last page"
-              icon={<LuChevronsRight />}
+              icon={<ChevronsRight />}
               aria-disabled={!table.getCanNextPage()}
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             />
@@ -509,7 +509,7 @@ const Table = <Datum extends object>({
           <TextBox
             placeholder="Search"
             tooltip="Search entire table (regex)"
-            icon={<LuSearch />}
+            icon={<Search />}
             value={search}
             onChange={setSearch}
           />
@@ -518,7 +518,7 @@ const Table = <Datum extends object>({
           <div className="flex flex-wrap items-center gap-2">
             {/* clear filters */}
             <Button
-              icon={<LuFilterX />}
+              icon={<FilterX />}
               design="hollow"
               tooltip="Clear all filters"
               onClick={() => {
@@ -529,7 +529,7 @@ const Table = <Datum extends object>({
             {/* download */}
             <Button
               design="hollow"
-              icon={<LuDownload />}
+              icon={<Download />}
               tooltip="Download table data as .csv"
               onClick={() => {
                 /** get col defs that are visible */
@@ -554,7 +554,7 @@ const Table = <Datum extends object>({
             />
             {/* expand/collapse */}
             <Button
-              icon={expanded ? <LuFoldHorizontal /> : <LuUnfoldHorizontal />}
+              icon={expanded ? <FoldHorizontal /> : <UnfoldHorizontal />}
               design="hollow"
               tooltip={expanded ? "Collapse table" : "Expand table"}
               onClick={() => setExpanded(!expanded)}
@@ -690,7 +690,7 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
       <TextBox
         label="Filter by text (regex)"
         placeholder="Search"
-        icon={<LuSearch />}
+        icon={<Search />}
         value={(column.getFilterValue() as string | undefined) ?? ""}
         onChange={column.setFilterValue}
       />

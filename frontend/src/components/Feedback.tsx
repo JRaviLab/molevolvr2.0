@@ -1,9 +1,9 @@
-import { LuDownload, LuMessageCircleMore, LuSend } from "react-icons/lu";
 import { useLocation } from "react-router";
 import { Fragment } from "react/jsx-runtime";
 import { useLocalStorage } from "@reactuses/core";
 import { useMutation } from "@tanstack/react-query";
 import { mapValues, startCase, truncate } from "lodash";
+import { Download, MessageCircleMore, Send } from "lucide-react";
 import { createIssue } from "@/api/issue";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
@@ -223,7 +223,7 @@ const Feedback = () => {
             <div className="flex flex-wrap gap-2">
               <Button
                 text="Screenshot"
-                icon={<LuDownload />}
+                icon={<Download />}
                 design="hollow"
                 tooltip="Download a screenshot of the current page"
                 onClick={async () => {
@@ -246,12 +246,12 @@ const Feedback = () => {
             <div className="grow" />
 
             {status === "idle" && (
-              <Button text="Submit" icon={<LuSend />} type="submit" />
+              <Button text="Submit" icon={<Send />} type="submit" />
             )}
           </>
         }
       >
-        <Button icon={<LuMessageCircleMore />} tooltip="Give us feedback" />
+        <Button icon={<MessageCircleMore />} tooltip="Give us feedback" />
       </Dialog>
     </Form>
   );

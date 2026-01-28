@@ -50,8 +50,7 @@ const Heading = ({
   /** icon or badge */
   let iconElement: ReactNode = null;
   if (typeof icon === "string") iconElement = <Badge>{icon}</Badge>;
-  if (typeof icon === "object" && typeof icon.type === "function")
-    iconElement = <div className="flex opacity-25">{icon}</div>;
+  else iconElement = <div className="flex opacity-25">{icon}</div>;
 
   const setHeadings = useSetAtom(headingsAtom);
 

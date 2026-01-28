@@ -20,12 +20,6 @@ import type { Option } from "@/components/SelectSingle";
 import type { Filename } from "@/util/download";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
-  LuCrop,
-  LuFoldHorizontal,
-  LuMaximize,
-  LuUnfoldHorizontal,
-} from "react-icons/lu";
-import {
   useDebounceFn,
   useFullscreen,
   useLocalStorage,
@@ -41,6 +35,7 @@ import klay from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
 import { mapValues, omit, orderBy, startCase, truncate } from "lodash";
+import { Crop, FoldHorizontal, Maximize, UnfoldHorizontal } from "lucide-react";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
 import Legend from "@/components/Legend";
@@ -756,21 +751,21 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
           />
 
           <Button
-            icon={<LuCrop />}
+            icon={<Crop />}
             design="hollow"
             tooltip="Fit view to contents"
             onClick={fit}
           />
 
           <Button
-            icon={expanded ? <LuFoldHorizontal /> : <LuUnfoldHorizontal />}
+            icon={expanded ? <FoldHorizontal /> : <UnfoldHorizontal />}
             tooltip={expanded ? "Collapse width" : "Expand width"}
             design="hollow"
             onClick={() => setExpanded(!expanded)}
           />
 
           <Button
-            icon={<LuMaximize />}
+            icon={<Maximize />}
             design="hollow"
             tooltip="Full screen"
             onClick={toggleFullscreen}

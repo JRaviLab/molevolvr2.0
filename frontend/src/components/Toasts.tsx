@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { LuX } from "react-icons/lu";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
+import { X } from "lucide-react";
 import Button from "@/components/Button";
 import { types } from "@/components/Mark";
 import { renderText } from "@/util/dom";
@@ -56,7 +56,7 @@ const Toasts = () => {
           </div>
           <Button
             design="hollow"
-            icon={<LuX />}
+            icon={<X />}
             tooltip="Dismiss notification"
             onClick={() => removeToast(toast.id)}
           />

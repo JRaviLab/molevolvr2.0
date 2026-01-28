@@ -1,19 +1,19 @@
 import type { AnalysisType, InputFormat } from "@/api/types";
 import type { Option } from "@/components/SelectSingle";
 import { useState } from "react";
-import {
-  LuArrowRightToLine,
-  LuBell,
-  LuCog,
-  LuLightbulb,
-  LuPlus,
-  LuSend,
-  LuUpload,
-} from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "@reactuses/core";
 import { parse } from "csv-parse/browser/esm/sync";
 import { isEmpty, startCase } from "lodash";
+import {
+  ArrowRightToLine,
+  Bell,
+  Cog,
+  Lightbulb,
+  Plus,
+  Send,
+  Upload,
+} from "lucide-react";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
@@ -216,13 +216,13 @@ const NewAnalysis = () => {
 
       <Form onSubmit={onSubmit}>
         <section>
-          <Heading level={1} icon={<LuPlus />}>
+          <Heading level={1} icon={<Plus />}>
             New Analysis
           </Heading>
         </section>
 
         <section>
-          <Heading level={2} icon={<LuArrowRightToLine />}>
+          <Heading level={2} icon={<ArrowRightToLine />}>
             Input
           </Heading>
 
@@ -320,7 +320,7 @@ const NewAnalysis = () => {
           <div className="flex items-center gap-4">
             <UploadButton
               text="Upload"
-              icon={<LuUpload />}
+              icon={<Upload />}
               onUpload={async (file, filename, extension) => {
                 if (!name) setName(startCase(filename));
                 const contents = await file.text();
@@ -338,7 +338,7 @@ const NewAnalysis = () => {
               }}
               accept={accept}
             />
-            <Button text="Example" icon={<LuLightbulb />} onClick={onExample} />
+            <Button text="Example" icon={<Lightbulb />} onClick={onExample} />
           </div>
 
           {inputType === "external" && (
@@ -366,7 +366,7 @@ const NewAnalysis = () => {
                   />
                   <UploadButton
                     text="Upload Query Sequence Accession Numbers"
-                    icon={<LuUpload />}
+                    icon={<Upload />}
                     design="hollow"
                     className="self-center"
                     onUpload={async (file) =>
@@ -381,7 +381,7 @@ const NewAnalysis = () => {
         </section>
 
         <section>
-          <Heading level={2} icon={<LuCog />}>
+          <Heading level={2} icon={<Cog />}>
             Options
           </Heading>
 
@@ -443,7 +443,7 @@ const NewAnalysis = () => {
         </section>
 
         <section className="narrow">
-          <Heading level={2} icon={<LuSend />}>
+          <Heading level={2} icon={<Send />}>
             Submit
           </Heading>
 
@@ -461,7 +461,7 @@ const NewAnalysis = () => {
             <TextBox
               label={
                 <>
-                  <LuBell /> Email me updates on this analysis
+                  <Bell /> Email me updates on this analysis
                 </>
               }
               placeholder="my-email@xyz.com"
@@ -481,7 +481,7 @@ const NewAnalysis = () => {
 
           <Button
             text="Submit"
-            icon={<LuSend />}
+            icon={<Send />}
             design="critical"
             type="submit"
           />

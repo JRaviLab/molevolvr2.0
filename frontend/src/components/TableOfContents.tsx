@@ -1,11 +1,11 @@
 import type { CSSProperties } from "react";
 import { useRef, useState } from "react";
-import { LuMenu, LuX } from "react-icons/lu";
 import { useLocation } from "react-router";
 import { useClickOutside, useEventListener } from "@reactuses/core";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { debounce } from "lodash";
+import { Menu, X } from "lucide-react";
 import Button from "@/components/Button";
 import { headingsAtom } from "@/components/Heading";
 import Link from "@/components/Link";
@@ -101,7 +101,7 @@ const TableOfContents = () => {
           <Button
             design="hollow"
             className="rounded-none"
-            icon={open ? <LuX /> : <LuMenu />}
+            icon={open ? <X /> : <Menu />}
             tooltip={open ? "Close" : "Table of contents"}
             aria-expanded={open}
             onClick={() => setOpen(!open)}

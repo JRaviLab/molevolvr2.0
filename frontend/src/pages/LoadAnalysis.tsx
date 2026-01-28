@@ -1,8 +1,8 @@
 import type { Analysis } from "@/api/types";
 import { useState } from "react";
-import { LuArrowRight, LuHistory } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "@reactuses/core";
+import { ArrowRight, History } from "lucide-react";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";
 import Form from "@/components/Form";
@@ -27,7 +27,7 @@ const LoadAnalysis = () => {
       <Meta title="Load Analysis" />
 
       <section>
-        <Heading level={1} icon={<LuArrowRight />}>
+        <Heading level={1} icon={<ArrowRight />}>
           Load Analysis
         </Heading>
 
@@ -39,13 +39,13 @@ const LoadAnalysis = () => {
         >
           <div className="flex flex-wrap justify-center gap-4">
             <TextBox placeholder="Analysis ID" value={id} onChange={setId} />
-            <Button text="Lookup" icon={<LuArrowRight />} type="submit" />
+            <Button text="Lookup" icon={<ArrowRight />} type="submit" />
           </div>
         </Form>
       </section>
 
       <section>
-        <Heading level={2} icon={<LuHistory />}>
+        <Heading level={2} icon={<History />}>
           History
         </Heading>
 

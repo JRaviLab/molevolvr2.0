@@ -1,8 +1,8 @@
 import type { ComponentProps, ReactNode } from "react";
 import type { To } from "react-router";
-import { LuExternalLink } from "react-icons/lu";
 import { resolvePath, Link as RouterLink, useLocation } from "react-router";
 import clsx from "clsx";
+import { ExternalLink } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
 
 type Props = Base & (_Anchor | _Router);
@@ -54,7 +54,7 @@ const Link = ({
     /** "external" plain link */
     <a ref={ref} href={to} target={target} className={_class} {...props}>
       {children}
-      {_showArrow && <LuExternalLink />}
+      {_showArrow && <ExternalLink />}
     </a>
   ) : (
     /** "internal" router link */
@@ -70,7 +70,7 @@ const Link = ({
       {...props}
     >
       {children}
-      {_showArrow && <LuExternalLink />}
+      {_showArrow && <ExternalLink />}
     </RouterLink>
   );
 

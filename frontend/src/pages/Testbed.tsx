@@ -1,41 +1,41 @@
 import { useMemo, useRef, useState } from "react";
-import {
-  LuAppWindowMac,
-  LuArrowRight,
-  LuArrowUpDown,
-  LuBeer,
-  LuBrush,
-  LuChartPie,
-  LuCircleCheckBig,
-  LuDog,
-  LuFolder,
-  LuFrown,
-  LuGrid3X3,
-  LuHash,
-  LuHourglass,
-  LuInfo,
-  LuLink,
-  LuListCheck,
-  LuMenu,
-  LuMessageSquare,
-  LuMessageSquareDot,
-  LuNetwork,
-  LuPalette,
-  LuSearch,
-  LuShapes,
-  LuSlidersHorizontal,
-  LuSquare,
-  LuSquareCheck,
-  LuTable,
-  LuTableCellsMerge,
-  LuTableColumnsSplit,
-  LuTextCursorInput,
-  LuType,
-  LuWaypoints,
-  LuWine,
-} from "react-icons/lu";
 import { useElementSize } from "@reactuses/core";
 import { mapValues, sample, startCase, uniq } from "lodash";
+import {
+  AppWindowMac,
+  ArrowRight,
+  ArrowUpDown,
+  Beer,
+  Brush,
+  ChartPie,
+  CircleCheckBig,
+  Dog,
+  Folder,
+  Frown,
+  Grid3X3,
+  Hash,
+  Hourglass,
+  Info,
+  LinkIcon,
+  ListCheck,
+  Menu,
+  MessageSquare,
+  MessageSquareDot,
+  NetworkIcon,
+  Palette,
+  Search,
+  Shapes,
+  SlidersHorizontal,
+  Square,
+  SquareCheck,
+  TableCellsMerge,
+  TableColumnsSplit,
+  TableIcon,
+  TextCursorInput,
+  Type,
+  Waypoints,
+  Wine,
+} from "lucide-react";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -160,7 +160,7 @@ const SectionElements = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<LuBrush />}>
+      <Heading level={2} icon={<Brush />}>
         Elements
       </Heading>
 
@@ -327,7 +327,7 @@ const SectionLegend = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<LuShapes />}>
+      <Heading level={2} icon={<Shapes />}>
         Legend
       </Heading>
 
@@ -345,7 +345,7 @@ const SectionLegend = () => {
 
 const SectionUpset = () => (
   <section>
-    <Heading level={2} icon={<LuFrown />}>
+    <Heading level={2} icon={<Frown />}>
       Upset
     </Heading>
 
@@ -355,7 +355,7 @@ const SectionUpset = () => (
 
 const SectionSunburst = () => (
   <section>
-    <Heading level={2} icon={<LuChartPie />}>
+    <Heading level={2} icon={<ChartPie />}>
       Sunburst
     </Heading>
 
@@ -365,7 +365,7 @@ const SectionSunburst = () => (
 
 const SectionHeatmap = () => (
   <section>
-    <Heading level={2} icon={<LuGrid3X3 />}>
+    <Heading level={2} icon={<Grid3X3 />}>
       Heatmap
     </Heading>
 
@@ -375,7 +375,7 @@ const SectionHeatmap = () => (
 
 const SectionTree = () => (
   <section>
-    <Heading level={2} icon={<LuNetwork />}>
+    <Heading level={2} icon={<NetworkIcon />}>
       Tree
     </Heading>
 
@@ -385,7 +385,7 @@ const SectionTree = () => (
 
 const SectionNetwork = () => (
   <section>
-    <Heading level={2} icon={<LuWaypoints />}>
+    <Heading level={2} icon={<Waypoints />}>
       Network
     </Heading>
 
@@ -395,7 +395,7 @@ const SectionNetwork = () => (
 
 const SectionMSA = () => (
   <section>
-    <Heading level={2} icon={<LuTableColumnsSplit />}>
+    <Heading level={2} icon={<TableColumnsSplit />}>
       MSA
     </Heading>
 
@@ -411,7 +411,7 @@ const SectionMSA = () => (
 
 const SectionIPR = () => (
   <section>
-    <Heading level={2} icon={<LuTableCellsMerge />}>
+    <Heading level={2} icon={<TableCellsMerge />}>
       IPR
     </Heading>
 
@@ -426,7 +426,7 @@ const SectionIPR = () => (
 
 const SectionLink = () => (
   <section>
-    <Heading level={2} icon={<LuLink />}>
+    <Heading level={2} icon={<LinkIcon />}>
       Link
     </Heading>
 
@@ -440,7 +440,7 @@ const SectionLink = () => (
 
 const SectionButton = () => (
   <section>
-    <Heading level={2} icon={<LuSquare />}>
+    <Heading level={2} icon={<Square />}>
       Button
     </Heading>
 
@@ -449,7 +449,7 @@ const SectionButton = () => (
         to="/about"
         text="As Link"
         design="hollow"
-        icon={<LuArrowRight />}
+        icon={<ArrowRight />}
         tooltip="Tooltip"
       />
       <Button to="/about" text="As Link" tooltip="Tooltip" />
@@ -467,7 +467,7 @@ const SectionButton = () => (
       />
       <Button
         text="As Button"
-        icon={<LuArrowRight />}
+        icon={<ArrowRight />}
         tooltip="Tooltip"
         onClick={() => window.alert("Hello World")}
       />
@@ -486,7 +486,7 @@ const SectionTextBox = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<LuType />}>
+      <Heading level={2} icon={<Type />}>
         Text Box
       </Heading>
 
@@ -503,7 +503,7 @@ const SectionTextBox = () => {
           tooltip="Tooltip"
           placeholder="Search"
           multi
-          icon={<LuSearch />}
+          icon={<Search />}
           value={value}
           onChange={setValue}
         />
@@ -530,7 +530,7 @@ const SectionSelect = () => {
       id: "c",
       primary: "Dolor",
       secondary: "123",
-      icon: <LuDog />,
+      icon: <Dog />,
     },
   ] as const;
 
@@ -540,7 +540,7 @@ const SectionSelect = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<LuListCheck />}>
+      <Heading level={2} icon={<ListCheck />}>
         Select
       </Heading>
 
@@ -569,7 +569,7 @@ const SectionCheckBox = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<LuSquareCheck />}>
+      <Heading level={2} icon={<SquareCheck />}>
         Check Box
       </Heading>
 
@@ -589,7 +589,7 @@ const SectionSlider = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<LuSlidersHorizontal />}>
+      <Heading level={2} icon={<SlidersHorizontal />}>
         Slider
       </Heading>
 
@@ -623,7 +623,7 @@ const SectionNumberBox = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<LuHash />}>
+      <Heading level={2} icon={<Hash />}>
         Number Box
       </Heading>
 
@@ -662,7 +662,7 @@ const SectionRadios = () => {
     {
       id: "third",
       primary: "Primar lorem ipsum",
-      icon: <LuDog />,
+      icon: <Dog />,
     },
   ] as const;
 
@@ -672,7 +672,7 @@ const SectionRadios = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<LuCircleCheckBig />}>
+      <Heading level={2} icon={<CircleCheckBig />}>
         Radios
       </Heading>
 
@@ -691,7 +691,7 @@ const SectionRadios = () => {
 
 const SectionAgo = () => (
   <section>
-    <Heading level={2} icon={<LuHourglass />}>
+    <Heading level={2} icon={<Hourglass />}>
       Ago
     </Heading>
 
@@ -705,7 +705,7 @@ const SectionAgo = () => (
 
 const SectionAlert = () => (
   <section>
-    <Heading level={2} icon={<LuInfo />}>
+    <Heading level={2} icon={<Info />}>
       Alert
     </Heading>
 
@@ -725,26 +725,26 @@ const SectionAlert = () => (
 
 const SectionTabs = () => (
   <section>
-    <Heading level={2} icon={<LuFolder />}>
+    <Heading level={2} icon={<Folder />}>
       Tabs
     </Heading>
 
     <Tabs syncWithUrl="tab" defaultValue="drinks">
-      <Tab text="Animals" icon={<LuDog />} tooltip="Tooltip">
+      <Tab text="Animals" icon={<Dog />} tooltip="Tooltip">
         <ul>
           <li>Cat</li>
           <li>Dog</li>
           <li>Bird</li>
         </ul>
       </Tab>
-      <Tab text="Drinks" icon={<LuBeer />} tooltip="Tooltip">
+      <Tab text="Drinks" icon={<Beer />} tooltip="Tooltip">
         <ul>
           <li>Soda</li>
           <li>Beer</li>
           <li>Water</li>
         </ul>
       </Tab>
-      <Tab text="Colors" icon={<LuPalette />}>
+      <Tab text="Colors" icon={<Palette />}>
         <ul>
           <li>Red</li>
           <li>Purple</li>
@@ -757,7 +757,7 @@ const SectionTabs = () => (
 
 const SectionToast = () => (
   <section>
-    <Heading level={2} icon={<LuWine />}>
+    <Heading level={2} icon={<Wine />}>
       Toast
     </Heading>
 
@@ -788,7 +788,7 @@ const SectionToast = () => (
 
 const SectionCollapsible = () => (
   <section>
-    <Heading level={2} icon={<LuArrowUpDown />}>
+    <Heading level={2} icon={<ArrowUpDown />}>
       Collapsible
     </Heading>
 
@@ -813,7 +813,7 @@ const SectionTile = () => (
 
     <div className="flex flex-wrap gap-8">
       <Tile
-        icon={<LuHourglass />}
+        icon={<Hourglass />}
         primary={formatNumber(1234)}
         secondary="Sequences"
       />
@@ -823,7 +823,7 @@ const SectionTile = () => (
         secondary="Proteins"
       />
       <Tile
-        icon={<LuMenu />}
+        icon={<Menu />}
         primary={formatNumber(99999)}
         secondary="Analyses"
       />
@@ -833,7 +833,7 @@ const SectionTile = () => (
 
 const SectionTable = () => (
   <section>
-    <Heading level={2} icon={<LuTable />}>
+    <Heading level={2} icon={<TableIcon />}>
       Table
     </Heading>
 
@@ -870,7 +870,7 @@ const SectionTable = () => (
 
 const SectionTooltip = () => (
   <section>
-    <Heading level={2} icon={<LuMessageSquare />}>
+    <Heading level={2} icon={<MessageSquare />}>
       Tooltip
     </Heading>
 
@@ -898,7 +898,7 @@ const SectionTooltip = () => (
 
 const SectionPopover = () => (
   <section>
-    <Heading level={2} icon={<LuMessageSquareDot />}>
+    <Heading level={2} icon={<MessageSquareDot />}>
       Popover
     </Heading>
 
@@ -934,7 +934,7 @@ const SectionPopover = () => (
 
 const SectionDialog = () => (
   <section>
-    <Heading level={2} icon={<LuAppWindowMac />}>
+    <Heading level={2} icon={<AppWindowMac />}>
       Dialog
     </Heading>
 
@@ -1051,7 +1051,7 @@ const SectionDialog = () => (
 
 const SectionForm = () => (
   <section>
-    <Heading level={2} icon={<LuTextCursorInput />}>
+    <Heading level={2} icon={<TextCursorInput />}>
       Form
     </Heading>
 

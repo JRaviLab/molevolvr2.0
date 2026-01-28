@@ -1,12 +1,12 @@
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { cloneElement, Fragment, useRef, useState } from "react";
-import { LuX } from "react-icons/lu";
 import {
   DialogPanel as Content,
   Description,
   Dialog as Root,
   DialogTitle as Title,
 } from "@headlessui/react";
+import { X } from "lucide-react";
 import Button from "@/components/Button";
 
 type Props = {
@@ -72,7 +72,7 @@ const Dialog = ({
                 <Button
                   design="hollow"
                   tooltip="Close dialog"
-                  icon={<LuX />}
+                  icon={<X />}
                   className="text-gray"
                   onClick={close}
                 />

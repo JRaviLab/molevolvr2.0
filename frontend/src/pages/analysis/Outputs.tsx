@@ -1,10 +1,10 @@
 import {
-  LuArrowRightFromLine,
-  LuChartNoAxesGantt,
-  LuFeather,
-  LuShapes,
-  LuSplit,
-} from "react-icons/lu";
+  ArrowRightFromLine,
+  ChartNoAxesGantt,
+  Feather,
+  Shapes,
+  Split,
+} from "lucide-react";
 import Heading from "@/components/Heading";
 import Tabs, { Tab } from "@/components/Tabs";
 import DomainArch from "@/pages/analysis/outputs/DomainArch";
@@ -15,21 +15,21 @@ import Summary from "@/pages/analysis/outputs/Summary";
 const Outputs = () => {
   return (
     <section>
-      <Heading level={2} icon={<LuArrowRightFromLine />}>
+      <Heading level={2} icon={<ArrowRightFromLine />}>
         Outputs
       </Heading>
 
       <Tabs syncWithUrl="output-tab">
-        <Tab text="Summary" icon={<LuFeather />}>
+        <Tab text="Summary" icon={<Feather />}>
           <Summary />
         </Tab>
-        <Tab text="Domain Arch." icon={<LuChartNoAxesGantt />}>
+        <Tab text="Domain Arch." icon={<ChartNoAxesGantt />}>
           <DomainArch />
         </Tab>
-        <Tab text="Phylogeny" icon={<LuSplit />}>
+        <Tab text="Phylogeny" icon={<Split />}>
           <Phylogeny />
         </Tab>
-        <Tab text="Homology" icon={<LuShapes />}>
+        <Tab text="Homology" icon={<Shapes />}>
           <Homology />
         </Tab>
       </Tabs>

@@ -221,7 +221,8 @@
     @apply even:bg-alt-white bg-white;
   }
 
-  .icon {
+  .icon,
+  .lucide {
     @apply inline-block h-[1.1em] w-[unset];
   }
 

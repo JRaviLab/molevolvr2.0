@@ -1,6 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
 import { Fragment, useEffect } from "react";
-import { LuChevronDown, LuDot } from "react-icons/lu";
 import {
   Label,
   Listbox,
@@ -9,6 +8,7 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import clsx from "clsx";
+import { ChevronDown, Dot } from "lucide-react";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 
@@ -95,7 +95,7 @@ const SelectSingle = <O extends Option>({
         <span className="grow truncate py-1 leading-none">
           {selected?.primary}
         </span>
-        <LuChevronDown />
+        <ChevronDown />
       </ListboxButton>
 
       {/* dropdown */}
@@ -117,7 +117,7 @@ const SelectSingle = <O extends Option>({
                 )}
               >
                 {/* check mark */}
-                <LuDot
+                <Dot
                   className={clsx(
                     "text-accent",
                     selected ? "opacity-100" : "opacity-0",

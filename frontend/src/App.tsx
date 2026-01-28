@@ -3,7 +3,6 @@ import "@fontsource/poppins/300.css";
 import "@fontsource/poppins/500.css";
 import "@fontsource/poppins/600.css";
 import "@fontsource-variable/jetbrains-mono";
-import { IconContext } from "react-icons";
 import {
   createBrowserRouter,
   Outlet,
@@ -49,18 +48,14 @@ const Layout = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <IconContext.Provider
-        value={{ className: "icon", attr: { "aria-hidden": true } }}
-      >
-        <Header />
-        <main>
-          <TableOfContents />
-          <Outlet />
-        </main>
-        <Footer />
-        <Toasts />
-        <ViewCorner />
-      </IconContext.Provider>
+      <Header />
+      <main>
+        <TableOfContents />
+        <Outlet />
+      </main>
+      <Footer />
+      <Toasts />
+      <ViewCorner />
     </QueryClientProvider>
   );
 };

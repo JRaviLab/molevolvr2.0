@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { useEffect } from "react";
-import { LuCircle, LuCircleCheckBig } from "react-icons/lu";
+import { Circle, CircleCheckBig } from "lucide-react";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 
@@ -79,9 +79,9 @@ const Radios = <O extends Option>({
 
             {/* check mark */}
             {value === option.id ? (
-              <LuCircleCheckBig className="h-lh w-[1.1em] text-accent" />
+              <CircleCheckBig className="h-lh w-[1.1em] text-accent" />
             ) : (
-              <LuCircle className="h-lh w-[1.1em] text-gray" />
+              <Circle className="h-lh w-[1.1em] text-gray" />
             )}
 
             {/* text content */}

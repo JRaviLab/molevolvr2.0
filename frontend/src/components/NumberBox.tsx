@@ -7,7 +7,7 @@ import {
   Label,
   NumberField,
 } from "react-aria-components";
-import { LuMinus, LuPlus } from "react-icons/lu";
+import { Minus, Plus } from "lucide-react";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { isFirefox } from "@/util/browser";
@@ -73,7 +73,7 @@ const NumberBox = ({
             "
           >
             <Button slot="decrement">
-              <LuMinus />
+              <Minus />
             </Button>
             {/* Poppins unfortunately doesn't support tabular nums */}
             <Input
@@ -91,7 +91,7 @@ const NumberBox = ({
               }}
             />
             <Button slot="increment">
-              <LuPlus />
+              <Plus />
             </Button>
           </Group>
         </>

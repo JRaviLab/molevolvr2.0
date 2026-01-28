@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { LuCircleHelp } from "react-icons/lu";
+import { CircleHelp } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
 import { sleep } from "@/util/misc";
 
@@ -27,7 +27,7 @@ const Help = ({ tooltip, children }: Props) => (
       }}
     >
       {children}
-      <LuCircleHelp />
+      <CircleHelp />
     </button>
   </Tooltip>
 );

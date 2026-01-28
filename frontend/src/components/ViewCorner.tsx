@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { LuChevronUp } from "react-icons/lu";
 import { useEventListener } from "@reactuses/core";
+import { ChevronUp } from "lucide-react";
 import Button from "@/components/Button";
 import Feedback from "@/components/Feedback";
 
@@ -17,7 +17,7 @@ const ViewCorner = () => {
     >
       {scrolled && (
         <Button
-          icon={<LuChevronUp />}
+          icon={<ChevronUp />}
           tooltip="Scroll to top of page"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         />

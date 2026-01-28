@@ -2,10 +2,10 @@ import type { ComponentProps, ReactNode } from "react";
 import type { Filename, Tabular } from "@/util/download";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { LuCrop, LuMaximize, LuPrinter } from "react-icons/lu";
 import { useDebounce, useElementSize, useFullscreen } from "@reactuses/core";
 import clsx from "clsx";
 import { clamp } from "lodash";
+import { Crop, Maximize, Printer } from "lucide-react";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
 import Tooltip from "@/components/Tooltip";
@@ -193,7 +193,7 @@ const Chart = ({
         <Button
           design="hollow"
           tooltip="Reset size"
-          icon={<LuCrop />}
+          icon={<Crop />}
           /* eslint-disable better-tailwindcss/no-unknown-classes */
           className="reset-handle absolute right-0 bottom-0 hidden"
           /* eslint-enable better-tailwindcss/no-unknown-classes */
@@ -226,7 +226,7 @@ const Chart = ({
         <div className="flex flex-wrap items-center justify-center gap-2">
           {/* fullscreen */}
           <Button
-            icon={<LuMaximize />}
+            icon={<Maximize />}
             design="hollow"
             tooltip="Full screen"
             onClick={toggleFullscreen}
@@ -242,7 +242,7 @@ const Chart = ({
             json={json}
           >
             <Button
-              icon={<LuPrinter />}
+              icon={<Printer />}
               text="PDF"
               onClick={print}
               tooltip="Print as pdf"

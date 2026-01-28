@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { LuChevronDown, LuChevronUp } from "react-icons/lu";
 import { clsx } from "clsx";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
 
 type Props = {
@@ -38,7 +38,7 @@ const Collapsible = ({ title, tooltip, className, children }: Props) => {
           )}
         >
           {title}
-          {open ? <LuChevronUp /> : <LuChevronDown />}
+          {open ? <ChevronUp /> : <ChevronDown />}
         </summary>
       </Tooltip>
 
