@@ -475,18 +475,18 @@ const About = () => {
         <div className="flex flex-wrap items-center justify-center gap-4">
           <Button
             to={`mailto:${VITE_EMAIL}`}
-            text={VITE_EMAIL}
             icon={<Mail />}
+            text={VITE_EMAIL}
           />
 
           <Button
             to={VITE_LAB_WEBSITE}
-            text={VITE_LAB_NAME}
             icon={<Microscope />}
+            text={VITE_LAB_NAME}
             tooltip={`${VITE_LAB_NAME} website`}
           />
 
-          <Button to={VITE_LAB_GITHUB} text="GitHub" icon={<Github />} />
+          <Button to={VITE_LAB_GITHUB} icon={<Github />} text="GitHub" />
         </div>
       </section>
     </>

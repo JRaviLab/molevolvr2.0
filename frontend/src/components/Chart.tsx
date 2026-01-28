@@ -191,9 +191,9 @@ const Chart = ({
       {/* reset handle */}
       <Tooltip content="Reset size">
         <Button
-          design="hollow"
-          tooltip="Reset size"
           icon={<Crop />}
+          tooltip="Reset size"
+          design="hollow"
           /* eslint-disable better-tailwindcss/no-unknown-classes */
           className="reset-handle absolute right-0 bottom-0 hidden"
           /* eslint-enable better-tailwindcss/no-unknown-classes */
@@ -227,8 +227,8 @@ const Chart = ({
           {/* fullscreen */}
           <Button
             icon={<Maximize />}
-            design="hollow"
             tooltip="Full screen"
+            design="hollow"
             onClick={toggleFullscreen}
           />
 
@@ -244,8 +244,8 @@ const Chart = ({
             <Button
               icon={<Printer />}
               text="PDF"
-              onClick={print}
               tooltip="Print as pdf"
+              onClick={print}
             />
           </Download>
         </div>

@@ -447,34 +447,34 @@ const SectionButton = () => (
     <div className="flex flex-wrap items-center gap-4">
       <Button
         to="/about"
-        text="As Link"
-        design="hollow"
         icon={<ArrowRight />}
         tooltip="Tooltip"
+        text="As Link"
+        design="hollow"
       />
       <Button to="/about" text="As Link" tooltip="Tooltip" />
       <Button
         to="/about"
         icon={<CustomIcon />}
-        design="critical"
         tooltip="Tooltip"
+        design="critical"
       />
       <Button
         text="As Button"
-        design="hollow"
         tooltip="Tooltip"
+        design="hollow"
         onClick={() => window.alert("Hello World")}
       />
       <Button
-        text="As Button"
         icon={<ArrowRight />}
+        text="As Button"
         tooltip="Tooltip"
         onClick={() => window.alert("Hello World")}
       />
       <Button
         icon={<CustomIcon />}
-        design="critical"
         tooltip="Tooltip"
+        design="critical"
         onClick={() => window.alert("Hello World")}
       />
     </div>

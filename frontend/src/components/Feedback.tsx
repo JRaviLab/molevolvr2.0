@@ -222,10 +222,10 @@ const Feedback = () => {
           <>
             <div className="flex flex-wrap gap-2">
               <Button
-                text="Screenshot"
                 icon={<Download />}
-                design="hollow"
+                text="Screenshot"
                 tooltip="Download a screenshot of the current page"
+                design="hollow"
                 onClick={async () => {
                   close();
                   await downloadJpg(document.body, ["screenshot"]);
@@ -246,7 +246,7 @@ const Feedback = () => {
             <div className="grow" />
 
             {status === "idle" && (
-              <Button text="Submit" icon={<Send />} type="submit" />
+              <Button icon={<Send />} text="Submit" type="submit" />
             )}
           </>
         }

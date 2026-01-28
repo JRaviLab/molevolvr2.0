@@ -15,7 +15,7 @@ const NotFound = () => {
 
         <p>The page you're looking for doesn't exist!</p>
 
-        <Button to="/" text="To Home Page" icon={<ArrowLeft />} flip />
+        <Button to="/" icon={<ArrowLeft />} text="To Home Page" flip />
       </section>
     </>
   );

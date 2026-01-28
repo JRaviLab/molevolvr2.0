@@ -31,13 +31,13 @@ const Actions = () => {
 
       <div className="flex flex-wrap items-center justify-center gap-4">
         <Button
-          text="Duplicate and Edit"
           icon={<Pencil />}
+          text="Duplicate and Edit"
           onClick={() => edit()}
         />
         <Button
-          text="Delete Analysis"
           icon={<Trash />}
+          text="Delete Analysis"
           design="critical"
           onClick={() => _delete()}
         />

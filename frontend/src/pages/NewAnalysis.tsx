@@ -338,7 +338,7 @@ const NewAnalysis = () => {
               }}
               accept={accept}
             />
-            <Button text="Example" icon={<Lightbulb />} onClick={onExample} />
+            <Button icon={<Lightbulb />} text="Example" onClick={onExample} />
           </div>
 
           {inputType === "external" && (
@@ -480,8 +480,8 @@ const NewAnalysis = () => {
           </Alert>
 
           <Button
-            text="Submit"
             icon={<Send />}
+            text="Submit"
             design="critical"
             type="submit"
           />

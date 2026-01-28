@@ -56,20 +56,20 @@ const Download = ({
               <Button
                 icon={<Image />}
                 text="PNG"
+                tooltip="High-resolution image"
                 onClick={async () => {
                   if (!raster.current) return;
                   downloadPng(raster.current, filename);
                 }}
-                tooltip="High-resolution image"
               />
               <Button
                 icon={<Image />}
                 text="JPEG"
+                tooltip="Compressed image"
                 onClick={async () => {
                   if (!raster.current) return;
                   downloadJpg(raster.current, filename);
                 }}
-                tooltip="Compressed image"
               />
             </>
           )}
@@ -77,11 +77,11 @@ const Download = ({
             <Button
               icon={<Spline />}
               text="SVG"
+              tooltip="Vector image"
               onClick={() => {
                 if (!vector.current) return;
                 downloadSvg(vector.current, filename);
               }}
-              tooltip="Vector image"
             />
           )}
           {tabular && (
@@ -89,14 +89,14 @@ const Download = ({
               <Button
                 icon={<Table />}
                 text="TSV"
-                onClick={() => downloadTsv(tabular, filename)}
                 tooltip="Tab-separated data"
+                onClick={() => downloadTsv(tabular, filename)}
               />
               <Button
                 icon={<Table />}
                 text="CSV"
-                onClick={() => downloadCsv(tabular, filename)}
                 tooltip="Tab-separated data"
+                onClick={() => downloadCsv(tabular, filename)}
               />
             </>
           )}
@@ -104,23 +104,23 @@ const Download = ({
             <Button
               icon={<Terminal />}
               text="Text"
-              onClick={() => downloadTxt(text, filename)}
               tooltip="Raw text data"
+              onClick={() => downloadTxt(text, filename)}
             />
           )}
           {!!json && (
             <Button
               icon={<Braces />}
               text="JSON"
-              onClick={() => downloadJson(json, filename)}
               tooltip="JSON data"
+              onClick={() => downloadJson(json, filename)}
             />
           )}
           {children}
         </div>
       }
     >
-      <Button icon={<DownloadIcon />} design="hollow" tooltip="Download" />
+      <Button icon={<DownloadIcon />} tooltip="Download" design="hollow" />
     </Popover>
   );
 };

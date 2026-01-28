@@ -77,13 +77,13 @@ const Home = () => {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <Button to="/new-analysis" text="New Analysis" icon={<Plus />} />
+          <Button to="/new-analysis" icon={<Plus />} text="New Analysis" />
           <Button
             to="/load-analysis"
-            text="Load Analysis"
             icon={<ArrowRight />}
+            text="Load Analysis"
           />
-          <Button to="/testbed" text="Testbed" icon={<FlaskConical />} />
+          <Button to="/testbed" icon={<FlaskConical />} text="Testbed" />
         </div>
       </section>
 
@@ -218,7 +218,7 @@ const Home = () => {
             text="Read the Paper"
             icon={<Newspaper />}
           />
-          <Button to="/about" text="Learn More" icon={<Info />} />
+          <Button to="/about" icon={<Info />} text="Learn More" />
         </div>
       </section>
 

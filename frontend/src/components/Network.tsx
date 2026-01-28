@@ -752,8 +752,8 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
 
           <Button
             icon={<Crop />}
-            design="hollow"
             tooltip="Fit view to contents"
+            design="hollow"
             onClick={fit}
           />
 
@@ -766,8 +766,8 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
 
           <Button
             icon={<Maximize />}
-            design="hollow"
             tooltip="Full screen"
+            design="hollow"
             onClick={toggleFullscreen}
           />
         </div>

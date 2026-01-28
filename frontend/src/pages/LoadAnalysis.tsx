@@ -39,7 +39,7 @@ const LoadAnalysis = () => {
         >
           <div className="flex flex-wrap justify-center gap-4">
             <TextBox placeholder="Analysis ID" value={id} onChange={setId} />
-            <Button text="Lookup" icon={<ArrowRight />} type="submit" />
+            <Button icon={<ArrowRight />} text="Lookup" type="submit" />
           </div>
         </Form>
       </section>

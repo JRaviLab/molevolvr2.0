@@ -65,10 +65,10 @@ const TextBox = ({
       <>
         {multi && (
           <Button
+            icon={<Copy />}
+            tooltip="Copy text"
             design="hollow"
             className="rounded-none"
-            tooltip="Copy text"
-            icon={<Copy />}
             onClick={async () => {
               await window.navigator.clipboard.writeText(value);
               toast("Copied text", "success");
@@ -76,10 +76,10 @@ const TextBox = ({
           />
         )}
         <Button
+          icon={<X />}
+          tooltip="Clear text"
           design="hollow"
           className="rounded-none"
-          tooltip="Clear text"
-          icon={<X />}
           onClick={() => {
             if (ref.current) ref.current.value = "";
             onChange("");

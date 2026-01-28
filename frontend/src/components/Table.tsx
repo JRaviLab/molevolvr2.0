@@ -432,31 +432,31 @@ const Table = <Datum extends object>({
           {/* pagination */}
           <div className="flex gap-2">
             <Button
+              icon={<ChevronsLeft />}
+              tooltip="First page"
               design="hollow"
               size="compact"
-              tooltip="First page"
-              icon={<ChevronsLeft />}
               aria-disabled={!table.getCanPreviousPage()}
               onClick={() => table.setPageIndex(0)}
             />
             <Button
+              icon={<ChevronLeft />}
+              tooltip="Previous page"
               design="hollow"
               size="compact"
-              tooltip="Previous page"
-              icon={<ChevronLeft />}
               aria-disabled={!table.getCanPreviousPage()}
               onClick={table.previousPage}
             />
             <Tooltip content="Jump to page">
               <Button
-                design="hollow"
-                size="compact"
                 text={[
                   "Page",
                   formatNumber(table.getState().pagination.pageIndex + 1),
                   "of",
                   formatNumber(table.getPageCount()),
                 ].join(" ")}
+                design="hollow"
+                size="compact"
                 onClick={() => {
                   const page = parseInt(window.prompt("Jump to page") || "");
                   if (Number.isNaN(page)) return;
@@ -465,18 +465,18 @@ const Table = <Datum extends object>({
               />
             </Tooltip>
             <Button
+              icon={<ChevronRight />}
+              tooltip="Next page"
               design="hollow"
               size="compact"
-              tooltip="Next page"
-              icon={<ChevronRight />}
               aria-disabled={!table.getCanNextPage()}
               onClick={table.nextPage}
             />
             <Button
+              icon={<ChevronsRight />}
+              tooltip="Last page"
               design="hollow"
               size="compact"
-              tooltip="Last page"
-              icon={<ChevronsRight />}
               aria-disabled={!table.getCanNextPage()}
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             />
@@ -519,8 +519,8 @@ const Table = <Datum extends object>({
             {/* clear filters */}
             <Button
               icon={<FilterX />}
-              design="hollow"
               tooltip="Clear all filters"
+              design="hollow"
               onClick={() => {
                 table.resetColumnFilters();
                 setSearch("");
@@ -528,9 +528,9 @@ const Table = <Datum extends object>({
             />
             {/* download */}
             <Button
-              design="hollow"
               icon={<Download />}
               tooltip="Download table data as .csv"
+              design="hollow"
               onClick={() => {
                 /** get col defs that are visible */
                 const defs = visibleCols.map(
@@ -555,8 +555,8 @@ const Table = <Datum extends object>({
             {/* expand/collapse */}
             <Button
               icon={expanded ? <FoldHorizontal /> : <UnfoldHorizontal />}
-              design="hollow"
               tooltip={expanded ? "Collapse table" : "Expand table"}
+              design="hollow"
               onClick={() => setExpanded(!expanded)}
             />
           </div>

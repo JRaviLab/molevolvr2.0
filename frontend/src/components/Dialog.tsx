@@ -70,10 +70,9 @@ const Dialog = ({
                 <Title>{title}</Title>
                 <Description className="sr-only">{title}</Description>
                 <Button
-                  design="hollow"
-                  tooltip="Close dialog"
                   icon={<X />}
-                  className="text-gray"
+                  tooltip="Close dialog"
+                  design="hollow"
                   onClick={close}
                 />
               </div>

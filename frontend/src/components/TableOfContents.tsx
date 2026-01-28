@@ -99,10 +99,10 @@ const TableOfContents = () => {
         {/* toggle button */}
         <Tooltip content={open ? "Close" : "Table of contents"}>
           <Button
-            design="hollow"
-            className="rounded-none"
             icon={open ? <X /> : <Menu />}
             tooltip={open ? "Close" : "Table of contents"}
+            design="hollow"
+            className="rounded-none"
             aria-expanded={open}
             onClick={() => setOpen(!open)}
           ></Button>

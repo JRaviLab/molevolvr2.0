@@ -55,9 +55,9 @@ const Toasts = () => {
             {toast.content}
           </div>
           <Button
-            design="hollow"
             icon={<X />}
             tooltip="Dismiss notification"
+            design="hollow"
             onClick={() => removeToast(toast.id)}
           />
         </div>
