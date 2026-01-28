@@ -19,6 +19,7 @@ import {
   scrollTo,
   scrollToSelector,
 } from "@/util/dom";
+import { useChanged } from "@/util/hooks";
 import { sleep } from "@/util/misc";
 
 /**
@@ -37,14 +38,12 @@ const TableOfContents = () => {
 
   /** auto-close if covering something important */
   const autoClose = useDebounceFn(() => {
+    console.log("auto");
     if (open && isCovering(ref.current)) setOpen(false);
   }, 1000);
 
   /** when path changes */
-  useEffect(() => {
-    /** auto-close */
-    autoClose.flush();
-  }, [autoClose, pathname]);
+  if (useChanged(pathname)) autoClose.flush();
 
   /** full heading details */
   const headings = useAtomValue(headingsAtom);
