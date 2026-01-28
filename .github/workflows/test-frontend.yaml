@@ -10,8 +10,8 @@ defaults:
     working-directory: ./frontend
 
 jobs:
-  # test that frontend can build without issues
-  test-build:
+  # test that frontend is properly formatted
+  test-format:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,7 +28,27 @@ jobs:
         uses: mxschmitt/action-tmate@v3
 
       - name: Run test
-        run: bun run build
+        run: bun run test:format
+
+  # test that frontend is properly linted
+  test-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install packages
+        run: bunx msw init && bun install
+
+      - name: SSH debug
+        if: runner.debug == '1'
+        uses: mxschmitt/action-tmate@v3
+
+      - name: Run test
+        run: bun run test:lint
 
   # test that frontend has no typescript errors
   test-types:
@@ -50,27 +70,7 @@ jobs:
       - name: Run test
         run: bun run test:types
 
-  # test that frontend is properly formatted and linted
-  test-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
-
-      - name: Install packages
-        run: bunx msw init && bun install
-
-      - name: SSH debug
-        if: runner.debug == '1'
-        uses: mxschmitt/action-tmate@v3
-
-      - name: Run test
-        run: bun run test:lint
-
-  # run end to end integration tests
+  # test that frontend passes end to end integration tests
   test-e2e:
     runs-on: ubuntu-latest
     steps:

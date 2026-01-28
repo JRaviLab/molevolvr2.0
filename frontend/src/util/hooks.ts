@@ -4,7 +4,7 @@ import { useEventListener } from "@reactuses/core";
 import { useAtomValue } from "jotai";
 import { isEqual } from "lodash";
 import { darkModeAtom } from "@/components/DarkMode";
-import { getTheme, getWidth, truncateWidth } from "@/util/dom";
+import { getStyles, getTheme, getWidth, truncateWidth } from "@/util/dom";
 import { getFilename } from "@/util/download";
 import { sleep } from "@/util/misc";
 
@@ -25,10 +25,7 @@ export const useTheme = () => {
   return theme;
 };
 
-/** get styles on root element */
-const getStyles = () => window.getComputedStyle(document.documentElement);
-
-/** reactive root styles */
+/** reactive styles */
 export const useStyles = () => {
   const [styles, setStyles] = useState(getStyles);
   useCssChange(useCallback(() => setStyles(getStyles()), []));

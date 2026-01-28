@@ -7,7 +7,7 @@ export type Theme = Record<`--${string}`, string>;
 /** https://stackoverflow.com/a/78994961/2180570 */
 /** get all css variables on root */
 export const getTheme = (): Theme => {
-  const rootStyles = window.getComputedStyle(document.documentElement);
+  const rootStyles = getStyles();
   return Object.fromEntries(
     Array.from(document.styleSheets)
       .flatMap((styleSheet) => {
@@ -23,6 +23,10 @@ export const getTheme = (): Theme => {
       .map((variable) => [variable, rootStyles.getPropertyValue(variable)]),
   );
 };
+
+/** get styles on target element */
+export const getStyles = (target?: Element | null) =>
+  window.getComputedStyle(target || document.documentElement);
 
 /** get name from font-family string e.g. 'Arial', sans-serif -> Arial */
 export const parseFont = (family: string) =>
@@ -77,19 +81,19 @@ export const isCovering = (
   element: HTMLElement | undefined | null,
   background = "section",
 ) => {
-  if (!element) return;
+  if (!element) return false;
 
   /** don't consider covering if user interacting with element */
-  if (element.matches(":hover, :focus-within")) return;
+  if (element.matches(":hover, :focus-within")) return false;
 
   /** density of points to check */
-  const gap = 20;
+  const gap = 5;
 
   const { left, top, width, height } = element.getBoundingClientRect() ?? {};
 
   /** check a grid of points under element */
-  for (let x = left + gap; x < width - gap; x += gap) {
-    for (let y = top + gap; y < height - gap; y += gap) {
+  for (let x = left; x < width; x += gap) {
+    for (let y = top; y < height; y += gap) {
       const covering = document
         /** get elements under point */
         .elementsFromPoint(x, y)
@@ -99,7 +103,7 @@ export const isCovering = (
         .shift();
 
       /** is "important" element */
-      if (!covering?.matches(background)) return covering;
+      if (!covering?.matches(background)) return !!covering;
     }
   }
 
