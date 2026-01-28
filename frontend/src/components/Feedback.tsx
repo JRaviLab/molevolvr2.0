@@ -145,6 +145,7 @@ const Feedback = () => {
               <TextBox
                 label="Subject"
                 placeholder="Subject"
+                required
                 value={subject}
                 onChange={setSubject}
               />
@@ -160,7 +161,7 @@ const Feedback = () => {
               />
             </div>
 
-            <Collapsible title="Debug Info">
+            <Collapsible title="Debug" className="self-center">
               <dl
                 className="
                   self-center [--cols:6]

@@ -31,7 +31,7 @@ const palette = [
    * five pointed star
    * https://www.jdawiseman.com/papers/easymath/surds_star_inner_radius.html
    */
-  makePolygon(10, 0.38196601125010515),
+  makePolygon(10, 0.382),
   /** rhombus */
   [-0.5, -0.75, 1, -0.75, 0.5, 0.75, -1, 0.75],
 ];

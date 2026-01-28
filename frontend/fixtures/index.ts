@@ -1,5 +1,5 @@
 import { random } from "lodash";
-import { http, HttpResponse, passthrough } from "msw";
+import { http, HttpResponse } from "msw";
 import type { HttpResponseResolver } from "msw";
 import { sleep } from "@/util/misc";
 import analyses from "./analyses.json";
@@ -8,7 +8,6 @@ import stats from "./stats.json";
 /** non-mocked/handled request */
 const nonMocked: HttpResponseResolver = ({ request }) => {
   console.debug("Non-mocked request", new URL(request.url).pathname);
-  return passthrough();
 };
 
 /** artificial delay to test loading spinners */
@@ -29,12 +28,12 @@ export const handlers = [
     else return HttpResponse.json(lookup);
   }),
 
-  http.post("*molevolvr-feedback*.run.app", async ({ request }) => {
+  http.post("*molevolvr-issue*.run.app", async ({ request }) => {
     await delay();
     if ((await request.clone().text()).includes("fake error"))
       return new HttpResponse(null, { status: 500 });
     return HttpResponse.json({
-      html_url: import.meta.env.VITE_REPO + "/issues",
+      html_url: import.meta.env.VITE_REPO + "/issues/12345",
     });
   }),
 

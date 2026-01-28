@@ -133,7 +133,7 @@ const TableOfContents = () => {
               replace
               onClick={() => scrollToSelector("#" + id)}
             >
-              {icon && <span className="flex text-deep-light">{icon}</span>}
+              {icon}
               <span className="grow truncate py-1">{content}</span>
             </Link>
           ))}

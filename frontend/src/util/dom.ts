@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
-import { waitFor, waitFrame } from "@/util/misc";
+import { frame, waitFor } from "@/util/misc";
 
 export type Theme = Record<`--${string}`, string>;
 
@@ -59,7 +59,6 @@ export const shrinkWrap = (
   const start = [...element.childNodes].at(startChild);
   const end = [...element.childNodes].at(endChild);
   if (!start || !end) return;
-  element.style.width = "";
   const range = document.createRange();
   range.setStartBefore(start);
   range.setEndAfter(end);
@@ -67,7 +66,7 @@ export const shrinkWrap = (
   const paddingLeft = parseFloat(style.paddingLeft) || 0;
   const paddingRight = parseFloat(style.paddingRight) || 0;
   const { width } = range.getBoundingClientRect();
-  element.style.width = width + paddingLeft + paddingRight + "px";
+  element.style.maxWidth = width + paddingLeft + paddingRight + "px";
 };
 
 /**
@@ -117,7 +116,7 @@ export const getViewBoxFit = (svg: SVGGraphicsElement) => {
 export const preserveScroll = async (element?: Element | null) => {
   if (!element) return;
   const oldY = element.getBoundingClientRect().top;
-  await waitFrame();
+  await frame();
   const newY = element.getBoundingClientRect().top;
   window.scrollBy({ top: newY - oldY, behavior: "instant" });
 };

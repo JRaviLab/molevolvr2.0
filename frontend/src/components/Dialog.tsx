@@ -1,7 +1,9 @@
 import {
   cloneElement,
   Fragment,
+  useRef,
   useState,
+  type ComponentProps,
   type ReactElement,
   type ReactNode,
 } from "react";
@@ -27,7 +29,7 @@ type Props = {
   /** when open state changes */
   onChange?: (open: boolean) => void;
   /** element that triggers dialog on click */
-  children: ReactElement<{ onClick: () => void }>;
+  children: ReactElement<ComponentProps<"button">>;
 };
 
 type Content = ReactNode | ((close: () => void, open: () => void) => ReactNode);
@@ -40,12 +42,15 @@ const Dialog = ({
   onChange,
   children,
 }: Props) => {
+  const ref = useRef<HTMLDivElement>(null);
+
   const [isOpen, setOpen] = useState(false);
 
-  const open = () => {
+  const open = async () => {
     setOpen(true);
     onChange?.(true);
   };
+
   const close = () => {
     setOpen(false);
     onChange?.(false);
@@ -53,8 +58,12 @@ const Dialog = ({
 
   return (
     <>
-      {cloneElement(children, { onClick: open })}
-      <Root open={isOpen} onClose={close}>
+      {cloneElement(children, {
+        onClick: open,
+        /** prevent implicit submission of wrapping form */
+        type: "button",
+      })}
+      <Root ref={ref} open={isOpen} onClose={close}>
         <div className="fixed inset-0 z-20 flex items-center justify-center p-8">
           <Content as={Fragment}>
             <div

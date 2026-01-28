@@ -414,7 +414,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
 
 export default IPR;
 
-/** separate sub-components for slight performance optimization */
+/** split into sub-components for slight performance optimization */
 
 type LabelProps = {
   index: number;
