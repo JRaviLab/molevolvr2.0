@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useLocation } from "react-router";
 import {
   useClickOutside,
@@ -38,7 +38,6 @@ const TableOfContents = () => {
 
   /** auto-close if covering something important */
   const autoClose = useDebounceFn(() => {
-    console.log("auto");
     if (open && isCovering(ref.current)) setOpen(false);
   }, 1000);
 
