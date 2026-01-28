@@ -1,7 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { Fragment, useEffect } from "react";
-import { LuChevronDown } from "react-icons/lu";
-import { VscCircleFilled } from "react-icons/vsc";
+import { LuChevronDown, LuDot } from "react-icons/lu";
 import {
   Label,
   Listbox,
@@ -118,7 +117,7 @@ const SelectSingle = <O extends Option>({
                 )}
               >
                 {/* check mark */}
-                <VscCircleFilled
+                <LuDot
                   className={clsx(
                     "text-accent",
                     selected ? "opacity-100" : "opacity-0",

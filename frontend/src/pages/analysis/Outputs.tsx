@@ -3,8 +3,8 @@ import {
   LuChartNoAxesGantt,
   LuFeather,
   LuShapes,
+  LuSplit,
 } from "react-icons/lu";
-import { TbBinaryTree } from "react-icons/tb";
 import Heading from "@/components/Heading";
 import Tabs, { Tab } from "@/components/Tabs";
 import DomainArch from "@/pages/analysis/outputs/DomainArch";
@@ -26,7 +26,7 @@ const Outputs = () => {
         <Tab text="Domain Arch." icon={<LuChartNoAxesGantt />}>
           <DomainArch />
         </Tab>
-        <Tab text="Phylogeny" icon={<TbBinaryTree />}>
+        <Tab text="Phylogeny" icon={<LuSplit />}>
           <Phylogeny />
         </Tab>
         <Tab text="Homology" icon={<LuShapes />}>

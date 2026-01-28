@@ -19,7 +19,12 @@ import type { KlayLayoutOptions } from "cytoscape-klay";
 import type { Option } from "@/components/SelectSingle";
 import type { Filename } from "@/util/download";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { LuCrop, LuMaximize } from "react-icons/lu";
+import {
+  LuCrop,
+  LuFoldHorizontal,
+  LuMaximize,
+  LuUnfoldHorizontal,
+} from "react-icons/lu";
 import {
   useDebounceFn,
   useFullscreen,
@@ -36,8 +41,6 @@ import klay from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
 import { mapValues, omit, orderBy, startCase, truncate } from "lodash";
-import Collapse from "@/assets/collapse.svg?react";
-import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
 import Legend from "@/components/Legend";
@@ -760,7 +763,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
           />
 
           <Button
-            icon={expanded ? <Collapse /> : <Expand />}
+            icon={expanded ? <LuFoldHorizontal /> : <LuUnfoldHorizontal />}
             tooltip={expanded ? "Collapse width" : "Expand width"}
             design="hollow"
             onClick={() => setExpanded(!expanded)}

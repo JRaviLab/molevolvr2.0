@@ -15,10 +15,10 @@ import {
   LuPlus,
   LuQuote,
   LuShapes,
+  LuSplit,
   LuUpload,
   LuWrench,
 } from "react-icons/lu";
-import { TbBinaryTree } from "react-icons/tb";
 import { useMediaQuery } from "@reactuses/core";
 import { useQuery } from "@tanstack/react-query";
 import { getStats } from "@/api/stats";
@@ -153,7 +153,7 @@ const Home = () => {
 
           <FeatureCard
             title="Phylogeny"
-            badge={<TbBinaryTree />}
+            badge={<LuSplit />}
             content={
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }

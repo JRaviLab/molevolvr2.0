@@ -20,7 +20,9 @@ import {
   LuDownload,
   LuFilter,
   LuFilterX,
+  LuFoldHorizontal,
   LuSearch,
+  LuUnfoldHorizontal,
 } from "react-icons/lu";
 import { useLocalStorage } from "@reactuses/core";
 import {
@@ -37,8 +39,6 @@ import {
 } from "@tanstack/react-table";
 import clsx from "clsx";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
-import Collapse from "@/assets/collapse.svg?react";
-import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
 import Help from "@/components/Help";
 import Popover from "@/components/Popover";
@@ -554,7 +554,7 @@ const Table = <Datum extends object>({
             />
             {/* expand/collapse */}
             <Button
-              icon={expanded ? <Collapse /> : <Expand />}
+              icon={expanded ? <LuFoldHorizontal /> : <LuUnfoldHorizontal />}
               design="hollow"
               tooltip={expanded ? "Collapse table" : "Expand table"}
               onClick={() => setExpanded(!expanded)}
