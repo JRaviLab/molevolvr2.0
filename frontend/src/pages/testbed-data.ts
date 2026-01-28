@@ -1,6 +1,6 @@
-import { random, range, sample, startCase, uniqueId } from "lodash";
 import type { Item as SunburstItem } from "@/components/Sunburst";
 import type { Item as TreeItem } from "@/components/Tree";
+import { random, range, sample, startCase, uniqueId } from "lodash";
 
 /** fake analysis id */
 export const analysis = Array(8)

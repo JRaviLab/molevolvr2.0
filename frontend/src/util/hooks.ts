@@ -1,3 +1,4 @@
+import type { Filename } from "@/util/download";
 import { useCallback, useState } from "react";
 import { useEventListener } from "@reactuses/core";
 import { useAtomValue } from "jotai";
@@ -5,7 +6,6 @@ import { isEqual } from "lodash";
 import { darkModeAtom } from "@/components/DarkMode";
 import { getTheme, getWidth, truncateWidth } from "@/util/dom";
 import { getFilename } from "@/util/download";
-import type { Filename } from "@/util/download";
 import { sleep } from "@/util/misc";
 
 /** trigger update when anything that could affect theme or styles changes */

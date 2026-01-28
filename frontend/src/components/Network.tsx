@@ -1,13 +1,3 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { LuCrop, LuMaximize } from "react-icons/lu";
-import {
-  useDebounceFn,
-  useFullscreen,
-  useLocalStorage,
-  useResizeObserver,
-} from "@reactuses/core";
-import clsx from "clsx";
-import cytoscape from "cytoscape";
 import type {
   BreadthFirstLayoutOptions,
   CircleLayoutOptions,
@@ -22,15 +12,27 @@ import type {
   NodeSingular,
   RandomLayoutOptions,
 } from "cytoscape";
-import avsdf from "cytoscape-avsdf";
 import type { AvsdfLayoutOptions } from "cytoscape-avsdf";
+import type { DagreLayoutOptions } from "cytoscape-dagre";
+import type { FcoseLayoutOptions } from "cytoscape-fcose";
+import type { KlayLayoutOptions } from "cytoscape-klay";
+import type { Option } from "@/components/SelectSingle";
+import type { Filename } from "@/util/download";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { LuCrop, LuMaximize } from "react-icons/lu";
+import {
+  useDebounceFn,
+  useFullscreen,
+  useLocalStorage,
+  useResizeObserver,
+} from "@reactuses/core";
+import clsx from "clsx";
+import cytoscape from "cytoscape";
+import avsdf from "cytoscape-avsdf";
 import cola from "cytoscape-cola";
 import dagre from "cytoscape-dagre";
-import type { DagreLayoutOptions } from "cytoscape-dagre";
 import fcose from "cytoscape-fcose";
-import type { FcoseLayoutOptions } from "cytoscape-fcose";
 import klay from "cytoscape-klay";
-import type { KlayLayoutOptions } from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
 import { mapValues, omit, orderBy, startCase, truncate } from "lodash";
@@ -40,11 +42,9 @@ import Button from "@/components/Button";
 import Download from "@/components/Download";
 import Legend from "@/components/Legend";
 import SelectSingle from "@/components/SelectSingle";
-import type { Option } from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import { useColorMap } from "@/util/color";
 import { parseFont } from "@/util/dom";
-import type { Filename } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { lerp } from "@/util/math";
 import { sleep } from "@/util/misc";

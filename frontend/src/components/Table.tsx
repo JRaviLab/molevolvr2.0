@@ -1,5 +1,14 @@
-import { useCallback, useMemo, useRef, useState } from "react";
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
+import type {
+  Column,
+  FilterFn,
+  NoInfer,
+  SortingState,
+} from "@tanstack/react-table";
+import type { Option as OptionMulti } from "@/components/SelectMulti";
+import type { Option as OptionSingle } from "@/components/SelectSingle";
+import type { Filename } from "@/util/download";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   LuArrowDown,
   LuArrowDownUp,
@@ -26,12 +35,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type {
-  Column,
-  FilterFn,
-  NoInfer,
-  SortingState,
-} from "@tanstack/react-table";
 import clsx from "clsx";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
 import Collapse from "@/assets/collapse.svg?react";
@@ -39,16 +42,13 @@ import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
 import Help from "@/components/Help";
 import Popover from "@/components/Popover";
-import type { Option as OptionMulti } from "@/components/SelectMulti";
 import SelectMulti from "@/components/SelectMulti";
-import type { Option as OptionSingle } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import TextBox from "@/components/TextBox";
 import Tooltip from "@/components/Tooltip";
 import { preserveScroll } from "@/util/dom";
 import { downloadCsv } from "@/util/download";
-import type { Filename } from "@/util/download";
 import { formatDate, formatNumber } from "@/util/string";
 
 type Props<Datum extends object> = {

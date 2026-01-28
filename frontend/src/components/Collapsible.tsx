@@ -1,5 +1,5 @@
-import { useState } from "react";
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { LuChevronDown, LuChevronUp } from "react-icons/lu";
 import { clsx } from "clsx";
 import Tooltip from "@/components/Tooltip";

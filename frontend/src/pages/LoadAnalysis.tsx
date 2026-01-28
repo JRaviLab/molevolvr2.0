@@ -1,8 +1,8 @@
+import type { Analysis } from "@/api/types";
 import { useState } from "react";
 import { LuArrowRight, LuHistory } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "@reactuses/core";
-import type { Analysis } from "@/api/types";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";
 import Form from "@/components/Form";

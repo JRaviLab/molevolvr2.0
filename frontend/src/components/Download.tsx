@@ -1,4 +1,5 @@
 import type { ReactNode, RefObject } from "react";
+import type { Filename, Tabular } from "@/util/download";
 import {
   LuBraces,
   LuDownload,
@@ -9,7 +10,6 @@ import {
 } from "react-icons/lu";
 import Button from "@/components/Button";
 import Popover from "@/components/Popover";
-import type { Filename, Tabular } from "@/util/download";
 import {
   downloadCsv,
   downloadJpg,

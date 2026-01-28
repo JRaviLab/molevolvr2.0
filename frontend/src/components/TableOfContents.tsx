@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import { useRef, useState } from "react";
 import { LuMenu, LuX } from "react-icons/lu";
 import { useLocation } from "react-router";
 import { useClickOutside, useEventListener } from "@reactuses/core";

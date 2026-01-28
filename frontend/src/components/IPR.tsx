@@ -1,3 +1,5 @@
+import type { D3DragEvent, D3ZoomEvent } from "d3";
+import type { Filename } from "@/util/download";
 import {
   useCallback,
   useEffect,
@@ -7,14 +9,12 @@ import {
   useState,
 } from "react";
 import { drag, scaleLinear, select, zoom, zoomIdentity } from "d3";
-import type { D3DragEvent, D3ZoomEvent } from "d3";
 import { clamp, inRange, mapValues, range } from "lodash";
 import Chart from "@/components/Chart";
 import Help from "@/components/Help";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import type { Filename } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
 
 /** label size */

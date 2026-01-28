@@ -1,3 +1,4 @@
+import type { Analysis } from "@/api/types";
 import {
   LuArrowRight,
   LuChartNoAxesGantt,
@@ -21,7 +22,6 @@ import { TbBinaryTree } from "react-icons/tb";
 import { useMediaQuery } from "@reactuses/core";
 import { useQuery } from "@tanstack/react-query";
 import { getStats } from "@/api/stats";
-import type { Analysis } from "@/api/types";
 import Alert from "@/components/Alert";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";

@@ -1,3 +1,5 @@
+import type { AnalysisType, InputFormat } from "@/api/types";
+import type { Option } from "@/components/SelectSingle";
 import { useState } from "react";
 import {
   LuArrowRightToLine,
@@ -12,7 +14,6 @@ import { useNavigate } from "react-router";
 import { useLocalStorage } from "@reactuses/core";
 import { parse } from "csv-parse/browser/esm/sync";
 import { isEmpty, startCase } from "lodash";
-import type { AnalysisType, InputFormat } from "@/api/types";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
@@ -23,7 +24,6 @@ import Meta from "@/components/Meta";
 import NumberBox from "@/components/NumberBox";
 import Radios from "@/components/Radios";
 import SelectSingle from "@/components/SelectSingle";
-import type { Option } from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import Table from "@/components/Table";
 import TextBox from "@/components/TextBox";

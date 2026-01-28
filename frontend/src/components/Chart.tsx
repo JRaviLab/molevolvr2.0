@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
 import type { ComponentProps, ReactNode } from "react";
+import type { Filename, Tabular } from "@/util/download";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { LuCrop, LuMaximize, LuPrinter } from "react-icons/lu";
 import { useDebounce, useElementSize, useFullscreen } from "@reactuses/core";
@@ -10,7 +11,6 @@ import Download from "@/components/Download";
 import Tooltip from "@/components/Tooltip";
 import { isSafari } from "@/util/browser";
 import { getViewBoxFit } from "@/util/dom";
-import type { Filename, Tabular } from "@/util/download";
 import { usePrint, useTextSize, useTheme } from "@/util/hooks";
 
 type Props = {

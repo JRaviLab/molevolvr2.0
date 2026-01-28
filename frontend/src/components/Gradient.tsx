@@ -1,8 +1,8 @@
-import { useId } from "react";
 import type { ComponentProps } from "react";
+import type { Option } from "@/components/SelectSingle";
+import { useId } from "react";
 import * as d3 from "d3";
 import { range } from "lodash";
-import type { Option } from "@/components/SelectSingle";
 
 type Props = {
   id: Id;

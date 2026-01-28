@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
 import type { JSX, ReactElement, ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import clsx from "clsx";
 import { atom, useSetAtom } from "jotai";
 import Badge from "@/components/Badge";

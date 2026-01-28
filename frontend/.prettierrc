@@ -14,6 +14,14 @@
           "prettier-plugin-jsdoc"
         ],
         "importOrder": [
+          "<TYPES>^react",
+          "<TYPES>^@[a-zA-Z]",
+          "<TYPES>^[a-zA-Z]",
+          "<TYPES>^@/",
+          "<TYPES>^/",
+          "<TYPES>^./",
+          "<TYPES>^../",
+          "<TYPES>",
           "^react",
           "^@[a-zA-Z]",
           "^[a-zA-Z]",

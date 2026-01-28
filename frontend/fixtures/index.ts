@@ -1,6 +1,6 @@
+import type { HttpResponseResolver } from "msw";
 import { random } from "lodash";
 import { http, HttpResponse } from "msw";
-import type { HttpResponseResolver } from "msw";
 import { sleep } from "@/util/misc";
 import analyses from "./analyses.json";
 import stats from "./stats.json";

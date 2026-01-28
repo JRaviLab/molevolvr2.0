@@ -1,11 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
+import type { To } from "react-router";
 import { LuExternalLink } from "react-icons/lu";
-import {
-  resolvePath,
-  Link as RouterLink,
-  useLocation,
-  type To,
-} from "react-router";
+import { resolvePath, Link as RouterLink, useLocation } from "react-router";
 import clsx from "clsx";
 import Tooltip from "@/components/Tooltip";
 

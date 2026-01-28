@@ -1,13 +1,6 @@
-import {
-  cloneElement,
-  Fragment,
-  useRef,
-  useState,
-  type ComponentProps,
-  type ReactElement,
-  type ReactNode,
-} from "react";
-import { FaCircleXmark } from "react-icons/fa6";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
+import { cloneElement, Fragment, useRef, useState } from "react";
+import { LuX } from "react-icons/lu";
 import {
   DialogPanel as Content,
   Description,
@@ -79,7 +72,7 @@ const Dialog = ({
                 <Button
                   design="hollow"
                   tooltip="Close dialog"
-                  icon={<FaCircleXmark />}
+                  icon={<LuX />}
                   className="text-gray"
                   onClick={close}
                 />
