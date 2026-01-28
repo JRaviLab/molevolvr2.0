@@ -23,8 +23,8 @@ import { useChanged } from "@/util/hooks";
 import { sleep } from "@/util/misc";
 
 /**
- * floating table of contents that outlines sections/headings on page. can be
- * turned on/off at route level. singleton.
+ * floating table of contents that outlines sections/headings on page.
+ * singleton.
  */
 const TableOfContents = () => {
   const ref = useRef<HTMLElement>(null);
