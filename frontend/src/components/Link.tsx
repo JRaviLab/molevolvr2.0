@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
+import { LuExternalLink } from "react-icons/lu";
 import {
   resolvePath,
   Link as RouterLink,
@@ -51,14 +51,14 @@ const Link = ({
   const _showArrow = showArrow ?? target;
 
   /** class name string */
-  const _class = clsx("inline-flex gap-1 items-center", className);
+  const _class = clsx("inline-flex items-center gap-1", className);
 
   /** full element to render */
   const element = external ? (
     /** "external" plain link */
     <a ref={ref} href={to} target={target} className={_class} {...props}>
       {children}
-      {_showArrow && <FaArrowUpRightFromSquare />}
+      {_showArrow && <LuExternalLink />}
     </a>
   ) : (
     /** "internal" router link */
@@ -74,7 +74,7 @@ const Link = ({
       {...props}
     >
       {children}
-      {_showArrow && <FaArrowUpRightFromSquare />}
+      {_showArrow && <LuExternalLink />}
     </RouterLink>
   );
 
@@ -122,4 +122,4 @@ export const mergeTo = (a: To, b: To) => {
 };
 
 /** merge state entries */
-export const mergeState = (a: object = {}, b: object = {}) => ({ ...a, ...b });
+const mergeState = (a: object = {}, b: object = {}) => ({ ...a, ...b });

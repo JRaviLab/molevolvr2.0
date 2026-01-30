@@ -1,4 +1,4 @@
-import { FaPencil, FaRegTrashCan } from "react-icons/fa6";
+import { LuPencil, LuTrash } from "react-icons/lu";
 import { useMutation } from "@tanstack/react-query";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
@@ -32,12 +32,12 @@ const Actions = () => {
       <div className="flex flex-wrap items-center justify-center gap-4">
         <Button
           text="Duplicate and Edit"
-          icon={<FaPencil />}
+          icon={<LuPencil />}
           onClick={() => edit()}
         />
         <Button
           text="Delete Analysis"
-          icon={<FaRegTrashCan />}
+          icon={<LuTrash />}
           design="critical"
           onClick={() => _delete()}
         />

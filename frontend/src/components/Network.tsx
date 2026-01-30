@@ -1,5 +1,11 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { FaCropSimple, FaExpand } from "react-icons/fa6";
+import { LuCrop, LuMaximize } from "react-icons/lu";
+import {
+  useDebounceFn,
+  useFullscreen,
+  useLocalStorage,
+  useResizeObserver,
+} from "@reactuses/core";
 import clsx from "clsx";
 import cytoscape from "cytoscape";
 import type {
@@ -27,19 +33,7 @@ import klay from "cytoscape-klay";
 import type { KlayLayoutOptions } from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
-import {
-  debounce,
-  mapValues,
-  omit,
-  orderBy,
-  startCase,
-  truncate,
-} from "lodash";
-import {
-  useFullscreen,
-  useLocalStorage,
-  useResizeObserver,
-} from "@reactuses/core";
+import { mapValues, omit, orderBy, startCase, truncate } from "lodash";
 import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
@@ -49,6 +43,7 @@ import SelectSingle from "@/components/SelectSingle";
 import type { Option } from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import { useColorMap } from "@/util/color";
+import { parseFont } from "@/util/dom";
 import type { Filename } from "@/util/download";
 import { useTheme } from "@/util/hooks";
 import { lerp } from "@/util/math";
@@ -492,7 +487,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
       "shape-polygon-points": getNodeShape,
       label: getNodeLabel,
       "font-size": fontSize,
-      "font-family": theme["--font-sans"],
+      "font-family": parseFont(theme["--font-sans"] ?? "sans-serif"),
       color: theme["--color-black"],
       "text-halign": "center",
       "text-valign": "center",
@@ -521,7 +516,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
       "arrow-scale": getEdgeArrowSize,
       label: getEdgeLabel,
       "font-size": fontSize,
-      "font-family": theme["--font-sans"],
+      "font-family": parseFont(theme["--font-sans"] ?? "sans-serif"),
       color: theme["--color-black"],
       "text-rotation": "autorotate",
       // "text-outline-width": 1,
@@ -595,29 +590,43 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   }, [nodes, edges, layoutParams]);
 
   /** on resize */
-  useResizeObserver(
-    ref,
-    debounce(() => {
-      graphRef.current?.resize();
-      fit();
-    }, 100),
-  );
+  const resize = useDebounceFn(() => {
+    graphRef.current?.resize();
+    fit();
+  });
+  useResizeObserver(ref, resize.run);
 
   /** fullscreen */
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
+
+  /** json download data */
+  const [json, setJson] = useState<object | null>(null);
+
+  useEffect(() => {
+    if (!graphRef.current) return;
+    setJson(graphRef.current.json());
+  }, [nodes, edges]);
 
   return (
     <div className="flex w-full flex-col items-center gap-4">
       <div
         ref={ref}
         className={clsx(
-          "grid w-full grid-cols-[max-content_auto] rounded bg-white shadow",
+          `
+            grid w-full grid-cols-[max-content_auto] rounded-md bg-white
+            shadow-sm
+          `,
           expanded && "h-[75dvh]! w-[calc(100dvw---spacing(20))]!",
         )}
         style={{ aspectRatio: expanded ? "" : aspectRatio }}
       >
         {/* panel */}
-        <div className="flex h-0 min-h-full max-w-50 flex-col items-start justify-start gap-8 overflow-x-hidden overflow-y-auto p-4 wrap-anywhere">
+        <div
+          className="
+            flex h-0 min-h-full max-w-50 flex-col items-start justify-start
+            gap-8 overflow-x-hidden overflow-y-auto p-4 wrap-anywhere
+          "
+        >
           {selectedItems.length ? (
             /** show info about selected nodes/edges */
             <>
@@ -692,30 +701,37 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
         </div>
 
         {/* cytoscape mount container */}
-        <div ref={containerRef} className="bg-white *:size-full!"></div>
+        <div
+          ref={containerRef}
+          className="
+            bg-white
+            *:size-full!
+          "
+        ></div>
       </div>
 
       {/* controls */}
       <div className="flex flex-wrap items-center gap-4">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
           <Slider
             label="Max Nodes"
-            layout="horizontal"
             min={1}
             max={100}
             step={1}
             value={maxNodes}
             onChange={setMaxNodes}
           />
+        </div>
+        <div className="flex items-center gap-2">
           <SelectSingle
             label="Layout"
-            layout="horizontal"
             options={layoutOptions}
             value={selectedLayout}
             onChange={setSelectedLayout}
           />
         </div>
 
+        {/* buttons */}
         <div className="flex flex-wrap items-center gap-2">
           <Download
             filename={[...filename, "network"]}
@@ -734,11 +750,11 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
                 filename: "edges",
               },
             ]}
-            json={graphRef.current?.json()}
+            json={json}
           />
 
           <Button
-            icon={<FaCropSimple />}
+            icon={<LuCrop />}
             design="hollow"
             tooltip="Fit view to contents"
             onClick={fit}
@@ -752,7 +768,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
           />
 
           <Button
-            icon={<FaExpand />}
+            icon={<LuMaximize />}
             design="hollow"
             tooltip="Full screen"
             onClick={toggleFullscreen}

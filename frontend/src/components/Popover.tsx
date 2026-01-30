@@ -15,7 +15,10 @@ const Popover = ({ content, children }: Props) => {
       <Trigger asChild>{children}</Trigger>
       <Portal>
         <Content
-          className="shadow-overlay z-30 flex max-w-100 flex-col gap-4 rounded bg-white p-4"
+          className="
+            z-20 flex max-w-100 flex-col gap-4 rounded-md bg-white p-4
+            shadow-overlay
+          "
           side="top"
           onFocusCapture={(event) => {
             /** https://github.com/radix-ui/primitives/issues/2248 */

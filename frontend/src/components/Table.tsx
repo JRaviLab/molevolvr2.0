@@ -1,20 +1,18 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import {
-  FaAngleLeft,
-  FaAngleRight,
-  FaAnglesLeft,
-  FaAnglesRight,
-  FaDownload,
-  FaFilter,
-  FaMagnifyingGlass,
-  FaSort,
-  FaSortDown,
-  FaSortUp,
-} from "react-icons/fa6";
-import { MdFilterAltOff } from "react-icons/md";
-import clsx from "clsx";
-import { clamp, isEqual, pick, sortBy, sum } from "lodash";
+  LuArrowDown,
+  LuArrowDownUp,
+  LuArrowUp,
+  LuChevronLeft,
+  LuChevronRight,
+  LuChevronsLeft,
+  LuChevronsRight,
+  LuDownload,
+  LuFilter,
+  LuFilterX,
+  LuSearch,
+} from "react-icons/lu";
 import { useLocalStorage } from "@reactuses/core";
 import {
   createColumnHelper,
@@ -34,17 +32,21 @@ import type {
   NoInfer,
   SortingState,
 } from "@tanstack/react-table";
+import clsx from "clsx";
+import { clamp, isEqual, pick, sortBy, sum } from "lodash";
 import Collapse from "@/assets/collapse.svg?react";
 import Expand from "@/assets/expand.svg?react";
 import Button from "@/components/Button";
 import Help from "@/components/Help";
 import Popover from "@/components/Popover";
+import type { Option as OptionMulti } from "@/components/SelectMulti";
 import SelectMulti from "@/components/SelectMulti";
-import type { Option } from "@/components/SelectSingle";
+import type { Option as OptionSingle } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import TextBox from "@/components/TextBox";
 import Tooltip from "@/components/Tooltip";
+import { preserveScroll } from "@/util/dom";
 import { downloadCsv } from "@/util/download";
 import type { Filename } from "@/util/download";
 import { formatDate, formatNumber } from "@/util/string";
@@ -54,6 +56,7 @@ type Props<Datum extends object> = {
   rows: Datum[];
   sort?: SortingState;
   filename?: Filename;
+  showControls?: boolean;
 };
 
 type Col<
@@ -100,10 +103,21 @@ type _Col<Datum extends object> = {
 const colToOption = <Datum extends object>(
   col: Props<Datum>["cols"][number],
   index: number,
-): Option => ({
+): OptionMulti => ({
   id: String(index),
   primary: col.name,
 });
+
+/** per page options */
+const perPageOptions = [
+  { id: 10, primary: formatNumber(10) },
+  { id: 25, primary: formatNumber(25) },
+  { id: 50, primary: formatNumber(50) },
+  { id: 100, primary: formatNumber(100) },
+  { id: 10000, primary: "All" },
+] as const;
+
+type PerPage = (typeof perPageOptions)[number]["id"];
 
 /**
  * table with sorting, filtering, searching, pagination, etc.
@@ -116,7 +130,18 @@ const Table = <Datum extends object>({
   rows,
   sort,
   filename = [],
+  showControls = true,
 }: Props<Datum>) => {
+  "use no memo";
+
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  /** per page state */
+  let [perPage, setPerPage] = useState<PerPage>(perPageOptions[0].id);
+
+  /** if not showing controls, show max rows */
+  if (!showControls) perPage = perPageOptions[4].id;
+
   /** expanded state */
   const [expanded, setExpanded] = useLocalStorage("table-expanded", false);
 
@@ -132,18 +157,6 @@ const Table = <Datum extends object>({
 
   /** table-wide search */
   const [search, setSearch] = useState("");
-
-  /** per page options */
-  const perPageOptions = [
-    { id: "5", primary: formatNumber(5) },
-    { id: "10", primary: formatNumber(10) },
-    { id: "50", primary: formatNumber(50) },
-    { id: "100", primary: formatNumber(100) },
-    { id: "500", primary: formatNumber(500) },
-  ];
-
-  /** initial per page */
-  const defaultPerPage = perPageOptions[1]!.id;
 
   /** get column definition (from props) by id */
   const getCol = useCallback((id: string) => cols[Number(id)], [cols]);
@@ -173,7 +186,7 @@ const Table = <Datum extends object>({
       /** enumerated col */
       if (type === "enum") {
         const cell = row.getValue(columnId) as string;
-        const value = filterValue as Option["id"][];
+        const value = filterValue as OptionMulti["id"][];
         if (!value.length) return true;
         return !!value.find((option) => option === cell);
       }
@@ -181,7 +194,7 @@ const Table = <Datum extends object>({
       /** boolean col */
       if (type === "boolean") {
         const cell = row.getValue(columnId);
-        const value = filterValue as Option["id"];
+        const value = filterValue as OptionSingle["id"];
         if (value === "all") return true;
         else return String(cell) === value;
       }
@@ -238,6 +251,8 @@ const Table = <Datum extends object>({
   );
 
   /** tanstack table api */
+  /** https://github.com/facebook/react/issues/33057 */
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: rows,
     columns,
@@ -254,10 +269,10 @@ const Table = <Datum extends object>({
     columnResizeMode: "onChange",
     /** initial sort, page, etc. state */
     initialState: {
-      sorting: sort ?? [{ id: "0", desc: false }],
+      sorting: sort,
       pagination: {
         pageIndex: 0,
-        pageSize: Number(defaultPerPage),
+        pageSize: Number(perPage),
       },
     },
     /** sync some controls with table state */
@@ -281,7 +296,7 @@ const Table = <Datum extends object>({
         expanded ? "w-[calc(100dvw---spacing(40))]" : "max-w-full",
       )}
     >
-      <div className="max-w-full overflow-x-auto">
+      <div className="max-w-full overflow-x-auto rounded-md shadow-sm">
         {/* table */}
         <table
           className="w-full max-w-[min(max-content,var(--content))]"
@@ -301,7 +316,13 @@ const Table = <Datum extends object>({
                     {...getCol(header.column.id)?.attrs}
                   >
                     {header.isPlaceholder ? null : (
-                      <div className="[&_button]:text-light-gray [&_button]:hover:text-deep [&_button]: flex items-center justify-start [&_button]:p-1">
+                      <div
+                        className="
+                          flex items-center justify-start
+                          [&_button]:p-1 [&_button]:text-gray
+                          [&_button]:hover:text-deep
+                        "
+                      >
                         {/* header label */}
                         <span className="mr-2">
                           {flexRender(
@@ -319,18 +340,16 @@ const Table = <Datum extends object>({
                         {header.column.getCanSort() && (
                           <Tooltip content="Sort this column">
                             <button
-                              type="button"
-                              data-active={header.column.getIsSorted()}
                               onClick={header.column.getToggleSortingHandler()}
                             >
                               {header.column.getIsSorted() ? (
                                 header.column.getIsSorted() === "asc" ? (
-                                  <FaSortUp />
+                                  <LuArrowUp className="text-accent" />
                                 ) : (
-                                  <FaSortDown />
+                                  <LuArrowDown className="text-accent" />
                                 )
                               ) : (
-                                <FaSort />
+                                <LuArrowDownUp />
                               )}
                             </button>
                           </Tooltip>
@@ -347,14 +366,12 @@ const Table = <Datum extends object>({
                             }
                           >
                             <Tooltip content="Filter this column">
-                              <button
-                                type="button"
-                                className={clsx(
-                                  header.column.getIsFiltered() &&
-                                    "text-accent",
+                              <button>
+                                {header.column.getIsFiltered() ? (
+                                  <LuFilterX className="text-accent" />
+                                ) : (
+                                  <LuFilter />
                                 )}
-                              >
-                                <FaFilter />
                               </button>
                             </Tooltip>
                           </Popover>
@@ -398,7 +415,7 @@ const Table = <Datum extends object>({
             ) : (
               <tr>
                 <td
-                  className="text-light-gray p-8 text-center"
+                  className="p-8 text-center text-light-gray"
                   colSpan={cols.length}
                 >
                   No Rows
@@ -410,137 +427,141 @@ const Table = <Datum extends object>({
       </div>
 
       {/* controls */}
-      <div className="flex flex-wrap items-center justify-center gap-4">
-        {/* pagination */}
-        <div className="flex gap-2">
-          <Button
-            design="hollow"
-            size="compact"
-            tooltip="First page"
-            icon={<FaAnglesLeft />}
-            aria-disabled={!table.getCanPreviousPage()}
-            onClick={() => table.setPageIndex(0)}
-          />
-          <Button
-            design="hollow"
-            size="compact"
-            tooltip="Previous page"
-            icon={<FaAngleLeft />}
-            aria-disabled={!table.getCanPreviousPage()}
-            onClick={table.previousPage}
-          />
-          <Tooltip content="Jump to page">
+      {showControls && (
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          {/* pagination */}
+          <div className="flex gap-2">
             <Button
               design="hollow"
               size="compact"
-              text={[
-                "Page",
-                formatNumber(table.getState().pagination.pageIndex + 1),
-                "of",
-                formatNumber(table.getPageCount()),
-              ].join(" ")}
-              onClick={() => {
-                const page = parseInt(window.prompt("Jump to page") || "");
-                if (Number.isNaN(page)) return;
-                table.setPageIndex(clamp(page, 1, table.getPageCount()) - 1);
+              tooltip="First page"
+              icon={<LuChevronsLeft />}
+              aria-disabled={!table.getCanPreviousPage()}
+              onClick={() => table.setPageIndex(0)}
+            />
+            <Button
+              design="hollow"
+              size="compact"
+              tooltip="Previous page"
+              icon={<LuChevronLeft />}
+              aria-disabled={!table.getCanPreviousPage()}
+              onClick={table.previousPage}
+            />
+            <Tooltip content="Jump to page">
+              <Button
+                design="hollow"
+                size="compact"
+                text={[
+                  "Page",
+                  formatNumber(table.getState().pagination.pageIndex + 1),
+                  "of",
+                  formatNumber(table.getPageCount()),
+                ].join(" ")}
+                onClick={() => {
+                  const page = parseInt(window.prompt("Jump to page") || "");
+                  if (Number.isNaN(page)) return;
+                  table.setPageIndex(clamp(page, 1, table.getPageCount()) - 1);
+                }}
+              />
+            </Tooltip>
+            <Button
+              design="hollow"
+              size="compact"
+              tooltip="Next page"
+              icon={<LuChevronRight />}
+              aria-disabled={!table.getCanNextPage()}
+              onClick={table.nextPage}
+            />
+            <Button
+              design="hollow"
+              size="compact"
+              tooltip="Last page"
+              icon={<LuChevronsRight />}
+              aria-disabled={!table.getCanNextPage()}
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            />
+          </div>
+
+          {/* filters */}
+          <div ref={filterRef} className="flex flex-wrap items-center gap-4">
+            {/* per page */}
+            <SelectSingle
+              label="Rows"
+              options={perPageOptions}
+              value={perPage}
+              onChange={(option) => {
+                const number = Number(option) as PerPage;
+                setPerPage(number);
+                table.setPageSize(number);
+                preserveScroll(filterRef.current);
               }}
             />
-          </Tooltip>
-          <Button
-            design="hollow"
-            size="compact"
-            tooltip="Next page"
-            icon={<FaAngleRight />}
-            aria-disabled={!table.getCanNextPage()}
-            onClick={table.nextPage}
+            {/* visible columns */}
+            <SelectMulti
+              label="Cols"
+              options={visibleOptions}
+              value={visibleCols}
+              onChange={setVisibleCols}
+            />
+          </div>
+
+          {/* table-wide search */}
+          <TextBox
+            placeholder="Search"
+            tooltip="Search entire table (regex)"
+            icon={<LuSearch />}
+            value={search}
+            onChange={setSearch}
           />
-          <Button
-            design="hollow"
-            size="compact"
-            tooltip="Last page"
-            icon={<FaAnglesRight />}
-            aria-disabled={!table.getCanNextPage()}
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-          />
+
+          {/* actions */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* clear filters */}
+            <Button
+              icon={<LuFilterX />}
+              design="hollow"
+              tooltip="Clear all filters"
+              onClick={() => {
+                table.resetColumnFilters();
+                setSearch("");
+              }}
+            />
+            {/* download */}
+            <Button
+              design="hollow"
+              icon={<LuDownload />}
+              tooltip="Download table data as .csv"
+              onClick={() => {
+                /** get col defs that are visible */
+                const defs = visibleCols.map(
+                  (visible) => cols[Number(visible)]!,
+                );
+
+                /** visible keys */
+                const keys = defs.map((def) => def.key);
+
+                /** visible names */
+                const names = defs.map((def) => def.name);
+
+                /** filtered row data */
+                const data = table
+                  .getFilteredRowModel()
+                  .rows.map((row) => Object.values(pick(row.original, keys)));
+
+                /** download */
+                downloadCsv([names, ...data], [...filename, "table"]);
+              }}
+            />
+            {/* expand/collapse */}
+            <Button
+              icon={expanded ? <Collapse /> : <Expand />}
+              design="hollow"
+              tooltip={expanded ? "Collapse table" : "Expand table"}
+              onClick={() => setExpanded(!expanded)}
+            />
+          </div>
         </div>
-
-        {/* filters */}
-        <div className="flex flex-wrap items-center gap-4">
-          {/* per page */}
-          <SelectSingle
-            label="Rows"
-            layout="horizontal"
-            value={defaultPerPage}
-            options={perPageOptions}
-            onChange={(option) => {
-              table.setPageSize(Number(option));
-            }}
-          />
-          {/* visible columns */}
-          <SelectMulti
-            label="Cols"
-            layout="horizontal"
-            options={visibleOptions}
-            value={visibleCols}
-            onChange={setVisibleCols}
-          />
-        </div>
-
-        {/* table-wide search */}
-        <TextBox
-          className="max-w-30"
-          placeholder="Search"
-          icon={<FaMagnifyingGlass />}
-          value={search}
-          onChange={setSearch}
-          tooltip="Search entire table for plain text or regex"
-        />
-
-        {/* actions */}
-        <div className="flex flex-wrap items-center gap-1">
-          {/* clear filters */}
-          <Button
-            icon={<MdFilterAltOff />}
-            design="hollow"
-            tooltip="Clear all filters"
-            onClick={() => {
-              table.resetColumnFilters();
-              setSearch("");
-            }}
-          />
-          {/* download */}
-          <Button
-            design="hollow"
-            icon={<FaDownload />}
-            tooltip="Download table data as .csv"
-            onClick={() => {
-              /** get col defs that are visible */
-              const defs = visibleCols.map((visible) => cols[Number(visible)]!);
-
-              /** visible keys */
-              const keys = defs.map((def) => def.key);
-
-              /** visible names */
-              const names = defs.map((def) => def.name);
-
-              /** filtered row data */
-              const data = table
-                .getFilteredRowModel()
-                .rows.map((row) => Object.values(pick(row.original, keys)));
-
-              /** download */
-              downloadCsv([names, ...data], [...filename, "table"]);
-            }}
-          />
-          {/* expand/collapse */}
-          <Button
-            icon={expanded ? <Collapse /> : <Expand />}
-            design="hollow"
-            tooltip={expanded ? "Collapse table" : "Expand table"}
-            onClick={() => setExpanded(!expanded)}
-          />
-        </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -562,30 +583,34 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
     const [min = 0, max = 100] = column.getFacetedMinMaxValues() ?? [];
 
     return (
-      <Slider
-        label="Filter by number"
-        min={min}
-        max={max}
-        step={(max - min) / 100}
-        multi
-        value={
-          (column.getFilterValue() as [number, number] | undefined) ?? [
-            min,
-            max,
-          ]
-        }
-        onChange={(value) => {
-          /** return as "unfiltered" if value equals min/max range */
-          column.setFilterValue(isEqual(value, [min, max]) ? undefined : value);
-        }}
-      />
+      <div className="flex flex-col gap-2">
+        <Slider
+          label="Filter by number"
+          min={min}
+          max={max}
+          step={(max - min) / 100}
+          multi
+          value={
+            (column.getFilterValue() as [number, number] | undefined) ?? [
+              min,
+              max,
+            ]
+          }
+          onChange={(value) => {
+            /** return as "unfiltered" if value equals min/max range */
+            column.setFilterValue(
+              isEqual(value, [min, max]) ? undefined : value,
+            );
+          }}
+        />
+      </div>
     );
   }
 
   /** filter as multi-select */
   if (type === "enum") {
     /** get unique values in column */
-    const options: Option[] = sortBy(
+    const options: OptionMulti[] = sortBy(
       Array.from(column.getFacetedUniqueValues().entries()).map(
         ([name, count]) => ({ name, count }),
       ),
@@ -597,27 +622,29 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
     }));
 
     return (
-      <SelectMulti
-        label="Filter by types"
-        options={options}
-        value={
-          (column.getFilterValue() as Option["id"][] | undefined) ??
-          options.map((option) => option.id)
-        }
-        onChange={(value, count) =>
-          /** return as "unfiltered" if all or none are selected */
-          column.setFilterValue(
-            count === "all" || count === "none" ? undefined : value,
-          )
-        }
-      />
+      <div className="flex flex-col gap-2">
+        <SelectMulti
+          label="Filter by types"
+          options={options}
+          value={
+            (column.getFilterValue() as OptionMulti["id"][] | undefined) ??
+            options.map((option) => option.id)
+          }
+          onChange={(value, count) =>
+            /** return as "unfiltered" if all or none are selected */
+            column.setFilterValue(
+              count === "all" || count === "none" ? undefined : value,
+            )
+          }
+        />
+      </div>
     );
   }
 
   /** filter as boolean */
   if (type === "boolean") {
     /** get options */
-    const options: Option[] = [
+    const options: OptionSingle[] = [
       {
         id: "all",
         primary: "All",
@@ -640,30 +667,34 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
     ];
 
     return (
-      <SelectSingle
-        label="Filter by type"
-        options={options}
-        value={
-          (column.getFilterValue() as Option["id"] | undefined) ??
-          options[0]!.id
-        }
-        onChange={(value) =>
-          /** return as "unfiltered" if all are selected */
-          column.setFilterValue(value === "all" ? undefined : value)
-        }
-      />
+      <div className="flex flex-col gap-2">
+        <SelectSingle
+          label="Filter by type"
+          options={options}
+          value={
+            (column.getFilterValue() as OptionSingle["id"] | undefined) ??
+            options[0]!.id
+          }
+          onChange={(value) =>
+            /** return as "unfiltered" if all are selected */
+            column.setFilterValue(value === "all" ? undefined : value)
+          }
+        />
+      </div>
     );
   }
 
   /** filter as text */
   return (
-    <TextBox
-      label="Filter by text"
-      placeholder="Search"
-      value={(column.getFilterValue() as string | undefined) ?? ""}
-      onChange={column.setFilterValue}
-      icon={<FaMagnifyingGlass />}
-    />
+    <div className="flex flex-col gap-2">
+      <TextBox
+        label="Filter by text (regex)"
+        placeholder="Search"
+        icon={<LuSearch />}
+        value={(column.getFilterValue() as string | undefined) ?? ""}
+        onChange={column.setFilterValue}
+      />
+    </div>
   );
 };
 

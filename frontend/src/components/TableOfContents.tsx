@@ -1,15 +1,22 @@
-import { useEffect, useRef, useState } from "react";
-import { FaBars, FaXmark } from "react-icons/fa6";
+import { useRef, useState } from "react";
+import type { CSSProperties } from "react";
+import { LuMenu, LuX } from "react-icons/lu";
 import { useLocation } from "react-router";
+import { useClickOutside, useEventListener } from "@reactuses/core";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { debounce } from "lodash";
-import { useClickOutside, useEventListener } from "@reactuses/core";
 import Button from "@/components/Button";
 import { headingsAtom } from "@/components/Heading";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
-import { firstInView, isCovering, scrollTo } from "@/util/dom";
+import {
+  firstInView,
+  isCovering,
+  scrollTo,
+  scrollToSelector,
+} from "@/util/dom";
+import { useChanged } from "@/util/hooks";
 import { sleep } from "@/util/misc";
 
 /**
@@ -38,9 +45,8 @@ const TableOfContents = () => {
   const [open, setOpen] = useState(false);
 
   /** when path changes, hide/show */
-  useEffect(() => {
+  if (useChanged(pathname))
     setOpen(pathname === "/" ? false : window.innerWidth > 1500);
-  }, [pathname]);
 
   /** full heading details */
   const headings = useAtomValue(headingsAtom);
@@ -67,10 +73,7 @@ const TableOfContents = () => {
       /** prevent jitter when pinch-zoomed in */
       if (window.visualViewport?.scale === 1)
         /** scroll active toc item into view */
-        scrollTo(activeRef.current ?? listRef.current?.firstElementChild, {
-          behavior: "instant",
-          block: "center",
-        });
+        scrollTo(activeRef.current, { behavior: "instant", block: "center" });
     }
   });
 
@@ -84,7 +87,7 @@ const TableOfContents = () => {
   return (
     <aside
       ref={ref}
-      className="fixed z-30 flex max-w-60 flex-col bg-white shadow"
+      className="fixed z-20 flex max-w-60 flex-col bg-white shadow-sm"
       aria-label="Table of contents"
     >
       <div className="flex items-center gap-4">
@@ -98,7 +101,7 @@ const TableOfContents = () => {
           <Button
             design="hollow"
             className="rounded-none"
-            icon={open ? <FaXmark /> : <FaBars />}
+            icon={open ? <LuX /> : <LuMenu />}
             tooltip={open ? "Close" : "Table of contents"}
             aria-expanded={open}
             onClick={() => setOpen(!open)}
@@ -116,17 +119,21 @@ const TableOfContents = () => {
             <Link
               key={index}
               ref={active === index ? activeRef : undefined}
+              style={{ "--level": level } as CSSProperties}
               className={clsx(
-                "hover:text-deep hover:bg-off-white flex items-center gap-2 p-1",
+                `
+                  flex items-center gap-2 p-1
+                  pl-[calc(var(--level)*--spacing(4))]
+                  hover:bg-off-white hover:text-deep
+                `,
                 active === index && "bg-off-white text-deep",
               )}
               data-active={active === index}
               to={{ hash: "#" + id }}
               replace
-              style={{ paddingLeft: 20 * (level - 0.5) }}
-              onClick={() => scrollTo("#" + id)}
+              onClick={() => scrollToSelector("#" + id)}
             >
-              {icon && <span className="text-deep-light">{icon}</span>}
+              {icon && <span className="flex text-deep-light">{icon}</span>}
               <span className="grow truncate py-1">{text}</span>
             </Link>
           ))}

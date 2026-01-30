@@ -1,10 +1,10 @@
 import {
-  FaArrowRightToBracket,
-  FaBarsStaggered,
-  FaFeatherPointed,
-  FaFireFlameSimple,
-  FaTableCells,
-} from "react-icons/fa6";
+  LuArrowRightToLine,
+  LuChartNoAxesGantt,
+  LuFeather,
+  LuFlame,
+  LuTable,
+} from "react-icons/lu";
 import Heading from "@/components/Heading";
 import Tabs, { Tab } from "@/components/Tabs";
 import { useAnalysis } from "@/pages/Analysis";
@@ -18,23 +18,23 @@ const Inputs = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<FaArrowRightToBracket />}>
+      <Heading level={2} icon={<LuArrowRightToLine />}>
         Inputs
       </Heading>
 
       {status?.type === "complete" ? (
         /** if complete, show all tabs */
         <Tabs syncWithUrl="input-tab">
-          <Tab text="Summary" icon={<FaFeatherPointed />}>
+          <Tab text="Summary" icon={<LuFeather />}>
             <Summary />
           </Tab>
-          <Tab text="Table" icon={<FaTableCells />}>
+          <Tab text="Table" icon={<LuTable />}>
             <Table />
           </Tab>
-          <Tab text="Heatmap" icon={<FaFireFlameSimple />}>
+          <Tab text="Heatmap" icon={<LuFlame />}>
             <Heatmap />
           </Tab>
-          <Tab text="Domain Arch." icon={<FaBarsStaggered />}>
+          <Tab text="Domain Arch." icon={<LuChartNoAxesGantt />}>
             <DomainArch />
           </Tab>
         </Tabs>

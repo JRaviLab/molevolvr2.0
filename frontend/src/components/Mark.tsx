@@ -1,10 +1,10 @@
 import type { ReactElement, ReactNode } from "react";
 import {
-  FaCircleCheck,
-  FaCircleExclamation,
-  FaCircleInfo,
-  FaTriangleExclamation,
-} from "react-icons/fa6";
+  LuCircleAlert,
+  LuCircleCheck,
+  LuInfo,
+  LuTriangleAlert,
+} from "react-icons/lu";
 import clsx from "clsx";
 import Loading from "@/assets/loading.svg?react";
 import Logo from "@/assets/logo.svg?react";
@@ -22,14 +22,14 @@ type Props = {
 
 /** available categories of marks and associated styles */
 export const types = {
-  info: { color: "var(--color-info)", icon: <FaCircleInfo /> },
+  info: { color: "var(--color-info)", icon: <LuInfo /> },
   loading: { color: "var(--color-gray)", icon: <Loading /> },
-  success: { color: "var(--color-success)", icon: <FaCircleCheck /> },
-  warning: { color: "var(--color-warning)", icon: <FaCircleExclamation /> },
-  error: { color: "var(--color-error)", icon: <FaTriangleExclamation /> },
+  success: { color: "var(--color-success)", icon: <LuCircleCheck /> },
+  warning: { color: "var(--color-warning)", icon: <LuCircleAlert /> },
+  error: { color: "var(--color-error)", icon: <LuTriangleAlert /> },
   analyzing: {
     color: "var(--color-deep-light)",
-    icon: <Logo data-animated style={{ height: "1.5em" }} />,
+    icon: <Logo data-animated className="h-[1.5em]" />,
   },
 };
 
@@ -48,8 +48,3 @@ const Mark = ({ type = "info", icon, className, children }: Props) => (
 );
 
 export default Mark;
-
-/** mark, but only yes/no */
-export const YesNo = (yes: boolean) => (
-  <Mark type={yes ? "success" : "error"}>{yes ? "Yes" : "No"}</Mark>
-);

@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { FaMagnifyingGlassChart } from "react-icons/fa6";
+import { LuFileChartPie } from "react-icons/lu";
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getAnalysis } from "@/api/analysis";
@@ -48,7 +48,7 @@ const Analysis = () => {
       <Meta title="Analysis" />
 
       <section>
-        <Heading level={1} icon={<FaMagnifyingGlassChart />}>
+        <Heading level={1} icon={<LuFileChartPie />}>
           Analysis
         </Heading>
 

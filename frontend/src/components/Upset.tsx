@@ -175,7 +175,6 @@ const Upset = ({ title, filename = [], x, y, data }: Props) => {
         <g
           ref={(el) => {
             if (!el) return;
-
             /** render axis */
             xAxis(select(el));
             /** remove interfering d3 axis styles */

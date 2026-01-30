@@ -1,9 +1,9 @@
 import {
-  FaArrowRightFromBracket,
-  FaBarsStaggered,
-  FaFeatherPointed,
-} from "react-icons/fa6";
-import { LuShapes } from "react-icons/lu";
+  LuArrowRightFromLine,
+  LuChartNoAxesGantt,
+  LuFeather,
+  LuShapes,
+} from "react-icons/lu";
 import { TbBinaryTree } from "react-icons/tb";
 import Heading from "@/components/Heading";
 import Tabs, { Tab } from "@/components/Tabs";
@@ -15,15 +15,15 @@ import Summary from "@/pages/analysis/outputs/Summary";
 const Outputs = () => {
   return (
     <section>
-      <Heading level={2} icon={<FaArrowRightFromBracket />}>
+      <Heading level={2} icon={<LuArrowRightFromLine />}>
         Outputs
       </Heading>
 
       <Tabs syncWithUrl="output-tab">
-        <Tab text="Summary" icon={<FaFeatherPointed />}>
+        <Tab text="Summary" icon={<LuFeather />}>
           <Summary />
         </Tab>
-        <Tab text="Domain Arch." icon={<FaBarsStaggered />}>
+        <Tab text="Domain Arch." icon={<LuChartNoAxesGantt />}>
           <DomainArch />
         </Tab>
         <Tab text="Phylogeny" icon={<TbBinaryTree />}>

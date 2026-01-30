@@ -15,10 +15,13 @@ type Props = {
 const Badge = ({ className, children }: Props) => (
   <span
     className={clsx(
-      "bg-pale text-deep grid size-[1.5em] place-items-center rounded-full text-[1rem] font-bold",
+      `
+        grid size-[1.5em] place-items-center rounded-full bg-pale text-[1rem]
+        font-bold text-deep
+      `,
       className,
     )}
-    aria-hidden="true"
+    aria-hidden
   >
     {children}
   </span>

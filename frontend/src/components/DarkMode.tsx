@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { FaRegMoon, FaRegSun } from "react-icons/fa6";
+import { LuMoon, LuSun } from "react-icons/lu";
 import { getDefaultStore, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import Tooltip from "@/components/Tooltip";
@@ -28,13 +28,12 @@ export const DarkMode = ({ className }: Props) => {
   return (
     <Tooltip content={`Switch to ${darkMode ? "light" : "dark"} mode`}>
       <button
-        type="button"
+        className={className}
+        onClick={() => setDarkMode(!darkMode)}
         role="switch"
         aria-checked={darkMode}
-        onClick={() => setDarkMode(!darkMode)}
-        className={className}
       >
-        {darkMode ? <FaRegSun /> : <FaRegMoon />}
+        {darkMode ? <LuSun /> : <LuMoon />}
       </button>
     </Tooltip>
   );

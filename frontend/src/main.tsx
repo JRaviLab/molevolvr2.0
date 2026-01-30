@@ -22,7 +22,7 @@ const mock = url.searchParams.get("mock") === "false" ? false : true;
   }
 
   /** render app entrypoint */
-  createRoot(document.getElementById("app")!).render(
+  createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <App />
     </StrictMode>,

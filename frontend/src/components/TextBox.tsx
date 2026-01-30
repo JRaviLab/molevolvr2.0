@@ -1,8 +1,8 @@
-import { useId, useRef, useState } from "react";
+import { useId, useRef } from "react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 import { FaRegCopy, FaXmark } from "react-icons/fa6";
-import clsx from "clsx";
 import { useElementBounding } from "@reactuses/core";
+import type { RequireAtLeastOne } from "type-fest";
 import Asterisk from "@/components/Asterisk";
 import Button from "@/components/Button";
 import { useForm } from "@/components/Form";
@@ -10,66 +10,58 @@ import Help from "@/components/Help";
 import { toast } from "@/components/Toasts";
 import Tooltip from "@/components/Tooltip";
 
-type Props = Base & (Single | Multi);
+type Props = Base & (Single | Multi) & Description;
 
 type Base = {
-  /** layout of label and control */
-  layout?: "vertical" | "horizontal";
-  /** label content */
-  label?: ReactNode;
-  /** tooltip on help icon */
-  tooltip?: ReactNode;
   /** hint icon to show on side */
   icon?: ReactElement;
   /** text state */
-  value?: string;
+  value: string;
   /** on text state change */
-  onChange?: (value: string) => void;
-  /** class on textbox */
-  className?: string;
+  onChange: (value: string) => void;
 };
+
+type Description =
+  /** require some kind of accessible label */
+  RequireAtLeastOne<{
+    label: ReactNode;
+    tooltip: ReactNode;
+    placeholder: string;
+  }>;
 
 type Single = {
   /** single line */
   multi?: false;
-} & Pick<
-  ComponentProps<"input">,
-  "placeholder" | "type" | "autoComplete" | "name" | "required"
->;
+} & Pick<ComponentProps<"input">, "type" | "autoComplete" | "required">;
 
 type Multi = {
   /** multi-line */
   multi: true;
-} & Pick<
-  ComponentProps<"textarea">,
-  "placeholder" | "autoComplete" | "name" | "required"
->;
+} & Pick<ComponentProps<"textarea">, "autoComplete" | "required">;
 
 /** single or multi-line text input box */
 const TextBox = ({
-  layout = "vertical",
   label,
   tooltip,
   multi,
   icon,
   value,
   onChange,
-  className,
   ...props
 }: Props) => {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
   const sideRef = useRef<HTMLDivElement>(null);
 
-  /** local text state */
-  const [text, setText] = useState(value ?? "");
+  /** link to parent form component */
+  const form = useForm();
 
-  /** unique id for component instance */
+  /** unique id for field */
   const id = useId();
 
   /** side elements */
-  let sideElements: ReactNode = "";
-  if (text || value)
-    sideElements = (
+  let side: ReactNode = "";
+  if (value)
+    side = (
       <>
         {multi && (
           <Button
@@ -78,7 +70,7 @@ const TextBox = ({
             tooltip="Copy text"
             icon={<FaRegCopy />}
             onClick={async () => {
-              await window.navigator.clipboard.writeText(text);
+              await window.navigator.clipboard.writeText(value);
               toast("Copied text", "success");
             }}
           />
@@ -90,33 +82,42 @@ const TextBox = ({
           icon={<FaXmark />}
           onClick={() => {
             if (ref.current) ref.current.value = "";
-            onChange?.("");
-            setText("");
+            onChange("");
           }}
         />
       </>
     );
   else if (icon)
-    sideElements = <div className="grid place-items-center">{icon}</div>;
+    side = (
+      <>
+        {multi && <div />}
+        <div>{icon}</div>
+      </>
+    );
+  else
+    side = (
+      <>
+        {multi && <div />}
+        <div />
+      </>
+    );
 
   /** extra padding needed for side element */
   const sidePadding = useElementBounding(sideRef).width;
-
-  /** link to parent form component */
-  const form = useForm();
 
   /** input field */
   const input = multi ? (
     <textarea
       ref={ref}
       id={id}
-      className="hover:border-accent border-off-white min-h-[4lh] grow resize rounded border-2 bg-white p-2"
+      className="
+        min-h-[calc(3lh+--spacing(4)+2px)] grow resize rounded-md border
+        border-light-gray bg-white p-2
+        hover:border-accent
+      "
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
       value={value}
-      onChange={(event) => {
-        onChange?.(event.target.value);
-        setText(event.target.value);
-      }}
+      onChange={(event) => onChange(event.target.value)}
       form={form}
       {...props}
     />
@@ -124,27 +125,19 @@ const TextBox = ({
     <input
       ref={ref}
       id={id}
-      className="hover:border-accent border-off-white grow rounded border-2 bg-white p-2"
+      className="
+        grow rounded-md border border-light-gray bg-white p-2
+        hover:border-accent
+      "
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
       value={value}
-      onChange={(event) => {
-        onChange?.(event.target.value);
-        setText(event.target.value);
-      }}
+      onChange={(event) => onChange(event.target.value)}
       form={form}
       {...props}
     />
   );
-
   return (
-    <div
-      className={clsx(
-        "flex max-w-full grow gap-4",
-        layout === "horizontal" && "items-center",
-        layout === "vertical" && "flex-col",
-        className,
-      )}
-    >
+    <>
       {(label || props.required) && (
         <label className="flex items-center gap-1" htmlFor={id}>
           {label}
@@ -155,19 +148,21 @@ const TextBox = ({
 
       {/* if no label but need tooltip, put it around input */}
       <Tooltip content={!label && tooltip ? tooltip : undefined}>
-        <div className="relative flex min-w-0 grow items-start">
+        <div className="relative flex items-start">
           {input}
-
-          {/* side element */}
           <div
             ref={sideRef}
-            className="text-dark-gray absolute top-1.5 right-1.5 bottom-1.5 flex items-start *:size-8"
+            className="
+              absolute top-0 right-0 flex items-start text-dark-gray
+              *:grid *:size-[calc(var(--leading-normal)*1em+--spacing(4)+2px)]
+              *:place-items-center *:p-0
+            "
           >
-            {sideElements}
+            {side}
           </div>
         </div>
       </Tooltip>
-    </div>
+    </>
   );
 };
 

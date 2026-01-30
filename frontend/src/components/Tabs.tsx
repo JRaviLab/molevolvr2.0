@@ -1,9 +1,9 @@
 import { Fragment, useEffect, useState } from "react";
 import type { ReactElement, ReactNode } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
+import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
 import clsx from "clsx";
 import { kebabCase } from "lodash";
-import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
 import { deleteParam, mergeTo } from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
 
@@ -72,10 +72,13 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
             <Trigger
               value={tab.id}
               className={clsx(
-                "hover:text-deep hover:border-deep cursor-pointer gap-2 border-b-2 p-2",
+                `
+                  cursor-pointer gap-2 border-b border-current p-2
+                  hover:bg-current/5 hover:text-deep
+                `,
                 tab.id === selected
-                  ? "text-accent border-accent"
-                  : "text-dark-gray border-light-gray",
+                  ? "bg-current/5 text-accent"
+                  : `text-dark-gray`,
               )}
               data-active={tab.id === selected}
             >
@@ -91,7 +94,10 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
         <Content
           key={index}
           value={tab.id}
-          className="contents data-[state='inactive']:hidden"
+          className="
+            contents
+            data-[state='inactive']:hidden
+          "
           forceMount
         >
           {tab.children}

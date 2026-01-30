@@ -1,41 +1,41 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
-  FaArrowRight,
-  FaArrowsUpDown,
-  FaBarcode,
-  FaBars,
-  FaBeerMugEmpty,
-  FaBrush,
-  FaCat,
-  FaChampagneGlasses,
-  FaChartPie,
-  FaCircleInfo,
-  FaClipboardList,
-  FaFaceSadCry,
-  FaFont,
-  FaHashtag,
-  FaHorse,
-  FaLink,
-  FaListCheck,
-  FaMagnifyingGlass,
-  FaMessage,
-  FaPalette,
-  FaRegCircleDot,
-  FaRegFolder,
-  FaRegHourglass,
-  FaRegMessage,
-  FaRegSquareCheck,
-  FaRegWindowMaximize,
-  FaShapes,
-  FaShareNodes,
-  FaSitemap,
-  FaSliders,
-  FaStop,
-  FaTableCells,
-} from "react-icons/fa6";
-import { PiSquaresFourFill } from "react-icons/pi";
-import { mapValues, sample, startCase, uniq } from "lodash";
+  LuAppWindowMac,
+  LuArrowRight,
+  LuArrowUpDown,
+  LuBeer,
+  LuBrush,
+  LuChartPie,
+  LuCircleCheckBig,
+  LuDog,
+  LuFolder,
+  LuFrown,
+  LuGrid3X3,
+  LuHash,
+  LuHourglass,
+  LuInfo,
+  LuLink,
+  LuListCheck,
+  LuMenu,
+  LuMessageSquare,
+  LuMessageSquareDot,
+  LuNetwork,
+  LuPalette,
+  LuSearch,
+  LuShapes,
+  LuSlidersHorizontal,
+  LuSquare,
+  LuSquareCheck,
+  LuTable,
+  LuTableCellsMerge,
+  LuTableColumnsSplit,
+  LuTextCursorInput,
+  LuType,
+  LuWaypoints,
+  LuWine,
+} from "react-icons/lu";
 import { useElementSize } from "@reactuses/core";
+import { mapValues, sample, startCase, uniq } from "lodash";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
@@ -76,7 +76,6 @@ import {
   iprSequence,
   iprTracks,
   label,
-  logChange,
   msaTracks,
   nodes,
   sunburst,
@@ -161,7 +160,7 @@ const SectionElements = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<FaBrush />}>
+      <Heading level={2} icon={<LuBrush />}>
         Elements
       </Heading>
 
@@ -320,6 +319,7 @@ const SectionLegend = () => {
       mapValues(colorMap, (color, label) => ({
         color,
         shape: shapesMap[label],
+        // eslint-disable-next-line react-hooks/purity
         stroke: Math.random() > 0.75,
       })),
     [colorMap, shapesMap],
@@ -327,11 +327,16 @@ const SectionLegend = () => {
 
   return (
     <section>
-      <Heading level={2} icon={<FaShapes />}>
+      <Heading level={2} icon={<LuShapes />}>
         Legend
       </Heading>
 
-      <div ref={ref} className="w-100 resize overflow-auto rounded p-4 shadow">
+      <div
+        ref={ref}
+        className="
+          w-100 max-w-full resize overflow-auto rounded-md p-4 shadow-sm
+        "
+      >
         <Legend entries={entries} x={0} y={0} w={width} />
       </div>
     </section>
@@ -340,7 +345,7 @@ const SectionLegend = () => {
 
 const SectionUpset = () => (
   <section>
-    <Heading level={2} icon={<FaFaceSadCry />}>
+    <Heading level={2} icon={<LuFrown />}>
       Upset
     </Heading>
 
@@ -350,7 +355,7 @@ const SectionUpset = () => (
 
 const SectionSunburst = () => (
   <section>
-    <Heading level={2} icon={<FaChartPie />}>
+    <Heading level={2} icon={<LuChartPie />}>
       Sunburst
     </Heading>
 
@@ -360,7 +365,7 @@ const SectionSunburst = () => (
 
 const SectionHeatmap = () => (
   <section>
-    <Heading level={2} icon={<PiSquaresFourFill />}>
+    <Heading level={2} icon={<LuGrid3X3 />}>
       Heatmap
     </Heading>
 
@@ -370,7 +375,7 @@ const SectionHeatmap = () => (
 
 const SectionTree = () => (
   <section>
-    <Heading level={2} icon={<FaSitemap />}>
+    <Heading level={2} icon={<LuNetwork />}>
       Tree
     </Heading>
 
@@ -380,7 +385,7 @@ const SectionTree = () => (
 
 const SectionNetwork = () => (
   <section>
-    <Heading level={2} icon={<FaShareNodes />}>
+    <Heading level={2} icon={<LuWaypoints />}>
       Network
     </Heading>
 
@@ -390,7 +395,7 @@ const SectionNetwork = () => (
 
 const SectionMSA = () => (
   <section>
-    <Heading level={2} icon={<FaTableCells />}>
+    <Heading level={2} icon={<LuTableColumnsSplit />}>
       MSA
     </Heading>
 
@@ -406,7 +411,7 @@ const SectionMSA = () => (
 
 const SectionIPR = () => (
   <section>
-    <Heading level={2} icon={<FaBarcode />}>
+    <Heading level={2} icon={<LuTableCellsMerge />}>
       IPR
     </Heading>
 
@@ -421,7 +426,7 @@ const SectionIPR = () => (
 
 const SectionLink = () => (
   <section>
-    <Heading level={2} icon={<FaLink />}>
+    <Heading level={2} icon={<LuLink />}>
       Link
     </Heading>
 
@@ -435,16 +440,16 @@ const SectionLink = () => (
 
 const SectionButton = () => (
   <section>
-    <Heading level={2} icon={<FaStop />}>
+    <Heading level={2} icon={<LuSquare />}>
       Button
     </Heading>
 
-    <div className="flex flex-wrap gap-4">
+    <div className="flex flex-wrap items-center gap-4">
       <Button
         to="/about"
         text="As Link"
         design="hollow"
-        icon={<FaArrowRight />}
+        icon={<LuArrowRight />}
         tooltip="Tooltip"
       />
       <Button to="/about" text="As Link" tooltip="Tooltip" />
@@ -455,199 +460,242 @@ const SectionButton = () => (
         tooltip="Tooltip"
       />
       <Button
-        onClick={() => window.alert("Hello World")}
         text="As Button"
         design="hollow"
         tooltip="Tooltip"
+        onClick={() => window.alert("Hello World")}
       />
       <Button
-        onClick={() => window.alert("Hello World")}
         text="As Button"
-        icon={<FaArrowRight />}
+        icon={<LuArrowRight />}
         tooltip="Tooltip"
+        onClick={() => window.alert("Hello World")}
       />
       <Button
-        onClick={() => window.alert("Hello World")}
         icon={<CustomIcon />}
         design="critical"
         tooltip="Tooltip"
+        onClick={() => window.alert("Hello World")}
       />
     </div>
   </section>
 );
 
-const SectionTextBox = () => (
-  <section>
-    <Heading level={2} icon={<FaFont />}>
-      Text Box
-    </Heading>
+const SectionTextBox = () => {
+  const [value, setValue] = useState("");
 
-    <div className="grid w-full grid-cols-2 gap-8 max-md:grid-cols-1">
-      <TextBox label="Label" placeholder="Search" onChange={logChange} />
-      <TextBox
-        label="Label"
-        placeholder="Search"
-        multi
-        icon={<FaMagnifyingGlass />}
-      />
-      <TextBox
-        layout="horizontal"
-        label="Label"
-        placeholder="Search"
-        onChange={logChange}
-      />
-      <TextBox
-        layout="horizontal"
-        label="Label"
-        placeholder="Search"
-        multi
-        icon={<FaMagnifyingGlass />}
-      />
-    </div>
-  </section>
-);
+  return (
+    <section>
+      <Heading level={2} icon={<LuType />}>
+        Text Box
+      </Heading>
 
-const SectionSelect = () => (
-  <section>
-    <Heading level={2} icon={<FaListCheck />}>
-      Select
-    </Heading>
+      <div className="flex flex-wrap items-center gap-4">
+        <TextBox
+          label="Label"
+          tooltip="Tooltip"
+          placeholder="Search"
+          value={value}
+          onChange={setValue}
+        />
+        <TextBox
+          label="Label"
+          tooltip="Tooltip"
+          placeholder="Search"
+          multi
+          icon={<LuSearch />}
+          value={value}
+          onChange={setValue}
+        />
+      </div>
+    </section>
+  );
+};
 
-    <div className="flex gap-8">
-      <SelectSingle
-        label="Single"
+const SectionSelect = () => {
+  const singleOptions = [
+    { id: "1", primary: "Lorem" },
+    { id: "2", primary: "Ipsum" },
+    { id: "3", primary: "Dolor" },
+  ] as const;
+
+  const [singleValue, setSingleValue] = useState<
+    (typeof singleOptions)[number]["id"]
+  >(singleOptions[0].id);
+
+  const multiOptions = [
+    { id: "a", primary: "Lorem" },
+    { id: "b", primary: "Ipsum", secondary: "123" },
+    {
+      id: "c",
+      primary: "Dolor",
+      secondary: "123",
+      icon: <LuDog />,
+    },
+  ] as const;
+
+  const [multiValue, setMultiValue] = useState<
+    (typeof multiOptions)[number]["id"][]
+  >([]);
+
+  return (
+    <section>
+      <Heading level={2} icon={<LuListCheck />}>
+        Select
+      </Heading>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <SelectSingle
+          label="Single"
+          tooltip="Tooltip"
+          options={singleOptions}
+          value={singleValue}
+          onChange={setSingleValue}
+        />
+        <SelectMulti
+          label="Multi"
+          tooltip="Tooltip"
+          options={multiOptions}
+          value={multiValue}
+          onChange={setMultiValue}
+        />
+      </div>
+    </section>
+  );
+};
+
+const SectionCheckBox = () => {
+  const [value, setValue] = useState(false);
+
+  return (
+    <section>
+      <Heading level={2} icon={<LuSquareCheck />}>
+        Check Box
+      </Heading>
+
+      <CheckBox
+        label="Accept terms and conditions"
         tooltip="Tooltip"
-        options={
-          [
-            { id: "1", primary: "Lorem" },
-            { id: "2", primary: "Ipsum" },
-            { id: "3", primary: "Dolor" },
-          ] as const
-        }
-        onChange={logChange}
+        value={value}
+        onChange={setValue}
       />
-      <SelectMulti
-        layout="horizontal"
-        label="Multi"
-        tooltip="Tooltip"
-        options={
-          [
-            { id: "a", primary: "Lorem" },
-            { id: "b", primary: "Ipsum", secondary: "123" },
-            {
-              id: "c",
-              primary: "Dolor",
-              secondary: "123",
-              icon: <FaHorse />,
-            },
-          ] as const
-        }
-        onChange={logChange}
-      />
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
-const SectionCheckBox = () => (
-  <section>
-    <Heading level={2} icon={<FaRegSquareCheck />}>
-      Check Box
-    </Heading>
+const SectionSlider = () => {
+  const [singleValue, setSingleValue] = useState(0);
+  const [multiValue, setMultiValue] = useState<number[]>([0, 1000]);
 
-    <CheckBox
-      label="Accept terms and conditions"
-      tooltip="Tooltip"
-      name="accept"
-      onChange={logChange}
-    />
-  </section>
-);
+  return (
+    <section>
+      <Heading level={2} icon={<LuSlidersHorizontal />}>
+        Slider
+      </Heading>
 
-const SectionSlider = () => (
-  <section>
-    <Heading level={2} icon={<FaSliders />}>
-      Slider
-    </Heading>
+      <div className="flex flex-wrap items-center gap-4">
+        <Slider
+          label="Single"
+          tooltip="Tooltip"
+          min={0}
+          max={100}
+          step={1}
+          value={singleValue}
+          onChange={setSingleValue}
+        />
+        <Slider
+          label="Range"
+          tooltip="Tooltip"
+          multi
+          min={0}
+          max={10000}
+          step={100}
+          value={multiValue}
+          onChange={setMultiValue}
+        />
+      </div>
+    </section>
+  );
+};
 
-    <div className="flex gap-8">
-      <Slider label="Single" min={0} max={100} step={1} onChange={logChange} />
-      <Slider
-        layout="horizontal"
-        label="Range"
-        multi
-        min={0}
-        max={10000}
-        step={100}
-        onChange={logChange}
-      />
-    </div>
-  </section>
-);
+const SectionNumberBox = () => {
+  const [value, setValue] = useState(0);
 
-const SectionNumberBox = () => (
-  <section>
-    <Heading level={2} icon={<FaHashtag />}>
-      Number Box
-    </Heading>
+  return (
+    <section>
+      <Heading level={2} icon={<LuHash />}>
+        Number Box
+      </Heading>
 
-    <div className="flex gap-8">
-      <NumberBox
-        label="Vertical"
-        min={0}
-        max={100}
-        step={1}
-        onChange={logChange}
-        tooltip="Tooltip"
-      />
-      <NumberBox
-        layout="horizontal"
-        label="Horizontal"
-        min={-10000}
-        max={10000}
-        step={100}
-        onChange={logChange}
-        tooltip="Tooltip"
-      />
-    </div>
-  </section>
-);
+      <div className="flex flex-wrap items-center gap-4">
+        <NumberBox
+          label="Number"
+          tooltip="Tooltip"
+          min={0}
+          max={100}
+          step={1}
+          value={value}
+          onChange={setValue}
+        />
+        <NumberBox
+          label="Big steps"
+          tooltip="Tooltip"
+          min={-10000}
+          max={10000}
+          step={100}
+          value={value}
+          onChange={setValue}
+        />
+      </div>
+    </section>
+  );
+};
 
-const SectionRadios = () => (
-  <section>
-    <Heading level={2} icon={<FaRegCircleDot />}>
-      Radios
-    </Heading>
+const SectionRadios = () => {
+  const options = [
+    { id: "first", primary: "Primary lorem ipsum" },
+    {
+      id: "second",
+      primary: "Primary lorem ipsum",
+      secondary: "Secondary lorem ipsum",
+    },
+    {
+      id: "third",
+      primary: "Primar lorem ipsum",
+      icon: <LuDog />,
+    },
+  ] as const;
 
-    <Radios
-      label="Choice"
-      tooltip="Tooltip"
-      options={
-        [
-          { id: "first", primary: "Primary lorem ipsum" },
-          {
-            id: "second",
-            primary: "Primary lorem ipsum",
-            secondary: "Secondary lorem ipsum",
-          },
-          {
-            id: "third",
-            primary: "Primar lorem ipsum",
-            icon: <FaCat />,
-          },
-        ] as const
-      }
-      onChange={logChange}
-    />
-  </section>
-);
+  const [value, setValue] = useState<(typeof options)[number]["id"]>(
+    options[0].id,
+  );
+
+  return (
+    <section>
+      <Heading level={2} icon={<LuCircleCheckBig />}>
+        Radios
+      </Heading>
+
+      <div className="flex flex-col gap-2">
+        <Radios
+          label="Choice"
+          tooltip="Tooltip"
+          options={options}
+          value={value}
+          onChange={setValue}
+        />
+      </div>
+    </section>
+  );
+};
 
 const SectionAgo = () => (
   <section>
-    <Heading level={2} icon={<FaRegHourglass />}>
+    <Heading level={2} icon={<LuHourglass />}>
       Ago
     </Heading>
 
-    <div className="flex gap-8">
+    <div className="flex flex-wrap items-center gap-4">
       <Ago date={new Date()} />
       <Ago date="Nov 12 2023" />
       <Ago date="Jun 1 2020" />
@@ -657,7 +705,7 @@ const SectionAgo = () => (
 
 const SectionAlert = () => (
   <section>
-    <Heading level={2} icon={<FaCircleInfo />}>
+    <Heading level={2} icon={<LuInfo />}>
       Alert
     </Heading>
 
@@ -677,26 +725,26 @@ const SectionAlert = () => (
 
 const SectionTabs = () => (
   <section>
-    <Heading level={2} icon={<FaRegFolder />}>
+    <Heading level={2} icon={<LuFolder />}>
       Tabs
     </Heading>
 
     <Tabs syncWithUrl="tab" defaultValue="drinks">
-      <Tab text="Animals" icon={<FaCat />} tooltip="Tooltip">
+      <Tab text="Animals" icon={<LuDog />} tooltip="Tooltip">
         <ul>
           <li>Cat</li>
           <li>Dog</li>
           <li>Bird</li>
         </ul>
       </Tab>
-      <Tab text="Drinks" icon={<FaBeerMugEmpty />} tooltip="Tooltip">
+      <Tab text="Drinks" icon={<LuBeer />} tooltip="Tooltip">
         <ul>
           <li>Soda</li>
           <li>Beer</li>
           <li>Water</li>
         </ul>
       </Tab>
-      <Tab text="Colors" icon={<FaPalette />}>
+      <Tab text="Colors" icon={<LuPalette />}>
         <ul>
           <li>Red</li>
           <li>Purple</li>
@@ -709,11 +757,11 @@ const SectionTabs = () => (
 
 const SectionToast = () => (
   <section>
-    <Heading level={2} icon={<FaChampagneGlasses />}>
+    <Heading level={2} icon={<LuWine />}>
       Toast
     </Heading>
 
-    <div className="flex gap-8">
+    <div className="flex flex-wrap gap-4">
       <Button
         text="Unique Toast"
         onClick={() =>
@@ -735,11 +783,11 @@ const SectionToast = () => (
 
 const SectionCollapsible = () => (
   <section>
-    <Heading level={2} icon={<FaArrowsUpDown />}>
+    <Heading level={2} icon={<LuArrowUpDown />}>
       Collapsible
     </Heading>
 
-    <Collapsible text="Expand Me" tooltip="Tooltip">
+    <Collapsible title="Expand Me" tooltip="Tooltip">
       <p>
         Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua. Facilisis sed odio
@@ -758,9 +806,9 @@ const SectionTile = () => (
       Tile
     </Heading>
 
-    <div className="flex gap-8">
+    <div className="flex flex-wrap gap-8">
       <Tile
-        icon={<FaRegHourglass />}
+        icon={<LuHourglass />}
         primary={formatNumber(1234)}
         secondary="Sequences"
       />
@@ -770,7 +818,7 @@ const SectionTile = () => (
         secondary="Proteins"
       />
       <Tile
-        icon={<FaBars />}
+        icon={<LuMenu />}
         primary={formatNumber(99999)}
         secondary="Analyses"
       />
@@ -780,14 +828,21 @@ const SectionTile = () => (
 
 const SectionTable = () => (
   <section>
-    <Heading level={2} icon={<FaTableCells />}>
+    <Heading level={2} icon={<LuTable />}>
       Table
     </Heading>
 
     <Table
       cols={[
-        { key: "name", name: "Name" },
-        { key: "age", name: "Age", filterType: "number" },
+        {
+          key: "name",
+          name: "Name",
+        },
+        {
+          key: "age",
+          name: "Age",
+          filterType: "number",
+        },
         {
           key: "status",
           name: "Status",
@@ -798,7 +853,9 @@ const SectionTable = () => (
           name: "Long text",
           filterType: "string",
           show: false,
-          render: (cell) => <div className="truncate-5">{cell}</div>,
+          render: (cell) => (
+            <div className="line-clamp-5 p-1 leading-normal">{cell}</div>
+          ),
         },
       ]}
       rows={tableData}
@@ -808,11 +865,11 @@ const SectionTable = () => (
 
 const SectionTooltip = () => (
   <section>
-    <Heading level={2} icon={<FaRegMessage />}>
+    <Heading level={2} icon={<LuMessageSquare />}>
       Tooltip
     </Heading>
 
-    <div className="flex gap-8">
+    <div className="flex flex-wrap gap-4">
       <Tooltip content="Minimal, non-interactive help or contextual info">
         <span className="text-tooltip" tabIndex={0} role="button">
           Plain content
@@ -836,7 +893,7 @@ const SectionTooltip = () => (
 
 const SectionPopover = () => (
   <section>
-    <Heading level={2} icon={<FaMessage />}>
+    <Heading level={2} icon={<LuMessageSquareDot />}>
       Popover
     </Heading>
 
@@ -849,7 +906,6 @@ const SectionPopover = () => (
           </p>
           <Button text="Save" />
           <SelectSingle
-            layout="horizontal"
             label="Select"
             options={
               [
@@ -858,7 +914,8 @@ const SectionPopover = () => (
                 { id: "pdf", primary: "PDF" },
               ] as const
             }
-            onChange={logChange}
+            value="csv"
+            onChange={() => null}
           />
         </>
       }
@@ -872,7 +929,7 @@ const SectionPopover = () => (
 
 const SectionDialog = () => (
   <section>
-    <Heading level={2} icon={<FaRegWindowMaximize />}>
+    <Heading level={2} icon={<LuAppWindowMac />}>
       Dialog
     </Heading>
 
@@ -898,7 +955,7 @@ const SectionDialog = () => (
                 volutpat convallis taciti quam nam posuere.
               </p>
 
-              <Collapsible text="Collapsible">
+              <Collapsible title="Collapsible">
                 <p>
                   Odio semper orci ante varius porttitor. Ultricies torquent
                   venenatis cursus praesent vel lacus ligula nostra iaculis.
@@ -951,7 +1008,6 @@ const SectionDialog = () => (
       bottomContent={(close) => (
         <>
           <SelectSingle
-            layout="horizontal"
             label="Select"
             options={
               [
@@ -960,7 +1016,8 @@ const SectionDialog = () => (
                 { id: "pdf", primary: "PDF" },
               ] as const
             }
-            onChange={logChange}
+            value="csv"
+            onChange={() => null}
           />
           <Button
             text="Nevermind"
@@ -989,61 +1046,16 @@ const SectionDialog = () => (
 
 const SectionForm = () => (
   <section>
-    <Heading level={2} icon={<FaClipboardList />}>
+    <Heading level={2} icon={<LuTextCursorInput />}>
       Form
     </Heading>
 
-    <Form onSubmit={console.debug}>
-      <div className="grid w-full grid-cols-2 gap-8 max-md:grid-cols-1">
-        <TextBox label="Email" name="email" type="email" autoComplete="email" />
-        <TextBox label="Description" multi name="description" required />
-        <NumberBox label="Age" name="age" />
-        <Slider label="Cutoff" name="cutoff" />
-        <Slider label="Range" multi name="range" />
-        <Radios
-          label="Order"
-          options={[
-            { id: "one", primary: "One" },
-            { id: "two", primary: "Two" },
-            { id: "three", primary: "Three" },
-          ]}
-          name="order"
-        />
-        <SelectSingle
-          label="Select"
-          options={
-            [
-              { id: "a", primary: "Lorem" },
-              { id: "b", primary: "Ipsum", secondary: "123" },
-              {
-                id: "c",
-                primary: "Dolor",
-                secondary: "123",
-                icon: <FaHorse />,
-              },
-            ] as const
-          }
-          name="select-single"
-        />
-        <SelectMulti
-          label="Select"
-          options={
-            [
-              { id: "a", primary: "Lorem" },
-              { id: "b", primary: "Ipsum", secondary: "123" },
-              {
-                id: "c",
-                primary: "Dolor",
-                secondary: "123",
-                icon: <FaHorse />,
-              },
-            ] as const
-          }
-          name="select-multi"
-        />
+    <Form onSubmit={() => console.info("Form submitted")}>
+      <div className="flex flex-wrap items-center gap-4">
+        <TextBox label="Name" value="Test" onChange={() => null} />
+        <Button text="Button" />
+        <Button text="Submit" type="submit" />
       </div>
-      <CheckBox label="I consent" name="consent" required />
-      <Button type="submit" text="Submit" design="critical" />
     </Form>
   </section>
 );

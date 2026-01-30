@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
+import { useEventListener } from "@reactuses/core";
 import { useAtomValue } from "jotai";
 import { isEqual } from "lodash";
-import { useEventListener } from "@reactuses/core";
 import { darkModeAtom } from "@/components/DarkMode";
 import { getTheme, getWidth, truncateWidth } from "@/util/dom";
 import type { Theme } from "@/util/dom";
@@ -21,9 +21,7 @@ export const useTheme = () => {
   const update = useCallback(() => setTheme(getTheme()), []);
 
   /** update theme variables when dark mode changes */
-  useEffect(() => {
-    update();
-  }, [update, darkMode]);
+  if (useChanged(darkMode)) update();
 
   /** when document done loading */
   useEventListener("load", update, window);
@@ -68,12 +66,11 @@ export const useTextSize = () => {
 };
 
 /** check if value changed from previous render */
-export const useChanged = <Value>(value: Value, initial = true) => {
-  const prev = useRef<Value | undefined>(undefined);
-  const changed = !isEqual(value, prev.current);
-  const result = initial ? changed : changed && prev.current !== undefined;
-  prev.current = value;
-  return result;
+export const useChanged = <Value>(value: Value) => {
+  const [prev, setPrev] = useState<Value>();
+  const changed = !isEqual(prev, value);
+  if (changed) setPrev(value);
+  return changed;
 };
 
 /** app entrypoint element */

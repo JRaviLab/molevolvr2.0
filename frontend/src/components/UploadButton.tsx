@@ -58,10 +58,12 @@ const UploadButton = ({
   return (
     <>
       <Button
-        {...props}
         className={clsx(
           drag &&
-            "outline-accent outline-2 outline-offset-2 outline-dashed *:pointer-events-none",
+            `
+              outline-dashed
+              *:pointer-events-none
+            `,
           className,
         )}
         tooltip={
@@ -79,13 +81,14 @@ const UploadButton = ({
           event.stopPropagation();
           onDrop(event);
         }}
+        {...props}
       />
 
       <input
         ref={ref}
         type="file"
         accept={accept.join(",")}
-        style={{ display: "none" }}
+        className="hidden"
         onChange={onChange}
       />
     </>

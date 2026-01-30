@@ -5,7 +5,6 @@ import {
   SliderThumb,
   SliderTrack,
 } from "react-aria-components";
-import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { formatNumber } from "@/util/string";
@@ -13,10 +12,10 @@ import { formatNumber } from "@/util/string";
 type Props = Base & (Single | Multi);
 
 type Base = {
-  /** layout of label and control */
-  layout?: "vertical" | "horizontal";
   /** label content */
   label: ReactNode;
+  /** whether to fit label height to control height */
+  fitLabel?: boolean;
   /** tooltip on help icon */
   tooltip?: ReactNode;
   /** min value */
@@ -25,26 +24,24 @@ type Base = {
   max?: number;
   /** inc/dec interval */
   step?: number;
-  /** field name in form data */
-  name?: string;
 };
 
 type Single = {
   /** single value */
   multi?: false;
   /** number state */
-  value?: number;
+  value: number;
   /** on number state change */
-  onChange?: (value: number) => void;
+  onChange: (value: number) => void;
 };
 
 type Multi = {
   /** multiple values (range) */
   multi: true;
   /** numbers state */
-  value?: number[];
+  value: number[];
   /** on numbers state change */
-  onChange?: (value: number[]) => void;
+  onChange: (value: number[]) => void;
 };
 
 /**
@@ -53,7 +50,6 @@ type Multi = {
  */
 const Slider = ({
   label,
-  layout = "vertical",
   tooltip,
   min = 0,
   max = 100,
@@ -61,26 +57,20 @@ const Slider = ({
   multi,
   value,
   onChange,
-  name,
 }: Props) => {
   /** link to parent form component */
   const form = useForm();
 
   return (
     <RACSlider
-      className={clsx(
-        "group flex gap-4",
-        layout === "horizontal" && "items-center",
-        layout === "vertical" && "flex-col items-start",
-      )}
-      defaultValue={(value ?? multi) ? [min, max] : min}
-      value={value}
+      className="contents"
       minValue={min}
       maxValue={max}
       step={Math.min(step, max - min)}
+      value={value}
       onChange={(value) => {
-        if (!multi && !Array.isArray(value)) onChange?.(value);
-        if (multi && Array.isArray(value)) onChange?.(value);
+        if (!multi && !Array.isArray(value)) onChange(value);
+        if (multi && Array.isArray(value)) onChange(value);
       }}
     >
       {({ state }) => (
@@ -90,10 +80,19 @@ const Slider = ({
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <SliderTrack className="bg-gray text-accent group-hover:text-deep m-2 box-content h-1 min-w-40 cursor-pointer rounded-full bg-clip-content p-2">
-            {/* fill */}
+          <SliderTrack
+            className="
+              group mx-2 flex h-9 min-w-40 cursor-pointer items-center
+              rounded-full text-accent
+              group-hover:text-deep
+            "
+          >
+            {/* bg fill */}
+            <div className="absolute h-1 w-full rounded-full bg-gray" />
+
+            {/* active fill */}
             <div
-              className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-current"
+              className="absolute h-1 rounded-full bg-current"
               style={{
                 left: multi ? 100 * state.getThumbPercent(0) + "%" : "",
                 width:
@@ -105,38 +104,50 @@ const Slider = ({
               }}
             />
 
-            <div className="absolute -top-full left-0 -translate-x-1/2 translate-y-1 whitespace-nowrap opacity-0 group-focus-within:opacity-50 group-hover:opacity-50">
+            {/* min marker */}
+            <div
+              className="
+                absolute bottom-full left-0 -translate-x-1/2 translate-y-2
+                whitespace-nowrap opacity-0
+                group-focus-within:opacity-50
+                group-hover:opacity-50
+              "
+            >
               {formatNumber(min, true)}
             </div>
-            <div className="absolute -top-full right-0 translate-x-1/2 translate-y-1 whitespace-nowrap opacity-0 group-focus-within:opacity-50 group-hover:opacity-50">
+
+            {/* max marker */}
+            <div
+              className="
+                absolute right-0 bottom-full translate-x-1/2 translate-y-2
+                whitespace-nowrap opacity-0
+                group-focus-within:opacity-50
+                group-hover:opacity-50
+              "
+            >
               {formatNumber(max, true)}
             </div>
 
+            {/* thumb and marker */}
             {state.values.map((value, index) => (
               <SliderThumb
                 key={index}
                 index={index}
-                className="top-1/2 size-4 cursor-pointer rounded-full bg-current outline-offset-2 outline-current focus-within:outline-2"
+                form={form}
+                className="
+                  top-1/2 size-4 cursor-pointer rounded-full bg-current
+                  focus-within:outline-2
+                "
               >
-                <div className="absolute top-full left-1/2 -translate-x-1/2 translate-y-1 text-center whitespace-nowrap">
+                <div
+                  className="
+                    absolute top-full left-1/2 -translate-x-1/2 translate-y-1
+                    text-center whitespace-nowrap
+                  "
+                >
                   {formatNumber(value, true)}
                 </div>
               </SliderThumb>
-            ))}
-
-            {/* https://github.com/adobe/react-spectrum/issues/4117 */}
-            {state.values.map((value, index) => (
-              <input
-                key={index}
-                className="sr-only"
-                tabIndex={-1}
-                aria-hidden
-                type="number"
-                value={value}
-                readOnly
-                form={form}
-                name={name}
-              />
             ))}
           </SliderTrack>
         </>

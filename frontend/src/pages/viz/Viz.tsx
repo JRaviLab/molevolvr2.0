@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useElementSize } from "@reactuses/core";
 import { gsap } from "gsap";
 import { random, range } from "lodash";
-import { useElementSize } from "@reactuses/core";
 import type { Theme } from "@/util/dom";
 import { useTheme } from "@/util/hooks";
 import { dist } from "@/util/math";
@@ -14,20 +14,21 @@ const spacing = 20;
 /** radius of points */
 const size = 3;
 /** number of shuffle steps */
-const steps = 10;
+const steps = 8;
+/** max number of grid cells to shuffle by */
+const offset = 5;
 /** shuffle animation duration, in seconds */
 const duration = 1;
 /** pause between shuffles, in seconds */
 const delay = 0.5;
+/** additional hold on last step, in seconds */
+const hold = 3;
 
 /** gsap settings */
 gsap.defaults({ ease: "power1.inOut" });
 
 /** fun bg visualization */
 const Viz = () => {
-  // disable until mem leak fixed (need to use gsap react hook)
-  return;
-
   const canvas = useRef<HTMLCanvasElement>(null);
   const ctx = useRef<CanvasRenderingContext2D>(null);
 
@@ -45,7 +46,6 @@ const Viz = () => {
 
   useEffect(() => {
     if (!canvas.current) return;
-
     ctx.current?.resetTransform();
     /** resolution scale */
     const scale = window.devicePixelRatio;
@@ -57,14 +57,17 @@ const Viz = () => {
     ctx.current?.translate(width / 2, height / 2);
   }, [width, height]);
 
-  /** key to trigger re-generation of objects */
-  const [key, setKey] = useState(0);
+  /** objects to draw */
+  const [objects, setObjects] = useState<Objects>([]);
 
-  /** get objects to draw */
-  const objects = useMemo(
-    () => generate([Shape], width, height, () => setKey(key + 1)),
-    [width, height, key],
-  );
+  /** generate/regenerate objects and start/restart animations */
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const loop = () => setObjects(generate([Shape], loop));
+      loop();
+    });
+    return () => ctx.revert();
+  }, []);
 
   /** hook up draw func to gsap timer */
   useEffect(() => {
@@ -84,15 +87,10 @@ const Viz = () => {
 
 export default Viz;
 
-/** generate objects to draw */
-const generate = (
-  svgs: string[],
-  width: number,
-  height: number,
-  onComplete: () => void,
-) => {
+/** generate objects to draw and animations for each object */
+const generate = (svgs: string[], onComplete: () => void) => {
   /** combined timeline for entire animation */
-  const combinedTimeline = gsap.timeline({ onComplete, repeat: -1 });
+  const combinedTimeline = gsap.timeline({ onComplete });
 
   /** transform matrix for one element coord system to another */
   const getMatrix = (to: SVGGraphicsElement, from: SVGGraphicsElement) =>
@@ -158,7 +156,7 @@ const generate = (
         col -= Math.round(w / gap / 2);
         row -= Math.round(h / gap / 2);
         /** current state */
-        const point = { col, row, alpha: 0, color: 0 };
+        const point = { col, row, alpha: 0 };
         /** animation */
         const steps = [{ ...point }];
         return { ...point, steps };
@@ -166,12 +164,6 @@ const generate = (
 
     /** remove from doc */
     svg.remove();
-
-    /** number of grid cells to shuffle by */
-    const offset = Math.min(
-      Math.round(width / spacing / 2),
-      Math.round(height / spacing / 2),
-    );
 
     /* alternate shuffling by row/col */
     let flip = true;
@@ -247,7 +239,7 @@ const generate = (
           row,
           alpha: stepIndex === steps - 1 ? 0 : 1,
           duration,
-          delay,
+          delay: delay + (stepIndex === 1 ? hold : 0),
         }),
       );
       /** play reversed to create "coming together" effect */
@@ -270,7 +262,11 @@ const generate = (
           duration: delay,
           delay: duration - delay / 2,
         });
-        timeline.to(link, { alpha: 0, duration: delay });
+        timeline.to(link, {
+          alpha: 0,
+          duration: delay,
+          delay: stepIndex === steps - 2 ? hold : 0,
+        });
         /** add to combined timeline */
         combinedTimeline.add(
           timeline,
@@ -285,13 +281,15 @@ const generate = (
   return shapes;
 };
 
+type Objects = ReturnType<typeof generate>;
+
 /** draw frame */
 const draw = (
   canvas: HTMLCanvasElement | null,
   ctx: CanvasRenderingContext2D | null,
   width: number,
   height: number,
-  objects: ReturnType<typeof generate>,
+  objects: Objects,
   theme: Theme,
 ) => {
   if (!canvas || !ctx) return;
@@ -300,8 +298,8 @@ const draw = (
   ctx.clearRect(-width / 2, -height / 2, width, height);
 
   /** static styles */
-  ctx.fillStyle = theme["--deep"] ?? "";
-  ctx.strokeStyle = theme["--deep"] ?? "";
+  ctx.fillStyle = theme["--color-deep"] ?? "";
+  ctx.strokeStyle = theme["--color-deep"] ?? "";
   ctx.lineWidth = size / 2;
 
   /** draw links */

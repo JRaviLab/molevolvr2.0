@@ -41,6 +41,7 @@ const Dialog = ({
   children,
 }: Props) => {
   const [isOpen, setOpen] = useState(false);
+
   const open = () => {
     setOpen(true);
     onChange?.(true);
@@ -54,11 +55,16 @@ const Dialog = ({
     <>
       {cloneElement(children, { onClick: open })}
       <Root open={isOpen} onClose={close}>
-        <div className="fixed inset-0 z-30 flex items-center justify-center p-8">
+        <div className="fixed inset-0 z-20 flex items-center justify-center p-8">
           <Content as={Fragment}>
-            <div className="shadow-overlay relative flex max-h-full w-(--content) max-w-full flex-col rounded bg-white">
+            <div
+              className="
+                relative flex max-h-full w-(--content) max-w-full flex-col
+                rounded-md bg-white shadow-overlay
+              "
+            >
               {/* top */}
-              <div className="z-10 flex items-center justify-center p-2 shadow">
+              <div className="flex items-center justify-center p-2 shadow-sm">
                 <Title>{title}</Title>
                 <Description className="sr-only">{title}</Description>
                 <Button
@@ -69,13 +75,20 @@ const Dialog = ({
                   onClick={close}
                 />
               </div>
+
               {/* middle */}
               <div className="flex w-full flex-col gap-4 overflow-y-auto p-4">
                 {typeof content === "function" ? content(close, open) : content}
               </div>
+
               {/* bottom */}
               {bottomContent && (
-                <div className="z-10 flex flex-wrap items-center justify-center gap-4 shadow">
+                <div
+                  className="
+                    flex flex-wrap items-center justify-center gap-4 p-4
+                    shadow-sm
+                  "
+                >
                   {typeof bottomContent === "function"
                     ? bottomContent(close, open)
                     : bottomContent}

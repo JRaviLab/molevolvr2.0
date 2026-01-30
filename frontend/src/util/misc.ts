@@ -3,12 +3,13 @@ export const sleep = async (ms = 0) =>
   new Promise((resolve) => window.setTimeout(resolve, ms));
 
 /** now shorthand */
-export const now = () => window.performance.now();
+const now = () => window.performance.now();
 
 /** wait for func to return, checking periodically */
 export const waitFor = async <Return>(
   func: () => Return,
 ): Promise<Return | undefined> => {
+  /** custom exponential backoff */
   const waits = [
     0, 1, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 2000, 3000,
   ];

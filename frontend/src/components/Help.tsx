@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { FaRegCircleQuestion } from "react-icons/fa6";
+import { LuCircleHelp } from "react-icons/lu";
 import Tooltip from "@/components/Tooltip";
 import { sleep } from "@/util/misc";
 
@@ -17,8 +17,7 @@ type Props = {
 const Help = ({ tooltip, children }: Props) => (
   <Tooltip content={tooltip}>
     <button
-      type="button"
-      className="text-dark-gray cursor-help"
+      className="cursor-help text-dark-gray"
       onClick={async (event) => {
         const target = event.currentTarget;
         /** force open tooltip */
@@ -28,7 +27,7 @@ const Help = ({ tooltip, children }: Props) => (
       }}
     >
       {children}
-      <FaRegCircleQuestion />
+      <LuCircleHelp />
     </button>
   </Tooltip>
 );

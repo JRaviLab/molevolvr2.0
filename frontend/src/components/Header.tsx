@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { FaBars, FaXmark } from "react-icons/fa6";
+import { LuMenu, LuX } from "react-icons/lu";
 import { useLocation } from "react-router";
-import clsx from "clsx";
 import { useElementSize } from "@reactuses/core";
+import clsx from "clsx";
 import Logo from "@/assets/logo.svg?react";
 import { DarkMode } from "@/components/DarkMode";
 import Link from "@/components/Link";
@@ -35,19 +35,23 @@ const Header = () => {
     doc.style.scrollPaddingTop = height + "px";
   }, [height]);
 
-  const buttonClass =
-    "rounded p-2 tracking-wide hover:bg-current/10 leading-none";
+  const _class =
+    "rounded-md p-2 tracking-wide hover:bg-current/10 leading-none";
 
   return (
     <header
       ref={ref}
-      className="bg-deep sticky top-0 z-20 flex flex-wrap items-center justify-between gap-8 p-4 text-white shadow-lg"
+      className="
+        sticky top-0 z-10 flex flex-wrap items-center justify-between gap-8
+        bg-deep p-4 text-white shadow-md
+        max-md:p-2
+      "
     >
       <div className="flex items-center gap-2">
         <Logo className="size-8" />
         <Link
           to="/"
-          className={clsx("text-lg tracking-wider uppercase", buttonClass)}
+          className={clsx("text-lg tracking-wider uppercase", _class)}
         >
           {import.meta.env.VITE_TITLE}
         </Link>
@@ -56,12 +60,12 @@ const Header = () => {
       {/* nav toggle */}
       <Tooltip content={open ? "Collapse menu" : "Expand menu"}>
         <button
+          className={clsx("md:hidden", _class)}
           onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-controls="nav"
-          className={clsx("md:hidden", buttonClass)}
         >
-          {open ? <FaXmark /> : <FaBars />}
+          {open ? <LuX /> : <LuMenu />}
         </button>
       </Tooltip>
 
@@ -69,7 +73,10 @@ const Header = () => {
       <nav
         id="nav"
         className={clsx(
-          "flex items-center gap-2 max-md:w-full max-md:flex-col max-md:items-end",
+          `
+            flex items-center gap-2
+            max-md:w-full max-md:flex-col max-md:items-end
+          `,
           !open && "max-md:hidden",
         )}
       >
@@ -77,13 +84,13 @@ const Header = () => {
           <Link
             key={to}
             to={to}
-            className={clsx(pathname === to && "bg-current/10", buttonClass)}
+            className={clsx(pathname === to && "bg-current/10", _class)}
           >
             {name}
           </Link>
         ))}
 
-        <DarkMode className={buttonClass} />
+        <DarkMode className={_class} />
       </nav>
     </header>
   );

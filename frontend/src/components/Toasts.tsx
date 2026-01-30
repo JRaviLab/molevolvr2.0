@@ -1,41 +1,12 @@
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
-import {
-  FaCircleCheck,
-  FaCircleExclamation,
-  FaCircleInfo,
-  FaTriangleExclamation,
-  FaXmark,
-} from "react-icons/fa6";
+import { LuX } from "react-icons/lu";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
 import Button from "@/components/Button";
+import { types } from "@/components/Mark";
 import { renderText } from "@/util/dom";
 import { sleep } from "@/util/misc";
-
-/** available categories of toasts and associated styles */
-const types = {
-  info: {
-    color: "var(--color-info)",
-    icon: <FaCircleInfo />,
-    timeout: 5,
-  },
-  success: {
-    color: "var(--color-success)",
-    icon: <FaCircleCheck />,
-    timeout: 3,
-  },
-  warning: {
-    color: "var(--color-warning)",
-    icon: <FaCircleExclamation />,
-    timeout: 5,
-  },
-  error: {
-    color: "var(--color-error)",
-    icon: <FaTriangleExclamation />,
-    timeout: 20,
-  },
-};
 
 type Toast = {
   /** id/name to de-duplicate by */
@@ -48,6 +19,16 @@ type Toast = {
   timer: number;
 };
 
+/** timeout for each toast type */
+const timeouts: Record<keyof typeof types, number> = {
+  info: 5,
+  loading: 5,
+  success: 3,
+  warning: 5,
+  error: 20,
+  analyzing: 5,
+};
+
 /** list of "toasts" (notifications) in corner of screen. singleton. */
 const Toasts = () => {
   const toasts = useAtomValue(toastsAtom);
@@ -56,14 +37,17 @@ const Toasts = () => {
 
   return createPortal(
     <div
-      className="fixed right-0 bottom-0 z-40 flex flex-col gap-4 p-4"
+      className="fixed right-0 bottom-0 z-30 flex flex-col gap-4 p-4"
       role="region"
       aria-label="Notifications"
     >
       {toasts.map((toast, index) => (
         <div
           key={index}
-          className="grid grid-cols-[min-content_1fr_min-content] items-center rounded bg-white shadow"
+          className="
+            grid grid-cols-[min-content_1fr_min-content] items-center rounded-md
+            bg-white shadow-sm
+          "
           style={{ color: types[toast.type].color }}
         >
           <div className="p-4">{types[toast.type].icon}</div>
@@ -75,7 +59,7 @@ const Toasts = () => {
           </div>
           <Button
             design="hollow"
-            icon={<FaXmark />}
+            icon={<LuX />}
             tooltip="Dismiss notification"
             onClick={() => removeToast(toast.id)}
           />
@@ -120,7 +104,7 @@ const toast = async (
   await sleep();
 
   /** timeout before close, in ms */
-  const timeout = 1000 * types[type].timeout + 10 * renderText(content).length;
+  const timeout = 1000 * timeouts[type] + 10 * renderText(content).length;
 
   const newToast = {
     id: id ?? uniqueId(),

@@ -1,4 +1,5 @@
-import { FaArrowRight, FaClockRotateLeft } from "react-icons/fa6";
+import { useState } from "react";
+import { LuArrowRight, LuHistory } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "@reactuses/core";
 import type { Analysis } from "@/api/types";
@@ -8,12 +9,15 @@ import Form from "@/components/Form";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
 import TextBox from "@/components/TextBox";
+import { toast } from "@/components/Toasts";
 import analyses from "../../fixtures/analyses.json";
 
-export const storageKey = "history";
+const storageKey = "history";
 
 const LoadAnalysis = () => {
   const navigate = useNavigate();
+
+  const [id, setId] = useState("");
 
   /** analysis history */
   const [history, setHistory] = useLocalStorage<Analysis[]>(storageKey, []);
@@ -23,25 +27,25 @@ const LoadAnalysis = () => {
       <Meta title="Load Analysis" />
 
       <section>
-        <Heading level={1} icon={<FaArrowRight />}>
+        <Heading level={1} icon={<LuArrowRight />}>
           Load Analysis
         </Heading>
 
         <Form
-          onSubmit={(data) => {
-            if (String(data.id).trim()) navigate(`/analysis/${data.id}`);
-            else window.alert("Please enter an analysis id");
+          onSubmit={() => {
+            if (id.trim()) navigate(`/analysis/${id}`);
+            else toast("Please enter an analysis id", "error");
           }}
         >
           <div className="flex flex-wrap justify-center gap-4">
-            <TextBox placeholder="Analysis ID" name="id" />
-            <Button text="Lookup" icon={<FaArrowRight />} type="submit" />
+            <TextBox placeholder="Analysis ID" value={id} onChange={setId} />
+            <Button text="Lookup" icon={<LuArrowRight />} type="submit" />
           </div>
         </Form>
       </section>
 
       <section>
-        <Heading level={2} icon={<FaClockRotateLeft />}>
+        <Heading level={2} icon={<LuHistory />}>
           History
         </Heading>
 

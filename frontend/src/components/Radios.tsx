@@ -1,7 +1,6 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect } from "react";
 import type { ReactElement, ReactNode } from "react";
-import { FaCircleDot, FaRegCircle } from "react-icons/fa6";
-import { usePrevious } from "@reactuses/core";
+import { LuCircle, LuCircleCheckBig } from "react-icons/lu";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 
@@ -13,11 +12,9 @@ type Props<O extends Option> = {
   /** pass with "as const" */
   options: readonly O[];
   /** selected option id */
-  value?: O["id"];
+  value: O["id"];
   /** when selected option changes */
-  onChange?: (value: O["id"]) => void;
-  /** field name in form data */
-  name?: string;
+  onChange: (value: O["id"]) => void;
 };
 
 export type Option<ID = string> = {
@@ -43,38 +40,20 @@ const Radios = <O extends Option>({
   options,
   value,
   onChange,
-  name,
 }: Props<O>) => {
   /** link to parent form component */
   const form = useForm();
 
-  /** fallback name */
-  const fallbackName = useId();
+  /** selected option */
+  const selected = options.find((option) => option.id === value);
 
-  /** local copy of selected state */
-  const [selected, setSelected] = useState(value);
-
-  /** whether selected option undefined and needs to fallback */
-  const fallback =
-    !selected || !options.find((option) => option.id === selected);
-
-  /** ensure local selected value always defined */
-  const selectedWFallback: O["id"] = fallback ? options[0]!.id : selected;
-
-  /** notify parent when selected changes */
-  const previousSelected = usePrevious(selectedWFallback);
+  /** auto-select first option if needed */
   useEffect(() => {
-    if (previousSelected && previousSelected !== selectedWFallback)
-      onChange?.(selectedWFallback);
-  }, [selectedWFallback, previousSelected, onChange]);
-
-  /** update local state from controlled value */
-  useEffect(() => {
-    if (value !== undefined) setSelected(value);
-  }, [value]);
+    if (options.length > 0 && !selected) onChange(options[0]!.id);
+  });
 
   return (
-    <div role="group" className="flex flex-col items-start gap-4">
+    <div role="group" className="contents">
       <legend className="flex items-center gap-2">
         {label}
         {tooltip && <Help tooltip={tooltip} />}
@@ -84,27 +63,29 @@ const Radios = <O extends Option>({
         {options.map((option, index) => (
           <label
             key={index}
-            className="hover:bg-off-white flex items-start gap-4 p-2"
+            className="
+              flex items-start gap-4 p-2
+              hover:bg-off-white
+            "
           >
             <input
               className="sr-only"
               type="radio"
               form={form}
-              name={name ?? fallbackName}
               value={option.id}
-              checked={selectedWFallback === option.id}
-              onChange={() => setSelected(option.id)}
+              checked={value === option.id}
+              onChange={() => onChange(option.id)}
             />
 
             {/* check mark */}
-            {selectedWFallback === option.id ? (
-              <FaCircleDot className="text-accent" />
+            {value === option.id ? (
+              <LuCircleCheckBig className="h-lh w-[1.1em] text-accent" />
             ) : (
-              <FaRegCircle />
+              <LuCircle className="h-lh w-[1.1em] text-gray" />
             )}
 
             {/* text content */}
-            <div className="flex flex-col items-start gap-4">
+            <div className="flex flex-col items-start gap-2">
               <span>{option.primary}</span>
               {option.secondary && (
                 <span className="text-dark-gray">{option.secondary}</span>

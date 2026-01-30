@@ -72,10 +72,22 @@ const Button = ({
   const _class = clsx(
     "gap-2",
     size === "compact" ? "p-1" : "p-3",
-    !!icon && !text ? "rounded-full" : "rounded",
-    design === "hollow" && "text-accent hover:text-deep",
-    design === "normal" && "bg-accent text-white hover:bg-deep outline-accent",
-    design === "critical" && "bg-black text-white hover:bg-deep outline-black",
+    !!icon && !text ? "rounded-full" : "rounded-md",
+    design === "hollow" &&
+      `
+        text-accent
+        hover:text-deep
+      `,
+    design === "normal" &&
+      `
+        bg-accent text-white
+        hover:bg-deep
+      `,
+    design === "critical" &&
+      `
+        bg-black text-white
+        hover:bg-deep
+      `,
     className,
   );
 
@@ -101,7 +113,6 @@ const Button = ({
         <button
           ref={ref as Ref<HTMLButtonElement>}
           className={_class}
-          type="button"
           form={form}
           {...props}
         >

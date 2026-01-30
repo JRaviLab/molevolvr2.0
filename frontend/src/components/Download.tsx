@@ -1,12 +1,12 @@
 import type { ReactNode, RefObject } from "react";
 import {
-  FaBezierCurve,
-  FaDownload,
-  FaRegImage,
-  FaTableCellsLarge,
-} from "react-icons/fa6";
-import { PiBracketsCurlyBold } from "react-icons/pi";
-import { TbPrompt } from "react-icons/tb";
+  LuBraces,
+  LuDownload,
+  LuImage,
+  LuSpline,
+  LuTable,
+  LuTerminal,
+} from "react-icons/lu";
 import Button from "@/components/Button";
 import Popover from "@/components/Popover";
 import type { Filename, Tabular } from "@/util/download";
@@ -54,7 +54,7 @@ const Download = ({
           {raster && (
             <>
               <Button
-                icon={<FaRegImage />}
+                icon={<LuImage />}
                 text="PNG"
                 onClick={async () => {
                   if (!raster.current) return;
@@ -63,7 +63,7 @@ const Download = ({
                 tooltip="High-resolution image"
               />
               <Button
-                icon={<FaRegImage />}
+                icon={<LuImage />}
                 text="JPEG"
                 onClick={async () => {
                   if (!raster.current) return;
@@ -75,7 +75,7 @@ const Download = ({
           )}
           {vector && (
             <Button
-              icon={<FaBezierCurve />}
+              icon={<LuSpline />}
               text="SVG"
               onClick={() => {
                 if (!vector.current) return;
@@ -87,13 +87,13 @@ const Download = ({
           {tabular && (
             <>
               <Button
-                icon={<FaTableCellsLarge />}
+                icon={<LuTable />}
                 text="TSV"
                 onClick={() => downloadTsv(tabular, filename)}
                 tooltip="Tab-separated data"
               />
               <Button
-                icon={<FaTableCellsLarge />}
+                icon={<LuTable />}
                 text="CSV"
                 onClick={() => downloadCsv(tabular, filename)}
                 tooltip="Tab-separated data"
@@ -102,7 +102,7 @@ const Download = ({
           )}
           {text && (
             <Button
-              icon={<TbPrompt />}
+              icon={<LuTerminal />}
               text="Text"
               onClick={() => downloadTxt(text, filename)}
               tooltip="Raw text data"
@@ -110,7 +110,7 @@ const Download = ({
           )}
           {!!json && (
             <Button
-              icon={<PiBracketsCurlyBold />}
+              icon={<LuBraces />}
               text="JSON"
               onClick={() => downloadJson(json, filename)}
               tooltip="JSON data"
@@ -120,7 +120,7 @@ const Download = ({
         </div>
       }
     >
-      <Button icon={<FaDownload />} design="hollow" tooltip="Download" />
+      <Button icon={<LuDownload />} design="hollow" tooltip="Download" />
     </Popover>
   );
 };

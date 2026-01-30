@@ -31,7 +31,7 @@ export const handlers = [
 
   http.post("*molevolvr-feedback*.run.app", async ({ request }) => {
     await delay();
-    if ((await request.clone().json())?.body?.includes("fake error"))
+    if ((await request.clone().text()).includes("fake error"))
       return new HttpResponse(null, { status: 500 });
     return HttpResponse.json({
       html_url: import.meta.env.VITE_REPO + "/issues",

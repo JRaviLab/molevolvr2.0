@@ -13,7 +13,7 @@ import { useTextSize, useTheme } from "@/util/hooks";
 /** label size */
 const labelWidth = 150;
 /** seq char width */
-const charWidth = 10;
+const charWidth = 12;
 /** row height */
 const rowHeight = 20;
 /** min chars to show per row */
@@ -80,9 +80,9 @@ const MSA = ({
       controls={[
         <CheckBox
           label="Wrap"
+          tooltip="Wrap sequence to stacked panels"
           value={wrap}
           onChange={setWrap}
-          tooltip="Wrap sequence to stacked panels"
         />,
       ]}
       containerProps={{ className: "w-full" }}

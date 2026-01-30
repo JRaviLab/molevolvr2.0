@@ -31,7 +31,7 @@ const Tooltip = ({ ref, content, children, ...props }: Props) => {
     <Provider delayDuration={100} disableHoverableContent>
       <Root>
         {/* allows nesting tooltip within popover https://github.com/radix-ui/primitives/discussions/560#discussioncomment-5325935 */}
-        <Trigger asChild ref={ref} {...props} aria-label={renderText(content)}>
+        <Trigger asChild ref={ref} aria-label={renderText(content)} {...props}>
           {children}
         </Trigger>
 
@@ -44,11 +44,14 @@ const Tooltip = ({ ref, content, children, ...props }: Props) => {
                */
               shrinkWrap(el, 0, -3);
             }}
-            className="dark z-30 flex max-w-80 flex-col gap-2 rounded bg-white p-4 leading-relaxed text-black"
+            className="
+              dark z-20 flex max-w-80 flex-col gap-2 rounded-md bg-white p-4
+              leading-normal text-black
+            "
             side="top"
           >
             {content}
-            <Arrow className="fill-off-white scale-110" />
+            <Arrow className="scale-110 fill-off-white" />
           </Content>
         </Portal>
       </Root>

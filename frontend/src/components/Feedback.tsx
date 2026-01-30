@@ -1,12 +1,13 @@
-import { FaDownload, FaRegComment, FaRegPaperPlane } from "react-icons/fa6";
+import { LuDownload, LuMessageCircleMore, LuSend } from "react-icons/lu";
 import { useLocation } from "react-router";
 import { Fragment } from "react/jsx-runtime";
-import { mapValues, startCase, truncate } from "lodash";
 import { useLocalStorage } from "@reactuses/core";
 import { useMutation } from "@tanstack/react-query";
+import { mapValues, startCase, truncate } from "lodash";
 import { createIssue } from "@/api/issue";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
+import Collapsible from "@/components/Collapsible";
 import Dialog from "@/components/Dialog";
 import Form from "@/components/Form";
 import Help from "@/components/Help";
@@ -97,112 +98,131 @@ const Feedback = () => {
     ]);
 
   return (
-    <Dialog
-      title="Feedback"
-      onChange={(open) => {
-        if (open && (status === "success" || status === "error")) {
-          if (status === "success") {
-            setSubject(null);
-            setFeedback(null);
-          }
-          reset();
-        }
-      }}
-      content={(close, open) => (
-        <Form onSubmit={onSubmit}>
-          <div className="grid-layout">
-            <TextBox
-              label="Name"
-              placeholder="Your Name"
-              tooltip="Optional. So we know who you are."
-              value={name}
-              onChange={setName}
-            />
-            <TextBox
-              label="GitHub Username"
-              placeholder="@yourname"
-              tooltip="Optional. So we can tag you in the post and you can follow it."
-              value={username}
-              onChange={setUsername}
-            />
-            <TextBox
-              label="Email"
-              placeholder="your.name@email.com"
-              tooltip="Optional. So we can contact you directly if needed."
-              value={email}
-              onChange={setEmail}
-            />
-          </div>
-
-          <TextBox
-            label="Subject"
-            placeholder="Subject"
-            value={subject}
-            onChange={setSubject}
-          />
-
-          <TextBox
-            label="Feedback"
-            placeholder="Questions, suggestions, bugs, etc."
-            required
-            multi
-            value={feedback}
-            onChange={setFeedback}
-          />
-
-          <dl>
-            {Object.entries(details).map(([key, value]) => (
-              <Fragment key={key}>
-                <dt>{key}</dt>
-                <dd>{value}</dd>
-              </Fragment>
-            ))}
-          </dl>
-
-          <Alert
-            type={
-              status === "pending"
-                ? "loading"
-                : status === "error"
-                  ? "error"
-                  : status === "success"
-                    ? "success"
-                    : "info"
+    <Form onSubmit={onSubmit}>
+      <Dialog
+        title="Feedback"
+        onChange={(open) => {
+          if (open && (status === "success" || status === "error")) {
+            if (status === "success") {
+              setSubject(null);
+              setFeedback(null);
             }
-          >
-            {status === "idle" && (
-              <>
-                Submitting will start a <strong>public post</strong> on{" "}
-                <Link to={VITE_ISSUES}>our GitHub feedback tracker</Link> with{" "}
-                <strong>all of the information above</strong>. You'll get a link
-                to it once it's created.
-              </>
-            )}
-            {status === "pending" && "Submitting feedback"}
-            {status === "error" && (
-              <>
-                Error submitting feedback. Contact us directly:{" "}
-                <Link
-                  to={`mailto:${VITE_EMAIL}?body=${window.encodeURIComponent(body)}`}
-                >
-                  {VITE_EMAIL}
-                </Link>
-                .
-              </>
-            )}
-            {status === "success" && data.link && (
-              <>
-                Submitted feedback!{" "}
-                <Link to={data.link}>{shortenUrl(data.link)}</Link>
-              </>
-            )}
-          </Alert>
+            reset();
+          }
+        }}
+        content={() => (
+          <>
+            <div className="grid-layout">
+              <div className="flex flex-col">
+                <TextBox
+                  label="Name"
+                  placeholder="Your Name"
+                  tooltip="Optional. So we know who you are."
+                  value={name}
+                  onChange={setName}
+                />{" "}
+              </div>
+              <div className="flex flex-col">
+                <TextBox
+                  label="GitHub Username"
+                  placeholder="@yourname"
+                  tooltip="Optional. So we can tag you in the post and you can follow it."
+                  value={username}
+                  onChange={setUsername}
+                />
+              </div>
+              <div className="flex flex-col">
+                <TextBox
+                  label="Email"
+                  placeholder="your.name@email.com"
+                  tooltip="Optional. So we can contact you directly if needed."
+                  value={email}
+                  onChange={setEmail}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <TextBox
+                label="Subject"
+                placeholder="Subject"
+                value={subject}
+                onChange={setSubject}
+              />
+            </div>
+            <div className="flex flex-col">
+              <TextBox
+                label="Feedback"
+                placeholder="Questions, suggestions, bugs, etc."
+                required
+                multi
+                value={feedback}
+                onChange={setFeedback}
+              />
+            </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-8">
+            <Collapsible title="Debug Info">
+              <dl
+                className="
+                  self-center [--cols:6]
+                  max-lg:[--cols:4]
+                  max-md:[--cols:2]
+                "
+              >
+                {Object.entries(details).map(([key, value]) => (
+                  <Fragment key={key}>
+                    <dt>{key}</dt>
+                    <dd>{value}</dd>
+                  </Fragment>
+                ))}
+              </dl>
+            </Collapsible>
+
+            <Alert
+              type={
+                status === "pending"
+                  ? "loading"
+                  : status === "error"
+                    ? "error"
+                    : status === "success"
+                      ? "success"
+                      : "info"
+              }
+            >
+              {status === "idle" && (
+                <>
+                  Submitting will start a <strong>public post</strong> on{" "}
+                  <Link to={VITE_ISSUES}>our GitHub feedback tracker</Link> with{" "}
+                  <strong>all of the information above</strong>. You'll get a
+                  link to it once it's created.
+                </>
+              )}
+              {status === "pending" && "Submitting feedback"}
+              {status === "error" && (
+                <>
+                  Error submitting feedback. Contact us directly:{" "}
+                  <Link
+                    to={`mailto:${VITE_EMAIL}?body=${window.encodeURIComponent(body)}`}
+                  >
+                    {VITE_EMAIL}
+                  </Link>
+                  .
+                </>
+              )}
+              {status === "success" && data.link && (
+                <>
+                  Submitted feedback!{" "}
+                  <Link to={data.link}>{shortenUrl(data.link)}</Link>
+                </>
+              )}
+            </Alert>
+          </>
+        )}
+        bottomContent={
+          <>
             <div className="flex flex-wrap gap-2">
               <Button
                 text="Screenshot"
-                icon={<FaDownload />}
+                icon={<LuDownload />}
                 design="hollow"
                 tooltip="Download a screenshot of the current page"
                 onClick={async () => {
@@ -214,8 +234,7 @@ const Feedback = () => {
               <Help
                 tooltip={
                   <div>
-                    Downloads a screenshot of the current page, which can help
-                    us troubleshoot issues. Currently, we can't{" "}
+                    This can help us troubleshoot issues. Currently, we can't{" "}
                     <i>automatically</i> attach a screenshot with your feedback,
                     so you'll have to download and attach/send it manually.
                   </div>
@@ -223,15 +242,17 @@ const Feedback = () => {
               />
             </div>
 
+            <div className="grow" />
+
             {status === "idle" && (
-              <Button text="Submit" icon={<FaRegPaperPlane />} type="submit" />
+              <Button text="Submit" icon={<LuSend />} type="submit" />
             )}
-          </div>
-        </Form>
-      )}
-    >
-      <Button icon={<FaRegComment />} tooltip="Give us feedback" />
-    </Dialog>
+          </>
+        }
+      >
+        <Button icon={<LuMessageCircleMore />} tooltip="Give us feedback" />
+      </Dialog>
+    </Form>
   );
 };
 
