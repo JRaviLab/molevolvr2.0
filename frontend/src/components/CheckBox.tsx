@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { LuSquare, LuSquareCheck } from "react-icons/lu";
+import { Square, SquareCheck } from "lucide-react";
 import Asterisk from "@/components/Asterisk";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -43,14 +43,14 @@ const CheckBox = ({ label, tooltip, value, onChange, required }: Props) => {
         }}
       />
       {value ? (
-        <LuSquareCheck
+        <SquareCheck
           className="
             size-5 text-accent
             group-hover:text-deep
           "
         />
       ) : (
-        <LuSquare
+        <Square
           className="
             size-5 text-accent
             group-hover:text-deep

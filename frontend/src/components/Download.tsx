@@ -1,15 +1,15 @@
 import type { ReactNode, RefObject } from "react";
+import type { Filename, Tabular } from "@/util/download";
 import {
-  LuBraces,
-  LuDownload,
-  LuImage,
-  LuSpline,
-  LuTable,
-  LuTerminal,
-} from "react-icons/lu";
+  Braces,
+  DownloadIcon,
+  Image,
+  Spline,
+  Table,
+  Terminal,
+} from "lucide-react";
 import Button from "@/components/Button";
 import Popover from "@/components/Popover";
-import type { Filename, Tabular } from "@/util/download";
 import {
   downloadCsv,
   downloadJpg,
@@ -54,73 +54,73 @@ const Download = ({
           {raster && (
             <>
               <Button
-                icon={<LuImage />}
+                icon={<Image />}
                 text="PNG"
+                tooltip="High-resolution image"
                 onClick={async () => {
                   if (!raster.current) return;
                   downloadPng(raster.current, filename);
                 }}
-                tooltip="High-resolution image"
               />
               <Button
-                icon={<LuImage />}
+                icon={<Image />}
                 text="JPEG"
+                tooltip="Compressed image"
                 onClick={async () => {
                   if (!raster.current) return;
                   downloadJpg(raster.current, filename);
                 }}
-                tooltip="Compressed image"
               />
             </>
           )}
           {vector && (
             <Button
-              icon={<LuSpline />}
+              icon={<Spline />}
               text="SVG"
+              tooltip="Vector image"
               onClick={() => {
                 if (!vector.current) return;
                 downloadSvg(vector.current, filename);
               }}
-              tooltip="Vector image"
             />
           )}
           {tabular && (
             <>
               <Button
-                icon={<LuTable />}
+                icon={<Table />}
                 text="TSV"
-                onClick={() => downloadTsv(tabular, filename)}
                 tooltip="Tab-separated data"
+                onClick={() => downloadTsv(tabular, filename)}
               />
               <Button
-                icon={<LuTable />}
+                icon={<Table />}
                 text="CSV"
-                onClick={() => downloadCsv(tabular, filename)}
                 tooltip="Tab-separated data"
+                onClick={() => downloadCsv(tabular, filename)}
               />
             </>
           )}
           {text && (
             <Button
-              icon={<LuTerminal />}
+              icon={<Terminal />}
               text="Text"
-              onClick={() => downloadTxt(text, filename)}
               tooltip="Raw text data"
+              onClick={() => downloadTxt(text, filename)}
             />
           )}
           {!!json && (
             <Button
-              icon={<LuBraces />}
+              icon={<Braces />}
               text="JSON"
-              onClick={() => downloadJson(json, filename)}
               tooltip="JSON data"
+              onClick={() => downloadJson(json, filename)}
             />
           )}
           {children}
         </div>
       }
     >
-      <Button icon={<LuDownload />} design="hollow" tooltip="Download" />
+      <Button icon={<DownloadIcon />} tooltip="Download" design="hollow" />
     </Popover>
   );
 };

@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { LuX } from "react-icons/lu";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
+import { X } from "lucide-react";
 import Button from "@/components/Button";
 import { types } from "@/components/Mark";
 import { renderText } from "@/util/dom";
@@ -41,9 +41,9 @@ const Toasts = () => {
       role="region"
       aria-label="Notifications"
     >
-      {toasts.map((toast, index) => (
+      {toasts.map((toast) => (
         <div
-          key={index}
+          key={toast.id}
           className="
             grid grid-cols-[min-content_1fr_min-content] items-center rounded-md
             bg-white shadow-sm
@@ -51,16 +51,13 @@ const Toasts = () => {
           style={{ color: types[toast.type].color }}
         >
           <div className="p-4">{types[toast.type].icon}</div>
-          <div
-            className="text-black"
-            role={toast.type === "error" ? "alert" : "status"}
-          >
+          <div className="text-black" role="alert">
             {toast.content}
           </div>
           <Button
-            design="hollow"
-            icon={<LuX />}
+            icon={<X />}
             tooltip="Dismiss notification"
+            design="hollow"
             onClick={() => removeToast(toast.id)}
           />
         </div>
@@ -95,7 +92,7 @@ const removeToast = (id: Toast["id"]) => {
 };
 
 /** add toast to global queue */
-const toast = async (
+export const toast = async (
   content: Toast["content"],
   type: Toast["type"] = "info",
   id?: Toast["id"],
@@ -114,5 +111,3 @@ const toast = async (
   };
   addToast(newToast);
 };
-
-export { toast };

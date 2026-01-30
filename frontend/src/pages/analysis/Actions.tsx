@@ -1,5 +1,5 @@
-import { LuPencil, LuTrash } from "react-icons/lu";
 import { useMutation } from "@tanstack/react-query";
+import { Pencil, Trash } from "lucide-react";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import { useAnalysis } from "@/pages/Analysis";
@@ -31,13 +31,13 @@ const Actions = () => {
 
       <div className="flex flex-wrap items-center justify-center gap-4">
         <Button
+          icon={<Pencil />}
           text="Duplicate and Edit"
-          icon={<LuPencil />}
           onClick={() => edit()}
         />
         <Button
+          icon={<Trash />}
           text="Delete Analysis"
-          icon={<LuTrash />}
           design="critical"
           onClick={() => _delete()}
         />

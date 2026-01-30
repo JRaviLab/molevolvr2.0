@@ -1,5 +1,5 @@
-import { createContext, useContext, useId } from "react";
 import type { ReactNode } from "react";
+import { createContext, useContext, useId } from "react";
 import { createPortal } from "react-dom";
 import { useEventListener } from "@reactuses/core";
 
@@ -34,7 +34,7 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
       {/* enable useForm in any child inputs */}
       <FormContext.Provider value={id}>{children}</FormContext.Provider>
 
-      {/* append actual form to end of document to avoid affecting layout and CSS selectors */}
+      {/* append actual form to end of document to avoid affecting layout and css selectors */}
       {createPortal(
         <form
           id={id}

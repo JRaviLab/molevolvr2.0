@@ -1,8 +1,8 @@
-import { useId, useRef } from "react";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
-import { FaRegCopy, FaXmark } from "react-icons/fa6";
-import { useElementBounding } from "@reactuses/core";
 import type { RequireAtLeastOne } from "type-fest";
+import { useId, useRef } from "react";
+import { useElementBounding } from "@reactuses/core";
+import { Copy, X } from "lucide-react";
 import Asterisk from "@/components/Asterisk";
 import Button from "@/components/Button";
 import { useForm } from "@/components/Form";
@@ -65,10 +65,10 @@ const TextBox = ({
       <>
         {multi && (
           <Button
+            icon={<Copy />}
+            tooltip="Copy text"
             design="hollow"
             className="rounded-none"
-            tooltip="Copy text"
-            icon={<FaRegCopy />}
             onClick={async () => {
               await window.navigator.clipboard.writeText(value);
               toast("Copied text", "success");
@@ -76,10 +76,10 @@ const TextBox = ({
           />
         )}
         <Button
+          icon={<X />}
+          tooltip="Clear text"
           design="hollow"
           className="rounded-none"
-          tooltip="Clear text"
-          icon={<FaXmark />}
           onClick={() => {
             if (ref.current) ref.current.value = "";
             onChange("");

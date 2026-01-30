@@ -1,13 +1,13 @@
-import { Fragment, useId, useMemo, useState } from "react";
 import type { ReactElement } from "react";
-import { arc, hierarchy } from "d3";
 import type { HierarchyNode } from "d3";
+import type { Filename } from "@/util/download";
+import { Fragment, useId, useMemo, useState } from "react";
+import { arc, hierarchy } from "d3";
 import { inRange, mapValues, sumBy } from "lodash";
 import Chart from "@/components/Chart";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import type { Filename } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
 import { tau } from "@/util/math";
 import { formatNumber } from "@/util/string";
@@ -216,7 +216,6 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
   /** unique segment id */
   const id = useId();
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { truncateWidth } = useTextSize();

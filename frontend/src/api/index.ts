@@ -30,7 +30,7 @@ export async function request<Response>(
   /** raw request options */
   const options: RequestInit = { ...rest };
   /** artificial delay for testing loading spinners */
-  await sleep(0);
+  await sleep();
   /** make url object */
   url = new URL(url);
   /** construct url params */

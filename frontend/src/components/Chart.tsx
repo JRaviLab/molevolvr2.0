@@ -1,16 +1,16 @@
-import { useEffect, useRef } from "react";
 import type { ComponentProps, ReactNode } from "react";
+import type { Filename, Tabular } from "@/util/download";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { LuCrop, LuMaximize, LuPrinter } from "react-icons/lu";
 import { useDebounce, useElementSize, useFullscreen } from "@reactuses/core";
 import clsx from "clsx";
 import { clamp } from "lodash";
+import { Crop, Maximize, Printer } from "lucide-react";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
 import Tooltip from "@/components/Tooltip";
 import { isSafari } from "@/util/browser";
 import { getViewBoxFit } from "@/util/dom";
-import type { Filename, Tabular } from "@/util/download";
 import { usePrint, useTextSize, useTheme } from "@/util/hooks";
 
 type Props = {
@@ -63,7 +63,6 @@ const Chart = ({
   const svgRef = useRef<SVGSVGElement>(null);
   const titleRef = useRef<SVGTextElement>(null);
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { fontSize, truncateWidth } = useTextSize();
@@ -192,9 +191,9 @@ const Chart = ({
       {/* reset handle */}
       <Tooltip content="Reset size">
         <Button
-          design="hollow"
+          icon={<Crop />}
           tooltip="Reset size"
-          icon={<LuCrop />}
+          design="hollow"
           /* eslint-disable better-tailwindcss/no-unknown-classes */
           className="reset-handle absolute right-0 bottom-0 hidden"
           /* eslint-enable better-tailwindcss/no-unknown-classes */
@@ -227,9 +226,9 @@ const Chart = ({
         <div className="flex flex-wrap items-center justify-center gap-2">
           {/* fullscreen */}
           <Button
-            icon={<LuMaximize />}
-            design="hollow"
+            icon={<Maximize />}
             tooltip="Full screen"
+            design="hollow"
             onClick={toggleFullscreen}
           />
 
@@ -243,10 +242,10 @@ const Chart = ({
             json={json}
           >
             <Button
-              icon={<LuPrinter />}
+              icon={<Printer />}
               text="PDF"
-              onClick={print}
               tooltip="Print as pdf"
+              onClick={print}
             />
           </Download>
         </div>

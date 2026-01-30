@@ -1,3 +1,4 @@
+import type { Filename } from "@/util/download";
 import { Fragment } from "react";
 import {
   axisLeft,
@@ -12,7 +13,6 @@ import {
 import { map, orderBy } from "lodash";
 import Chart from "@/components/Chart";
 import Tooltip from "@/components/Tooltip";
-import type { Filename } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
 
 /** size of cells in main plot area */
@@ -55,7 +55,6 @@ type Props = {
 
 /** upset plot */
 const Upset = ({ title, filename = [], x, y, data }: Props) => {
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { getWidth, truncateWidth } = useTextSize();

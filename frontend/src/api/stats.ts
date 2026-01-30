@@ -1,5 +1,5 @@
-import { api, request } from "./";
 import type { Stats } from "./types";
+import { api, request } from "./";
 
 /** get homepage stats */
 export const getStats = async () => {

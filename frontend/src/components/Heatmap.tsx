@@ -1,3 +1,4 @@
+import type { Filename } from "@/util/download";
 import { useState } from "react";
 import { extent, scaleBand, scaleLinear, transpose } from "d3";
 import { range } from "lodash";
@@ -6,7 +7,6 @@ import CheckBox from "@/components/CheckBox";
 import { Gradient, gradientFunc, gradientOptions } from "@/components/Gradient";
 import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
-import type { Filename } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
 
 /** width/height of cells */
@@ -66,7 +66,6 @@ const Heatmap = ({
     data = transpose(data);
   }
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { truncateWidth } = useTextSize();

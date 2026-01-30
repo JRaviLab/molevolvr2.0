@@ -1,5 +1,5 @@
-import { api, request } from "./";
 import type { Analysis } from "./types";
+import { api, request } from "./";
 
 /** get analysis details */
 export const getAnalysis = async (id: Analysis["id"]) => {

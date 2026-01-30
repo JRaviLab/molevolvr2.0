@@ -1,27 +1,27 @@
-import {
-  LuArrowRight,
-  LuChartNoAxesGantt,
-  LuChartScatter,
-  LuDna,
-  LuEye,
-  LuFeather,
-  LuFlaskConical,
-  LuInfo,
-  LuLightbulb,
-  LuMicroscope,
-  LuMonitorCheck,
-  LuNewspaper,
-  LuPlus,
-  LuQuote,
-  LuShapes,
-  LuUpload,
-  LuWrench,
-} from "react-icons/lu";
-import { TbBinaryTree } from "react-icons/tb";
+import type { Analysis } from "@/api/types";
 import { useMediaQuery } from "@reactuses/core";
 import { useQuery } from "@tanstack/react-query";
+import {
+  ArrowRight,
+  ChartNoAxesGantt,
+  ChartScatter,
+  Dna,
+  Eye,
+  Feather,
+  FlaskConical,
+  Info,
+  Lightbulb,
+  Microscope,
+  MonitorCheck,
+  Newspaper,
+  Plus,
+  Quote,
+  Shapes,
+  Split,
+  Upload,
+  Wrench,
+} from "lucide-react";
 import { getStats } from "@/api/stats";
-import type { Analysis } from "@/api/types";
 import Alert from "@/components/Alert";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";
@@ -77,18 +77,18 @@ const Home = () => {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <Button to="/new-analysis" text="New Analysis" icon={<LuPlus />} />
+          <Button to="/new-analysis" icon={<Plus />} text="New Analysis" />
           <Button
             to="/load-analysis"
+            icon={<ArrowRight />}
             text="Load Analysis"
-            icon={<LuArrowRight />}
           />
-          <Button to="/testbed" text="Testbed" icon={<LuFlaskConical />} />
+          <Button to="/testbed" icon={<FlaskConical />} text="Testbed" />
         </div>
       </section>
 
       <section>
-        <Heading level={2} icon={<LuLightbulb />}>
+        <Heading level={2} icon={<Lightbulb />}>
           Examples
         </Heading>
 
@@ -104,7 +104,7 @@ const Home = () => {
       </section>
 
       <section>
-        <Heading level={2} icon={<LuEye />}>
+        <Heading level={2} icon={<Eye />}>
           Overview
         </Heading>
 
@@ -118,7 +118,7 @@ const Home = () => {
         >
           <FeatureCard
             title="Construct protein family"
-            badge={<LuWrench />}
+            badge={<Wrench />}
             content={
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
@@ -128,7 +128,7 @@ const Home = () => {
 
           <FeatureCard
             title="Load your own proteins"
-            badge={<LuUpload />}
+            badge={<Upload />}
             content={
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
@@ -145,7 +145,7 @@ const Home = () => {
         >
           <FeatureCard
             title="Domain architecture"
-            badge={<LuChartNoAxesGantt />}
+            badge={<ChartNoAxesGantt />}
             content={
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
@@ -153,7 +153,7 @@ const Home = () => {
 
           <FeatureCard
             title="Phylogeny"
-            badge={<TbBinaryTree />}
+            badge={<Split />}
             content={
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
@@ -161,7 +161,7 @@ const Home = () => {
 
           <FeatureCard
             title="Homology"
-            badge={<LuShapes />}
+            badge={<Shapes />}
             content={
               <p>Lorem ipsum dolor situr. Simplified chart thumbnail.</p>
             }
@@ -170,7 +170,7 @@ const Home = () => {
       </section>
 
       <section>
-        <Heading level={2} icon={<LuChartScatter />}>
+        <Heading level={2} icon={<ChartScatter />}>
           Stats
         </Heading>
 
@@ -180,17 +180,17 @@ const Home = () => {
         {stats && (
           <div className="flex flex-wrap items-center justify-center gap-8">
             <Tile
-              icon={<LuMonitorCheck />}
+              icon={<MonitorCheck />}
               primary={formatNumber(stats.running, true)}
               secondary="Analyses Running"
             />
             <Tile
-              icon={<LuMicroscope />}
+              icon={<Microscope />}
               primary={formatNumber(stats.performed, true)}
               secondary="Analyses Performed"
             />
             <Tile
-              icon={<LuDna />}
+              icon={<Dna />}
               primary={formatNumber(stats.proteins, true)}
               secondary="Proteins Processed"
             />
@@ -199,7 +199,7 @@ const Home = () => {
       </section>
 
       <section>
-        <Heading level={2} icon={<LuFeather />}>
+        <Heading level={2} icon={<Feather />}>
           Abstract
         </Heading>
 
@@ -216,14 +216,14 @@ const Home = () => {
           <Button
             to="https://biorxiv.org/link-to-paper"
             text="Read the Paper"
-            icon={<LuNewspaper />}
+            icon={<Newspaper />}
           />
-          <Button to="/about" text="Learn More" icon={<LuInfo />} />
+          <Button to="/about" icon={<Info />} text="Learn More" />
         </div>
       </section>
 
       <section>
-        <Heading level={2} icon={<LuQuote />}>
+        <Heading level={2} icon={<Quote />}>
           Cite
         </Heading>
 

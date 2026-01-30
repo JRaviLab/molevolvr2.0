@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
-import { LuMoon, LuSun } from "react-icons/lu";
 import { getDefaultStore, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { Moon, Sun } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
 
 /** dark mode state */
@@ -33,7 +33,7 @@ export const DarkMode = ({ className }: Props) => {
         role="switch"
         aria-checked={darkMode}
       >
-        {darkMode ? <LuSun /> : <LuMoon />}
+        {darkMode ? <Sun /> : <Moon />}
       </button>
     </Tooltip>
   );

@@ -1,8 +1,8 @@
+import type { Theme } from "@/util/dom";
 import { useEffect, useRef, useState } from "react";
 import { useElementSize } from "@reactuses/core";
 import { gsap } from "gsap";
 import { random, range } from "lodash";
-import type { Theme } from "@/util/dom";
 import { useTheme } from "@/util/hooks";
 import { dist } from "@/util/math";
 import Shape from "./shape.svg?raw";
@@ -41,7 +41,6 @@ const Viz = () => {
   /** canvas client size */
   const [width, height] = useElementSize(canvas);
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   useEffect(() => {

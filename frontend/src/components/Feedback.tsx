@@ -1,9 +1,9 @@
-import { LuDownload, LuMessageCircleMore, LuSend } from "react-icons/lu";
 import { useLocation } from "react-router";
 import { Fragment } from "react/jsx-runtime";
 import { useLocalStorage } from "@reactuses/core";
 import { useMutation } from "@tanstack/react-query";
 import { mapValues, startCase, truncate } from "lodash";
+import { Download, MessageCircleMore, Send } from "lucide-react";
 import { createIssue } from "@/api/issue";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
@@ -145,6 +145,7 @@ const Feedback = () => {
               <TextBox
                 label="Subject"
                 placeholder="Subject"
+                required
                 value={subject}
                 onChange={setSubject}
               />
@@ -160,7 +161,7 @@ const Feedback = () => {
               />
             </div>
 
-            <Collapsible title="Debug Info">
+            <Collapsible title="Debug" className="self-center">
               <dl
                 className="
                   self-center [--cols:6]
@@ -221,10 +222,10 @@ const Feedback = () => {
           <>
             <div className="flex flex-wrap gap-2">
               <Button
+                icon={<Download />}
                 text="Screenshot"
-                icon={<LuDownload />}
-                design="hollow"
                 tooltip="Download a screenshot of the current page"
+                design="hollow"
                 onClick={async () => {
                   close();
                   await downloadJpg(document.body, ["screenshot"]);
@@ -245,12 +246,12 @@ const Feedback = () => {
             <div className="grow" />
 
             {status === "idle" && (
-              <Button text="Submit" icon={<LuSend />} type="submit" />
+              <Button icon={<Send />} text="Submit" type="submit" />
             )}
           </>
         }
       >
-        <Button icon={<LuMessageCircleMore />} tooltip="Give us feedback" />
+        <Button icon={<MessageCircleMore />} tooltip="Give us feedback" />
       </Dialog>
     </Form>
   );

@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useState } from "react";
 import type { ReactElement, ReactNode } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
 import clsx from "clsx";
@@ -124,8 +124,6 @@ type TabProps = {
 };
 
 /** use within a Tabs component */
-const Tab = (props: TabProps) => {
+export const Tab = (props: TabProps) => {
   return <Fragment {...props} />;
 };
-
-export { Tab };

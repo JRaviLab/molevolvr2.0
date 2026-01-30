@@ -1,18 +1,14 @@
-import { useCallback, useMemo, useRef, useState } from "react";
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
-import {
-  LuArrowDown,
-  LuArrowDownUp,
-  LuArrowUp,
-  LuChevronLeft,
-  LuChevronRight,
-  LuChevronsLeft,
-  LuChevronsRight,
-  LuDownload,
-  LuFilter,
-  LuFilterX,
-  LuSearch,
-} from "react-icons/lu";
+import type {
+  Column,
+  FilterFn,
+  NoInfer,
+  SortingState,
+} from "@tanstack/react-table";
+import type { Option as OptionMulti } from "@/components/SelectMulti";
+import type { Option as OptionSingle } from "@/components/SelectSingle";
+import type { Filename } from "@/util/download";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useLocalStorage } from "@reactuses/core";
 import {
   createColumnHelper,
@@ -26,29 +22,33 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type {
-  Column,
-  FilterFn,
-  NoInfer,
-  SortingState,
-} from "@tanstack/react-table";
 import clsx from "clsx";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
-import Collapse from "@/assets/collapse.svg?react";
-import Expand from "@/assets/expand.svg?react";
+import {
+  ArrowDown,
+  ArrowDownUp,
+  ArrowUp,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Download,
+  FilterIcon,
+  FilterX,
+  FoldHorizontal,
+  Search,
+  UnfoldHorizontal,
+} from "lucide-react";
 import Button from "@/components/Button";
 import Help from "@/components/Help";
 import Popover from "@/components/Popover";
-import type { Option as OptionMulti } from "@/components/SelectMulti";
 import SelectMulti from "@/components/SelectMulti";
-import type { Option as OptionSingle } from "@/components/SelectSingle";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import TextBox from "@/components/TextBox";
 import Tooltip from "@/components/Tooltip";
 import { preserveScroll } from "@/util/dom";
 import { downloadCsv } from "@/util/download";
-import type { Filename } from "@/util/download";
 import { formatDate, formatNumber } from "@/util/string";
 
 type Props<Datum extends object> = {
@@ -344,12 +344,12 @@ const Table = <Datum extends object>({
                             >
                               {header.column.getIsSorted() ? (
                                 header.column.getIsSorted() === "asc" ? (
-                                  <LuArrowUp className="text-accent" />
+                                  <ArrowUp className="text-accent" />
                                 ) : (
-                                  <LuArrowDown className="text-accent" />
+                                  <ArrowDown className="text-accent" />
                                 )
                               ) : (
-                                <LuArrowDownUp />
+                                <ArrowDownUp />
                               )}
                             </button>
                           </Tooltip>
@@ -368,9 +368,9 @@ const Table = <Datum extends object>({
                             <Tooltip content="Filter this column">
                               <button>
                                 {header.column.getIsFiltered() ? (
-                                  <LuFilterX className="text-accent" />
+                                  <FilterX className="text-accent" />
                                 ) : (
-                                  <LuFilter />
+                                  <FilterIcon />
                                 )}
                               </button>
                             </Tooltip>
@@ -432,31 +432,31 @@ const Table = <Datum extends object>({
           {/* pagination */}
           <div className="flex gap-2">
             <Button
+              icon={<ChevronsLeft />}
+              tooltip="First page"
               design="hollow"
               size="compact"
-              tooltip="First page"
-              icon={<LuChevronsLeft />}
               aria-disabled={!table.getCanPreviousPage()}
               onClick={() => table.setPageIndex(0)}
             />
             <Button
+              icon={<ChevronLeft />}
+              tooltip="Previous page"
               design="hollow"
               size="compact"
-              tooltip="Previous page"
-              icon={<LuChevronLeft />}
               aria-disabled={!table.getCanPreviousPage()}
               onClick={table.previousPage}
             />
             <Tooltip content="Jump to page">
               <Button
-                design="hollow"
-                size="compact"
                 text={[
                   "Page",
                   formatNumber(table.getState().pagination.pageIndex + 1),
                   "of",
                   formatNumber(table.getPageCount()),
                 ].join(" ")}
+                design="hollow"
+                size="compact"
                 onClick={() => {
                   const page = parseInt(window.prompt("Jump to page") || "");
                   if (Number.isNaN(page)) return;
@@ -465,18 +465,18 @@ const Table = <Datum extends object>({
               />
             </Tooltip>
             <Button
+              icon={<ChevronRight />}
+              tooltip="Next page"
               design="hollow"
               size="compact"
-              tooltip="Next page"
-              icon={<LuChevronRight />}
               aria-disabled={!table.getCanNextPage()}
               onClick={table.nextPage}
             />
             <Button
+              icon={<ChevronsRight />}
+              tooltip="Last page"
               design="hollow"
               size="compact"
-              tooltip="Last page"
-              icon={<LuChevronsRight />}
               aria-disabled={!table.getCanNextPage()}
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             />
@@ -509,7 +509,7 @@ const Table = <Datum extends object>({
           <TextBox
             placeholder="Search"
             tooltip="Search entire table (regex)"
-            icon={<LuSearch />}
+            icon={<Search />}
             value={search}
             onChange={setSearch}
           />
@@ -518,9 +518,9 @@ const Table = <Datum extends object>({
           <div className="flex flex-wrap items-center gap-2">
             {/* clear filters */}
             <Button
-              icon={<LuFilterX />}
-              design="hollow"
+              icon={<FilterX />}
               tooltip="Clear all filters"
+              design="hollow"
               onClick={() => {
                 table.resetColumnFilters();
                 setSearch("");
@@ -528,9 +528,9 @@ const Table = <Datum extends object>({
             />
             {/* download */}
             <Button
-              design="hollow"
-              icon={<LuDownload />}
+              icon={<Download />}
               tooltip="Download table data as .csv"
+              design="hollow"
               onClick={() => {
                 /** get col defs that are visible */
                 const defs = visibleCols.map(
@@ -554,9 +554,9 @@ const Table = <Datum extends object>({
             />
             {/* expand/collapse */}
             <Button
-              icon={expanded ? <Collapse /> : <Expand />}
-              design="hollow"
+              icon={expanded ? <FoldHorizontal /> : <UnfoldHorizontal />}
               tooltip={expanded ? "Collapse table" : "Expand table"}
+              design="hollow"
               onClick={() => setExpanded(!expanded)}
             />
           </div>
@@ -690,7 +690,7 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
       <TextBox
         label="Filter by text (regex)"
         placeholder="Search"
-        icon={<LuSearch />}
+        icon={<Search />}
         value={(column.getFilterValue() as string | undefined) ?? ""}
         onChange={column.setFilterValue}
       />

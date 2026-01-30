@@ -1,17 +1,12 @@
-import {
-  cloneElement,
-  Fragment,
-  useState,
-  type ReactElement,
-  type ReactNode,
-} from "react";
-import { FaCircleXmark } from "react-icons/fa6";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
+import { cloneElement, Fragment, useRef, useState } from "react";
 import {
   DialogPanel as Content,
   Description,
   Dialog as Root,
   DialogTitle as Title,
 } from "@headlessui/react";
+import { X } from "lucide-react";
 import Button from "@/components/Button";
 
 type Props = {
@@ -27,7 +22,7 @@ type Props = {
   /** when open state changes */
   onChange?: (open: boolean) => void;
   /** element that triggers dialog on click */
-  children: ReactElement<{ onClick: () => void }>;
+  children: ReactElement<ComponentProps<"button">>;
 };
 
 type Content = ReactNode | ((close: () => void, open: () => void) => ReactNode);
@@ -40,12 +35,15 @@ const Dialog = ({
   onChange,
   children,
 }: Props) => {
+  const ref = useRef<HTMLDivElement>(null);
+
   const [isOpen, setOpen] = useState(false);
 
-  const open = () => {
+  const open = async () => {
     setOpen(true);
     onChange?.(true);
   };
+
   const close = () => {
     setOpen(false);
     onChange?.(false);
@@ -53,8 +51,12 @@ const Dialog = ({
 
   return (
     <>
-      {cloneElement(children, { onClick: open })}
-      <Root open={isOpen} onClose={close}>
+      {cloneElement(children, {
+        onClick: open,
+        /** prevent implicit submission of wrapping form */
+        type: "button",
+      })}
+      <Root ref={ref} open={isOpen} onClose={close}>
         <div className="fixed inset-0 z-20 flex items-center justify-center p-8">
           <Content as={Fragment}>
             <div
@@ -68,10 +70,9 @@ const Dialog = ({
                 <Title>{title}</Title>
                 <Description className="sr-only">{title}</Description>
                 <Button
-                  design="hollow"
+                  icon={<X />}
                   tooltip="Close dialog"
-                  icon={<FaCircleXmark />}
-                  className="text-gray"
+                  design="hollow"
                   onClick={close}
                 />
               </div>

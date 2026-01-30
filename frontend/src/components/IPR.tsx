@@ -1,3 +1,5 @@
+import type { D3DragEvent, D3ZoomEvent } from "d3";
+import type { Filename } from "@/util/download";
 import {
   useCallback,
   useEffect,
@@ -7,14 +9,12 @@ import {
   useState,
 } from "react";
 import { drag, scaleLinear, select, zoom, zoomIdentity } from "d3";
-import type { D3DragEvent, D3ZoomEvent } from "d3";
 import { clamp, inRange, mapValues, range } from "lodash";
 import Chart from "@/components/Chart";
 import Help from "@/components/Help";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import type { Filename } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
 
 /** label size */
@@ -69,9 +69,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
     "mode",
   );
 
-  /** reactive CSS vars */
   const theme = useTheme();
-
   const { fontSize, getWidth, truncateWidth } = useTextSize();
 
   /** unique id for clip path */
@@ -235,20 +233,16 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                 </text>
               </g>
               <g fill={theme["--color-black"]}>
-                {tracks.map((track, trackIndex) => (
-                  <Tooltip key={trackIndex} content={track.label}>
-                    <text
-                      x={0}
-                      y={(trackIndex + 0.5) * (rowHeight + rowGap)}
-                      tabIndex={0}
-                    >
-                      {truncateWidth(track.label ?? "-", labelWidth)}
-                    </text>
-                  </Tooltip>
+                {tracks.map(({ label }, trackIndex) => (
+                  <Label
+                    key={trackIndex}
+                    index={trackIndex}
+                    label={label}
+                    truncateWidth={truncateWidth}
+                  />
                 ))}
               </g>
             </g>
-
             {/* main content area */}
             <g
               ref={(el) => {
@@ -267,11 +261,11 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                     zoomBehavior.transform(selection, zoomIdentity);
                     setTransform(zoomIdentity);
                   };
-                  if (prevWidth.current !== width) reset();
                   selection.on("dblclick.zoom", (event) => {
                     event.preventDefault();
                     reset();
                   });
+                  if (prevWidth.current !== width) reset();
                   prevWidth.current = width;
                 }
 
@@ -306,32 +300,22 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                   className="pointer-events-none"
                   transform={`translate(0, ${-1.5 * (rowHeight + rowGap)})`}
                 >
-                  {sequence.split("").map((char, index) => (
-                    <g
-                      key={index}
-                      transform={`translate(${scaleX(index + 0.5)}, 0)`}
-                    >
-                      <rect
-                        x={-cellWidth / 2}
-                        y={-rowHeight / 2}
-                        width={cellWidth}
-                        height={rowHeight}
-                        fill={theme["--color-light-gray"]}
-                        opacity={index % 2 === 0 ? 0.25 : 0.5}
-                      />
-                      <text
-                        x={0}
-                        y={0}
-                        fill={theme["--color-black"]}
-                        transform={`scale(${clamp(cellWidth / fontSize, 0, 1)})`}
-                        textAnchor="middle"
-                      >
-                        {char}
-                      </text>
-                    </g>
+                  {/* only draw sequence chars in view */}
+                  {range(startPosition, endPosition).map((position) => (
+                    <Char
+                      key={position}
+                      char={sequence.charAt(position)}
+                      position={position}
+                      scaleX={scaleX}
+                      cellWidth={cellWidth}
+                      rowHeight={rowHeight}
+                      theme={theme}
+                      fontSize={fontSize}
+                    />
                   ))}
                 </g>
 
+                {/* ticks row */}
                 <g
                   className="pointer-events-none"
                   fill={theme["--color-black"]}
@@ -344,7 +328,8 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                     </text>
                   ))}
                 </g>
-                {/* tracks */}
+
+                {/* track rows */}
                 <g>
                   {tracks.map((track, trackIndex) => (
                     <g
@@ -353,55 +338,26 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                     >
                       {track.features.map(
                         ({ id, label, type, start, end }, featureIndex) => {
-                          /** x in view */
-                          const drawX = clamp(scaleX(start - 1), 0, width);
-                          /** width in view */
-                          const drawWidth =
-                            clamp(scaleX(end), 0, width) -
-                            clamp(scaleX(start - 1), 0, width);
-                          /** mid in view */
-                          const drawMidX = drawX + drawWidth / 2;
+                          /** don't draw features outside view */
+                          if (end < startPosition + 1 || start > endPosition)
+                            return null;
 
                           return (
-                            <Tooltip
+                            <Feature
                               key={featureIndex}
-                              content={
-                                <dl>
-                                  <dt>Name</dt>
-                                  <dd>{label ?? id}</dd>
-                                  <dt>Type</dt>
-                                  <dd>{type}</dd>
-                                  <dt>Range</dt>
-                                  <dd>
-                                    {start}-{end}
-                                  </dd>
-                                </dl>
-                              }
-                            >
-                              <g tabIndex={0} role="graphics-symbol">
-                                <rect
-                                  x={drawX}
-                                  y={0}
-                                  width={drawWidth}
-                                  height={rowHeight}
-                                  fill={colorMap[type ?? ""]}
-                                />
-                                {inRange(
-                                  drawMidX,
-                                  fontSize,
-                                  width - fontSize,
-                                ) && (
-                                  <text
-                                    x={drawMidX}
-                                    y={rowHeight / 2}
-                                    fill={theme["--color-black"]}
-                                    textAnchor="middle"
-                                  >
-                                    {truncateWidth(label ?? id, drawWidth)}
-                                  </text>
-                                )}
-                              </g>
-                            </Tooltip>
+                              id={id}
+                              label={label}
+                              type={type}
+                              start={start}
+                              end={end}
+                              scaleX={scaleX}
+                              width={width}
+                              rowHeight={rowHeight}
+                              colorMap={colorMap}
+                              theme={theme}
+                              fontSize={fontSize}
+                              truncateWidth={truncateWidth}
+                            />
                           );
                         },
                       )}
@@ -443,7 +399,6 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                 />
               </g>
             </g>
-
             <Legend
               x={-labelWidth - 2 * rowHeight}
               y={(1 + tracks.length) * (rowHeight + rowGap)}
@@ -458,3 +413,137 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
 };
 
 export default IPR;
+
+/** split into sub-components for slight performance optimization */
+
+type LabelProps = {
+  index: number;
+  label?: string;
+  truncateWidth: ReturnType<typeof useTextSize>["truncateWidth"];
+};
+
+/** track row label */
+const Label = ({ index, label, truncateWidth }: LabelProps) => (
+  <Tooltip content={label}>
+    <text x={0} y={(index + 0.5) * (rowHeight + rowGap)} tabIndex={0}>
+      {truncateWidth(label ?? "-", labelWidth)}
+    </text>
+  </Tooltip>
+);
+
+type CharProps = {
+  char: string;
+  position: number;
+  scaleX: (position: number) => number;
+  cellWidth: number;
+  rowHeight: number;
+  theme: ReturnType<typeof useTheme>;
+  fontSize: ReturnType<typeof useTextSize>["fontSize"];
+};
+
+/** sequence row char */
+const Char = ({
+  char,
+  position,
+  scaleX,
+  cellWidth,
+  rowHeight,
+  theme,
+  fontSize,
+}: CharProps) => (
+  <g transform={`translate(${scaleX(position + 0.5)}, 0)`}>
+    <rect
+      x={-cellWidth / 2}
+      y={-rowHeight / 2}
+      width={cellWidth}
+      height={rowHeight}
+      fill={theme["--color-light-gray"]}
+      opacity={position % 2 === 0 ? 0.25 : 0.5}
+    />
+    <text
+      x={0}
+      y={0}
+      fill={theme["--color-black"]}
+      transform={`scale(${clamp(cellWidth / fontSize, 0, 1)})`}
+      textAnchor="middle"
+    >
+      {char}
+    </text>
+  </g>
+);
+
+type FeatureProps = {
+  id: string;
+  label?: string;
+  type?: string;
+  start: number;
+  end: number;
+  scaleX: (position: number) => number;
+  width: number;
+  rowHeight: number;
+  theme: ReturnType<typeof useTheme>;
+  fontSize: ReturnType<typeof useTextSize>["fontSize"];
+  truncateWidth: ReturnType<typeof useTextSize>["truncateWidth"];
+  colorMap: ReturnType<typeof useColorMap>;
+};
+
+/** feature track */
+const Feature = ({
+  id,
+  label,
+  type,
+  start,
+  end,
+  scaleX,
+  width,
+  rowHeight,
+  colorMap,
+  theme,
+  fontSize,
+  truncateWidth,
+}: FeatureProps) => {
+  /** x in view */
+  const drawX = clamp(scaleX(start - 1), 0, width);
+  /** width in view */
+  const drawWidth =
+    clamp(scaleX(end), 0, width) - clamp(scaleX(start - 1), 0, width);
+  /** mid in view */
+  const drawMidX = drawX + drawWidth / 2;
+
+  return (
+    <Tooltip
+      content={
+        <dl>
+          <dt>Name</dt>
+          <dd>{label ?? id}</dd>
+          <dt>Type</dt>
+          <dd>{type}</dd>
+          <dt>Range</dt>
+          <dd>
+            {start}-{end}
+          </dd>
+        </dl>
+      }
+    >
+      <g tabIndex={0} role="graphics-symbol">
+        <rect
+          x={drawX}
+          y={0}
+          width={drawWidth}
+          height={rowHeight}
+          fill={colorMap[type ?? ""]}
+        />
+        {inRange(drawMidX, fontSize, width - fontSize) && (
+          <text
+            x={drawMidX}
+            y={rowHeight / 2}
+            fill={theme["--color-black"]}
+            textAnchor="middle"
+          >
+            {truncateWidth(label ?? id, drawWidth)}
+          </text>
+        )}
+      </g>
+    </Tooltip>
+  );
+};

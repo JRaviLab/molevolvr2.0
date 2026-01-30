@@ -1,7 +1,7 @@
-import { useId, useState } from "react";
 import type { ReactNode } from "react";
-import { LuChevronDown, LuChevronUp } from "react-icons/lu";
-import clsx from "clsx";
+import { useState } from "react";
+import { clsx } from "clsx";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
 
 type Props = {
@@ -9,42 +9,42 @@ type Props = {
   title: ReactNode;
   /** tooltip content */
   tooltip?: ReactNode;
+  /** class on button */
+  className?: string;
   /** panel content */
   children: ReactNode;
 };
 
 /** button with expandable/collapsible content beneath */
-const Collapsible = ({ title, tooltip, children }: Props) => {
-  /** unique id for component instance */
-  const id = useId();
-
+const Collapsible = ({ title, tooltip, className, children }: Props) => {
   /** open state */
   const [open, setOpen] = useState(false);
 
   return (
-    <>
+    <details
+      className="contents"
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+    >
       {/* trigger */}
       <Tooltip content={tooltip}>
-        <button
-          className="
-            flex items-center gap-2 rounded-md border border-dashed
-            border-light-gray p-2 text-accent
-            hover:text-deep
-          "
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          aria-controls={open ? id : undefined}
+        <summary
+          className={clsx(
+            `
+              flex items-center gap-2 rounded-md border border-dashed
+              border-current p-2 text-accent
+              hover:text-deep
+            `,
+            className,
+          )}
         >
           {title}
-          {open ? <LuChevronUp /> : <LuChevronDown />}
-        </button>
+          {open ? <ChevronUp /> : <ChevronDown />}
+        </summary>
       </Tooltip>
 
       {/* content */}
-      <div id={id} className={clsx("contents", !open && "hidden")}>
-        {children}
-      </div>
-    </>
+      {children}
+    </details>
   );
 };
 

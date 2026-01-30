@@ -2,6 +2,13 @@
 export const sleep = async (ms = 0) =>
   new Promise((resolve) => window.setTimeout(resolve, ms));
 
+/**
+ * wait for next animation frame (after async tasks like react rendering but
+ * before browser repaint)
+ */
+export const frame = () =>
+  new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+
 /** now shorthand */
 const now = () => window.performance.now();
 

@@ -1,4 +1,4 @@
-import { LuFileChartPie } from "react-icons/lu";
+import { FileChartPie } from "lucide-react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
 import Heading from "@/components/Heading";
@@ -9,7 +9,7 @@ const Overview = () => {
 
   return (
     <section>
-      <Heading level={1} icon={<LuFileChartPie />}>
+      <Heading level={1} icon={<FileChartPie />}>
         {name}
       </Heading>
 

@@ -1,6 +1,6 @@
-import { sum } from "lodash";
 import type { Hue } from "@/util/color";
 import type { Props } from "./MSA";
+import { sum } from "lodash";
 
 /** https://www.jalview.org/help/html/colourSchemes/clustal.html */
 

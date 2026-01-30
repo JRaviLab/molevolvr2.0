@@ -1,3 +1,5 @@
+import type { Hue } from "@/util/color";
+import type { Filename } from "@/util/download";
 import { Fragment, useMemo, useState } from "react";
 import { pairs } from "d3";
 import { countBy, mapKeys, mapValues, max, orderBy, range } from "lodash";
@@ -6,8 +8,6 @@ import CheckBox from "@/components/CheckBox";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
-import type { Hue } from "@/util/color";
-import type { Filename } from "@/util/download";
 import { useTextSize, useTheme } from "@/util/hooks";
 
 /** label size */
@@ -53,7 +53,6 @@ const MSA = ({
   /** whether to wrap sequence to separate "panels" */
   const [wrap, setWrap] = useState(true);
 
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { fontSize, truncateWidth } = useTextSize();

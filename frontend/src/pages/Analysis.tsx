@@ -1,9 +1,9 @@
+import type { Analysis as _Analysis } from "@/api/types";
 import { createContext, useContext } from "react";
-import { LuFileChartPie } from "react-icons/lu";
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { FileChartPie } from "lucide-react";
 import { getAnalysis } from "@/api/analysis";
-import type { Analysis as _Analysis } from "@/api/types";
 import Alert from "@/components/Alert";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
@@ -48,7 +48,7 @@ const Analysis = () => {
       <Meta title="Analysis" />
 
       <section>
-        <Heading level={1} icon={<LuFileChartPie />}>
+        <Heading level={1} icon={<FileChartPie />}>
           Analysis
         </Heading>
 

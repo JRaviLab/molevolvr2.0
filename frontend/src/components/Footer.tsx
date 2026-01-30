@@ -1,5 +1,4 @@
-import { FaGithub } from "react-icons/fa6";
-import { LuMail } from "react-icons/lu";
+import { Github, Mail } from "lucide-react";
 import Link from "@/components/Link";
 
 const { VITE_EMAIL, VITE_LAB_NAME, VITE_LAB_WEBSITE, VITE_LAB_GITHUB } =
@@ -21,10 +20,10 @@ const Footer = () => (
       "
     >
       <Link to={`mailto:${VITE_EMAIL}`} showArrow={false} tooltip="Email us">
-        <LuMail />
+        <Mail />
       </Link>
       <Link to={VITE_LAB_GITHUB} showArrow={false} tooltip="GitHub">
-        <FaGithub />
+        <Github />
       </Link>
     </div>
 

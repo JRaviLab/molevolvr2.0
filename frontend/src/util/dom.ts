@@ -1,21 +1,34 @@
 import type { ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
-import { sleep, waitFor } from "@/util/misc";
+import { frame, waitFor } from "@/util/misc";
 
 export type Theme = Record<`--${string}`, string>;
 
+/** https://stackoverflow.com/a/78994961/2180570 */
 /** get all css variables on root */
 export const getTheme = (): Theme => {
-  const styles = window.getComputedStyle(document.documentElement);
-  const vars = Object.values(
-    window.getComputedStyle(document.documentElement),
-  ).filter((value) => value.startsWith("--"));
+  const rootStyles = getStyles();
   return Object.fromEntries(
-    vars.map((key) => [key, styles.getPropertyValue(key).trim()]),
+    Array.from(document.styleSheets)
+      .flatMap((styleSheet) => {
+        try {
+          return Array.from(styleSheet.cssRules);
+        } catch (error) {
+          return [];
+        }
+      })
+      .filter((cssRule) => cssRule instanceof CSSStyleRule)
+      .flatMap((cssRule) => Array.from(cssRule.style))
+      .filter((style) => style.startsWith("--"))
+      .map((variable) => [variable, rootStyles.getPropertyValue(variable)]),
   );
 };
 
-/** get first font name from font-family string */
+/** get styles on target element */
+export const getStyles = (target?: Element | null) =>
+  window.getComputedStyle(target || document.documentElement);
+
+/** get name from font-family string e.g. 'Arial', sans-serif -> Arial */
 export const parseFont = (family: string) =>
   family.split(",")[0]?.replaceAll(/['"]/g, "").trim() || "";
 
@@ -50,7 +63,6 @@ export const shrinkWrap = (
   const start = [...element.childNodes].at(startChild);
   const end = [...element.childNodes].at(endChild);
   if (!start || !end) return;
-  element.style.width = "";
   const range = document.createRange();
   range.setStartBefore(start);
   range.setEndAfter(end);
@@ -58,7 +70,7 @@ export const shrinkWrap = (
   const paddingLeft = parseFloat(style.paddingLeft) || 0;
   const paddingRight = parseFloat(style.paddingRight) || 0;
   const { width } = range.getBoundingClientRect();
-  element.style.width = width + paddingLeft + paddingRight + "px";
+  element.style.maxWidth = width + paddingLeft + paddingRight + "px";
 };
 
 /**
@@ -69,19 +81,19 @@ export const isCovering = (
   element: HTMLElement | undefined | null,
   background = "section",
 ) => {
-  if (!element) return;
+  if (!element) return false;
 
   /** don't consider covering if user interacting with element */
-  if (element.matches(":hover, :focus-within")) return;
+  if (element.matches(":hover, :focus-within")) return false;
 
   /** density of points to check */
-  const gap = 20;
+  const gap = 5;
 
   const { left, top, width, height } = element.getBoundingClientRect() ?? {};
 
   /** check a grid of points under element */
-  for (let x = left + gap; x < width - gap; x += gap) {
-    for (let y = top + gap; y < height - gap; y += gap) {
+  for (let x = left; x < width; x += gap) {
+    for (let y = top; y < height; y += gap) {
       const covering = document
         /** get elements under point */
         .elementsFromPoint(x, y)
@@ -91,7 +103,7 @@ export const isCovering = (
         .shift();
 
       /** is "important" element */
-      if (!covering?.matches(background)) return covering;
+      if (!covering?.matches(background)) return !!covering;
     }
   }
 
@@ -108,7 +120,7 @@ export const getViewBoxFit = (svg: SVGGraphicsElement) => {
 export const preserveScroll = async (element?: Element | null) => {
   if (!element) return;
   const oldY = element.getBoundingClientRect().top;
-  await sleep(0);
+  await frame();
   const newY = element.getBoundingClientRect().top;
   window.scrollBy({ top: newY - oldY, behavior: "instant" });
 };

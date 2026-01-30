@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
 import type { JSX, ReactElement, ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import clsx from "clsx";
 import { atom, useSetAtom } from "jotai";
 import Badge from "@/components/Badge";
@@ -21,11 +21,11 @@ type Props = {
 };
 
 type Heading = {
-  ref: HTMLHeadingElement;
+  element: HTMLHeadingElement;
   id: string;
   level: number;
   icon?: ReactNode;
-  text: ReactNode;
+  content: ReactNode;
 };
 
 /** global list of headings */
@@ -35,61 +35,58 @@ export const headingsAtom = atom<Heading[]>([]);
  * demarcates a new section/level of content. only use one level 1 per page.
  * don't use levels below 4.
  */
-const Heading = ({
-  level,
-  icon = <></>,
-  anchor,
-  className,
-  children,
-}: Props) => {
+const Heading = ({ level, icon, anchor, className, children }: Props) => {
   const ref = useRef<HTMLHeadingElement>(null);
 
   /** heading tag */
   const Tag: keyof JSX.IntrinsicElements = `h${level}`;
 
-  /** url-compatible, "slugified" id */
-  const id = anchor ?? slugify(renderText(children));
-
   /** icon or badge */
   let iconElement: ReactNode = null;
   if (typeof icon === "string") iconElement = <Badge>{icon}</Badge>;
-  if (typeof icon === "object" && typeof icon.type === "function")
-    iconElement = <div className="flex opacity-25">{icon}</div>;
+  else if (icon) iconElement = <div className="flex opacity-25">{icon}</div>;
 
   const setHeadings = useSetAtom(headingsAtom);
 
-  /** on every render */
+  /** url-compatible, "slugified" id */
+  const id = anchor ?? slugify(renderText(children));
+
   useEffect(() => {
     const element = ref.current;
 
-    if (element) {
-      setHeadings((headings) =>
-        headings
-          /** remove heading from list */
-          .filter((heading) => heading.ref !== element)
-          /** add heading to list */
-          .concat([
-            { ref: element, id, level, icon: iconElement, text: children },
-          ])
-          /**
-           * make sure list is in order of document appearance
-           * https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
-           */
-          .sort((a, b) =>
-            a.ref.compareDocumentPosition(b.ref) &
-            Node.DOCUMENT_POSITION_FOLLOWING
-              ? -1
-              : 1,
-          ),
-      );
-    }
+    if (element)
+      /** add heading to list */
+      setHeadings((headings) => {
+        /** find position to insert */
+        const position =
+          headings.findLastIndex(
+            (heading) =>
+              heading.element.compareDocumentPosition(element) &
+              Node.DOCUMENT_POSITION_FOLLOWING,
+          ) + 1;
 
-    return () =>
+        /** this heading */
+        const heading = {
+          element,
+          id,
+          level,
+          icon: iconElement,
+          content: children,
+        };
+
+        /** insert at correct position */
+        headings.splice(position, 0, heading);
+
+        return headings;
+      });
+
+    return () => {
       /** remove heading from list */
       setHeadings((headings) =>
-        headings.filter((heading) => heading.ref !== element),
+        headings.filter((heading) => heading.element !== element),
       );
-  });
+    };
+  }, [id, children, iconElement, level, setHeadings]);
 
   return (
     <Link to={"#" + id} className={clsx("group", className)}>

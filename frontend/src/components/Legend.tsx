@@ -41,7 +41,6 @@ const Legend = ({
   w: rootW = maxEntryWidth,
   anchor = [0, 0],
 }: Props) => {
-  /** reactive CSS vars */
   const theme = useTheme();
 
   const { fontSize, getWidth, truncateWidth } = useTextSize();
@@ -102,67 +101,102 @@ const Legend = ({
       dominantBaseline="central"
     >
       {Object.entries(entries).map(
-        ([label, { color, shape, stroke }], index) => {
-          /** wrap to grid of rows/cols */
-          const row = Math.floor(index / cols);
-          const col = index % cols;
-          const x = col * (colWidth + gapSize);
-          const y = row * (rowHeight + gapSize);
-
-          /** scale shape points */
-          shape = shape?.map((p) => rowHeight / 2 + p * (rowHeight / 2));
-
-          return (
-            <g key={index} transform={`translate(${x}, ${y})`}>
-              <g
-                fill={color}
-                stroke={theme["--color-black"]}
-                strokeWidth={strokeWidth}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                {shape ? (
-                  stroke ? (
-                    <>
-                      <polygon
-                        fill="none"
-                        strokeWidth={5 * strokeWidth}
-                        points={shape.join(" ")}
-                      />
-                      <polygon
-                        fill="none"
-                        stroke={color}
-                        strokeWidth={3 * strokeWidth}
-                        points={shape.join(" ")}
-                      />
-                    </>
-                  ) : (
-                    <polygon points={shape.join(" ")} />
-                  )
-                ) : (
-                  <circle
-                    cx={rowHeight / 2}
-                    cy={rowHeight / 2}
-                    r={rowHeight / 2}
-                  />
-                )}
-              </g>
-              <Tooltip content={label}>
-                <text
-                  x={labelX}
-                  y={rowHeight / 2}
-                  fill={theme["--color-black"]}
-                  tabIndex={0}
-                >
-                  {truncateWidth(label, colWidth - labelX)}
-                </text>
-              </Tooltip>
-            </g>
-          );
-        },
+        ([label, { color, shape, stroke }], index) => (
+          <Cell
+            key={index}
+            index={index}
+            label={label}
+            labelX={labelX}
+            cols={cols}
+            colWidth={colWidth}
+            color={color}
+            shape={shape}
+            stroke={stroke}
+            theme={theme}
+            truncateWidth={truncateWidth}
+          />
+        ),
       )}
     </svg>
   );
 };
 
 export default Legend;
+
+type CellProps = {
+  index: number;
+  label: string;
+  labelX: number;
+  cols: number;
+  colWidth: number;
+  theme: ReturnType<typeof useTheme>;
+  truncateWidth: ReturnType<typeof useTextSize>["truncateWidth"];
+} & Entry;
+
+/** split into sub-components for slight performance optimization */
+
+const Cell = ({
+  index,
+  label,
+  labelX,
+  cols,
+  colWidth,
+  color,
+  shape,
+  stroke,
+  theme,
+  truncateWidth,
+}: CellProps) => {
+  /** wrap to grid of rows/cols */
+  const row = Math.floor(index / cols);
+  const col = index % cols;
+  const x = col * (colWidth + gapSize);
+  const y = row * (rowHeight + gapSize);
+
+  /** scale shape points */
+  shape = shape?.map((p) => rowHeight / 2 + p * (rowHeight / 2));
+
+  return (
+    <g key={index} transform={`translate(${x}, ${y})`}>
+      <g
+        fill={color}
+        stroke={theme["--color-black"]}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {shape ? (
+          stroke ? (
+            <>
+              <polygon
+                fill="none"
+                strokeWidth={5 * strokeWidth}
+                points={shape.join(" ")}
+              />
+              <polygon
+                fill="none"
+                stroke={color}
+                strokeWidth={3 * strokeWidth}
+                points={shape.join(" ")}
+              />
+            </>
+          ) : (
+            <polygon points={shape.join(" ")} />
+          )
+        ) : (
+          <circle cx={rowHeight / 2} cy={rowHeight / 2} r={rowHeight / 2} />
+        )}
+      </g>
+      <Tooltip content={label}>
+        <text
+          x={labelX}
+          y={rowHeight / 2}
+          fill={theme["--color-black"]}
+          tabIndex={0}
+        >
+          {truncateWidth(label, colWidth - labelX)}
+        </text>
+      </Tooltip>
+    </g>
+  );
+};
