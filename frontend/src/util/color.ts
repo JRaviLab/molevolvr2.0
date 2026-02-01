@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDeepCompareEffect } from "@reactuses/core";
-import { color, interpolateHsl } from "d3";
+import { lch } from "d3";
 import { useAtomValue } from "jotai";
 import { darkModeAtom } from "@/components/DarkMode";
 import { getEntries } from "@/util/types";
@@ -8,7 +8,7 @@ import colors from "./colors.json";
 
 /**
  * https://tailwindcss.com/docs/customizing-colors
- * https://github.com/tailwindlabs/tailwindcss.com/blob/5a77fe695f8558de7e59b08881ee9f2405a81736/src/components/color.tsx
+ * https://github.com/tailwindlabs/tailwindcss.com/blob/main/src/components/color.tsx
  */
 
 /** neutral hue */
@@ -47,13 +47,16 @@ const getNeutral = (shade: Shade) => {
 
 /** get (colorful) color from hue and shade */
 const getColor = (hue: Hue, shade: Shade) => {
-  if (shade === "dark") return blend(colors[hue]["900"], "#808080", 0.5);
-  else return blend(colors[hue]["100"], "#808080", 0.25);
+  if (shade === "dark") return desaturate(colors[hue]["800"]);
+  else return desaturate(colors[hue]["200"]);
 };
 
-/** blend two colors together in color space */
-const blend = (a: string, b: string, t = 0.5) =>
-  color(interpolateHsl(a, b)(t))?.formatHex() ?? a;
+/** pleasantly desaturate color */
+const desaturate = (color: string) => {
+  const _color = lch(color);
+  _color.c = 20;
+  return _color.formatHex();
+};
 
 /** map enumerated values to colors */
 const getColorMap = <Value extends string>(

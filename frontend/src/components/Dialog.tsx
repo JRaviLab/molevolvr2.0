@@ -39,7 +39,7 @@ const Dialog = ({
 
   const [isOpen, setOpen] = useState(false);
 
-  const open = async () => {
+  const open = () => {
     setOpen(true);
     onChange?.(true);
   };
