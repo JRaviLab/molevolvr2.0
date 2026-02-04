@@ -1,13 +1,13 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { paths } from "./paths";
-import { log } from "./util";
+import { log, stringify } from "./util";
 
 log();
 
 /** generic page axe test */
 const checkPage = (path: string) =>
-  test(`Axe check ${path}`, async ({ browserName, page }) => {
+  test(`Axe check page "${path}"`, async ({ browserName, page }) => {
     /** axe tests should be independent of browser, so only run one */
     test.skip(browserName !== "chromium", "Only test Axe on chromium");
 
@@ -24,49 +24,30 @@ const checkPage = (path: string) =>
     /** axe check */
     const check = async () => {
       /** get page violations */
-      const { violations } = await new AxeBuilder({ page })
-        .exclude(".axe-ignore")
-        .analyze();
+      const { violations } = await new AxeBuilder({ page }).analyze();
 
-      const warnRules = [
-        /** just warn about color-contrast violations */
+      /** split up critical/non-critical */
+      const { critical } = Object.groupBy(violations, ({ id }) => {
         /** https://github.com/dequelabs/axe-core/issues/3325#issuecomment-2383832705 */
-        "color-contrast",
-      ];
-
-      /** split up critical/non-critical violations */
-      const isCritical =
-        (match: boolean) => (violation: (typeof violations)[number]) =>
-          !warnRules.includes(violation.id) === match;
-      const criticals = violations.filter(isCritical(true));
-      const warnings = violations.filter(isCritical(false));
-
-      /** log errors */
-      if (criticals.length) {
-        const json = JSON.stringify(criticals, null, 2);
-        console.error(json);
-        /** just log warnings on non-critical violations */
-        test.info().annotations.push({
-          type: "Axe Error",
-          description: json,
-        });
-      }
-
-      /** fail test on critical violations */
-      expect(criticals.length).toBe(0);
-
-      /** just log warnings on non-critical violations */
-      test.info().annotations.push({
-        type: "Axe Warning",
-        description: JSON.stringify(warnings, null, 2),
+        if (id === "color-contrast") return "warning";
+        else return "critical";
       });
+
+      /** annotate test with all */
+      test.info().annotations.push({
+        type: "Axe violations",
+        description: stringify(violations),
+      });
+
+      /** fail test on critical */
+      expect(critical?.length).toBe(0);
     };
 
+    /** check page */
     await check();
-    /** check dark mode */
-    await page
-      .locator("header button[role='switch'][aria-label*='mode']")
-      .click();
+    /** turn on dark mode */
+    await page.getByLabel(/dark mode/i).click();
+    /** check page again */
     await check();
   });
 

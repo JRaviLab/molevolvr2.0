@@ -19,7 +19,7 @@ const Tile = ({ icon, primary, secondary }: Props) => {
     >
       <div className="mb-2 flex text-2xl">{icon}</div>
       <div className="text-lg/normal font-medium">{primary}</div>
-      <div className="leading-normal text-dark-gray">{secondary}</div>
+      <div className="text-dark-gray">{secondary}</div>
     </div>
   );
 };

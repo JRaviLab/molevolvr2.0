@@ -432,7 +432,6 @@ const SectionLink = () => (
 
     <p className="flex gap-4">
       <Link to="/">Internal Link</Link>
-      <br />
       <Link to="https://medschool.cuanschutz.edu/dbmi">External Link</Link>
     </p>
   </section>
@@ -858,9 +857,7 @@ const SectionTable = () => (
           name: "Long text",
           filterType: "string",
           show: false,
-          render: (cell) => (
-            <div className="line-clamp-5 p-1 leading-normal">{cell}</div>
-          ),
+          render: (cell) => <div className="line-clamp-5 p-1">{cell}</div>,
         },
       ]}
       rows={tableData}

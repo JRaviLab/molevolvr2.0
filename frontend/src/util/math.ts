@@ -7,8 +7,8 @@ export const tau = 2 * Math.PI;
 export const sin = (degrees: number) => Math.sin(tau * (degrees / 360));
 export const cos = (degrees: number) => Math.cos(tau * (degrees / 360));
 
-/** linear interpolate */
-export const lerp = (
+/** map value from source range to target range */
+export const linMap = (
   value: number,
   sourceMin: number,
   sourceMax: number,

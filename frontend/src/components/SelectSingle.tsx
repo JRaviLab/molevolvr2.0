@@ -8,7 +8,7 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import clsx from "clsx";
-import { ChevronDown, Dot } from "lucide-react";
+import { ChevronDown, CircleSmall } from "lucide-react";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 
@@ -75,6 +75,7 @@ const SelectSingle = <O extends Option>({
       <ListboxButton
         className="
           gap-2 border-b border-current p-2 text-accent
+          *:leading-none
           hover:text-deep
         "
         onKeyDown={({ key }) => {
@@ -92,9 +93,7 @@ const SelectSingle = <O extends Option>({
         }}
       >
         {selected?.icon}
-        <span className="grow truncate py-1 leading-none">
-          {selected?.primary}
-        </span>
+        <span className="grow truncate py-1">{selected?.primary}</span>
         <ChevronDown />
       </ListboxButton>
 
@@ -112,25 +111,26 @@ const SelectSingle = <O extends Option>({
                   `
                     flex max-w-[calc(100dvw--spacing(20))] cursor-pointer
                     items-center gap-2 p-2
+                    *:leading-none
                   `,
                   focus && "bg-off-white",
                 )}
               >
                 {/* check mark */}
-                <Dot
+                <CircleSmall
                   className={clsx(
                     "text-accent",
                     selected ? "opacity-100" : "opacity-0",
                   )}
                 />
                 {/* text */}
-                <span className="flex grow-2 items-center leading-none">
+                <span className="flex grow-2 items-center">
                   {option.primary}
                 </span>
                 <span
                   className="
                     flex grow items-center justify-end justify-self-end
-                    text-right text-sm leading-none text-gray
+                    text-right text-sm text-gray
                   "
                 >
                   {option.secondary}

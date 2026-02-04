@@ -87,12 +87,11 @@ const SelectMulti = <O extends Option>({
             <ListboxButton
               className="
                 gap-2 border-b border-current p-2 text-accent
+                *:leading-none
                 hover:text-deep
               "
             >
-              <span className="grow truncate py-1 leading-none">
-                {selectedLabel}
-              </span>
+              <span className="grow truncate py-1">{selectedLabel}</span>
               <ChevronDown />
             </ListboxButton>
 
@@ -110,6 +109,7 @@ const SelectMulti = <O extends Option>({
                         `
                           flex max-w-[calc(100dvw--spacing(20))] cursor-pointer
                           items-center gap-2 p-2
+                          *:leading-none
                         `,
                         focus && "bg-off-white",
                       )}
@@ -122,13 +122,13 @@ const SelectMulti = <O extends Option>({
                         )}
                       />
                       {/* text */}
-                      <span className="flex grow-2 items-center leading-none">
+                      <span className="flex grow-2 items-center">
                         {option.primary}
                       </span>
                       <span
                         className="
                           flex grow items-center justify-end justify-self-end
-                          text-right text-sm leading-none text-gray
+                          text-right text-sm text-gray
                         "
                       >
                         {option.secondary}

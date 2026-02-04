@@ -44,7 +44,7 @@ import Slider from "@/components/Slider";
 import { useColorMap } from "@/util/color";
 import { parseFont } from "@/util/dom";
 import { useTheme } from "@/util/hooks";
-import { lerp } from "@/util/math";
+import { linMap } from "@/util/math";
 import { sleep } from "@/util/misc";
 import { getShapeMap } from "@/util/shapes";
 import { formatNumber } from "@/util/string";
@@ -309,7 +309,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
             length: 4 * (minNodeSize / fontSize),
           }),
           type: node.type ?? "",
-          size: lerp(
+          size: linMap(
             node.strength ?? minNodeStrength,
             minNodeStrength,
             maxNodeStrength,
@@ -353,7 +353,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
           /** truncated later on node position update */
           shortLabel: edge.label ?? edge.id,
           type: edge.type ?? "",
-          size: lerp(
+          size: linMap(
             edge.strength ?? minEdgeStrength,
             minEdgeStrength,
             maxEdgeStrength,

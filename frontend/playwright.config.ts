@@ -7,8 +7,13 @@ export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
   workers: "75%",
-  reporter: "html",
-  use: { baseURL: url },
+  retries: 1,
+  reporter: [["html", { open: process.env.CI ? "never" : "on-failure" }]],
+
+  use: {
+    baseURL: url,
+    trace: "on-first-retry",
+  },
 
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },

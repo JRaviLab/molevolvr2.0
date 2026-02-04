@@ -76,21 +76,13 @@
   --color-error: oklch(65% 0.15 15);
 }
 
-@layer components {
-  * {
-    @apply outline-offset-2 outline-black;
-  }
-
+@layer base {
   html {
-    @apply font-sans leading-none font-normal text-black underline-offset-2;
+    @apply font-sans leading-normal font-normal text-black underline-offset-2;
   }
 
   body {
     @apply flex min-h-dvh flex-col;
-  }
-
-  #root {
-    @apply contents;
   }
 
   main {
@@ -161,19 +153,19 @@
 
   button,
   summary {
-    @apply flex cursor-pointer items-center justify-center;
+    @apply flex cursor-pointer items-center justify-center leading-none;
   }
 
   label {
-    @apply flex cursor-pointer items-center gap-2 rounded-md leading-normal;
+    @apply flex cursor-pointer items-center gap-2 rounded-md;
   }
 
   input {
-    @apply min-w-0 leading-normal;
+    @apply min-w-0;
   }
 
   textarea {
-    @apply min-w-0 leading-normal;
+    @apply min-w-0;
   }
 
   pre {
@@ -189,7 +181,7 @@
   }
 
   dl {
-    @apply grid max-w-max grid-cols-[repeat(var(--cols),auto)] gap-x-4 gap-y-2 leading-normal [--cols:2];
+    @apply grid max-w-max grid-cols-[repeat(var(--cols),auto)] gap-x-4 gap-y-2 [--cols:2];
   }
 
   dt {
