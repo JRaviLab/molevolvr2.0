@@ -1,6 +1,5 @@
 import type { JSX, ReactElement, ReactNode } from "react";
 import { useEffect, useRef } from "react";
-import clsx from "clsx";
 import { atom, useSetAtom } from "jotai";
 import Badge from "@/components/Badge";
 import Link from "@/components/Link";
@@ -89,19 +88,12 @@ const Heading = ({ level, icon, anchor, className, children }: Props) => {
   }, [id, children, iconElement, level, setHeadings]);
 
   return (
-    <Link to={"#" + id} className={clsx("group", className)}>
-      <Tag
-        id={id}
-        ref={ref}
-        className="
-          text-deep
-          group-hover:text-accent
-        "
-      >
+    <Tag id={id} ref={ref} className={className}>
+      <Link to={"#" + id} className="contents! text-current no-underline">
         {iconElement}
         {children}
-      </Tag>
-    </Link>
+      </Link>
+    </Tag>
   );
 };
 

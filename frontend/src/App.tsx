@@ -23,9 +23,8 @@ import LoadAnalysis from "@/pages/LoadAnalysis";
 import NewAnalysis from "@/pages/NewAnalysis";
 import NotFound from "@/pages/NotFound";
 import Testbed from "@/pages/Testbed";
-import { getDocBbox, glow, scrollTo } from "@/util/dom";
+import { scrollToSelector } from "@/util/dom";
 import { useChanged } from "@/util/hooks";
-import { waitFor, waitForStable } from "@/util/misc";
 import { redirectPath, redirectState } from "@/util/url";
 
 /** app entrypoint */
@@ -43,8 +42,9 @@ const Layout = () => {
   /** did hash change */
   const hashChanged = useChanged(hash);
 
-  /** if just hash changed, scroll immediately. else, wait for layout shifts */
-  if (changed) scrollToHash(hash, hashChanged);
+  if (changed)
+    /** if just hash changed, scroll immediately. else, wait for layout shifts */
+    scrollToSelector(hash, undefined, hashChanged);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -115,18 +115,3 @@ const router = createBrowserRouter(routes, {
 
 /** query client */
 const queryClient = new QueryClient();
-
-/** scroll to target of url hash on page */
-const scrollToHash = async (hash: string, waitForLayoutShift = true) => {
-  if (!hash) return;
-
-  /** wait for element to appear */
-  const element = await waitFor(() => document.querySelector(hash));
-  if (!element) return;
-
-  /** wait for layout shifts to stabilize */
-  if (waitForLayoutShift) await waitForStable(() => getDocBbox(element).top);
-
-  scrollTo(element);
-  glow(element);
-};

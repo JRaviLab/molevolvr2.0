@@ -98,7 +98,7 @@
   h2,
   h3,
   h4 {
-    @apply flex w-full items-center gap-[0.75em] leading-normal font-medium;
+    @apply text-deep flex w-full items-center gap-[0.75em] leading-normal font-medium;
   }
 
   h1 {
