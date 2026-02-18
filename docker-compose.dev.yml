@@ -1,16 +1,12 @@
 services:
   backend:
     volumes:
-      - ./backend/:/app/
-      # - ./backend/api/:/app/api/
-      # - ./backend/schema/:/app/schema/
-      # - ./backend/entrypoint.R:/app/entrypoint.R
-      # - ./backend/run_tests.sh:/app/run_tests.sh
+      - ./backend/src/:/app/src/
     ports:
-      - "9050:9050"
+      - "${API_PORT}:8000"
     environment:
       - "POSTGRES_DEV_HOST=dev-db"
-      - "PLUMBER_DEBUG=1"
+      - "DJANGO_DEBUG=1"
     depends_on:
       - "dev-db"
 
@@ -21,9 +17,9 @@ services:
     volumes:
       - ./frontend:/app/frontend
     environment:
-      - 'VITE_API=http://localhost:9050'
+      - "VITE_API=http://localhost:${API_PORT}"
     ports:
-      - "5173:5173"
+      - "5180:5173"
 
   db:
     ports:

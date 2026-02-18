@@ -39,21 +39,28 @@ services:
 
   db:
     hostname: ${POSTGRES_HOST}
-    image: postgres:16
+    # image: postgres:16
+    build: ./services/postgres/
     env_file:
       - .env
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./db-exports/:/db-exports/
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
-      interval: 30s
+      # test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      # interval: 30s
+      # timeout: 60s
+      # retries: 5
+      # start_period: 80s
+      test: ["CMD-SHELL", "/opt/healthcheck.sh || exit 1"]
+      interval: 5s
       timeout: 60s
       retries: 5
-      start_period: 80s
+      start_period: 2m
 
   galaxy:
     image: bgruening/galaxy-stable:latest
-    container_name: galaxy
+    hostname: galaxy-${TARGET_ENV}
     restart: unless-stopped
     ports:
       - "8092:80"            # Galaxy UI available on http://localhost:8092
