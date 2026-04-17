@@ -8,30 +8,37 @@ import globals from "globals";
 import typescriptEslint from "typescript-eslint";
 
 export default defineConfig([
-  globalIgnores(["dist", "public"]),
-  eslintJs.configs.recommended,
-  typescriptEslint.configs.recommended,
-  eslintPluginPrettierRecommended,
-  eslintPluginReactHooks.configs.flat.recommended,
-  eslintPluginJsxA11y.flatConfigs.recommended,
+  globalIgnores([
+    "dist",
+    "public",
+    "lighthouse-report",
+    "playwright-report",
+    "test-results",
+  ]),
   {
-    plugins: {
-      "better-tailwindcss": eslintPluginBetterTailwindcss,
-    },
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-    },
+    name: "TypeScript",
+    extends: typescriptEslint.configs.recommended,
     rules: {
-      /** GENERAL */
-      "prefer-const": ["error", { destructuring: "all" }],
-
-      /** TYPESCRIPT */
       "@typescript-eslint/no-unused-vars": ["warn", { caughtErrors: "none" }],
       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
       "@typescript-eslint/consistent-type-imports": "error",
-
-      /** ACCESSIBILITY */
+    },
+  },
+  {
+    name: "JavaScript",
+    ...eslintJs.configs.recommended,
+    rules: {
+      "prefer-const": ["error", { destructuring: "all" }],
+    },
+  },
+  {
+    name: "React Hooks",
+    ...eslintPluginReactHooks.configs.flat.recommended,
+  },
+  {
+    name: "JSX Accessibility",
+    ...eslintPluginJsxA11y.flatConfigs.recommended,
+    rules: {
       /** https://github.com/dequelabs/axe-core/issues/4566 */
       "jsx-a11y/no-noninteractive-tabindex": ["off"],
       /**
@@ -42,17 +49,33 @@ export default defineConfig([
         "error",
         { controlComponents: ["*"] },
       ],
-
-      /** FORMATTING */
+    },
+  },
+  {
+    name: "Prettier",
+    ...eslintPluginPrettierRecommended,
+    rules: {
       "prettier/prettier": "warn",
-      ...eslintPluginBetterTailwindcss.configs["recommended-warn"].rules,
-      /** https://github.com/schoero/eslint-plugin-better-tailwindcss/issues/302 */
+    },
+  },
+  {
+    name: "Tailwind",
+    extends: [eslintPluginBetterTailwindcss.configs.recommended],
+    rules: {
       "better-tailwindcss/enforce-consistent-line-wrapping": [
         "warn",
         { strictness: "loose" },
       ],
       "better-tailwindcss/no-unknown-classes": ["warn", { ignore: ["dark"] }],
     },
-    settings: { "better-tailwindcss": { entryPoint: "src/styles.css" } },
+    settings: {
+      "better-tailwindcss": { entryPoint: "src/styles.css" },
+    },
+  },
+  {
+    languageOptions: {
+      globals: globals.browser,
+      ecmaVersion: 2020,
+    },
   },
 ]);

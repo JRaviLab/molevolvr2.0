@@ -32,7 +32,6 @@ const directory = "lighthouse-report";
 const _test = test.extend<object, { port: number; browser: Browser }>({
   port: [
     /** https://github.com/microsoft/playwright/issues/14590 */
-    // eslint-disable-next-line
     async ({}, use) => {
       /** get unique port for each worker to support parallel tests */
       const port = await getPort();

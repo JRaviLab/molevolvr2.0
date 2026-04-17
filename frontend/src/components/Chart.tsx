@@ -86,13 +86,13 @@ const Chart = ({
     /** ignore certain elements in fitting */
     const ignores =
       svgRef.current.querySelectorAll<SVGGraphicsElement>("[data-fit-ignore]");
-    ignores.forEach((el) => (el.style.display = "none"));
+    ignores.forEach((element) => (element.style.display = "none"));
 
     /** get bbox of contents */
     let { x, y, w, h } = getViewBoxFit(svgRef.current);
 
     /** restore fit ignore elements */
-    ignores.forEach((el) => (el.style.display = ""));
+    ignores.forEach((element) => (element.style.display = ""));
 
     /** chart title */
     if (title && titleRef.current) {
@@ -147,7 +147,6 @@ const Chart = ({
   /** chart content */
   const chart = (
     // rely on component consumer handling keyboard appropriately
-    // eslint-disable-next-line
     <div
       ref={containerRef}
       className={clsx(

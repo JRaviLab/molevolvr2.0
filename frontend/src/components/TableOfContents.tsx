@@ -13,12 +13,7 @@ import Button from "@/components/Button";
 import { headingsAtom } from "@/components/Heading";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
-import {
-  firstInView,
-  isCovering,
-  scrollTo,
-  scrollToSelector,
-} from "@/util/dom";
+import { firstInView, isCovering, scrollTo } from "@/util/dom";
 import { useChanged } from "@/util/hooks";
 import { sleep } from "@/util/misc";
 
@@ -124,10 +119,9 @@ const TableOfContents = () => {
                 `,
                 active === index && "bg-off-white text-deep",
               )}
-              data-active={active === index}
               to={{ hash: "#" + id }}
               replace
-              onClick={() => scrollToSelector("#" + id)}
+              onClick={() => scrollTo("#" + id)}
             >
               {icon}
               <span className="grow truncate py-1">{content}</span>

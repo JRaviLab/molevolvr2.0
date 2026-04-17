@@ -80,7 +80,6 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
                   ? "bg-current/5 text-accent"
                   : `text-dark-gray`,
               )}
-              data-active={tab.id === selected}
             >
               {tab.text}
               {tab.icon}

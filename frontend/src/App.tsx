@@ -23,7 +23,7 @@ import LoadAnalysis from "@/pages/LoadAnalysis";
 import NewAnalysis from "@/pages/NewAnalysis";
 import NotFound from "@/pages/NotFound";
 import Testbed from "@/pages/Testbed";
-import { scrollToSelector } from "@/util/dom";
+import { scrollTo } from "@/util/dom";
 import { useChanged } from "@/util/hooks";
 import { redirectPath, redirectState } from "@/util/url";
 
@@ -44,7 +44,7 @@ const Layout = () => {
 
   if (changed)
     /** if just hash changed, scroll immediately. else, wait for layout shifts */
-    scrollToSelector(hash, undefined, hashChanged);
+    scrollTo(hash, undefined, hashChanged);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -1,4 +1,9 @@
-import type { ComponentProps, ReactElement, ReactNode, Ref } from "react";
+import type {
+  ComponentPropsWithRef,
+  ReactElement,
+  ReactNode,
+  Ref,
+} from "react";
 import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Link from "@/components/Link";
@@ -23,13 +28,11 @@ type Description =
   /** require text and/or tooltip for accessibility */
   { text: string; tooltip?: ReactNode } | { text?: string; tooltip: ReactNode };
 
-type _Link = { ref?: Ref<HTMLAnchorElement> } & Pick<
-  ComponentProps<typeof Link>,
-  "to" | "style"
->;
+type _Link = Pick<ComponentPropsWithRef<typeof Link>, "ref" | "to" | "style">;
 
-type _Button = { ref?: Ref<HTMLButtonElement> } & Pick<
-  ComponentProps<"button">,
+type _Button = Pick<
+  ComponentPropsWithRef<"button">,
+  | "ref"
   | "type"
   | "style"
   | "onClick"

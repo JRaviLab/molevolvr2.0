@@ -49,7 +49,6 @@ const TextBox = ({
   onChange,
   ...props
 }: Props) => {
-  const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
   const sideRef = useRef<HTMLDivElement>(null);
 
   /** link to parent form component */
@@ -80,10 +79,7 @@ const TextBox = ({
           tooltip="Clear text"
           design="hollow"
           className="rounded-none"
-          onClick={() => {
-            if (ref.current) ref.current.value = "";
-            onChange("");
-          }}
+          onClick={() => onChange("")}
         />
       </>
     );
@@ -108,7 +104,6 @@ const TextBox = ({
   /** input field */
   const input = multi ? (
     <textarea
-      ref={ref}
       id={id}
       className="
         min-h-[calc(3lh+--spacing(4)+2px)] grow resize rounded-md border
@@ -123,7 +118,6 @@ const TextBox = ({
     />
   ) : (
     <input
-      ref={ref}
       id={id}
       className="
         grow rounded-md border border-light-gray bg-white p-2

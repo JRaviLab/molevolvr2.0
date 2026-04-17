@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactElement, ReactNode } from "react";
-import { cloneElement, Fragment, useRef, useState } from "react";
+import { cloneElement, Fragment, useState } from "react";
 import {
   DialogPanel as Content,
   Description,
@@ -35,8 +35,6 @@ const Dialog = ({
   onChange,
   children,
 }: Props) => {
-  const ref = useRef<HTMLDivElement>(null);
-
   const [isOpen, setOpen] = useState(false);
 
   const open = () => {
@@ -56,7 +54,7 @@ const Dialog = ({
         /** prevent implicit submission of wrapping form */
         type: "button",
       })}
-      <Root ref={ref} open={isOpen} onClose={close}>
+      <Root open={isOpen} onClose={close}>
         <div className="fixed inset-0 z-20 flex items-center justify-center p-8">
           <Content as={Fragment}>
             <div

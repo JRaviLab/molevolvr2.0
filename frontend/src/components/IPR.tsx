@@ -245,12 +245,12 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
             </g>
             {/* main content area */}
             <g
-              ref={(el) => {
-                zoomRef.current = el;
+              ref={(element) => {
+                zoomRef.current = element;
 
-                if (el) {
+                if (element) {
                   /** attach zoom behavior */
-                  const selection = select(el);
+                  const selection = select(element);
                   zoomBehavior(selection);
 
                   /** prevent scroll overflow */
@@ -368,15 +368,15 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
 
               {/* scrollbar */}
               <g
-                ref={(el) => {
-                  dragRef.current = el;
+                ref={(element) => {
+                  dragRef.current = element;
 
-                  if (el)
+                  if (element)
                     /** attach drag behavior */
-                    dragBehavior(select(el));
+                    dragBehavior(select(element));
 
                   return () => {
-                    dragRef.current = el;
+                    dragRef.current = element;
                   };
                 }}
                 transform={`translate(0, ${tracks.length * (rowHeight + rowGap)})`}

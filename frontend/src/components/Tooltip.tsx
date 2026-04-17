@@ -37,12 +37,12 @@ const Tooltip = ({ ref, content, children, ...props }: Props) => {
 
         <Portal>
           <Content
-            ref={(el) => {
+            ref={(element) => {
               /**
                * radix ui tooltip puts two children at end that aren't part of
                * text content
                */
-              shrinkWrap(el, 0, -3);
+              shrinkWrap(element, 0, -3);
             }}
             className="
               dark z-20 flex max-w-80 flex-col gap-2 rounded-md bg-white p-4

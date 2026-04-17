@@ -91,14 +91,14 @@
 
   section {
     --width: 300;
-    @apply even:bg-alt-white relative z-0 flex flex-col items-center gap-12 bg-white px-[max(var(--pad),(100%---spacing(1)*var(--width))/2)] py-(--pad) [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
+    @apply even:bg-alt-white relative z-0 flex flex-col gap-12 bg-white px-[max(var(--pad),(100%---spacing(1)*var(--width))/2)] py-(--pad) [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
   }
 
   h1,
   h2,
   h3,
   h4 {
-    @apply text-deep flex w-full items-center gap-[0.75em] leading-normal font-medium;
+    @apply text-deep flex w-full scroll-mt-8 items-center gap-[0.75em] leading-normal font-medium;
   }
 
   h1 {
