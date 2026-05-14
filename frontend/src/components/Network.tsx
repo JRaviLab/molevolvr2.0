@@ -613,7 +613,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
             grid w-full grid-cols-[max-content_auto] rounded-md bg-white
             shadow-sm
           `,
-          expanded && "h-[75dvh]! w-[calc(100dvw---spacing(20))]!",
+          expanded && "h-[75dvh]! w-[calc(100dvw-(--spacing(20)))]!",
         )}
         style={{ aspectRatio: expanded ? "" : aspectRatio }}
       >

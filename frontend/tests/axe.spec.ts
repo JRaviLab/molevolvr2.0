@@ -12,14 +12,13 @@ const checkPage = (path: string) =>
     test.skip(browserName !== "chromium", "Only test Axe on chromium");
 
     /** test can be slow on ci on very large page (e.g. testbed) */
-    test.setTimeout(2 * 60 * 1000);
+    test.setTimeout(1 * 60 * 1000);
 
     /** navigate to page */
     await page.goto(path);
 
-    /** wait for content to load */
-    await page.waitForSelector("footer");
-    await page.waitForTimeout(10000);
+    /** wait for some content to render */
+    await expect(page.locator("footer")).toBeVisible();
 
     /** axe check */
     const check = async () => {

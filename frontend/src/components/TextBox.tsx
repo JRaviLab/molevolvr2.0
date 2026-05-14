@@ -106,7 +106,7 @@ const TextBox = ({
     <textarea
       id={id}
       className="
-        min-h-[calc(3lh+--spacing(4)+2px)] grow resize rounded-md border
+        min-h-[calc(3lh+(--spacing(4))+2px)] grow resize rounded-md border
         border-light-gray bg-white p-2
         hover:border-accent
       "
@@ -148,7 +148,7 @@ const TextBox = ({
             ref={sideRef}
             className="
               absolute top-0 right-0 flex items-start text-dark-gray
-              *:grid *:size-[calc(var(--leading-normal)*1em+--spacing(4)+2px)]
+              *:grid *:size-[calc(var(--leading-normal)*1em+(--spacing(4))+2px)]
               *:place-items-center *:p-0
             "
           >

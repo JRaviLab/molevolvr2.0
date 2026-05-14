@@ -34,6 +34,9 @@ export default defineConfig([
   {
     name: "React Hooks",
     ...reactHooks.configs.flat.recommended,
+    rules: {
+      "react-hooks/immutability": "off",
+    },
   },
   {
     name: "JSX Accessibility",

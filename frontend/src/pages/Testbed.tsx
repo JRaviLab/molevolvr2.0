@@ -319,7 +319,6 @@ const SectionLegend = () => {
       mapValues(colorMap, (color, label) => ({
         color,
         shape: shapesMap[label],
-        // eslint-disable-next-line react-hooks/purity
         stroke: Math.random() > 0.75,
       })),
     [colorMap, shapesMap],

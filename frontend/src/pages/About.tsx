@@ -2,13 +2,13 @@ import {
   ArrowLeftRight,
   Book,
   DoorOpen,
-  Github,
   Mail,
   MessageCircleMore,
   Microscope,
   PenTool,
   Users,
 } from "lucide-react";
+import GitHub from "@/assets/github.svg?react";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Link from "@/components/Link";
@@ -405,7 +405,7 @@ const About = () => {
               render: (cell) =>
                 cell ? (
                   <Link to={`https://github.com/${cell}`}>
-                    <Github />@{cell}
+                    <GitHub />@{cell}
                   </Link>
                 ) : null,
             },
@@ -486,7 +486,7 @@ const About = () => {
             tooltip={`${VITE_LAB_NAME} website`}
           />
 
-          <Button to={VITE_LAB_GITHUB} icon={<Github />} text="GitHub" />
+          <Button to={VITE_LAB_GITHUB} icon={<GitHub />} text="GitHub" />
         </div>
       </section>
     </>

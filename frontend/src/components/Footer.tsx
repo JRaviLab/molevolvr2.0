@@ -1,4 +1,5 @@
-import { Github, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
+import GitHub from "@/assets/github.svg?react";
 import Link from "@/components/Link";
 
 const { VITE_EMAIL, VITE_LAB_NAME, VITE_LAB_WEBSITE, VITE_LAB_GITHUB } =
@@ -23,7 +24,7 @@ const Footer = () => (
         <Mail />
       </Link>
       <Link to={VITE_LAB_GITHUB} showArrow={false} tooltip="GitHub">
-        <Github />
+        <GitHub />
       </Link>
     </div>
 

@@ -252,7 +252,6 @@ const Table = <Datum extends object>({
 
   /** tanstack table api */
   /** https://github.com/facebook/react/issues/33057 */
-  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: rows,
     columns,
@@ -293,7 +292,7 @@ const Table = <Datum extends object>({
     <div
       className={clsx(
         "flex flex-col items-center gap-4",
-        expanded ? "w-[calc(100dvw---spacing(40))]" : "max-w-full",
+        expanded ? "w-[calc(100dvw-(--spacing(40)))]" : "max-w-full",
       )}
     >
       <div className="max-w-full overflow-x-auto rounded-md shadow-sm">
