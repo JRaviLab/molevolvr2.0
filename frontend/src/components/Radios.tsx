@@ -63,10 +63,7 @@ const Radios = <O extends Option>({
         {options.map((option, index) => (
           <label
             key={index}
-            className="
-              flex items-start gap-4 p-2
-              hover:bg-off-white
-            "
+            className="flex items-start gap-4 p-2 hover:bg-off-white"
           >
             <input
               className="sr-only"

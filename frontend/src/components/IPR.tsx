@@ -118,7 +118,9 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
         .container(function () {
           return this;
         })
+        // eslint-disable-next-line -- false positive https://github.com/react/react/issues/34775
         .on("start", onDrag)
+        // eslint-disable-next-line -- false positive https://github.com/react/react/issues/34775
         .on("drag", onDrag),
     [onDrag],
   );

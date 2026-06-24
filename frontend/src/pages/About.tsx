@@ -36,7 +36,7 @@ const About = () => {
         </Heading>
       </section>
 
-      <section className="items-stretch">
+      <section>
         <Heading level={2} icon={<MessageCircleMore />}>
           FAQs
         </Heading>
@@ -253,7 +253,7 @@ const About = () => {
         </div>
       </section>
 
-      <section className="items-stretch">
+      <section>
         <Heading level={2} icon={<Book />}>
           Case studies
         </Heading>

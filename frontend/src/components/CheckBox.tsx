@@ -24,12 +24,7 @@ const CheckBox = ({ label, tooltip, value, onChange, required }: Props) => {
   const form = useForm();
 
   return (
-    <label
-      className="
-        group p-2
-        hover:bg-off-white
-      "
-    >
+    <label className="group p-2 hover:bg-off-white">
       <input
         type="checkbox"
         className="sr-only"
@@ -43,19 +38,9 @@ const CheckBox = ({ label, tooltip, value, onChange, required }: Props) => {
         }}
       />
       {value ? (
-        <SquareCheck
-          className="
-            size-5 text-accent
-            group-hover:text-deep
-          "
-        />
+        <SquareCheck className="size-5 text-accent group-hover:text-deep" />
       ) : (
-        <Square
-          className="
-            size-5 text-accent
-            group-hover:text-deep
-          "
-        />
+        <Square className="size-5 text-accent group-hover:text-deep" />
       )}
       {label}
       {tooltip && <Help tooltip={tooltip} />}

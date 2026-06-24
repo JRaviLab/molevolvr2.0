@@ -24,12 +24,12 @@ const Actions = () => {
   });
 
   return (
-    <section>
+    <section className="items-center">
       <Heading level={2} className="sr-only">
         Actions
       </Heading>
 
-      <div className="flex flex-wrap items-center justify-center gap-4">
+      <div className="flex flex-wrap gap-4">
         <Button
           icon={<Pencil />}
           text="Duplicate and Edit"

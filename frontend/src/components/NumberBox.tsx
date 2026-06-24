@@ -66,12 +66,7 @@ const NumberBox = ({
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <Group
-            className="
-              flex justify-between border-b border-current text-accent
-              hover:text-deep
-            "
-          >
+          <Group className="flex justify-between border-b border-current text-accent hover:text-deep">
             <Button slot="decrement">
               <Minus />
             </Button>

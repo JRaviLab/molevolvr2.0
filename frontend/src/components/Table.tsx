@@ -219,7 +219,7 @@ const Table = <Datum extends object>({
   const columnHelper = createColumnHelper<Datum>();
   /** column definitions */
   const columns = cols.map((col, index) =>
-    columnHelper.accessor((row: Datum) => row[col.key], {
+    columnHelper.accessor((row) => row[col.key], {
       /** unique column id, from position in provided column list */
       id: String(index),
       /** name */
@@ -251,7 +251,7 @@ const Table = <Datum extends object>({
   );
 
   /** tanstack table api */
-  /** https://github.com/facebook/react/issues/33057 */
+  // eslint-disable-next-line -- https://github.com/facebook/react/issues/33057
   const table = useReactTable({
     data: rows,
     columns,
@@ -315,13 +315,7 @@ const Table = <Datum extends object>({
                     {...getCol(header.column.id)?.attrs}
                   >
                     {header.isPlaceholder ? null : (
-                      <div
-                        className="
-                          flex items-center justify-start
-                          [&_button]:p-1 [&_button]:text-gray
-                          [&_button]:hover:text-deep
-                        "
-                      >
+                      <div className="flex items-center justify-start [&_button]:p-1 [&_button]:text-gray [&_button]:hover:text-deep">
                         {/* header label */}
                         <span className="mr-2">
                           {flexRender(

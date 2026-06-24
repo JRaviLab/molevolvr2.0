@@ -85,13 +85,17 @@
     @apply flex min-h-dvh flex-col;
   }
 
+  #root {
+    @apply contents;
+  }
+
   main {
     @apply flex grow flex-col;
   }
 
   section {
     --width: 300;
-    @apply even:bg-alt-white relative z-0 flex flex-col gap-12 bg-white px-[max(var(--pad),(100%---spacing(1)*var(--width))/2)] py-(--pad) [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
+    @apply even:bg-alt-white relative z-0 flex flex-col gap-12 bg-white px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] py-(--pad) [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
   }
 
   h1,
@@ -177,7 +181,7 @@
   }
 
   blockquote {
-    @apply w-full border-l-4 border-current/10 pl-8 leading-loose;
+    @apply border-l-4 border-current/10 pl-8 leading-loose;
   }
 
   dl {
@@ -236,16 +240,12 @@
   }
 }
 
-@utility narrow {
-  &:is(section) {
-    --width: 150;
-  }
+@utility width-sm {
+  --width: 150;
 }
 
-@utility full {
-  &:is(section) {
-    --width: 1000;
-  }
+@utility width-full {
+  --width: 999;
 }
 
 @utility grid-layout {

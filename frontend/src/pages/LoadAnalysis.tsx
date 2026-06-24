@@ -26,7 +26,7 @@ const LoadAnalysis = () => {
     <>
       <Meta title="Load Analysis" />
 
-      <section>
+      <section className="items-center">
         <Heading level={1} icon={<ArrowRight />}>
           Load Analysis
         </Heading>
@@ -37,14 +37,14 @@ const LoadAnalysis = () => {
             else toast("Please enter an analysis id", "error");
           }}
         >
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap gap-4">
             <TextBox placeholder="Analysis ID" value={id} onChange={setId} />
             <Button icon={<ArrowRight />} text="Lookup" type="submit" />
           </div>
         </Form>
       </section>
 
-      <section>
+      <section className="items-center">
         <Heading level={2} icon={<History />}>
           History
         </Heading>

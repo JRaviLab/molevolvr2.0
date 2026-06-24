@@ -609,21 +609,13 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
       <div
         ref={ref}
         className={clsx(
-          `
-            grid w-full grid-cols-[max-content_auto] rounded-md bg-white
-            shadow-sm
-          `,
+          `grid w-full grid-cols-[max-content_auto] rounded-md bg-white shadow-sm`,
           expanded && "h-[75dvh]! w-[calc(100dvw-(--spacing(20)))]!",
         )}
         style={{ aspectRatio: expanded ? "" : aspectRatio }}
       >
         {/* panel */}
-        <div
-          className="
-            flex h-0 min-h-full max-w-50 flex-col items-start justify-start
-            gap-8 overflow-x-hidden overflow-y-auto p-4 wrap-anywhere
-          "
-        >
+        <div className="flex h-0 min-h-full max-w-50 flex-col items-start justify-start gap-8 overflow-x-hidden overflow-y-auto p-4 wrap-anywhere">
           {selectedItems.length ? (
             /** show info about selected nodes/edges */
             <>
@@ -698,13 +690,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
         </div>
 
         {/* cytoscape mount container */}
-        <div
-          ref={containerRef}
-          className="
-            bg-white
-            *:size-full!
-          "
-        ></div>
+        <div ref={containerRef} className="bg-white *:size-full!"></div>
       </div>
 
       {/* controls */}

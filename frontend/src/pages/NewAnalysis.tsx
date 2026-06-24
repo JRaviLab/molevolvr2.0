@@ -227,12 +227,7 @@ const NewAnalysis = () => {
           </Heading>
 
           {/* input questions */}
-          <div
-            className="
-              grid w-full grid-cols-2 items-start gap-8
-              max-md:grid-cols-1
-            "
-          >
+          <div className="grid w-full grid-cols-2 items-start gap-8 max-md:grid-cols-1">
             <div className="flex flex-col items-start gap-2">
               <Radios
                 label="What do you want to input?"
@@ -275,7 +270,7 @@ const NewAnalysis = () => {
 
           {/* list input */}
           {inputType === "list" && (
-            <div className="flex flex-col gap-2 self-stretch">
+            <div className="flex flex-col gap-2">
               <TextBox
                 label={
                   <>
@@ -317,7 +312,7 @@ const NewAnalysis = () => {
           )}
 
           {/* controls */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-center gap-4">
             <UploadButton
               text="Upload"
               icon={<Upload />}
@@ -380,7 +375,7 @@ const NewAnalysis = () => {
           )}
         </section>
 
-        <section>
+        <section className="items-center">
           <Heading level={2} icon={<Cog />}>
             Options
           </Heading>
@@ -442,12 +437,12 @@ const NewAnalysis = () => {
           />
         </section>
 
-        <section className="narrow">
+        <section className="width-sm">
           <Heading level={2} icon={<Send />}>
             Submit
           </Heading>
 
-          <div className="flex flex-col gap-2 self-stretch">
+          <div className="flex flex-col gap-2">
             <TextBox
               label="Analysis Name"
               tooltip="Give your analysis a name to remember it by"
@@ -457,7 +452,7 @@ const NewAnalysis = () => {
             />
           </div>
 
-          <div className="flex flex-col gap-2 self-stretch">
+          <div className="flex flex-col gap-2">
             <TextBox
               label={
                 <>

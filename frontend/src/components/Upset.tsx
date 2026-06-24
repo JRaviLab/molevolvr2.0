@@ -10,7 +10,7 @@ import {
   select,
   transpose,
 } from "d3";
-import { map, orderBy } from "lodash";
+import { cloneDeep, map, orderBy } from "lodash";
 import Chart from "@/components/Chart";
 import Tooltip from "@/components/Tooltip";
 import { useTextSize, useTheme } from "@/util/hooks";
@@ -54,7 +54,12 @@ type Props = {
 };
 
 /** upset plot */
-const Upset = ({ title, filename = [], x, y, data }: Props) => {
+const Upset = ({ title, filename = [], x: _x, y: _y, data: _data }: Props) => {
+  /** clone props to avoid mutating original data */
+  const x = cloneDeep(_x);
+  const y = cloneDeep(_y);
+  let data = cloneDeep(_data);
+
   const theme = useTheme();
 
   const { getWidth, truncateWidth } = useTextSize();

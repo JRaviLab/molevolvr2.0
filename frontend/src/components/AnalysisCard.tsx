@@ -22,11 +22,7 @@ const AnalysisCard = ({
   return (
     <Link
       to={`/analysis/${id}`}
-      className="
-        flex flex-col items-start gap-2 rounded-md border border-light-gray
-        bg-white p-4
-        hover:border-accent
-      "
+      className="flex flex-col items-start gap-2 rounded-md border border-light-gray bg-white p-4 hover:border-accent"
       showArrow={false}
     >
       <div className="font-bold">{name}</div>

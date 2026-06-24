@@ -162,13 +162,7 @@ const Feedback = () => {
             </div>
 
             <Collapsible title="Debug" className="self-center">
-              <dl
-                className="
-                  self-center [--cols:6]
-                  max-lg:[--cols:4]
-                  max-md:[--cols:2]
-                "
-              >
+              <dl className="self-center [--cols:6] max-lg:[--cols:4] max-md:[--cols:2]">
                 {Object.entries(details).map(([key, value]) => (
                   <Fragment key={key}>
                     <dt>{key}</dt>

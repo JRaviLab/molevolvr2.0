@@ -25,7 +25,7 @@ import NotFound from "@/pages/NotFound";
 import Testbed from "@/pages/Testbed";
 import { scrollTo } from "@/util/dom";
 import { useChanged } from "@/util/hooks";
-import { redirectPath, redirectState } from "@/util/url";
+import { getRedirect } from "@/util/url";
 
 /** app entrypoint */
 const App = () => <RouterProvider router={router} />;
@@ -70,7 +70,8 @@ const routes = [
         index: true,
         element: <Home />,
         loader: async () => {
-          /** handle 404 redirect */
+          /** handle 404 redirect (see 404.html) */
+          const { redirectPath, redirectState } = getRedirect();
           if (redirectState !== null)
             window.history.replaceState(redirectState, "");
           if (redirectPath) {

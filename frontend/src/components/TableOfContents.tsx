@@ -112,11 +112,7 @@ const TableOfContents = () => {
               ref={active === index ? activeRef : undefined}
               style={{ "--level": level } as CSSProperties}
               className={clsx(
-                `
-                  flex items-center gap-2 p-1
-                  pl-[calc(var(--level)*(--spacing(4)))]
-                  hover:bg-off-white hover:text-deep
-                `,
+                `flex items-center gap-2 p-1 pl-[calc(var(--level)*(--spacing(4)))] hover:bg-off-white hover:text-deep`,
                 active === index && "bg-off-white text-deep",
               )}
               to={{ hash: "#" + id }}

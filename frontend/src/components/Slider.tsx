@@ -80,13 +80,7 @@ const Slider = ({
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <SliderTrack
-            className="
-              group mx-2 flex h-9 min-w-40 cursor-pointer items-center
-              rounded-full text-accent
-              group-hover:text-deep
-            "
-          >
+          <SliderTrack className="group mx-2 flex h-9 min-w-40 cursor-pointer items-center rounded-full text-accent group-hover:text-deep">
             {/* bg fill */}
             <div className="absolute h-1 w-full rounded-full bg-gray" />
 
@@ -105,26 +99,12 @@ const Slider = ({
             />
 
             {/* min marker */}
-            <div
-              className="
-                absolute bottom-full left-0 -translate-x-1/2 translate-y-2
-                whitespace-nowrap opacity-0
-                group-focus-within:opacity-50
-                group-hover:opacity-50
-              "
-            >
+            <div className="absolute bottom-full left-0 -translate-x-1/2 translate-y-2 whitespace-nowrap opacity-0 group-focus-within:opacity-50 group-hover:opacity-50">
               {formatNumber(min, true)}
             </div>
 
             {/* max marker */}
-            <div
-              className="
-                absolute right-0 bottom-full translate-x-1/2 translate-y-2
-                whitespace-nowrap opacity-0
-                group-focus-within:opacity-50
-                group-hover:opacity-50
-              "
-            >
+            <div className="absolute right-0 bottom-full translate-x-1/2 translate-y-2 whitespace-nowrap opacity-0 group-focus-within:opacity-50 group-hover:opacity-50">
               {formatNumber(max, true)}
             </div>
 
@@ -134,17 +114,9 @@ const Slider = ({
                 key={index}
                 index={index}
                 form={form}
-                className="
-                  top-1/2 size-4 cursor-pointer rounded-full bg-current
-                  focus-within:outline-2
-                "
+                className="top-1/2 size-4 cursor-pointer rounded-full bg-current focus-within:outline-2"
               >
-                <div
-                  className="
-                    absolute top-full left-1/2 -translate-x-1/2 translate-y-1
-                    text-center whitespace-nowrap
-                  "
-                >
+                <div className="absolute top-full left-1/2 -translate-x-1/2 translate-y-1 text-center whitespace-nowrap">
                   {formatNumber(value, true)}
                 </div>
               </SliderThumb>

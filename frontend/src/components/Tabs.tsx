@@ -44,6 +44,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
   /** update selected from url */
   const fromUrl = searchParams.get(syncWithUrl) ?? defaultValue ?? "";
   useEffect(() => {
+    // eslint-disable-next-line -- https://github.com/facebook/react/issues/34045#issuecomment-3801067128
     setSelected(fromUrl);
   }, [fromUrl]);
 
@@ -72,10 +73,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
             <Trigger
               value={tab.id}
               className={clsx(
-                `
-                  cursor-pointer gap-2 border-b border-current p-2
-                  hover:bg-current/5 hover:text-deep
-                `,
+                `cursor-pointer gap-2 rounded-t-md border-b border-current p-2 hover:bg-current/5 hover:text-deep`,
                 tab.id === selected
                   ? "bg-current/5 text-accent"
                   : `text-dark-gray`,
@@ -93,10 +91,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
         <Content
           key={index}
           value={tab.id}
-          className="
-            contents
-            data-[state='inactive']:hidden
-          "
+          className="contents data-[state='inactive']:hidden"
           forceMount
         >
           {tab.children}

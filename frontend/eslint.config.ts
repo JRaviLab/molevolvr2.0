@@ -1,11 +1,25 @@
 import js from "@eslint/js";
 import tailwind from "eslint-plugin-better-tailwindcss";
+import { getDefaultSelectors } from "eslint-plugin-better-tailwindcss/defaults";
+import {
+  MatcherType,
+  SelectorKind,
+} from "eslint-plugin-better-tailwindcss/types";
 import a11y from "eslint-plugin-jsx-a11y";
 import prettier from "eslint-plugin-prettier/recommended";
 import reactHooks from "eslint-plugin-react-hooks";
 import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 import tslint from "typescript-eslint";
+
+const tailwindSelectors = [
+  ...getDefaultSelectors(),
+  {
+    kind: SelectorKind.Callee,
+    name: "^column$",
+    match: [{ type: MatcherType.ObjectValue, path: "^className$" }],
+  },
+];
 
 export default defineConfig([
   globalIgnores([
@@ -15,6 +29,7 @@ export default defineConfig([
     "playwright-report",
     "test-results",
   ]),
+
   {
     name: "TypeScript",
     extends: tslint.configs.recommended,
@@ -24,20 +39,21 @@ export default defineConfig([
       "@typescript-eslint/consistent-type-imports": "error",
     },
   },
+
   {
     name: "JavaScript",
+    files: ["**/*.{ts,tsx,js,jsx}"],
     ...js.configs.recommended,
     rules: {
       "prefer-const": ["error", { destructuring: "all" }],
     },
   },
+
   {
     name: "React Hooks",
-    ...reactHooks.configs.flat.recommended,
-    rules: {
-      "react-hooks/immutability": "off",
-    },
+    extends: [reactHooks.configs.flat.recommended],
   },
+
   {
     name: "JSX Accessibility",
     ...a11y.flatConfigs.recommended,
@@ -54,27 +70,47 @@ export default defineConfig([
       ],
     },
   },
+
   {
     name: "Prettier",
-    ...prettier,
+    extends: [prettier],
     rules: {
       "prettier/prettier": "warn",
     },
   },
+
   {
     name: "Tailwind",
+    files: ["**/*.{ts,tsx,js,jsx}"],
     extends: [tailwind.configs.recommended],
     rules: {
+      "better-tailwindcss/enforce-consistent-class-order": [
+        "warn",
+        { selectors: tailwindSelectors },
+      ],
       "better-tailwindcss/enforce-consistent-line-wrapping": [
         "warn",
-        { strictness: "loose" },
+        {
+          preferSingleLine: true,
+          group: "never",
+          printWidth: 0,
+          selectors: tailwindSelectors,
+        },
       ],
-      "better-tailwindcss/no-unknown-classes": ["warn", { ignore: ["dark"] }],
+      "better-tailwindcss/no-unknown-classes": [
+        "warn",
+        { ignore: ["^animate-", "dark"], selectors: tailwindSelectors },
+      ],
+      "better-tailwindcss/no-unnecessary-whitespace": [
+        "warn",
+        { selectors: tailwindSelectors },
+      ],
     },
     settings: {
-      "better-tailwindcss": { entryPoint: "src/styles.css" },
+      "better-tailwindcss": { entryPoint: "./src/styles.css" },
     },
   },
+
   {
     languageOptions: {
       globals: globals.browser,

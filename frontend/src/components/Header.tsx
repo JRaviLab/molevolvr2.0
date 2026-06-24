@@ -41,11 +41,7 @@ const Header = () => {
   return (
     <header
       ref={ref}
-      className="
-        sticky top-0 z-10 flex flex-wrap items-center justify-between gap-8
-        bg-deep p-4 text-white shadow-md
-        max-md:p-2
-      "
+      className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-8 bg-deep p-4 text-white shadow-md max-md:p-2"
     >
       <div className="flex items-center gap-2">
         <Logo className="size-8" />
@@ -73,10 +69,7 @@ const Header = () => {
       <nav
         id="nav"
         className={clsx(
-          `
-            flex items-center gap-2
-            max-md:w-full max-md:flex-col max-md:items-end
-          `,
+          `flex items-center gap-2 max-md:w-full max-md:flex-col max-md:items-end`,
           !open && "max-md:hidden",
         )}
       >

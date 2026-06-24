@@ -96,7 +96,7 @@ const TestbedPage = () => {
     <>
       <Meta title="Testbed" />
 
-      <section>
+      <section className="items-center">
         <Heading level={1}>Testbed</Heading>
 
         <dl>
@@ -159,7 +159,7 @@ const SectionElements = () => {
   const darkColorMap = uniq(Object.values(useColorMap(words, "invert")));
 
   return (
-    <section>
+    <section className="items-center">
       <Heading level={2} icon={<Brush />}>
         Elements
       </Heading>
@@ -286,7 +286,7 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
 };
 
 const SectionHeading = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon="X">
       Heading 2
     </Heading>
@@ -314,27 +314,23 @@ const SectionLegend = () => {
   );
   const shapesMap = useMemo(() => getShapeMap(labels), [labels]);
   const colorMap = useColorMap(labels, "mode");
-  const entries = useMemo(
-    () =>
-      mapValues(colorMap, (color, label) => ({
-        color,
-        shape: shapesMap[label],
-        stroke: Math.random() > 0.75,
-      })),
-    [colorMap, shapesMap],
+  const [entries] = useState(() =>
+    mapValues(colorMap, (color, label) => ({
+      color,
+      shape: shapesMap[label],
+      stroke: Math.random() > 0.75,
+    })),
   );
 
   return (
-    <section>
+    <section className="items-center">
       <Heading level={2} icon={<Shapes />}>
         Legend
       </Heading>
 
       <div
         ref={ref}
-        className="
-          w-100 max-w-full resize overflow-auto rounded-md p-4 shadow-sm
-        "
+        className="w-100 max-w-full resize overflow-auto rounded-md p-4 shadow-sm"
       >
         <Legend entries={entries} x={0} y={0} w={width} />
       </div>
@@ -343,7 +339,7 @@ const SectionLegend = () => {
 };
 
 const SectionUpset = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<Frown />}>
       Upset
     </Heading>
@@ -353,7 +349,7 @@ const SectionUpset = () => (
 );
 
 const SectionSunburst = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<ChartPie />}>
       Sunburst
     </Heading>
@@ -363,7 +359,7 @@ const SectionSunburst = () => (
 );
 
 const SectionHeatmap = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<Grid3X3 />}>
       Heatmap
     </Heading>
@@ -373,7 +369,7 @@ const SectionHeatmap = () => (
 );
 
 const SectionTree = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<NetworkIcon />}>
       Tree
     </Heading>
@@ -383,7 +379,7 @@ const SectionTree = () => (
 );
 
 const SectionNetwork = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<Waypoints />}>
       Network
     </Heading>
@@ -393,7 +389,7 @@ const SectionNetwork = () => (
 );
 
 const SectionMSA = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<TableColumnsSplit />}>
       MSA
     </Heading>
@@ -409,7 +405,7 @@ const SectionMSA = () => (
 );
 
 const SectionIPR = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<TableCellsMerge />}>
       IPR
     </Heading>
@@ -424,7 +420,7 @@ const SectionIPR = () => (
 );
 
 const SectionLink = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<LinkIcon />}>
       Link
     </Heading>
@@ -437,7 +433,7 @@ const SectionLink = () => (
 );
 
 const SectionButton = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<Square />}>
       Button
     </Heading>
@@ -483,7 +479,7 @@ const SectionTextBox = () => {
   const [value, setValue] = useState("");
 
   return (
-    <section>
+    <section className="items-center">
       <Heading level={2} icon={<Type />}>
         Text Box
       </Heading>
@@ -537,7 +533,7 @@ const SectionSelect = () => {
   >([]);
 
   return (
-    <section>
+    <section className="items-center">
       <Heading level={2} icon={<ListCheck />}>
         Select
       </Heading>
@@ -566,7 +562,7 @@ const SectionCheckBox = () => {
   const [value, setValue] = useState(false);
 
   return (
-    <section>
+    <section className="items-center">
       <Heading level={2} icon={<SquareCheck />}>
         Check Box
       </Heading>
@@ -586,7 +582,7 @@ const SectionSlider = () => {
   const [multiValue, setMultiValue] = useState<number[]>([0, 1000]);
 
   return (
-    <section>
+    <section className="items-center">
       <Heading level={2} icon={<SlidersHorizontal />}>
         Slider
       </Heading>
@@ -620,7 +616,7 @@ const SectionNumberBox = () => {
   const [value, setValue] = useState(0);
 
   return (
-    <section>
+    <section className="items-center">
       <Heading level={2} icon={<Hash />}>
         Number Box
       </Heading>
@@ -669,7 +665,7 @@ const SectionRadios = () => {
   );
 
   return (
-    <section>
+    <section className="items-center">
       <Heading level={2} icon={<CircleCheckBig />}>
         Radios
       </Heading>
@@ -688,7 +684,7 @@ const SectionRadios = () => {
 };
 
 const SectionAgo = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<Hourglass />}>
       Ago
     </Heading>
@@ -702,7 +698,7 @@ const SectionAgo = () => (
 );
 
 const SectionAlert = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<Info />}>
       Alert
     </Heading>
@@ -722,7 +718,7 @@ const SectionAlert = () => (
 );
 
 const SectionTabs = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<Folder />}>
       Tabs
     </Heading>
@@ -754,7 +750,7 @@ const SectionTabs = () => (
 );
 
 const SectionToast = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<Wine />}>
       Toast
     </Heading>
@@ -785,7 +781,7 @@ const SectionToast = () => (
 );
 
 const SectionCollapsible = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<ArrowUpDown />}>
       Collapsible
     </Heading>
@@ -804,7 +800,7 @@ const SectionCollapsible = () => (
 );
 
 const SectionTile = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<CustomIcon />}>
       Tile
     </Heading>
@@ -830,7 +826,7 @@ const SectionTile = () => (
 );
 
 const SectionTable = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<TableIcon />}>
       Table
     </Heading>
@@ -865,7 +861,7 @@ const SectionTable = () => (
 );
 
 const SectionTooltip = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<MessageSquare />}>
       Tooltip
     </Heading>
@@ -893,7 +889,7 @@ const SectionTooltip = () => (
 );
 
 const SectionPopover = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<MessageSquareDot />}>
       Popover
     </Heading>
@@ -929,7 +925,7 @@ const SectionPopover = () => (
 );
 
 const SectionDialog = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<AppWindowMac />}>
       Dialog
     </Heading>
@@ -1046,7 +1042,7 @@ const SectionDialog = () => (
 );
 
 const SectionForm = () => (
-  <section>
+  <section className="items-center">
     <Heading level={2} icon={<TextCursorInput />}>
       Form
     </Heading>

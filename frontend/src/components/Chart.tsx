@@ -150,16 +150,9 @@ const Chart = ({
     <div
       ref={containerRef}
       className={clsx(
-        `
-          relative grid max-w-full resize place-items-center overflow-auto p-4
-          [&:is([style*='width'],[style*='height'])>.reset-handle]:grid
-        `,
+        `relative grid max-w-full resize place-items-center overflow-auto p-4 [&:is([style*='width'],[style*='height'])>.reset-handle]:grid`,
         printing
-          ? `
-            aspect-auto h-screen max-h-none min-h-0 w-auto max-w-none min-w-0
-            resize-none overflow-visible rounded-none border-0 bg-white p-0
-            shadow-none
-          `
+          ? `aspect-auto h-screen max-h-none min-h-0 w-auto max-w-none min-w-0 resize-none overflow-visible rounded-none border-0 bg-white p-0 shadow-none`
           : "rounded-md bg-white shadow-sm",
         containerClassName,
       )}

@@ -57,12 +57,7 @@ const Dialog = ({
       <Root open={isOpen} onClose={close}>
         <div className="fixed inset-0 z-20 flex items-center justify-center p-8">
           <Content as={Fragment}>
-            <div
-              className="
-                relative flex max-h-full w-(--content) max-w-full flex-col
-                rounded-md bg-white shadow-overlay
-              "
-            >
+            <div className="relative flex max-h-full w-(--content) max-w-full flex-col rounded-md bg-white shadow-overlay">
               {/* top */}
               <div className="flex items-center justify-center p-2 shadow-sm">
                 <Title>{title}</Title>
@@ -82,12 +77,7 @@ const Dialog = ({
 
               {/* bottom */}
               {bottomContent && (
-                <div
-                  className="
-                    flex flex-wrap items-center justify-center gap-4 p-4
-                    shadow-sm
-                  "
-                >
+                <div className="flex flex-wrap items-center justify-center gap-4 p-4 shadow-sm">
                   {typeof bottomContent === "function"
                     ? bottomContent(close, open)
                     : bottomContent}

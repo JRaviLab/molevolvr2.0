@@ -1,7 +1,7 @@
 import type { Filename } from "@/util/download";
 import { useState } from "react";
 import { extent, scaleBand, scaleLinear, transpose } from "d3";
-import { range } from "lodash";
+import { cloneDeep, range } from "lodash";
 import Chart from "@/components/Chart";
 import CheckBox from "@/components/CheckBox";
 import { Gradient, gradientFunc, gradientOptions } from "@/components/Gradient";
@@ -45,13 +45,17 @@ type Props = {
 const Heatmap = ({
   title,
   filename = [],
-  x,
-  y,
+  x: _x,
+  y: _y,
   data,
   legend,
   min,
   max,
 }: Props) => {
+  /** clone props to avoid mutating original data */
+  let x = cloneDeep(_x);
+  let y = cloneDeep(_y);
+
   /** selected gradient */
   const [gradient, setGradient] = useState(gradientOptions(false)[0]!.id);
 
@@ -150,12 +154,7 @@ const Heatmap = ({
               }
             >
               <rect
-                className="
-                  stroke-transparent stroke-2 outline-none
-                  hover:stroke-black
-                  focus-visible:stroke-black
-                  [.group:has(&:focus)_&:not(:focus)]:opacity-25
-                "
+                className="stroke-transparent stroke-2 outline-none hover:stroke-black focus-visible:stroke-black [.group:has(&:focus)_&:not(:focus)]:opacity-25"
                 x={xScale(colIndex) ?? 0}
                 y={yScale(rowIndex) ?? 0}
                 width={xScale.bandwidth() ?? 0}

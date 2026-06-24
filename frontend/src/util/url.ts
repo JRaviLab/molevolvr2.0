@@ -1,17 +1,22 @@
-/** see 404.html */
-
-/** load redirect storage items */
-export const redirectPath = window.sessionStorage.redirectPath || "";
-export const redirectState = JSON.parse(
-  window.sessionStorage.redirectState || "null",
-);
-
-/** remove redirect storage items right after consuming */
-window.sessionStorage.removeItem("redirectPath");
-window.sessionStorage.removeItem("redirectState");
+/** get redirect details (see 404.html) */
+export const getRedirect = (clear = true) => {
+  /** load redirect storage items */
+  const redirectPath = window.sessionStorage.redirectPath || "";
+  const redirectState = JSON.parse(
+    window.sessionStorage.redirectState || "null",
+  );
+  /** remove/consume redirect storage items */
+  if (clear) {
+    window.sessionStorage.removeItem("redirectPath");
+    window.sessionStorage.removeItem("redirectState");
+  }
+  return { redirectPath, redirectState };
+};
 
 /** url from address bar */
 const { origin, href } = window.location;
+
+const { redirectPath } = getRedirect(false);
 
 /** url at app load time (not reactive) */
 export const url = new URL(

@@ -65,7 +65,7 @@ const Home = () => {
     <>
       <Meta title="Home" />
 
-      <section className="min-h-100 justify-center bg-pale narrow">
+      <section className="min-h-100 justify-center bg-pale width-sm">
         {!reduceMotion && <Viz />}
 
         <Heading level={1} className="sr-only">
@@ -87,7 +87,7 @@ const Home = () => {
         </div>
       </section>
 
-      <section>
+      <section className="items-center">
         <Heading level={2} icon={<Lightbulb />}>
           Examples
         </Heading>
@@ -103,19 +103,14 @@ const Home = () => {
         </div>
       </section>
 
-      <section>
+      <section className="items-center">
         <Heading level={2} icon={<Eye />}>
           Overview
         </Heading>
 
         <p className="font-medium">Select your inputs...</p>
 
-        <div
-          className="
-            flex items-center justify-center gap-4
-            max-md:flex-col
-          "
-        >
+        <div className="flex items-center gap-4 max-md:flex-col">
           <FeatureCard
             title="Construct protein family"
             badge={<Wrench />}
@@ -137,12 +132,7 @@ const Home = () => {
 
         <p className="font-medium">...then view your results...</p>
 
-        <div
-          className="
-            flex items-center justify-center gap-4
-            max-md:flex-col
-          "
-        >
+        <div className="flex items-center gap-4 max-md:flex-col">
           <FeatureCard
             title="Domain architecture"
             badge={<ChartNoAxesGantt />}
@@ -169,7 +159,7 @@ const Home = () => {
         </div>
       </section>
 
-      <section>
+      <section className="items-center">
         <Heading level={2} icon={<ChartScatter />}>
           Stats
         </Heading>
@@ -178,7 +168,7 @@ const Home = () => {
         {status === "error" && <Alert type="error">Error loading stats</Alert>}
 
         {stats && (
-          <div className="flex flex-wrap items-center justify-center gap-8">
+          <div className="flex flex-wrap gap-8">
             <Tile
               icon={<MonitorCheck />}
               primary={formatNumber(stats.running, true)}
@@ -198,7 +188,7 @@ const Home = () => {
         )}
       </section>
 
-      <section>
+      <section className="items-center">
         <Heading level={2} icon={<Feather />}>
           Abstract
         </Heading>
@@ -212,7 +202,7 @@ const Home = () => {
           analysis, summarization, and visualization.
         </p>
 
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        <div className="flex flex-wrap gap-4">
           <Button
             to="https://biorxiv.org/link-to-paper"
             text="Read the Paper"
@@ -222,7 +212,7 @@ const Home = () => {
         </div>
       </section>
 
-      <section>
+      <section className="items-center">
         <Heading level={2} icon={<Quote />}>
           Cite
         </Heading>

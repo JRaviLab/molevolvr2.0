@@ -47,7 +47,7 @@ const Analysis = () => {
     <>
       <Meta title="Analysis" />
 
-      <section>
+      <section className="items-center">
         <Heading level={1} icon={<FileChartPie />}>
           Analysis
         </Heading>

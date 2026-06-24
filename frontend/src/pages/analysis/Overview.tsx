@@ -8,7 +8,7 @@ const Overview = () => {
   const { id, name, type, started, status } = useAnalysis();
 
   return (
-    <section>
+    <section className="items-center">
       <Heading level={1} icon={<FileChartPie />}>
         {name}
       </Heading>

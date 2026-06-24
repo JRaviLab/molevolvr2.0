@@ -59,11 +59,7 @@ const UploadButton = ({
     <>
       <Button
         className={clsx(
-          drag &&
-            `
-              outline-dashed
-              *:pointer-events-none
-            `,
+          drag && `outline-dashed *:pointer-events-none`,
           className,
         )}
         tooltip={
