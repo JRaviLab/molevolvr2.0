@@ -18,7 +18,7 @@ import { useColorMap } from "@/util/color";
 import { useTextSize, useTheme } from "@/util/hooks";
 
 /** label size */
-const labelWidth = 150;
+const labelWidth = 200;
 /** row height */
 const rowHeight = 20;
 /** gap between rows */

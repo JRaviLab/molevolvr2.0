@@ -26,7 +26,7 @@ const barLength = 100;
 /** target number of bar chart ticks */
 const ticks = 3;
 /** label size */
-const labelWidth = 150;
+const labelWidth = 200;
 
 type Props = {
   /** title text */

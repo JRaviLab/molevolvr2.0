@@ -11,7 +11,7 @@ import { useColorMap } from "@/util/color";
 import { useTextSize, useTheme } from "@/util/hooks";
 
 /** label size */
-const labelWidth = 150;
+const labelWidth = 200;
 /** seq char width */
 const charWidth = 12;
 /** row height */

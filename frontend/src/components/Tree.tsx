@@ -16,8 +16,8 @@ const size = 30;
 const nodeSize = 6;
 /** line thickness */
 const lineWidth = 1;
-/** width of legend and labels */
-const sideWidth = 150;
+/** label size */
+const labelWidth = 150;
 
 type Props = {
   /** title text */
@@ -61,6 +61,9 @@ const Tree = ({ title, filename = [], data }: Props) => {
     /** hierarchical data structure with convenient access methods */
     const tree = hierarchy<Node>({ children: data });
 
+    /** horizontal = depth */
+    /** vertical = breadth */
+
     /** set fallbacks */
     tree.descendants().forEach((node) => {
       node.data.dist ??= node.depth > 0 ? 1 : 0;
@@ -85,28 +88,28 @@ const Tree = ({ title, filename = [], data }: Props) => {
     /** sort breadth by dist */
     tree.sort((a, b) => b.data.rootDist! - a.data.rootDist!);
 
-    /** calc depths */
+    /** place nodes along depth */
     tree.descendants().forEach((node) => {
-      node.y = node.data.normRootDist! * size;
+      node.x = node.data.normRootDist! * size;
     });
 
-    /** make leaves evenly spaced breadth-wise */
+    /** make leaves evenly spaced along breadth */
     tree.leaves().forEach((node, index) => {
-      node.x = index * size;
+      node.y = index * size;
     });
 
     /** go up tree */
     orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
-      if (!node.x) {
+      if (!node.y) {
         /** position node breadth in middle of children */
-        const xs = map(node.children ?? [], "x");
-        node.x = ((min(xs) ?? 0) + (max(xs) ?? 0)) / 2;
+        const ys = map(node.children ?? [], "y");
+        node.y = ((min(ys) ?? 0) + (max(ys) ?? 0)) / 2;
       }
     });
 
     /** snap breadth to grid */
     tree.descendants().forEach((node) => {
-      node.x = round(node.x!, size);
+      node.y = round(node.y!, size);
     });
 
     return tree;
@@ -121,10 +124,10 @@ const Tree = ({ title, filename = [], data }: Props) => {
   const selectedPath = selectedA && selectedB ? selectedA.path(selectedB) : [];
 
   /** max node depth */
-  const maxY = max(map(tree.descendants(), "y")) ?? 0;
+  const maxX = max(map(tree.descendants(), "x")) ?? 0;
 
   /** max node breadth */
-  const maxX = max(map(tree.descendants(), "x")) ?? 0;
+  const maxY = max(map(tree.descendants(), "y")) ?? 0;
 
   /** dist between selected nodes */
   const selectedDist = Math.abs(
@@ -152,8 +155,8 @@ const Tree = ({ title, filename = [], data }: Props) => {
     <Chart title={title} filename={[...filename, "tree"]} onClick={deselect}>
       <Legend
         x={-size}
-        y={maxX / 2}
-        w={sideWidth}
+        y={maxY / 2}
+        w={labelWidth}
         anchor={[1, 0.5]}
         entries={mapValues(colorMap, (color) => ({ color }))}
       />
@@ -179,8 +182,8 @@ const Tree = ({ title, filename = [], data }: Props) => {
               opacity={isSelected === false ? 0.25 : 1}
               d={
                 link([
-                  [source.y ?? 0, source.x ?? 0],
-                  [target.y ?? 0, target.x ?? 0],
+                  [source.x ?? 0, source.y ?? 0],
+                  [target.x ?? 0, target.y ?? 0],
                 ]) ?? ""
               }
             />
@@ -189,7 +192,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
       </g>
 
       <g>
-        {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => {
+        {orderBy(tree.descendants(), ["y", "x"]).map((node, index) => {
           /** is node selected */
           const isSelected = selected.length
             ? selected.includes(node) || selectedPath.includes(node)
@@ -201,20 +204,20 @@ const Tree = ({ title, filename = [], data }: Props) => {
                 <>
                   {/* leaf node label */}
                   <line
-                    x1={node.y}
-                    x2={maxY}
-                    y1={node.x ?? 0}
-                    y2={node.x ?? 0}
+                    x1={node.x}
+                    x2={maxX}
+                    y1={node.y ?? 0}
+                    y2={node.y ?? 0}
                     stroke={theme["--color-black"]}
                     strokeWidth={lineWidth}
                     strokeDasharray={[lineWidth, 2 * lineWidth].join(" ")}
                   />
                   <text
-                    x={maxY + 0.5 * size}
-                    y={node.x ?? 0}
+                    x={maxX + 0.5 * size}
+                    y={node.y ?? 0}
                     fill={theme["--color-black"]}
                   >
-                    {truncateWidth(node.data.label ?? "-", sideWidth)}
+                    {truncateWidth(node.data.label ?? "-", labelWidth)}
                   </text>
                 </>
               )}
@@ -244,8 +247,8 @@ const Tree = ({ title, filename = [], data }: Props) => {
               >
                 <circle
                   className="cursor-help"
-                  cx={node.y ?? 0}
-                  cy={node.x ?? 0}
+                  cx={node.x ?? 0}
+                  cy={node.y ?? 0}
                   r={nodeSize}
                   fill={
                     isSelected === false
@@ -277,7 +280,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
 
       {/* selected */}
       {selectedPath.length > 1 && (
-        <g transform={`translate(0, ${maxX + 2 * size})`}>
+        <g transform={`translate(0, ${maxY + 2 * size})`}>
           <g fill={theme["--color-gray"]}>
             <text x={0} y={0 * size}>
               From
@@ -293,13 +296,13 @@ const Tree = ({ title, filename = [], data }: Props) => {
             <text x={2 * size} y={0 * size}>
               {truncateWidth(
                 selectedA?.data.label ?? "",
-                maxY + sideWidth - 2 * size,
+                maxX + labelWidth - 2 * size,
               )}
             </text>
             <text x={2 * size} y={1 * size}>
               {truncateWidth(
                 selectedB?.data.label ?? "",
-                maxY + sideWidth - 2 * size,
+                maxX + labelWidth - 2 * size,
               )}
             </text>
             <text x={2 * size} y={2 * size}>
