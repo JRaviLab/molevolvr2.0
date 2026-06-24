@@ -10,14 +10,14 @@ import { useColorMap } from "@/util/color";
 import { useTextSize, useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
 
-/** grid spacing */
-const size = 30;
+/** row height */
+const rowHeight = 30;
 /** circle size */
 const nodeSize = 6;
 /** line thickness */
 const lineWidth = 1;
 /** label size */
-const labelWidth = 150;
+const labelWidth = 200;
 
 type Props = {
   /** title text */
@@ -69,20 +69,9 @@ const Tree = ({ title, filename = [], data }: Props) => {
       node.data.dist ??= node.depth > 0 ? 1 : 0;
     });
 
-    /** normalize distances */
-    const dists = tree.descendants().map((node) => node.data.dist!);
-    const minDist = min(dists)!;
-    const maxDist = max(dists)!;
-    tree.descendants().forEach((node) => {
-      node.data.normDist = (node.data.dist! + minDist) / (maxDist - minDist);
-    });
-
     /** calc distance from root */
     tree.descendants().forEach((node) => {
       node.data.rootDist = sum(node.ancestors().map((node) => node.data.dist!));
-      node.data.normRootDist = sum(
-        node.ancestors().map((node) => node.data.normDist!),
-      );
     });
 
     /** sort breadth by dist */
@@ -90,12 +79,19 @@ const Tree = ({ title, filename = [], data }: Props) => {
 
     /** place nodes along depth */
     tree.descendants().forEach((node) => {
-      node.x = node.data.normRootDist! * size;
+      node.x = node.data.rootDist!;
     });
 
-    /** make leaves evenly spaced along breadth */
+    /** normalize depth */
+    const minX = min(map(tree.descendants(), "x")) ?? 0;
+    const maxX = max(map(tree.descendants(), "x")) ?? 0;
+    tree.descendants().forEach((node) => {
+      node.x = (node.x! - minX) / (maxX - minX);
+    });
+
+    /** place leaves evenly spaced along breadth */
     tree.leaves().forEach((node, index) => {
-      node.y = index * size;
+      node.y = index;
     });
 
     /** go up tree */
@@ -109,7 +105,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
 
     /** snap breadth to grid */
     tree.descendants().forEach((node) => {
-      node.y = round(node.y!, size);
+      node.y = round(node.y!);
     });
 
     return tree;
@@ -152,165 +148,182 @@ const Tree = ({ title, filename = [], data }: Props) => {
     );
 
   return (
-    <Chart title={title} filename={[...filename, "tree"]} onClick={deselect}>
-      <Legend
-        x={-size}
-        y={maxY / 2}
-        w={labelWidth}
-        anchor={[1, 0.5]}
-        entries={mapValues(colorMap, (color) => ({ color }))}
-      />
+    <Chart
+      title={title}
+      filename={[...filename, "tree"]}
+      onClick={deselect}
+      containerProps={{ className: "w-full" }}
+    >
+      {({ width }) => {
+        /** width of tree view area */
+        width = Math.max(width - 2 * labelWidth - rowHeight, labelWidth);
 
-      <g>
-        {tree.links().map(({ source, target }, index) => {
-          /** is link selected */
-          const isSelected =
-            selected.length > 1
-              ? selectedPath.includes(source) && selectedPath.includes(target)
-              : selected.length === 1
-                ? false
-                : null;
-
-          return (
-            <path
-              key={index}
-              fill="none"
-              stroke={
-                isSelected ? theme["--color-accent"] : theme["--color-black"]
-              }
-              strokeWidth={isSelected ? 2 * lineWidth : lineWidth}
-              opacity={isSelected === false ? 0.25 : 1}
-              d={
-                link([
-                  [source.x ?? 0, source.y ?? 0],
-                  [target.x ?? 0, target.y ?? 0],
-                ]) ?? ""
-              }
+        return (
+          <>
+            <Legend
+              x={-rowHeight}
+              y={0}
+              w={labelWidth}
+              anchor={[1, 0]}
+              entries={mapValues(colorMap, (color) => ({ color }))}
             />
-          );
-        })}
-      </g>
 
-      <g>
-        {orderBy(tree.descendants(), ["y", "x"]).map((node, index) => {
-          /** is node selected */
-          const isSelected = selected.length
-            ? selected.includes(node) || selectedPath.includes(node)
-            : null;
+            <g>
+              {tree.links().map(({ source, target }, index) => {
+                /** is link selected */
+                const isSelected =
+                  selected.length > 1
+                    ? selectedPath.includes(source) &&
+                      selectedPath.includes(target)
+                    : selected.length === 1
+                      ? false
+                      : null;
 
-          return (
-            <Fragment key={index}>
-              {!node.children && (
-                <>
-                  {/* leaf node label */}
-                  <line
-                    x1={node.x}
-                    x2={maxX}
-                    y1={node.y ?? 0}
-                    y2={node.y ?? 0}
-                    stroke={theme["--color-black"]}
-                    strokeWidth={lineWidth}
-                    strokeDasharray={[lineWidth, 2 * lineWidth].join(" ")}
-                  />
-                  <text
-                    x={maxX + 0.5 * size}
-                    y={node.y ?? 0}
-                    fill={theme["--color-black"]}
-                  >
-                    {truncateWidth(node.data.label ?? "-", labelWidth)}
-                  </text>
-                </>
-              )}
-
-              {/* node circle */}
-              <Tooltip
-                content={
-                  <>
-                    <dl>
-                      <dt>Name</dt>
-                      <dd>{node.data.label}</dd>
-                      <dt>Type</dt>
-                      <dd>{node.data.type}</dd>
-                      {node.ancestors().length > 1 && (
-                        <>
-                          <dt>Dist</dt>
-                          <dd>{node.data.dist?.toFixed(3)}</dd>
-                          <dt>From root</dt>
-                          <dd>{node.data.rootDist?.toFixed(3)}</dd>
-                        </>
-                      )}
-                    </dl>
-                    <hr />
-                    Click to select. Select two to see path between them.
-                  </>
-                }
-              >
-                <circle
-                  className="cursor-help"
-                  cx={node.x ?? 0}
-                  cy={node.y ?? 0}
-                  r={nodeSize}
-                  fill={
-                    isSelected === false
-                      ? theme["--color-light-gray"]
-                      : colorMap[node.data.type ?? ""]
-                  }
-                  stroke={theme["--color-black"]}
-                  strokeWidth={lineWidth}
-                  tabIndex={0}
-                  role="graphics-symbol"
-                  onClick={(event) => {
-                    /** prevent deselect from container onClick */
-                    event.stopPropagation();
-                    select(node);
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
-                      select(node);
+                return (
+                  <path
+                    key={index}
+                    fill="none"
+                    stroke={
+                      isSelected
+                        ? theme["--color-accent"]
+                        : theme["--color-black"]
                     }
-                    if (event.key === "Escape") deselect();
-                  }}
-                />
-              </Tooltip>
-            </Fragment>
-          );
-        })}
-      </g>
+                    strokeWidth={isSelected ? 2 * lineWidth : lineWidth}
+                    opacity={isSelected === false ? 0.25 : 1}
+                    d={
+                      link([
+                        [(source.x ?? 0) * width, (source.y ?? 0) * rowHeight],
+                        [(target.x ?? 0) * width, (target.y ?? 0) * rowHeight],
+                      ]) ?? ""
+                    }
+                  />
+                );
+              })}
+            </g>
 
-      {/* selected */}
-      {selectedPath.length > 1 && (
-        <g transform={`translate(0, ${maxY + 2 * size})`}>
-          <g fill={theme["--color-gray"]}>
-            <text x={0} y={0 * size}>
-              From
-            </text>
-            <text x={0} y={1 * size}>
-              To
-            </text>
-            <text x={0} y={2 * size}>
-              Dist.
-            </text>
-          </g>
-          <g fill={theme["--color-black"]}>
-            <text x={2 * size} y={0 * size}>
-              {truncateWidth(
-                selectedA?.data.label ?? "",
-                maxX + labelWidth - 2 * size,
-              )}
-            </text>
-            <text x={2 * size} y={1 * size}>
-              {truncateWidth(
-                selectedB?.data.label ?? "",
-                maxX + labelWidth - 2 * size,
-              )}
-            </text>
-            <text x={2 * size} y={2 * size}>
-              {selectedDist.toFixed(2)}
-            </text>
-          </g>
-        </g>
-      )}
+            <g>
+              {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => {
+                /** is node selected */
+                const isSelected = selected.length
+                  ? selected.includes(node) || selectedPath.includes(node)
+                  : null;
+
+                return (
+                  <Fragment key={index}>
+                    {!node.children && (
+                      <>
+                        {/* leaf node label */}
+                        <line
+                          x1={(node.x ?? 0) * width}
+                          x2={(maxX ?? 0) * width}
+                          y1={(node.y ?? 0) * rowHeight}
+                          y2={(node.y ?? 0) * rowHeight}
+                          stroke={theme["--color-black"]}
+                          strokeWidth={lineWidth}
+                          strokeDasharray={[lineWidth, 2 * lineWidth].join(" ")}
+                        />
+                        <text
+                          x={width + rowHeight}
+                          y={(node.y ?? 0) * rowHeight}
+                          fill={theme["--color-black"]}
+                        >
+                          {truncateWidth(node.data.label ?? "-", labelWidth)}
+                        </text>
+                      </>
+                    )}
+
+                    {/* node circle */}
+                    <Tooltip
+                      content={
+                        <>
+                          <dl>
+                            <dt>Name</dt>
+                            <dd>{node.data.label}</dd>
+                            <dt>Type</dt>
+                            <dd>{node.data.type}</dd>
+                            {node.ancestors().length > 1 && (
+                              <>
+                                <dt>Dist</dt>
+                                <dd>{node.data.dist?.toFixed(3)}</dd>
+                                <dt>From root</dt>
+                                <dd>{node.data.rootDist?.toFixed(3)}</dd>
+                              </>
+                            )}
+                          </dl>
+                          <hr />
+                          Click to select. Select two to see path between them.
+                        </>
+                      }
+                    >
+                      <circle
+                        className="cursor-help"
+                        cx={(node.x ?? 0) * width}
+                        cy={(node.y ?? 0) * rowHeight}
+                        r={nodeSize}
+                        fill={
+                          isSelected === false
+                            ? theme["--color-light-gray"]
+                            : colorMap[node.data.type ?? ""]
+                        }
+                        stroke={theme["--color-black"]}
+                        strokeWidth={lineWidth}
+                        tabIndex={0}
+                        role="graphics-symbol"
+                        onClick={(event) => {
+                          /** prevent deselect from container onClick */
+                          event.stopPropagation();
+                          select(node);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            select(node);
+                          }
+                          if (event.key === "Escape") deselect();
+                        }}
+                      />
+                    </Tooltip>
+                  </Fragment>
+                );
+              })}
+            </g>
+
+            {/* selected */}
+            {selectedPath.length > 1 && (
+              <g transform={`translate(0, ${(maxY + 2) * rowHeight})`}>
+                <g fill={theme["--color-gray"]}>
+                  <text x={0} y={0 * rowHeight}>
+                    From
+                  </text>
+                  <text x={0} y={1 * rowHeight}>
+                    To
+                  </text>
+                  <text x={0} y={2 * rowHeight}>
+                    Dist.
+                  </text>
+                </g>
+                <g fill={theme["--color-black"]}>
+                  <text x={labelWidth / 2} y={0 * rowHeight}>
+                    {truncateWidth(
+                      selectedA?.data.label ?? "",
+                      width - labelWidth / 2,
+                    )}
+                  </text>
+                  <text x={labelWidth / 2} y={1 * rowHeight}>
+                    {truncateWidth(
+                      selectedB?.data.label ?? "",
+                      width - labelWidth / 2,
+                    )}
+                  </text>
+                  <text x={labelWidth / 2} y={2 * rowHeight}>
+                    {selectedDist.toFixed(2)}
+                  </text>
+                </g>
+              </g>
+            )}
+          </>
+        );
+      }}
     </Chart>
   );
 };
