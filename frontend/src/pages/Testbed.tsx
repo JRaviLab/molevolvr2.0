@@ -314,7 +314,7 @@ const SectionLegend = () => {
   );
   const shapesMap = useMemo(() => getShapeMap(labels), [labels]);
   const colorMap = useColorMap(labels, "mode");
-  const [entries] = useState(() =>
+  const { data, control } = useData(() =>
     mapValues(colorMap, (color, label) => ({
       color,
       shape: shapesMap[label],
@@ -332,92 +332,134 @@ const SectionLegend = () => {
         ref={ref}
         className="w-100 max-w-full resize overflow-auto rounded-md p-4 shadow-sm"
       >
-        <Legend entries={entries} x={0} y={0} w={width} />
+        <Legend entries={data} x={0} y={0} w={width} />
       </div>
+
+      {control}
     </section>
   );
 };
 
-const SectionUpset = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<Frown />}>
-      Upset
-    </Heading>
+const SectionUpset = () => {
+  const { data, control } = useData(() => upset);
 
-    <Upset title={label()} filename={[analysis]} {...upset} />
-  </section>
-);
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<Frown />}>
+        Upset
+      </Heading>
 
-const SectionSunburst = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<ChartPie />}>
-      Sunburst
-    </Heading>
+      <Upset title={label()} filename={[analysis]} {...data} />
 
-    <Sunburst title={label()} filename={[analysis]} data={sunburst} />
-  </section>
-);
+      {control}
+    </section>
+  );
+};
 
-const SectionHeatmap = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<Grid3X3 />}>
-      Heatmap
-    </Heading>
+const SectionSunburst = () => {
+  const { data, control } = useData(() => sunburst);
 
-    <Heatmap title={label()} filename={[analysis]} {...heatmap} />
-  </section>
-);
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<ChartPie />}>
+        Sunburst
+      </Heading>
 
-const SectionTree = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<NetworkIcon />}>
-      Tree
-    </Heading>
+      <Sunburst title={label()} filename={[analysis]} data={data} />
 
-    <Tree title={label()} filename={[analysis]} data={tree} />
-  </section>
-);
+      {control}
+    </section>
+  );
+};
 
-const SectionNetwork = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<Waypoints />}>
-      Network
-    </Heading>
+const SectionHeatmap = () => {
+  const { data, control } = useData(() => heatmap);
 
-    <Network filename={[analysis]} nodes={nodes} edges={edges} />
-  </section>
-);
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<Grid3X3 />}>
+        Heatmap
+      </Heading>
 
-const SectionMSA = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<TableColumnsSplit />}>
-      MSA
-    </Heading>
+      <Heatmap title={label()} filename={[analysis]} {...data} />
 
-    <MSA
-      title={label()}
-      filename={[analysis]}
-      tracks={msaTracks}
-      getType={clustalType}
-      colorMap={clustalColors}
-    />
-  </section>
-);
+      {control}
+    </section>
+  );
+};
 
-const SectionIPR = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<TableCellsMerge />}>
-      IPR
-    </Heading>
+const SectionTree = () => {
+  const { data, control } = useData(() => tree);
 
-    <IPR
-      title={label()}
-      filename={[analysis]}
-      sequence={iprSequence}
-      tracks={iprTracks}
-    />
-  </section>
-);
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<NetworkIcon />}>
+        Tree
+      </Heading>
+
+      <Tree title={label()} filename={[analysis]} data={data} />
+
+      {control}
+    </section>
+  );
+};
+
+const SectionNetwork = () => {
+  const { data, control } = useData(() => ({ nodes, edges }));
+
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<Waypoints />}>
+        Network
+      </Heading>
+
+      <Network filename={[analysis]} {...data} />
+
+      {control}
+    </section>
+  );
+};
+
+const SectionMSA = () => {
+  const { data, control } = useData(() => msaTracks);
+
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<TableColumnsSplit />}>
+        MSA
+      </Heading>
+
+      <MSA
+        title={label()}
+        filename={[analysis]}
+        tracks={data}
+        getType={clustalType}
+        colorMap={clustalColors}
+      />
+
+      {control}
+    </section>
+  );
+};
+
+const SectionIPR = () => {
+  const { data, control } = useData(() => ({
+    sequence: iprSequence,
+    tracks: iprTracks,
+  }));
+
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<TableCellsMerge />}>
+        IPR
+      </Heading>
+
+      <IPR title={label()} filename={[analysis]} {...data} />
+
+      {control}
+    </section>
+  );
+};
 
 const SectionLink = () => (
   <section className="items-center">
@@ -1056,3 +1098,18 @@ const SectionForm = () => (
     </Form>
   </section>
 );
+
+const useData = <Data,>(initial: Data | (() => Data)) => {
+  const [data, setData] = useState<Data>(initial);
+
+  const control = (
+    <TextBox
+      placeholder="raw data"
+      multi
+      value={JSON.stringify(data, null, 2)}
+      onChange={(value) => setData(JSON.parse(value))}
+    />
+  );
+
+  return { data, control };
+};

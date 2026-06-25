@@ -73,7 +73,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
             <Trigger
               value={tab.id}
               className={clsx(
-                `cursor-pointer gap-2 rounded-t-md border-b border-current p-2 hover:bg-current/5 hover:text-deep`,
+                `min-h-10 cursor-pointer gap-2 rounded-t-md border-b border-current p-2 hover:bg-current/5 hover:text-deep`,
                 tab.id === selected
                   ? "bg-current/5 text-accent"
                   : `text-dark-gray`,

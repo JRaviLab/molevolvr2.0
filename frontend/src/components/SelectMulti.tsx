@@ -84,7 +84,7 @@ const SelectMulti = <O extends Option>({
             </Label>
 
             {/* button */}
-            <ListboxButton className="gap-2 border-b border-current p-2 text-accent *:leading-none hover:text-deep">
+            <ListboxButton className="min-h-10 gap-2 border-b border-current p-2 text-accent *:leading-none hover:text-deep">
               <span className="grow truncate py-1">{selectedLabel}</span>
               <ChevronDown />
             </ListboxButton>
@@ -100,7 +100,7 @@ const SelectMulti = <O extends Option>({
                   {({ focus, selected }) => (
                     <li
                       className={clsx(
-                        `flex max-w-[calc(100dvw--spacing(20))] cursor-pointer items-center gap-2 p-2 *:leading-none`,
+                        `flex cursor-pointer items-center gap-2 p-2 *:leading-none`,
                         focus && "bg-off-white",
                       )}
                     >

@@ -73,7 +73,7 @@ const SelectSingle = <O extends Option>({
 
       {/* button */}
       <ListboxButton
-        className="gap-2 border-b border-current p-2 text-accent *:leading-none hover:text-deep"
+        className="min-h-10 gap-2 border-b border-current p-2 text-accent *:leading-none hover:text-deep"
         onKeyDown={({ key }) => {
           if (index === -1) return;
 
@@ -104,7 +104,7 @@ const SelectSingle = <O extends Option>({
             {({ focus, selected }) => (
               <li
                 className={clsx(
-                  `flex max-w-[calc(100dvw--spacing(20))] cursor-pointer items-center gap-2 p-2 *:leading-none`,
+                  `flex cursor-pointer items-center gap-2 p-2 *:leading-none`,
                   focus && "bg-off-white",
                 )}
               >

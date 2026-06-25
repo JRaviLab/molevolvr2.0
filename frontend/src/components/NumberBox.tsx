@@ -72,7 +72,7 @@ const NumberBox = ({
             </Button>
             {/* Poppins unfortunately doesn't support tabular nums */}
             <Input
-              className="field-sizing-content px-2 py-1 text-center font-mono"
+              className="field-sizing-content min-h-10 px-2 py-1 text-center font-mono"
               form={form}
               onBlurCapture={(event) => {
                 /** https://github.com/adobe/react-spectrum/discussions/6261 */

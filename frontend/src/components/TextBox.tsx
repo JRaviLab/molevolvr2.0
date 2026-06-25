@@ -105,7 +105,7 @@ const TextBox = ({
   const input = multi ? (
     <textarea
       id={id}
-      className="min-h-[calc(3lh+(--spacing(4))+2px)] grow resize rounded-md border border-light-gray bg-white p-2 hover:border-accent"
+      className="min-h-10 grow resize rounded-md border border-light-gray bg-white p-2 hover:border-accent"
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
       value={value}
       onChange={(event) => onChange(event.target.value)}
@@ -139,7 +139,7 @@ const TextBox = ({
           {input}
           <div
             ref={sideRef}
-            className="absolute top-0 right-0 flex items-start text-dark-gray *:grid *:size-[calc(var(--leading-normal)*1em+(--spacing(4))+2px)] *:place-items-center *:p-0"
+            className="absolute top-0 right-0 flex items-start text-dark-gray *:grid *:size-10 *:place-items-center *:p-0"
           >
             {side}
           </div>

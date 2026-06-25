@@ -29,7 +29,7 @@ const Collapsible = ({ title, tooltip, className, children }: Props) => {
       <Tooltip content={tooltip}>
         <summary
           className={clsx(
-            `flex items-center gap-2 rounded-md border border-dashed border-current p-2 text-accent hover:text-deep`,
+            `flex min-h-10 items-center gap-2 rounded-md border border-dashed border-current p-2 text-accent hover:text-deep`,
             className,
           )}
         >
