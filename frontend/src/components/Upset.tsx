@@ -54,7 +54,13 @@ type Props = {
 };
 
 /** upset plot */
-const Upset = ({ title, filename = [], x: _x, y: _y, data: _data }: Props) => {
+export default function Upset({
+  title,
+  filename = [],
+  x: _x,
+  y: _y,
+  data: _data,
+}: Props) {
   console.debug("upset render");
 
   /** clone props to avoid mutating original data */
@@ -263,9 +269,7 @@ const Upset = ({ title, filename = [], x: _x, y: _y, data: _data }: Props) => {
       </g>
     </Chart>
   );
-};
-
-export default Upset;
+}
 
 /** sort array and return indices */
 const sortedIndices = <Type,>(array: Type[]) =>

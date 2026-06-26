@@ -16,7 +16,7 @@ import { examples } from "@/pages/Home";
 const AnalysisContext = createContext<_Analysis>(examples[0]!);
 export const useAnalysis = () => useContext(AnalysisContext);
 
-const Analysis = () => {
+export default function Analysis() {
   /** get id from url */
   const { id = "Analysis" } = useParams();
 
@@ -65,6 +65,4 @@ const Analysis = () => {
       </section>
     </>
   );
-};
-
-export default Analysis;
+}

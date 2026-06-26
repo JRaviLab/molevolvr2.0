@@ -47,7 +47,7 @@ type ChildrenProps = {
 };
 
 /** generic chart wrapper */
-const Chart = ({
+export default function Chart({
   title,
   filename,
   tabular,
@@ -58,7 +58,7 @@ const Chart = ({
   onClick,
   containerProps: { className: containerClassName, ...containerProps } = {},
   svgProps = {},
-}: Props) => {
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const titleRef = useRef<SVGTextElement>(null);
@@ -244,6 +244,4 @@ const Chart = ({
       </div>
     </div>
   );
-};
-
-export default Chart;
+}

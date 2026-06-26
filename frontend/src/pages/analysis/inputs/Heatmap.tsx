@@ -1,3 +1,3 @@
-const Heatmap = () => <>Lorem ipsum dolor sit amet.</>;
-
-export default Heatmap;
+export default function Heatmap() {
+  return <>Lorem ipsum dolor sit amet.</>;
+}

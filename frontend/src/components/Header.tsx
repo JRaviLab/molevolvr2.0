@@ -19,7 +19,7 @@ const links = [
 ];
 
 /** at top of every page. singleton. */
-const Header = () => {
+export default function Header() {
   const { pathname } = useLocation();
 
   /** nav menu expanded/collapsed state */
@@ -87,6 +87,4 @@ const Header = () => {
       </nav>
     </header>
   );
-};
-
-export default Header;
+}

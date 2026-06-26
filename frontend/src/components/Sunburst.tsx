@@ -64,7 +64,7 @@ type Derived = {
 type Node = HierarchyNode<Derived>;
 
 /** sunburst plot */
-const Sunburst = ({ title, filename = [], data }: Props) => {
+export default function Sunburst({ title, filename = [], data }: Props) {
   /** "breadcrumb trail" of selected nodes */
   const [selected, setSelected] = useState<Node[]>([]);
 
@@ -190,9 +190,7 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
       </g>
     </Chart>
   );
-};
-
-export default Sunburst;
+}
 
 type SegmentProps = {
   node: Node;
@@ -201,7 +199,7 @@ type SegmentProps = {
 };
 
 /** single arc segment */
-const Segment = ({ node, select, deselect }: SegmentProps) => {
+function Segment({ node, select, deselect }: SegmentProps) {
   /** unique segment id */
   const id = useId();
 
@@ -291,33 +289,35 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
       </text>
     </g>
   );
-};
+}
 
 /** tooltip for data node */
-const NodeTooltip = ({
+function NodeTooltip({
   label,
   value,
   percent,
   type,
   children,
-}: Omit<Derived, "children"> & { children: ReactElement }) => (
-  <Tooltip
-    content={
-      <dl>
-        <dt>Name</dt>
-        <dd>{label}</dd>
-        <dt>Value</dt>
-        <dd>{formatNumber(value)}</dd>
-        <dt>Percent</dt>
-        <dd>{formatPercent(percent)}</dd>
-        <dt>Type</dt>
-        <dd>{type}</dd>
-      </dl>
-    }
-  >
-    {children}
-  </Tooltip>
-);
+}: Omit<Derived, "children"> & { children: ReactElement }) {
+  return (
+    <Tooltip
+      content={
+        <dl>
+          <dt>Name</dt>
+          <dd>{label}</dd>
+          <dt>Value</dt>
+          <dd>{formatNumber(value)}</dd>
+          <dt>Percent</dt>
+          <dd>{formatPercent(percent)}</dd>
+          <dt>Type</dt>
+          <dd>{type}</dd>
+        </dl>
+      }
+    >
+      {children}
+    </Tooltip>
+  );
+}
 
 /** format 0-1 as % */
 const formatPercent = (percent = 0) => `${(100 * percent).toFixed(0)}%`;

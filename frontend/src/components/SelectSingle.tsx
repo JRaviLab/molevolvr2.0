@@ -37,13 +37,13 @@ export type Option<ID = string | number> = {
 };
 
 /** single select box */
-const SelectSingle = <O extends Option>({
+export default function SelectSingle<O extends Option>({
   label,
   tooltip,
   value,
   onChange,
   options,
-}: Props<O>) => {
+}: Props<O>) {
   /** link to parent form component */
   const form = useForm();
 
@@ -135,6 +135,4 @@ const SelectSingle = <O extends Option>({
       </ListboxOptions>
     </Listbox>
   );
-};
-
-export default SelectSingle;
+}

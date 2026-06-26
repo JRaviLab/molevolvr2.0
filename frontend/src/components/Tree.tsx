@@ -62,7 +62,7 @@ const sortOptions = [
 ] as const;
 
 /** tree/hierarchy plot */
-const Tree = ({ title, filename = [], data }: Props) => {
+export default function Tree({ title, filename = [], data }: Props) {
   console.debug("tree render");
 
   const theme = useTheme();
@@ -372,6 +372,4 @@ const Tree = ({ title, filename = [], data }: Props) => {
       }}
     </Chart>
   );
-};
-
-export default Tree;
+}

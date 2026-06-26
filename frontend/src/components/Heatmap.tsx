@@ -43,7 +43,7 @@ type Props = {
 };
 
 /** heatmap plot */
-const Heatmap = ({
+export default function Heatmap({
   title,
   filename = [],
   x: _x,
@@ -52,7 +52,7 @@ const Heatmap = ({
   legend,
   min,
   max,
-}: Props) => {
+}: Props) {
   console.debug("heatmap render");
 
   /** clone props to avoid mutating original data */
@@ -276,6 +276,4 @@ const Heatmap = ({
       </g>
     </Chart>
   );
-};
-
-export default Heatmap;
+}

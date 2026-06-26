@@ -12,7 +12,7 @@ import Homology from "@/pages/analysis/outputs/Homology";
 import Phylogeny from "@/pages/analysis/outputs/Phylogeny";
 import Summary from "@/pages/analysis/outputs/Summary";
 
-const Outputs = () => {
+export default function Outputs() {
   return (
     <section>
       <Heading level={2} icon={<ArrowRightFromLine />}>
@@ -35,6 +35,4 @@ const Outputs = () => {
       </Tabs>
     </section>
   );
-};
-
-export default Outputs;
+}

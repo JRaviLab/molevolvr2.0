@@ -38,7 +38,7 @@ type Props = {
 };
 
 /** chart download button */
-const Download = ({
+export default function Download({
   filename,
   raster,
   vector,
@@ -46,7 +46,7 @@ const Download = ({
   text,
   json,
   children,
-}: Props) => {
+}: Props) {
   const _json = typeof json === "function" ? json() : json;
 
   return (
@@ -125,6 +125,4 @@ const Download = ({
       <Button icon={<DownloadIcon />} tooltip="Download" design="hollow" />
     </Popover>
   );
-};
-
-export default Download;
+}

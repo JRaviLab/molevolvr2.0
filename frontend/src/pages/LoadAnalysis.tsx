@@ -14,7 +14,7 @@ import analyses from "../../fixtures/analyses.json";
 
 const storageKey = "history";
 
-const LoadAnalysis = () => {
+export default function LoadAnalysis() {
   const navigate = useNavigate();
 
   const [id, setId] = useState("");
@@ -74,6 +74,4 @@ const LoadAnalysis = () => {
       </section>
     </>
   );
-};
-
-export default LoadAnalysis;
+}

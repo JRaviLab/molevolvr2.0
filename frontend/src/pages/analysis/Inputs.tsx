@@ -13,7 +13,7 @@ import Heatmap from "@/pages/analysis/inputs/Heatmap";
 import Summary from "@/pages/analysis/inputs/Summary";
 import Table from "@/pages/analysis/inputs/Table";
 
-const Inputs = () => {
+export default function Inputs() {
   const { status } = useAnalysis();
 
   return (
@@ -44,6 +44,4 @@ const Inputs = () => {
       )}
     </section>
   );
-};
-
-export default Inputs;
+}

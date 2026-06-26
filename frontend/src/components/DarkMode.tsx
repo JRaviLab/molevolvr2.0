@@ -22,7 +22,7 @@ getDefaultStore().sub(darkModeAtom, update);
 type Props = ComponentProps<"button">;
 
 /** dark mode toggle */
-export const DarkMode = ({ className }: Props) => {
+export function DarkMode({ className }: Props) {
   const [darkMode, setDarkMode] = useAtom(darkModeAtom);
 
   return (
@@ -37,4 +37,4 @@ export const DarkMode = ({ className }: Props) => {
       </button>
     </Tooltip>
   );
-};
+}

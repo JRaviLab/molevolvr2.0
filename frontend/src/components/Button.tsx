@@ -47,7 +47,7 @@ type _Button = Pick<
  * looks like a button and either goes somewhere (link) or does something
  * (button)
  */
-const Button = ({
+export default function Button({
   ref,
   text,
   icon,
@@ -57,7 +57,7 @@ const Button = ({
   className,
   tooltip,
   ...props
-}: Props) => {
+}: Props) {
   /** contents of main element */
   const children = flip ? (
     <>
@@ -111,6 +111,4 @@ const Button = ({
         </button>
       </Tooltip>
     );
-};
-
-export default Button;
+}

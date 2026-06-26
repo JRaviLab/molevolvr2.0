@@ -1,3 +1,3 @@
-const DomainArch = () => <>Lorem ipsum dolor sit amet.</>;
-
-export default DomainArch;
+export default function DomainArch() {
+  return <>Lorem ipsum dolor sit amet.</>;
+}

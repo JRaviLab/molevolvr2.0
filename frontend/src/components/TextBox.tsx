@@ -40,7 +40,7 @@ type Multi = {
 } & Pick<ComponentProps<"textarea">, "autoComplete" | "required">;
 
 /** single or multi-line text input box */
-const TextBox = ({
+export default function TextBox({
   label,
   tooltip,
   multi,
@@ -48,7 +48,7 @@ const TextBox = ({
   value,
   onChange,
   ...props
-}: Props) => {
+}: Props) {
   const sideRef = useRef<HTMLDivElement>(null);
 
   /** link to parent form component */
@@ -147,6 +147,4 @@ const TextBox = ({
       </Tooltip>
     </>
   );
-};
-
-export default TextBox;
+}

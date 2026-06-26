@@ -20,7 +20,7 @@ import { shortenUrl } from "@/util/string";
 const { VITE_EMAIL, VITE_ISSUES, VITE_ORG, VITE_REPO_NAME } = import.meta.env;
 
 /** feedback form on every page. singleton. */
-const Feedback = () => {
+export default function Feedback() {
   /** form state, saved to local storage */
   let [name, setName] = useLocalStorage("feedback-name", "");
   let [username, setUsername] = useLocalStorage("feedback-username", "");
@@ -249,6 +249,4 @@ const Feedback = () => {
       </Dialog>
     </Form>
   );
-};
-
-export default Feedback;
+}

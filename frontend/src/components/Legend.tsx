@@ -35,13 +35,13 @@ type Entry = {
 };
 
 /** general purpose legend with colored symbols and labels */
-const Legend = ({
+export default function Legend({
   entries,
   x: rootX = 0,
   y: rootY = 0,
   w: rootW = maxEntryWidth,
   anchor = [0, 0],
-}: Props) => {
+}: Props) {
   const theme = useTheme();
 
   const { fontSize, getWidth, truncateWidth } = useTextSize();
@@ -120,9 +120,7 @@ const Legend = ({
       )}
     </svg>
   );
-};
-
-export default Legend;
+}
 
 type CellProps = {
   index: number;
@@ -136,7 +134,7 @@ type CellProps = {
 
 /** split into sub-components for slight performance optimization */
 
-const Cell = ({
+function Cell({
   index,
   label,
   labelX,
@@ -147,7 +145,7 @@ const Cell = ({
   stroke,
   theme,
   truncateWidth,
-}: CellProps) => {
+}: CellProps) {
   /** wrap to grid of rows/cols */
   const row = Math.floor(index / cols);
   const col = index % cols;
@@ -203,4 +201,4 @@ const Cell = ({
       </Tooltip>
     </g>
   );
-};
+}

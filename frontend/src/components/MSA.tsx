@@ -43,13 +43,13 @@ type Track = {
 export type Combined = Record<string, number>;
 
 /** multiple sequence alignment plot */
-const MSA = ({
+export default function MSA({
   title,
   filename = [],
   tracks,
   getType = (char) => char,
   colorMap: manualColors = {},
-}: Props) => {
+}: Props) {
   console.debug("msa render");
 
   /** whether to wrap sequence to separate "panels" */
@@ -262,9 +262,7 @@ const MSA = ({
       }}
     </Chart>
   );
-};
-
-export default MSA;
+}
 
 /** get input data + derived data, e.g. assigning types */
 const getDerived = (

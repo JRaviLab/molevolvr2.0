@@ -31,7 +31,7 @@ type Props = {
 };
 
 /** number input box. use for numeric values that need precise adjustment. */
-const NumberBox = ({
+export default function NumberBox({
   label,
   tooltip,
   min = 0,
@@ -39,7 +39,7 @@ const NumberBox = ({
   step = 1,
   value,
   onChange,
-}: Props) => {
+}: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   /** link to parent form component */
@@ -93,6 +93,4 @@ const NumberBox = ({
       )}
     </NumberField>
   );
-};
-
-export default NumberBox;
+}

@@ -1,3 +1,3 @@
-const Phylogeny = () => <>Lorem ipsum dolor sit amet.</>;
-
-export default Phylogeny;
+export default function Phylogeny() {
+  return <>Lorem ipsum dolor sit amet.</>;
+}

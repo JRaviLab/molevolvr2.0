@@ -255,7 +255,11 @@ const layoutOptions = layouts.map(({ name, label }) => ({
   primary: label,
 })) satisfies Option[];
 
-const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
+export default function Network({
+  filename = [],
+  nodes: _nodes,
+  edges: _edges,
+}: Props) {
   console.debug("network render");
 
   const ref = useRef<HTMLDivElement | null>(null);
@@ -735,6 +739,4 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
       </div>
     </div>
   );
-};
-
-export default Network;
+}

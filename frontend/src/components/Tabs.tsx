@@ -19,7 +19,11 @@ type Props = {
   defaultValue?: string;
 };
 
-const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
+export default function Tabs({
+  syncWithUrl = "",
+  children,
+  defaultValue,
+}: Props) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -99,9 +103,7 @@ const Tabs = ({ syncWithUrl = "", children, defaultValue }: Props) => {
       ))}
     </Root>
   );
-};
-
-export default Tabs;
+}
 
 type TabProps = {
   /**
@@ -118,6 +120,6 @@ type TabProps = {
 };
 
 /** use within a Tabs component */
-export const Tab = (props: TabProps) => {
+export function Tab(props: TabProps) {
   return <Fragment {...props} />;
-};
+}

@@ -125,13 +125,13 @@ type PerPage = (typeof perPageOptions)[number]["id"];
  * reference:
  * https://codesandbox.io/p/devbox/tanstack-table-example-kitchen-sink-vv4871
  */
-const Table = <Datum extends object>({
+export default function Table<Datum extends object>({
   cols,
   rows,
   sort,
   filename = [],
   showControls = true,
-}: Props<Datum>) => {
+}: Props<Datum>) {
   "use no memo";
 
   const filterRef = useRef<HTMLDivElement>(null);
@@ -551,9 +551,7 @@ const Table = <Datum extends object>({
       )}
     </div>
   );
-};
-
-export default Table;
+}
 
 type FilterProps<Datum extends object> = {
   column: Column<Datum>;
@@ -561,7 +559,7 @@ type FilterProps<Datum extends object> = {
 };
 
 /** content of filter popup for column */
-const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
+function Filter<Datum extends object>({ column, def }: FilterProps<Datum>) {
   /** type of filter */
   const type = def?.filterType ?? "string";
 
@@ -683,7 +681,7 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
       />
     </div>
   );
-};
+}
 
 /** default cell formatter based on detected type */
 const defaultFormat = (cell: unknown) => {

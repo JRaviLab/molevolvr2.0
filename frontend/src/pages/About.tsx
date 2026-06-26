@@ -25,7 +25,7 @@ const {
   VITE_LAB_GITHUB,
 } = import.meta.env;
 
-const About = () => {
+export default function About() {
   return (
     <>
       <Meta title="About" />
@@ -491,6 +491,4 @@ const About = () => {
       </section>
     </>
   );
-};
-
-export default About;
+}

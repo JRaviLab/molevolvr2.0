@@ -24,7 +24,7 @@ type Props = {
  * popup of minimal, non-interactive help or contextual info when hovering or
  * focusing children
  */
-const Tooltip = ({ ref, content, children, ...props }: Props) => {
+export default function Tooltip({ ref, content, children, ...props }: Props) {
   if (!content) return children;
 
   return (
@@ -54,6 +54,4 @@ const Tooltip = ({ ref, content, children, ...props }: Props) => {
       </Root>
     </Provider>
   );
-};
-
-export default Tooltip;
+}

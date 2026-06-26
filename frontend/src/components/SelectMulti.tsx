@@ -37,13 +37,13 @@ export type Option<ID = string | number> = {
 };
 
 /** multi select box */
-const SelectMulti = <O extends Option>({
+export default function SelectMulti<O extends Option>({
   label,
   tooltip,
   value,
   onChange,
   options,
-}: Props<O>) => {
+}: Props<O>) {
   /** link to parent form component */
   const form = useForm();
 
@@ -134,6 +134,4 @@ const SelectMulti = <O extends Option>({
       }}
     </Listbox>
   );
-};
-
-export default SelectMulti;
+}

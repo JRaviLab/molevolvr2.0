@@ -48,7 +48,7 @@ type Multi = {
  * single or multi-value number slider. use for numeric values that need quick
  * or imprecise adjustment.
  */
-const Slider = ({
+export default function Slider({
   label,
   tooltip,
   min = 0,
@@ -57,7 +57,7 @@ const Slider = ({
   multi,
   value,
   onChange,
-}: Props) => {
+}: Props) {
   /** link to parent form component */
   const form = useForm();
 
@@ -126,6 +126,4 @@ const Slider = ({
       )}
     </RACSlider>
   );
-};
-
-export default Slider;
+}

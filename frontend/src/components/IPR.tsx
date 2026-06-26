@@ -50,7 +50,7 @@ type Feature = {
 };
 
 /** interproscan result visualization */
-const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
+export default function IPR({ title, filename = [], sequence, tracks }: Props) {
   console.debug("ipr render");
 
   const zoomRef = useRef<SVGGElement>(null);
@@ -396,9 +396,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
       }}
     </Chart>
   );
-};
-
-export default IPR;
+}
 
 /** split into sub-components for slight performance optimization */
 
@@ -409,13 +407,15 @@ type LabelProps = {
 };
 
 /** track row label */
-const Label = ({ index, label, truncateWidth }: LabelProps) => (
-  <Tooltip content={label}>
-    <text x={0} y={(index + 0.5) * (rowHeight + rowGap)} tabIndex={0}>
-      {truncateWidth(label ?? "-", labelWidth)}
-    </text>
-  </Tooltip>
-);
+function Label({ index, label, truncateWidth }: LabelProps) {
+  return (
+    <Tooltip content={label}>
+      <text x={0} y={(index + 0.5) * (rowHeight + rowGap)} tabIndex={0}>
+        {truncateWidth(label ?? "-", labelWidth)}
+      </text>
+    </Tooltip>
+  );
+}
 
 type CharProps = {
   char: string;
@@ -428,7 +428,7 @@ type CharProps = {
 };
 
 /** sequence row char */
-const Char = ({
+function Char({
   char,
   position,
   scaleX,
@@ -436,27 +436,29 @@ const Char = ({
   rowHeight,
   theme,
   fontSize,
-}: CharProps) => (
-  <g transform={`translate(${scaleX(position + 0.5)}, 0)`}>
-    <rect
-      x={-cellWidth / 2}
-      y={-rowHeight / 2}
-      width={cellWidth}
-      height={rowHeight}
-      fill={theme["--color-light-gray"]}
-      opacity={position % 2 === 0 ? 0.25 : 0.5}
-    />
-    <text
-      x={0}
-      y={0}
-      fill={theme["--color-black"]}
-      transform={`scale(${clamp(cellWidth / fontSize, 0, 1)})`}
-      textAnchor="middle"
-    >
-      {char}
-    </text>
-  </g>
-);
+}: CharProps) {
+  return (
+    <g transform={`translate(${scaleX(position + 0.5)}, 0)`}>
+      <rect
+        x={-cellWidth / 2}
+        y={-rowHeight / 2}
+        width={cellWidth}
+        height={rowHeight}
+        fill={theme["--color-light-gray"]}
+        opacity={position % 2 === 0 ? 0.25 : 0.5}
+      />
+      <text
+        x={0}
+        y={0}
+        fill={theme["--color-black"]}
+        transform={`scale(${clamp(cellWidth / fontSize, 0, 1)})`}
+        textAnchor="middle"
+      >
+        {char}
+      </text>
+    </g>
+  );
+}
 
 type FeatureProps = {
   id: string;
@@ -474,7 +476,7 @@ type FeatureProps = {
 };
 
 /** feature track */
-const Feature = ({
+function Feature({
   id,
   label,
   type,
@@ -487,7 +489,7 @@ const Feature = ({
   theme,
   fontSize,
   truncateWidth,
-}: FeatureProps) => {
+}: FeatureProps) {
   /** x in view */
   const drawX = clamp(scaleX(start - 1), 0, width);
   /** width in view */
@@ -532,4 +534,4 @@ const Feature = ({
       </g>
     </Tooltip>
   );
-};
+}

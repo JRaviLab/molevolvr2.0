@@ -12,12 +12,12 @@ type Props = {
 } & ComponentProps<"svg">;
 
 /** gradient */
-export const Gradient = ({
+export function Gradient({
   id,
   reverse = false,
   direction = "horizontal",
   ...props
-}: Props) => {
+}: Props) {
   const gradientId = useId();
 
   return (
@@ -41,7 +41,7 @@ export const Gradient = ({
       <rect x={0} y={0} width={10} height={10} fill={`url(#${gradientId})`} />
     </svg>
   );
-};
+}
 
 /** gradient options for select */
 export const gradientOptions = (reverse: boolean): Option<Id>[] =>

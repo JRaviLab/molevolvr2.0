@@ -34,13 +34,13 @@ export type Option<ID = string> = {
  * group of mutually-exclusive options. only use for 2-4 very important options
  * that all need to be simultaneously visible, otherwise use select.
  */
-const Radios = <O extends Option>({
+export default function Radios<O extends Option>({
   label,
   tooltip,
   options,
   value,
   onChange,
-}: Props<O>) => {
+}: Props<O>) {
   /** link to parent form component */
   const form = useForm();
 
@@ -99,6 +99,4 @@ const Radios = <O extends Option>({
       </div>
     </div>
   );
-};
-
-export default Radios;
+}
