@@ -112,14 +112,14 @@ const TestbedPage = () => {
 
       {/* complex components */}
 
-      <SectionLegend />
-      <SectionUpset />
-      <SectionSunburst />
-      <SectionHeatmap />
-      <SectionTree />
-      {/* <SectionNetwork /> */}
-      <SectionMSA />
-      <SectionIPR />
+      {/* <SectionLegend /> */}
+      {/* <SectionUpset /> */}
+      {/* <SectionSunburst /> */}
+      {/* <SectionHeatmap /> */}
+      {/* <SectionTree /> */}
+      <SectionNetwork />
+      {/* <SectionMSA /> */}
+      {/* <SectionIPR /> */}
 
       {/* formatting */}
 

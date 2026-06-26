@@ -576,14 +576,6 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   /** fullscreen */
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
 
-  /** json download data */
-  const [json, setJson] = useState<object | null>(null);
-
-  useEffect(() => {
-    if (!graphRef.current) return;
-    setJson(graphRef.current.json());
-  }, [nodes, edges]);
-
   return (
     <div className="flex w-full flex-col items-center gap-4">
       <div
@@ -716,7 +708,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
                 filename: "edges",
               },
             ]}
-            json={json}
+            json={() => graphRef.current?.json()}
           />
 
           <Button

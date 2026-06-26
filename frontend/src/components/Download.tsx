@@ -32,7 +32,7 @@ type Props = {
   /** text string */
   text?: string;
   /** json data */
-  json?: unknown;
+  json?: unknown | (() => unknown);
   /** extra buttons */
   children?: ReactNode;
 };
@@ -47,6 +47,8 @@ const Download = ({
   json,
   children,
 }: Props) => {
+  const _json = typeof json === "function" ? json() : json;
+
   return (
     <Popover
       content={
@@ -113,7 +115,7 @@ const Download = ({
               icon={<Braces />}
               text="JSON"
               tooltip="JSON data"
-              onClick={() => downloadJson(json, filename)}
+              onClick={() => downloadJson(_json, filename)}
             />
           )}
           {children}
