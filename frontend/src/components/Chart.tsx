@@ -182,13 +182,13 @@ const Chart = ({
 
       {/* reset handle */}
       <Tooltip content="Reset size">
+        {/* Sticky zero-size anchor keeps the button pinned to the scroll viewport corner. */}
         <Button
           icon={<Crop />}
           tooltip="Reset size"
           design="hollow"
           /* eslint-disable better-tailwindcss/no-unknown-classes */
-          className="reset-handle absolute right-0 bottom-0 hidden"
-          /* eslint-enable better-tailwindcss/no-unknown-classes */
+          className="reset-handle sticky right-0 bottom-0 z-10 hidden translate-4 place-self-end"
           onClick={() => {
             /** reset resize */
             const target = containerRef.current;

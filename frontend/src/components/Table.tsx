@@ -8,7 +8,7 @@ import type {
 import type { Option as OptionMulti } from "@/components/SelectMulti";
 import type { Option as OptionSingle } from "@/components/SelectSingle";
 import type { Filename } from "@/util/download";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useLocalStorage } from "@reactuses/core";
 import {
   createColumnHelper,
@@ -159,62 +159,56 @@ const Table = <Datum extends object>({
   const [search, setSearch] = useState("");
 
   /** get column definition (from props) by id */
-  const getCol = useCallback((id: string) => cols[Number(id)], [cols]);
+  const getCol = (id: string) => cols[Number(id)];
 
   /** individual column filter func */
-  const filterFunc = useMemo<FilterFn<Datum>>(
-    () => (row, columnId, filterValue: unknown) => {
-      const type = getCol(columnId)?.filterType ?? "string";
-      if (!type) return true;
+  const filterFunc: FilterFn<Datum> = (row, columnId, filterValue: unknown) => {
+    const type = getCol(columnId)?.filterType ?? "string";
+    if (!type) return true;
 
-      /** string column */
-      if (type === "string") {
-        const value = (filterValue as string).trim();
-        if (!value) return true;
-        const cell = (row.getValue(columnId) as string).trim();
-        if (!cell) return true;
-        return !!cell.match(new RegExp(value, "i"));
-      }
-
-      /** number col */
-      if (type === "number") {
-        const value = filterValue as [number, number];
-        const cell = row.getValue(columnId) as number;
-        return cell >= value[0] && cell <= value[1];
-      }
-
-      /** enumerated col */
-      if (type === "enum") {
-        const cell = row.getValue(columnId) as string;
-        const value = filterValue as OptionMulti["id"][];
-        if (!value.length) return true;
-        return !!value.find((option) => option === cell);
-      }
-
-      /** boolean col */
-      if (type === "boolean") {
-        const cell = row.getValue(columnId);
-        const value = filterValue as OptionSingle["id"];
-        if (value === "all") return true;
-        else return String(cell) === value;
-      }
-
-      return true;
-    },
-    [getCol],
-  );
-
-  /** global search func */
-  const searchFunc = useMemo<FilterFn<Datum>>(
-    () => (row, columnId, filterValue: unknown) => {
+    /** string column */
+    if (type === "string") {
       const value = (filterValue as string).trim();
       if (!value) return true;
-      const cell = String(row.getValue(columnId)).trim();
+      const cell = (row.getValue(columnId) as string).trim();
       if (!cell) return true;
       return !!cell.match(new RegExp(value, "i"));
-    },
-    [],
-  );
+    }
+
+    /** number col */
+    if (type === "number") {
+      const value = filterValue as [number, number];
+      const cell = row.getValue(columnId) as number;
+      return cell >= value[0] && cell <= value[1];
+    }
+
+    /** enumerated col */
+    if (type === "enum") {
+      const cell = row.getValue(columnId) as string;
+      const value = filterValue as OptionMulti["id"][];
+      if (!value.length) return true;
+      return !!value.find((option) => option === cell);
+    }
+
+    /** boolean col */
+    if (type === "boolean") {
+      const cell = row.getValue(columnId);
+      const value = filterValue as OptionSingle["id"];
+      if (value === "all") return true;
+      else return String(cell) === value;
+    }
+
+    return true;
+  };
+
+  /** global search func */
+  const searchFunc: FilterFn<Datum> = (row, columnId, filterValue: unknown) => {
+    const value = (filterValue as string).trim();
+    if (!value) return true;
+    const cell = String(row.getValue(columnId)).trim();
+    if (!cell) return true;
+    return !!cell.match(new RegExp(value, "i"));
+  };
 
   const columnHelper = createColumnHelper<Datum>();
   /** column definitions */

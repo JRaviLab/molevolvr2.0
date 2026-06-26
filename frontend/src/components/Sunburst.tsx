@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import type { HierarchyNode } from "d3";
 import type { Filename } from "@/util/download";
-import { Fragment, useId, useMemo, useState } from "react";
+import { Fragment, useId, useState } from "react";
 import { arc, hierarchy } from "d3";
 import { inRange, mapValues, sumBy } from "lodash";
 import Chart from "@/components/Chart";
@@ -74,64 +74,53 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
   const anySelected = !!selected.length;
 
   /** hierarchical data structure with convenient access methods */
-  const tree = useMemo(() => {
-    const tree = hierarchy<Derived>({ children: data } as Derived);
+  const tree = hierarchy<Derived>({ children: data } as Derived);
 
-    /** set fallbacks */
-    for (const { data } of tree) {
-      data.label ??= "";
-      data.type ??= "";
-      data.value ??= 0;
-      data.color ??= "";
-      data.percent ??= 1;
-      data.angle ??= 0;
-      data.childAngle ??= 0;
-    }
+  /** set fallbacks */
+  for (const { data } of tree) {
+    data.label ??= "";
+    data.type ??= "";
+    data.value ??= 0;
+    data.color ??= "";
+    data.percent ??= 1;
+    data.angle ??= 0;
+    data.childAngle ??= 0;
+  }
 
-    /** go down tree recursively */
-    tree.eachBefore(({ data, parent }) => {
-      if (!parent) return;
-      /** get total of siblings' values */
-      const total = sumBy(parent?.children, (d) => d.data.value);
-      /** get this node's value as percent of total */
-      const percent = data.value / total || 0;
-      /** get percent of relative to parent, i.e. percent of full circle */
-      data.percent = parent.data.percent * percent;
-      /** set angle from parent's current child angle */
-      data.angle = parent.data.childAngle;
-      data.childAngle = parent.data.childAngle;
-      /** increment parent's child angle */
-      parent.data.childAngle += data.percent;
-    });
-
-    return tree;
-  }, [data]);
+  /** go down tree recursively */
+  tree.eachBefore(({ data, parent }) => {
+    if (!parent) return;
+    /** get total of siblings' values */
+    const total = sumBy(parent?.children, (d) => d.data.value);
+    /** get this node's value as percent of total */
+    const percent = data.value / total || 0;
+    /** get percent of relative to parent, i.e. percent of full circle */
+    data.percent = parent.data.percent * percent;
+    /** set angle from parent's current child angle */
+    data.angle = parent.data.childAngle;
+    data.childAngle = parent.data.childAngle;
+    /** increment parent's child angle */
+    parent.data.childAngle += data.percent;
+  });
 
   /** get all nodes' types */
-  const types = useMemo(() => {
-    const types: string[] = [];
-    tree.each((node) => types.push(node.data.type));
-    return types;
-  }, [tree]);
+  const types: string[] = [];
+  tree.each((node) => types.push(node.data.type));
 
   /** map of node type to color */
   const colorMap = useColorMap(types, "mode");
 
   /** convert node tree to list and derive some more props */
-  const nodes = useMemo(
-    () =>
-      [...tree].map((node) => {
-        /** assign color from type */
-        node.data.color = colorMap[node.data.type]!;
+  const nodes = [...tree].map((node) => {
+    /** assign color from type */
+    node.data.color = colorMap[node.data.type]!;
 
-        /** selected state */
-        node.data.selected = anySelected ? selected.includes(node) : null;
-        node.data.lastSelected = anySelected ? selected.at(-1) === node : null;
+    /** selected state */
+    node.data.selected = anySelected ? selected.includes(node) : null;
+    node.data.lastSelected = anySelected ? selected.at(-1) === node : null;
 
-        return node;
-      }),
-    [tree, colorMap, selected, anySelected],
-  );
+    return node;
+  });
 
   /** clear selection */
   const deselect = () => setSelected([]);
@@ -229,43 +218,36 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
   const radius = (depth + startDepth - 0.5) * ringSize;
 
   /** get enclosed shape to fill */
-  const fill = useMemo(
-    () =>
-      arc<null>()
-        .innerRadius(radius - ringSize / 2 + gapSize / 2)
-        .outerRadius(radius + ringSize / 2 - gapSize / 2)
-        .startAngle(angle * tau)
-        .endAngle(end * tau)
-        .padRadius(gapSize)
-        .padAngle(1)(null) ?? "",
-    [radius, angle, end],
-  );
+  const fill =
+    arc<null>()
+      .innerRadius(radius - ringSize / 2 + gapSize / 2)
+      .outerRadius(radius + ringSize / 2 - gapSize / 2)
+      .startAngle(angle * tau)
+      .endAngle(end * tau)
+      .padRadius(gapSize)
+      .padAngle(1)(null) ?? "";
+
+  /** if angle midpoint in lower half of circle, flip text so not upside down */
+  const flip = inRange((angle + end) / 2, 0.25, 0.75);
 
   /** get stroke path */
-  const stroke = useMemo(() => {
-    /** if angle midpoint in lower half of circle, flip text so not upside down */
-    const flip = inRange((angle + end) / 2, 0.25, 0.75);
+  let stroke =
+    arc<null>()
+      /** center line of segment */
+      .innerRadius(radius)
+      /**
+       * centerline, minus some thickness to ensure there is L command. d3 does
+       * A command(s) for larger radius first, and we will only keep that, so
+       * thickness can be arbitrary.
+       */
+      .outerRadius(radius - 999)
+      .startAngle((flip ? end : angle) * tau)
+      .endAngle((flip ? angle : end) * tau)
+      .padRadius(3 * gapSize)
+      .padAngle(1)(null) ?? "";
 
-    let stroke =
-      arc<null>()
-        /** center line of segment */
-        .innerRadius(radius)
-        /**
-         * centerline, minus some thickness to ensure there is L command. d3
-         * does A command(s) for larger radius first, and we will only keep
-         * that, so thickness can be arbitrary.
-         */
-        .outerRadius(radius - 999)
-        .startAngle((flip ? end : angle) * tau)
-        .endAngle((flip ? angle : end) * tau)
-        .padRadius(3 * gapSize)
-        .padAngle(1)(null) ?? "";
-
-    /** extract just first half of path, center-line of segment */
-    stroke = stroke.slice(0, stroke.indexOf("L"));
-
-    return stroke;
-  }, [radius, angle, end]);
+  /** extract just first half of path, center-line of segment */
+  stroke = stroke.slice(0, stroke.indexOf("L"));
 
   /** length of arc centerline */
   const arcLength = radius * Math.abs(end - angle) * tau - 2 * gapSize;

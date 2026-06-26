@@ -1,6 +1,6 @@
 import type { Hue } from "@/util/color";
 import type { Filename } from "@/util/download";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useState } from "react";
 import { pairs } from "d3";
 import { countBy, mapKeys, mapValues, max, orderBy, range } from "lodash";
 import Chart from "@/components/Chart";
@@ -50,6 +50,8 @@ const MSA = ({
   getType = (char) => char,
   colorMap: manualColors = {},
 }: Props) => {
+  console.debug("msa render");
+
   /** whether to wrap sequence to separate "panels" */
   const [wrap, setWrap] = useState(true);
 
@@ -58,15 +60,13 @@ const MSA = ({
   const { fontSize, truncateWidth } = useTextSize();
 
   /** maximum sequence length */
-  const length = useMemo(
-    () => max(tracks.map((track) => track.sequence.length)) ?? 0,
-    [tracks],
-  );
+  const length = max(tracks.map((track) => track.sequence.length)) ?? 0;
 
   /** assign types */
-  const { combinedWithTypes, tracksWithTypes, types } = useMemo(
-    () => getDerived(tracks, length, getType),
-    [tracks, length, getType],
+  const { combinedWithTypes, tracksWithTypes, types } = getDerived(
+    tracks,
+    length,
+    getType,
   );
 
   /** map of type to color */
@@ -87,6 +87,8 @@ const MSA = ({
       containerProps={{ className: "w-full" }}
     >
       {({ width }) => {
+        console.debug("msa chart render");
+
         /** max num of chars that can fit in width */
         const rowChars = wrap
           ? Math.max(

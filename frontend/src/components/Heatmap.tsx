@@ -53,6 +53,8 @@ const Heatmap = ({
   min,
   max,
 }: Props) => {
+  console.debug("heatmap render");
+
   /** clone props to avoid mutating original data */
   let x = cloneDeep(_x);
   let y = cloneDeep(_y);
@@ -137,6 +139,8 @@ const Heatmap = ({
         />,
       ]}
     >
+      {void console.debug("heatmap chart render")}
+
       {/* cells */}
       <g className="group">
         {data.map((row, rowIndex) =>

@@ -55,6 +55,8 @@ type Props = {
 
 /** upset plot */
 const Upset = ({ title, filename = [], x: _x, y: _y, data: _data }: Props) => {
+  console.debug("upset render");
+
   /** clone props to avoid mutating original data */
   const x = cloneDeep(_x);
   const y = cloneDeep(_y);
@@ -138,6 +140,8 @@ const Upset = ({ title, filename = [], x: _x, y: _y, data: _data }: Props) => {
 
   return (
     <Chart title={title} filename={[...filename, "upset"]}>
+      {void console.debug("upset chart render")}
+
       {/* main chart area */}
       <g>
         {/* cells */}
@@ -150,7 +154,9 @@ const Upset = ({ title, filename = [], x: _x, y: _y, data: _data }: Props) => {
                 cy={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
                 r={nodeSize}
                 fill={
-                  col ? theme["--color-accent"] : theme["--color-light-gray"]
+                  col
+                    ? theme["--color-deep-light"]
+                    : theme["--color-light-gray"]
                 }
               />
             )),
@@ -162,7 +168,7 @@ const Upset = ({ title, filename = [], x: _x, y: _y, data: _data }: Props) => {
           {links.map(([[col1, row1], [col2, row2]], index) => (
             <line
               key={index}
-              stroke={theme["--color-accent"]}
+              stroke={theme["--color-deep-light"]}
               strokeWidth={strokeWidth}
               x1={(xScale(col1) ?? 0) + xScale.bandwidth() / 2}
               y1={(yScale(row1) ?? 0) + yScale.bandwidth() / 2}
@@ -190,7 +196,7 @@ const Upset = ({ title, filename = [], x: _x, y: _y, data: _data }: Props) => {
         />
 
         {/* bars */}
-        <g fill={theme["--color-accent"]}>
+        <g fill={theme["--color-deep-light"]}>
           {x.data.map((col, colIndex) => (
             <Tooltip key={colIndex} content={col.value}>
               <rect
@@ -223,7 +229,7 @@ const Upset = ({ title, filename = [], x: _x, y: _y, data: _data }: Props) => {
         />
 
         {/* bars */}
-        <g fill={theme["--color-accent"]}>
+        <g fill={theme["--color-deep-light"]}>
           {y.data.map((row, rowIndex) => (
             <Fragment key={rowIndex}>
               <Tooltip content={row.value}>

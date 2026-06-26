@@ -1,6 +1,6 @@
 import type { HierarchyNode } from "d3";
 import type { Filename } from "@/util/download";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useState } from "react";
 import { curveStepBefore, hierarchy, line } from "d3";
 import { map, mapValues, max, min, orderBy, sum } from "lodash";
 import Chart from "@/components/Chart";
@@ -63,6 +63,8 @@ const sortOptions = [
 
 /** tree/hierarchy plot */
 const Tree = ({ title, filename = [], data }: Props) => {
+  console.debug("tree render");
+
   const theme = useTheme();
 
   const { truncateWidth } = useTextSize();
@@ -78,68 +80,67 @@ const Tree = ({ title, filename = [], data }: Props) => {
     rootDist?: number;
   };
 
-  const tree = useMemo(() => {
-    /** hierarchical data structure with convenient access methods */
-    const tree = hierarchy<Node>({ children: data });
+  /** hierarchical data structure with convenient access methods */
+  const tree = hierarchy<Node>({ children: data });
 
-    /** horizontal = depth */
-    /** vertical = breadth */
+  /** horizontal = depth */
+  /** vertical = breadth */
 
-    /** set fallbacks */
-    tree.descendants().forEach((node) => {
-      node.data.dist ??= node.depth > 0 ? 1 : 0;
+  /** set fallbacks */
+  tree.descendants().forEach((node) => {
+    node.data.dist ??= node.depth > 0 ? 1 : 0;
+  });
+
+  /** calc distance from root */
+  tree.descendants().forEach((node) => {
+    node.data.rootDist = sum(node.ancestors().map((node) => node.data.dist!));
+  });
+
+  /** sort breadth by dist */
+  /** https://github.com/d3/d3-hierarchy/blob/main/src/hierarchy/sort.js */
+  tree.eachAfter((node) => {
+    node.children?.sort((a, b) => {
+      if (sort === "dist") return b.data.dist! - a.data.dist!;
+      if (sort === "type")
+        return (a.data.type ?? "").localeCompare(b.data.type ?? "");
+      return 0;
     });
+    if (flip) node.children?.reverse();
+  });
 
-    /** calc distance from root */
-    tree.descendants().forEach((node) => {
-      node.data.rootDist = sum(node.ancestors().map((node) => node.data.dist!));
-    });
+  /** place nodes along depth */
+  tree.descendants().forEach((node) => {
+    node.x = node.data.rootDist!;
+  });
 
-    /** sort breadth by dist */
-    /** https://github.com/d3/d3-hierarchy/blob/main/src/hierarchy/sort.js */
-    tree.eachAfter((node) => {
-      node.children?.sort((a, b) => {
-        if (sort === "dist") return b.data.dist! - a.data.dist!;
-        if (sort === "type")
-          return (a.data.type ?? "").localeCompare(b.data.type ?? "");
-        return 0;
-      });
-      if (flip) node.children?.reverse();
-    });
+  /** normalize depth */
+  const minX = min(map(tree.descendants(), "x")) ?? 0;
+  const maxX = max(map(tree.descendants(), "x")) ?? 0;
+  tree.descendants().forEach((node) => {
+    node.x = (node.x! - minX) / (maxX - minX);
+  });
 
-    /** place nodes along depth */
-    tree.descendants().forEach((node) => {
-      node.x = node.data.rootDist!;
-    });
+  /** place leaves evenly spaced along breadth */
+  tree.leaves().forEach((node, index) => {
+    node.y = index;
+  });
 
-    /** normalize depth */
-    const minX = min(map(tree.descendants(), "x")) ?? 0;
-    const maxX = max(map(tree.descendants(), "x")) ?? 0;
-    tree.descendants().forEach((node) => {
-      node.x = (node.x! - minX) / (maxX - minX);
-    });
+  /** go up tree */
+  orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
+    if (!node.y) {
+      /** position node breadth in middle of children */
+      const ys = map(node.children ?? [], "y");
+      node.y = ((min(ys) ?? 0) + (max(ys) ?? 0)) / 2;
+    }
+  });
 
-    /** place leaves evenly spaced along breadth */
-    tree.leaves().forEach((node, index) => {
-      node.y = index;
-    });
+  /** snap breadth to grid */
+  tree.descendants().forEach((node) => {
+    node.y = round(node.y!);
+  });
 
-    /** go up tree */
-    orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
-      if (!node.y) {
-        /** position node breadth in middle of children */
-        const ys = map(node.children ?? [], "y");
-        node.y = ((min(ys) ?? 0) + (max(ys) ?? 0)) / 2;
-      }
-    });
-
-    /** snap breadth to grid */
-    tree.descendants().forEach((node) => {
-      node.y = round(node.y!);
-    });
-
-    return tree;
-  }, [data, sort, flip]);
+  /** max node breadth */
+  const maxY = max(map(tree.descendants(), "y")) ?? 0;
 
   /** selected nodes */
   const [selected, setSelected] = useState<HierarchyNode<Node>[]>([]);
@@ -148,12 +149,6 @@ const Tree = ({ title, filename = [], data }: Props) => {
 
   /** path between selected nodes */
   const selectedPath = selectedA && selectedB ? selectedA.path(selectedB) : [];
-
-  /** max node depth */
-  const maxX = max(map(tree.descendants(), "x")) ?? 0;
-
-  /** max node breadth */
-  const maxY = max(map(tree.descendants(), "y")) ?? 0;
 
   /** dist between selected nodes */
   const selectedDist = Math.abs(
@@ -198,6 +193,8 @@ const Tree = ({ title, filename = [], data }: Props) => {
       ]}
     >
       {({ width }) => {
+        console.debug("tree chart render");
+
         /** width of tree view area */
         width = Math.max(width - 2 * labelWidth - rowHeight, labelWidth);
 

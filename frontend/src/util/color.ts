@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDeepCompareEffect } from "@reactuses/core";
-import { filterBrightness, formatHex } from "culori";
+import { filterSaturate, formatHex } from "culori";
 import { useAtomValue } from "jotai";
 import colors from "tailwindcss/colors";
 import { darkModeAtom } from "@/components/DarkMode";
@@ -52,8 +52,7 @@ const getColor = (hue: Hue, shade: Shade) => {
 };
 
 /** pleasantly process color */
-const process = (color: string, brightness = 1) =>
-  formatHex(filterBrightness(brightness)(color)) ?? "";
+const process = (color: string) => formatHex(filterSaturate(0.75)(color)) ?? "";
 
 /** map enumerated values to colors */
 const getColorMap = <Value extends string>(

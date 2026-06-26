@@ -56,6 +56,12 @@ export const sequence = (chars?: string, min = 10, max = 100) =>
     .map(() => char(chars))
     .join("");
 
+/** fake legend data */
+export const legend = Array(10)
+  .fill(null)
+  .map(label)
+  .map((label) => label || "");
+
 /** fake upset data */
 const upsetCols = random(3, 10);
 const upsetRows = random(3, 10);

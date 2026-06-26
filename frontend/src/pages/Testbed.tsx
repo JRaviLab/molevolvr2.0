@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useElementSize } from "@reactuses/core";
 import { mapValues, sample, startCase, uniq } from "lodash";
 import {
@@ -76,6 +76,7 @@ import {
   iprSequence,
   iprTracks,
   label,
+  legend,
   msaTracks,
   nodes,
   sunburst,
@@ -111,14 +112,14 @@ const TestbedPage = () => {
 
       {/* complex components */}
 
-      {/* <SectionLegend />
+      <SectionLegend />
       <SectionUpset />
       <SectionSunburst />
-      <SectionHeatmap /> */}
+      <SectionHeatmap />
       <SectionTree />
-      {/* <SectionNetwork />
+      {/* <SectionNetwork /> */}
       <SectionMSA />
-      <SectionIPR /> */}
+      <SectionIPR />
 
       {/* formatting */}
 
@@ -304,16 +305,8 @@ const SectionLegend = () => {
 
   const [width] = useElementSize(ref);
 
-  const labels = useMemo(
-    () =>
-      Array(10)
-        .fill(null)
-        .map(label)
-        .map((label) => label || ""),
-    [],
-  );
-  const shapesMap = useMemo(() => getShapeMap(labels), [labels]);
-  const colorMap = useColorMap(labels, "mode");
+  const shapesMap = getShapeMap(legend);
+  const colorMap = useColorMap(legend, "mode");
   const { data, control } = useData(() =>
     mapValues(colorMap, (color, label) => ({
       color,

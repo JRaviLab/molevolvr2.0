@@ -1,13 +1,6 @@
 import type { D3DragEvent, D3ZoomEvent } from "d3";
 import type { Filename } from "@/util/download";
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useId, useRef, useState } from "react";
 import { drag, scaleLinear, select, zoom, zoomIdentity } from "d3";
 import { clamp, inRange, mapValues, range } from "lodash";
 import Chart from "@/components/Chart";
@@ -58,6 +51,8 @@ type Feature = {
 
 /** interproscan result visualization */
 const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
+  console.debug("ipr render");
+
   const zoomRef = useRef<SVGGElement>(null);
   const dragRef = useRef<SVGGElement>(null);
 
@@ -79,51 +74,38 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
   const [transform, setTransform] = useState(zoomIdentity);
 
   /** pan/zoom behavior */
-  const zoomBehavior = useMemo(
-    () =>
-      zoom<SVGGElement, unknown>().on(
-        "zoom",
-        (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
-          setTransform(event.transform);
-        },
-      ),
-    [],
+  const zoomBehavior = zoom<SVGGElement, unknown>().on(
+    "zoom",
+    (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
+      setTransform(event.transform);
+    },
   );
 
   /** update zoom limit */
-  useEffect(() => {
-    zoomBehavior.scaleExtent([
-      /** min zoom out, chars fill width */
-      1,
-      /** max zoom in, by # of chars in view */
-      sequence.length / 3,
-    ]);
-  }, [zoomBehavior, sequence.length]);
+  zoomBehavior.scaleExtent([
+    /** min zoom out, chars fill width */
+    1,
+    /** max zoom in, by # of chars in view */
+    sequence.length / 3,
+  ]);
 
   type Drag = D3DragEvent<SVGSVGElement, unknown, unknown>;
 
-  const onDrag = useCallback(
-    ({ x }: Drag) => {
-      if (!zoomRef.current) return;
-      /** update zoom transform */
-      zoomBehavior.translateTo(select(zoomRef.current), x, 0);
-    },
-    [zoomBehavior],
-  );
+  const onDrag = ({ x }: Drag) => {
+    if (!zoomRef.current) return;
+    /** update zoom transform */
+    zoomBehavior.translateTo(select(zoomRef.current), x, 0);
+  };
 
   /** scrollbar drag behavior */
-  const dragBehavior = useMemo(
-    () =>
-      drag<SVGGElement, unknown>()
-        .container(function () {
-          return this;
-        })
-        // eslint-disable-next-line -- false positive https://github.com/react/react/issues/34775
-        .on("start", onDrag)
-        // eslint-disable-next-line -- false positive https://github.com/react/react/issues/34775
-        .on("drag", onDrag),
-    [onDrag],
-  );
+  const dragBehavior = drag<SVGGElement, unknown>()
+    .container(function () {
+      return this;
+    })
+    // eslint-disable-next-line -- false positive https://github.com/react/react/issues/34775
+    .on("start", onDrag)
+    // eslint-disable-next-line -- false positive https://github.com/react/react/issues/34775
+    .on("drag", onDrag);
 
   const prevWidth = useRef(0);
 
@@ -149,6 +131,8 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
       ]}
     >
       {({ width }) => {
+        console.debug("ipr chart render");
+
         /** width of main sequence view area */
         width = Math.max(width - labelWidth - 2 * rowHeight, labelWidth);
 

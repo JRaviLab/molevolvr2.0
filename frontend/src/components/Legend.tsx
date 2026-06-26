@@ -42,6 +42,8 @@ const Legend = ({
   w: rootW = maxEntryWidth,
   anchor = [0, 0],
 }: Props) => {
+  console.debug("legend render");
+
   const theme = useTheme();
 
   const { fontSize, getWidth, truncateWidth } = useTextSize();
