@@ -4,16 +4,19 @@ import { Fragment, useMemo, useState } from "react";
 import { curveStepBefore, hierarchy, line } from "d3";
 import { map, mapValues, max, min, orderBy, sum } from "lodash";
 import Chart from "@/components/Chart";
+import CheckBox from "@/components/CheckBox";
 import Legend from "@/components/Legend";
+import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import { useTextSize, useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
+import { getShapeMap, shapeToString } from "@/util/shapes";
 
 /** row height */
 const rowHeight = 30;
 /** circle size */
-const nodeSize = 6;
+const nodeSize = 20;
 /** line thickness */
 const lineWidth = 1;
 /** label size */
@@ -42,19 +45,37 @@ export type Item = {
 /** link line generator */
 const link = line().curve(curveStepBefore);
 
+/** sort order options */
+const sortOptions = [
+  {
+    id: "input",
+    primary: "Input",
+  },
+  {
+    id: "dist",
+    primary: "Distance",
+  },
+  {
+    id: "type",
+    primary: "Type",
+  },
+] as const;
+
 /** tree/hierarchy plot */
 const Tree = ({ title, filename = [], data }: Props) => {
   const theme = useTheme();
 
   const { truncateWidth } = useTextSize();
 
+  /** sort mode */
+  const [sort, setSort] = useState<(typeof sortOptions)[number]["id"]>("dist");
+
+  /** sort direction */
+  const [flip, setFlip] = useState(false);
+
   type Node = Item & {
-    /** normalized distance from parent */
-    normDist?: number;
     /** distance from root (sum of ancestors dists) */
     rootDist?: number;
-    /** normalized distance from root (sum of ancestors normalized dists) */
-    normRootDist?: number;
   };
 
   const tree = useMemo(() => {
@@ -75,7 +96,16 @@ const Tree = ({ title, filename = [], data }: Props) => {
     });
 
     /** sort breadth by dist */
-    tree.sort((a, b) => b.data.rootDist! - a.data.rootDist!);
+    /** https://github.com/d3/d3-hierarchy/blob/main/src/hierarchy/sort.js */
+    tree.eachAfter((node) => {
+      node.children?.sort((a, b) => {
+        if (sort === "dist") return b.data.dist! - a.data.dist!;
+        if (sort === "type")
+          return (a.data.type ?? "").localeCompare(b.data.type ?? "");
+        return 0;
+      });
+      if (flip) node.children?.reverse();
+    });
 
     /** place nodes along depth */
     tree.descendants().forEach((node) => {
@@ -109,7 +139,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
     });
 
     return tree;
-  }, [data]);
+  }, [data, sort, flip]);
 
   /** selected nodes */
   const [selected, setSelected] = useState<HierarchyNode<Node>[]>([]);
@@ -130,11 +160,14 @@ const Tree = ({ title, filename = [], data }: Props) => {
     (selectedA?.data.rootDist ?? 0) - (selectedB?.data.rootDist ?? 0),
   );
 
+  /** list of node types */
+  const nodeTypes = map(tree.descendants(), (node) => node.data.type ?? "");
+
   /** map of node types to colors */
-  const colorMap = useColorMap(
-    map(tree.descendants(), (node) => node.data.type ?? ""),
-    "mode",
-  );
+  const colorMap = useColorMap(nodeTypes, "mode");
+
+  /** map of node types to shapes */
+  const shapeMap = getShapeMap(nodeTypes);
 
   /** clear selection */
   const deselect = () => setSelected([]);
@@ -153,6 +186,16 @@ const Tree = ({ title, filename = [], data }: Props) => {
       filename={[...filename, "tree"]}
       onClick={deselect}
       containerProps={{ className: "w-full" }}
+      controls={[
+        <SelectSingle
+          key="sort"
+          label="Sort"
+          options={sortOptions}
+          value={sort}
+          onChange={setSort}
+        />,
+        <CheckBox key="flip" label="Flip" value={flip} onChange={setFlip} />,
+      ]}
     >
       {({ width }) => {
         /** width of tree view area */
@@ -165,7 +208,10 @@ const Tree = ({ title, filename = [], data }: Props) => {
               y={0}
               w={labelWidth}
               anchor={[1, 0]}
-              entries={mapValues(colorMap, (color) => ({ color }))}
+              entries={mapValues(colorMap, (color, type) => ({
+                color,
+                shape: shapeMap[type],
+              }))}
             />
 
             <g>
@@ -232,7 +278,7 @@ const Tree = ({ title, filename = [], data }: Props) => {
                       </>
                     )}
 
-                    {/* node circle */}
+                    {/* node shape */}
                     <Tooltip
                       content={
                         <>
@@ -255,11 +301,14 @@ const Tree = ({ title, filename = [], data }: Props) => {
                         </>
                       }
                     >
-                      <circle
+                      <polygon
                         className="cursor-help"
-                        cx={(node.x ?? 0) * width}
-                        cy={(node.y ?? 0) * rowHeight}
-                        r={nodeSize}
+                        points={shapeToString(
+                          shapeMap[node.data.type ?? ""],
+                          node.x! * width,
+                          node.y! * rowHeight,
+                          nodeSize / 2,
+                        )}
                         fill={
                           isSelected === false
                             ? theme["--color-light-gray"]

@@ -111,14 +111,14 @@ const TestbedPage = () => {
 
       {/* complex components */}
 
-      <SectionLegend />
+      {/* <SectionLegend />
       <SectionUpset />
       <SectionSunburst />
-      <SectionHeatmap />
+      <SectionHeatmap /> */}
       <SectionTree />
-      <SectionNetwork />
+      {/* <SectionNetwork />
       <SectionMSA />
-      <SectionIPR />
+      <SectionIPR /> */}
 
       {/* formatting */}
 

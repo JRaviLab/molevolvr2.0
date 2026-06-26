@@ -46,7 +46,7 @@ import { parseFont } from "@/util/dom";
 import { useTheme } from "@/util/hooks";
 import { linMap } from "@/util/math";
 import { sleep } from "@/util/misc";
-import { getShapeMap } from "@/util/shapes";
+import { getShapeMap, shapeToList } from "@/util/shapes";
 import { formatNumber } from "@/util/string";
 
 /** settings */
@@ -281,17 +281,14 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   /** full width */
   const [expanded, setExpanded] = useLocalStorage("network-expanded", false);
 
-  const nodeTypes = useMemo(
-    () => _nodes.map((node) => node.type ?? ""),
-    [_nodes],
-  );
+  /** list of node types */
+  const nodeTypes = _nodes.map((node) => node.type ?? "");
+
   /** map of node types to colors */
   const nodeColors = useColorMap(nodeTypes, "mode");
   /** map of node types to shapes */
-  const nodeShapes = useMemo(
-    () => getShapeMap(_nodes.map((node) => node.type ?? "")),
-    [_nodes],
-  );
+  const nodeShapes = getShapeMap(nodeTypes);
+
   /** range of node strengths */
   const [minNodeStrength = 0, maxNodeStrength = 1] = useMemo(
     () => extent(_nodes.flatMap((node) => node.strength ?? [])),
@@ -317,7 +314,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
             maxNodeSize,
           ),
           color: nodeColors[node.type ?? ""] ?? "",
-          shape: nodeShapes[node.type ?? ""] ?? "",
+          shape: shapeToList(nodeShapes[node.type ?? ""]),
         })),
     [
       _nodes,
@@ -680,7 +677,10 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
                 <Legend
                   entries={mapValues(edgeColors, (color) => ({
                     color,
-                    shape: [-0.75, 0.75, 0.75, -0.75],
+                    shape: [
+                      { x: -0.75, y: 0.75 },
+                      { x: 0.75, y: -0.75 },
+                    ],
                     stroke: true,
                   }))}
                 />

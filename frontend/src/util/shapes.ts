@@ -1,5 +1,7 @@
 import { cos, sin } from "@/util/math";
 
+type Point = { x: number; y: number };
+
 /** make regular polygon or star */
 const makePolygon = (sides: number, starInset = 1) =>
   Array(sides)
@@ -7,7 +9,7 @@ const makePolygon = (sides: number, starInset = 1) =>
     .map((_, index) => {
       const angle = -90 + 360 * (index / sides);
       const radius = index % 2 === 0 ? 1 : starInset;
-      return [cos(angle) * radius, sin(angle) * radius];
+      return { x: cos(angle) * radius, y: sin(angle) * radius };
     })
     .flat();
 
@@ -16,7 +18,12 @@ const palette = [
   /** circle */
   makePolygon(50),
   /** square */
-  [-0.8, -0.8, 0.8, -0.8, 0.8, 0.8, -0.8, 0.8],
+  [
+    { x: -0.8, y: -0.8 },
+    { x: 0.8, y: -0.8 },
+    { x: 0.8, y: 0.8 },
+    { x: -0.8, y: 0.8 },
+  ],
   /** diamond */
   makePolygon(4),
   /** triangle */
@@ -33,7 +40,12 @@ const palette = [
    */
   makePolygon(10, 0.382),
   /** rhombus */
-  [-0.5, -0.75, 1, -0.75, 0.5, 0.75, -1, 0.75],
+  [
+    { x: -0.5, y: -0.75 },
+    { x: 1, y: -0.75 },
+    { x: 0.5, y: 0.75 },
+    { x: -1, y: 0.75 },
+  ],
 ];
 
 /** map enumerated values to shapes */
@@ -42,10 +54,28 @@ export const getShapeMap = <Value extends string>(values: Value[]) => {
   const [neutral = "", ...shapes] = palette;
   let index = 0;
   /** make blank value a neutral shape */
-  const map = { "": neutral } as Record<Value, number[]>;
+  const map = { "": neutral } as Record<Value, Point[]>;
   for (const value of values)
     if (value.trim())
       /** add value to shape map (if not already defined) */
       map[value] ??= shapes[index++ % shapes.length]!;
   return map;
 };
+
+/** join shape coordinates to svg polygon string */
+export const shapeToString = (
+  shape?: Point[],
+  centerX = 0,
+  centerY = 0,
+  scale = 1,
+) => shapeToList(shape, centerX, centerY, scale).join(" ");
+
+/** join shape coordinates to flat list of coordinates */
+export const shapeToList = (
+  shape?: Point[],
+  centerX = 0,
+  centerY = 0,
+  scale = 1,
+) =>
+  shape?.map(({ x, y }) => [centerX + x * scale, centerY + y * scale]).flat() ??
+  [];

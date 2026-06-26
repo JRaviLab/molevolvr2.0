@@ -1,6 +1,7 @@
 import { clamp, mapKeys, max, startCase } from "lodash";
 import Tooltip from "@/components/Tooltip";
 import { useTextSize, useTheme } from "@/util/hooks";
+import { shapeToString } from "@/util/shapes";
 
 /** entry symbol size */
 const rowHeight = 20;
@@ -28,7 +29,7 @@ type Entry = {
   /** fill color */
   color?: string;
   /** shape points, from [-1, -1] to [1, 1] */
-  shape?: number[];
+  shape?: { x: number; y: number }[];
   /** whether to stroke shape outline instead of fill */
   stroke?: boolean;
 };
@@ -154,7 +155,10 @@ const Cell = ({
   const y = row * (rowHeight + gapSize);
 
   /** scale shape points */
-  shape = shape?.map((p) => rowHeight / 2 + p * (rowHeight / 2));
+  shape = shape?.map(({ x, y }) => ({
+    x: rowHeight / 2 + x * (rowHeight / 2),
+    y: rowHeight / 2 + y * (rowHeight / 2),
+  }));
 
   return (
     <g key={index} transform={`translate(${x}, ${y})`}>
@@ -171,17 +175,17 @@ const Cell = ({
               <polygon
                 fill="none"
                 strokeWidth={5 * strokeWidth}
-                points={shape.join(" ")}
+                points={shapeToString(shape)}
               />
               <polygon
                 fill="none"
                 stroke={color}
                 strokeWidth={3 * strokeWidth}
-                points={shape.join(" ")}
+                points={shapeToString(shape)}
               />
             </>
           ) : (
-            <polygon points={shape.join(" ")} />
+            <polygon points={shapeToString(shape)} />
           )
         ) : (
           <circle cx={rowHeight / 2} cy={rowHeight / 2} r={rowHeight / 2} />

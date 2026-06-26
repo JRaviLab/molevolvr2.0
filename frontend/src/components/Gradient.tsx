@@ -1,8 +1,9 @@
 import type { ComponentProps } from "react";
 import type { Option } from "@/components/SelectSingle";
+import type { Id } from "@/util/gradient";
 import { useId } from "react";
-import * as d3 from "d3";
 import { range } from "lodash";
+import { gradientFunc, gradients } from "@/util/gradient";
 
 type Props = {
   id: Id;
@@ -32,7 +33,7 @@ export const Gradient = ({
               <stop
                 key={index}
                 offset={`${100 * percent}%`}
-                stopColor={gradientFunc(id, reverse, percent)}
+                stopColor={gradientFunc(id, reverse)(percent)}
               />
             ))}
         </linearGradient>
@@ -42,50 +43,10 @@ export const Gradient = ({
   );
 };
 
-/** a few pretty color gradient options */
-/** from https://d3js.org/d3-scale-chromatic */
-const gradients = [
-  "interpolateRdPu",
-  "interpolatePuBuGn",
-  "interpolatePuBu",
-  "interpolateBuPu",
-  "interpolateGnBu",
-  "interpolateYlGnBu",
-  "interpolateYlOrRd",
-  "interpolatePuRd",
-  "interpolateOrRd",
-
-  "interpolateBlues",
-  "interpolateGreens",
-  "interpolateOranges",
-  "interpolatePurples",
-  "interpolateReds",
-  "interpolateGreys",
-
-  "interpolateCool",
-  "interpolateViridis",
-  "interpolatePlasma",
-  "interpolateTurbo",
-  "interpolateMagma",
-
-  "interpolateSpectral",
-  "interpolateRdYlGn",
-  "interpolateRdYlBu",
-  "interpolateRdBu",
-  "interpolatePiYG",
-  "interpolatePuOr",
-  "interpolatePRGn",
-] satisfies Extract<keyof typeof d3, `interpolate${string}`>[];
-
-type Id = (typeof gradients)[number];
-
-export const gradientFunc = (id: Id, reverse: boolean, value: number) =>
-  d3[id](reverse ? 1 - value : value);
-
-/** list of gradient options for select */
-export const gradientOptions = (reverse: boolean) =>
-  gradients.map((id) => ({
-    id,
-    primary: id.replace("interpolate", ""),
-    icon: <Gradient id={id} reverse={reverse} width="3em" height="1em" />,
-  })) satisfies Option[];
+/** gradient options for select */
+export const gradientOptions = (reverse: boolean): Option<Id>[] =>
+  Object.keys(gradients).map((id) => ({
+    id: id as Id,
+    primary: id,
+    icon: <Gradient id={id as Id} reverse={reverse} width="3em" height="1em" />,
+  }));

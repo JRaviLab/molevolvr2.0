@@ -4,9 +4,10 @@ import { extent, scaleBand, scaleLinear, transpose } from "d3";
 import { cloneDeep, range } from "lodash";
 import Chart from "@/components/Chart";
 import CheckBox from "@/components/CheckBox";
-import { Gradient, gradientFunc, gradientOptions } from "@/components/Gradient";
+import { Gradient, gradientOptions } from "@/components/Gradient";
 import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
+import { defaultGradient, gradientFunc } from "@/util/gradient";
 import { useTextSize, useTheme } from "@/util/hooks";
 
 /** width/height of cells */
@@ -57,7 +58,7 @@ const Heatmap = ({
   let y = cloneDeep(_y);
 
   /** selected gradient */
-  const [gradient, setGradient] = useState(gradientOptions(false)[0]!.id);
+  const [gradient, setGradient] = useState(defaultGradient);
 
   /** reverse gradient */
   const [reverse, setReverse] = useState(false);
@@ -98,7 +99,7 @@ const Heatmap = ({
   /** value to % */
   const valueScale = scaleLinear([min, max], [0, 1]);
   /** % to color */
-  const colorScale = (value: number) => gradientFunc(gradient, reverse, value);
+  const colorScale = gradientFunc(gradient, reverse);
 
   /** main chart area */
   const width = (xScale(cols - 1) ?? 0) + xScale.bandwidth();
