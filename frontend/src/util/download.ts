@@ -102,7 +102,7 @@ export const downloadJpg = async (element: Element, filename: Filename) => {
   try {
     // @ts-expect-error typing says lib funcs don't support svg elements, but in practice it does
     const blob = await toJpeg(element, {
-      backgroundColor: getTheme()["--white"],
+      backgroundColor: getTheme()["--color-white"],
     });
     download(getUrl(blob, "image/jpeg"), filename, "jpg");
   } catch (error) {

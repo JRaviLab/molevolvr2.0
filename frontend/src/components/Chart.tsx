@@ -169,7 +169,7 @@ export default function Chart({
             ref={titleRef}
             textAnchor="middle"
             dominantBaseline="hanging"
-            fill={theme["--black"]}
+            fill={theme["--color-black"]}
             style={{ fontWeight: theme["--bold"] }}
             data-fit-ignore
           />
