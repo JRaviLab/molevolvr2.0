@@ -99,7 +99,7 @@ export default function Tree({ title, filename = [], data }: Props) {
 
     /** sort breadth by dist */
     /** https://github.com/d3/d3-hierarchy/blob/main/src/hierarchy/sort.js */
-    tree.eachAfter((node) => {
+    tree.eachBefore((node) => {
       node.children?.sort((a, b) => {
         if (sort === "dist") return b.data.dist! - a.data.dist!;
         if (sort === "type")
@@ -160,7 +160,10 @@ export default function Tree({ title, filename = [], data }: Props) {
   );
 
   /** list of node types */
-  const nodeTypes = map(tree.descendants(), (node) => node.data.type ?? "");
+  const nodeTypes = map(
+    hierarchy<Node>({ children: data }).descendants(),
+    (node) => node.data.type ?? "",
+  );
 
   /** map of node types to colors */
   const colorMap = useColorMap(nodeTypes, "mode");

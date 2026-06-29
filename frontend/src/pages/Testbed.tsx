@@ -112,41 +112,41 @@ export default function TestbedPage() {
 
       {/* complex components */}
 
-      <SectionLegend />
-      <SectionUpset />
-      <SectionSunburst />
-      <SectionHeatmap />
+      {/* <SectionLegend /> */}
+      {/* <SectionUpset /> */}
+      {/* <SectionSunburst /> */}
+      {/* <SectionHeatmap /> */}
       <SectionTree />
-      <SectionNetwork />
-      <SectionMSA />
-      <SectionIPR />
+      {/* <SectionNetwork /> */}
+      {/* <SectionMSA /> */}
+      {/* <SectionIPR /> */}
 
       {/* formatting */}
 
-      <SectionElements />
-      <SectionHeading />
+      {/* <SectionElements /> */}
+      {/* <SectionHeading /> */}
 
       {/* generic components */}
 
-      <SectionLink />
-      <SectionButton />
-      <SectionTextBox />
-      <SectionSelect />
-      <SectionCheckBox />
-      <SectionSlider />
-      <SectionNumberBox />
-      <SectionRadios />
-      <SectionAgo />
-      <SectionAlert />
-      <SectionTabs />
-      <SectionToast />
-      <SectionCollapsible />
-      <SectionTile />
-      <SectionTable />
-      <SectionTooltip />
-      <SectionPopover />
-      <SectionDialog />
-      <SectionForm />
+      {/* <SectionLink /> */}
+      {/* <SectionButton /> */}
+      {/* <SectionTextBox /> */}
+      {/* <SectionSelect /> */}
+      {/* <SectionCheckBox /> */}
+      {/* <SectionSlider /> */}
+      {/* <SectionNumberBox /> */}
+      {/* <SectionRadios /> */}
+      {/* <SectionAgo /> */}
+      {/* <SectionAlert /> */}
+      {/* <SectionTabs /> */}
+      {/* <SectionToast /> */}
+      {/* <SectionCollapsible /> */}
+      {/* <SectionTile /> */}
+      {/* <SectionTable /> */}
+      {/* <SectionTooltip /> */}
+      {/* <SectionPopover /> */}
+      {/* <SectionDialog /> */}
+      {/* <SectionForm /> */}
     </>
   );
 }
