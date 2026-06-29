@@ -3,7 +3,7 @@ import type { HierarchyNode } from "d3";
 import type { Filename } from "@/util/download";
 import { Fragment, useId, useState } from "react";
 import { arc, hierarchy } from "d3";
-import { inRange, mapValues, sumBy } from "lodash";
+import { inRange, map, mapValues, sumBy } from "lodash";
 import Chart from "@/components/Chart";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
@@ -42,11 +42,17 @@ export type Item = {
   children?: Item[];
 };
 
-type Derived = {
-  label: string;
-  type: string;
+type Node = {
+  /** human-readable label */
+  label?: string;
+  /** arbitrary type/category */
+  type?: string;
+  /** arbitrary value, normalized to determine segment % */
   value: number;
-  children: Derived[];
+  /** children items */
+  children: Node[];
+  /** unique identifier of item */
+  id: string;
   /** color mapped from type */
   color: string;
   /** percent of full circle that item takes up, from 0 to 1 */
@@ -61,12 +67,10 @@ type Derived = {
   childAngle: number;
 };
 
-type Node = HierarchyNode<Derived>;
-
 /** sunburst plot */
 export default function Sunburst({ title, filename = [], data }: Props) {
   /** "breadcrumb trail" of selected nodes */
-  const [selected, setSelected] = useState<Node[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const { fontSize, truncateWidth } = useTextSize();
 
@@ -74,18 +78,25 @@ export default function Sunburst({ title, filename = [], data }: Props) {
   const anySelected = !!selected.length;
 
   /** hierarchical data structure with convenient access methods */
-  const tree = hierarchy<Derived>({ children: data } as Derived);
+  const tree = hierarchy<Node>({ children: data } as Node);
 
   /** set fallbacks */
   for (const { data } of tree) {
-    data.label ??= "";
-    data.type ??= "";
-    data.value ??= 0;
     data.color ??= "";
     data.percent ??= 1;
     data.angle ??= 0;
     data.childAngle ??= 0;
   }
+
+  /** unique id from path to node in tree */
+  tree.eachBefore((node) =>
+    node.children?.forEach(
+      (child, index) =>
+        (child.data.id = [node.data.id, index]
+          .filter((part) => part !== undefined)
+          .join("|")),
+    ),
+  );
 
   /** go down tree recursively */
   tree.eachBefore(({ data, parent }) => {
@@ -103,21 +114,22 @@ export default function Sunburst({ title, filename = [], data }: Props) {
     parent.data.childAngle += data.percent;
   });
 
-  /** get all nodes' types */
-  const types: string[] = [];
-  tree.each((node) => types.push(node.data.type));
+  /** list of node types */
+  const nodeTypes = map(tree.descendants(), (node) => node.data.type ?? "");
 
   /** map of node type to color */
-  const colorMap = useColorMap(types, "mode");
+  const colorMap = useColorMap(nodeTypes, "mode");
 
   /** convert node tree to list and derive some more props */
   const nodes = [...tree].map((node) => {
     /** assign color from type */
-    node.data.color = colorMap[node.data.type]!;
+    node.data.color = colorMap[node.data.type ?? ""] ?? "";
 
     /** selected state */
-    node.data.selected = anySelected ? selected.includes(node) : null;
-    node.data.lastSelected = anySelected ? selected.at(-1) === node : null;
+    node.data.selected = anySelected ? selected.includes(node.data.id) : null;
+    node.data.lastSelected = anySelected
+      ? selected.at(-1) === node.data.id
+      : null;
 
     return node;
   });
@@ -150,7 +162,13 @@ export default function Sunburst({ title, filename = [], data }: Props) {
                 select={() =>
                   node.data.lastSelected
                     ? deselect()
-                    : setSelected(node.ancestors().slice(0, -1).reverse())
+                    : setSelected(
+                        node
+                          .ancestors()
+                          .slice(0, -1)
+                          .reverse()
+                          .map((node) => node.data.id),
+                      )
                 }
                 deselect={deselect}
                 node={node}
@@ -162,10 +180,11 @@ export default function Sunburst({ title, filename = [], data }: Props) {
 
       {/* selected breadcrumbs */}
       <g>
-        {selected.map((node, index) => {
+        {selected.map((id, index) => {
           const h = 1.5 * fontSize;
           const x = maxR + ringSize;
           const y = maxR - (index + 1) * (h + gapSize);
+          const node = nodes.find((node) => node.data.id === id)!;
 
           return (
             <NodeTooltip key={index} {...node.data}>
@@ -179,7 +198,7 @@ export default function Sunburst({ title, filename = [], data }: Props) {
                 />
                 <text x={x + gapSize} y={y} tabIndex={0}>
                   {truncateWidth(
-                    node.data.label || "-",
+                    node.data.label ?? "-",
                     panelWidth - 2 * gapSize,
                   )}
                 </text>
@@ -193,7 +212,7 @@ export default function Sunburst({ title, filename = [], data }: Props) {
 }
 
 type SegmentProps = {
-  node: Node;
+  node: HierarchyNode<Node>;
   select: () => void;
   deselect: () => void;
 };
@@ -284,7 +303,7 @@ function Segment({ node, select, deselect }: SegmentProps) {
         fill={theme["--color-black"]}
       >
         <textPath href={`#${id}`} startOffset="50%">
-          {truncateWidth(label || "-", arcLength)}
+          {truncateWidth(label ?? "-", arcLength)}
         </textPath>
       </text>
     </g>
@@ -298,7 +317,7 @@ function NodeTooltip({
   percent,
   type,
   children,
-}: Omit<Derived, "children"> & { children: ReactElement }) {
+}: Omit<Node, "children"> & { children: ReactElement }) {
   return (
     <Tooltip
       content={

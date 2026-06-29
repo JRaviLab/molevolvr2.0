@@ -71,7 +71,7 @@ export default function SelectMulti<O extends Option>({
         if (count === 0) selectedLabel = "None selected";
         else if (count === 1)
           selectedLabel =
-            options.find((option) => option.id === value[0])?.primary || "";
+            options.find((option) => option.id === value[0])?.primary || "-";
         else if (count === options.length) selectedLabel = "All selected";
         else selectedLabel = count + " selected";
 

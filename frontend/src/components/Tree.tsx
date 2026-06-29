@@ -40,9 +40,30 @@ export type Item = {
   /** arbitrary type/category */
   type?: string;
   /** distance from parent */
-  dist?: number;
+  dist: number;
   /** children items */
   children?: Item[];
+};
+
+type Node = {
+  /** human-readable label */
+  label?: string;
+  /** arbitrary type/category */
+  type?: string;
+  /** distance from parent */
+  dist: number;
+  /** children items */
+  children: Node[];
+  /** unique identifier of item */
+  id: string;
+  /** distance from root (sum of ancestors dists) */
+  rootDist: number;
+  /** distance from parent, collapsed if too large */
+  collapsedDist: number;
+  /** collapsed distance from root */
+  collapsedRootDist: number;
+  /** is node collapsed */
+  isCollapsed: boolean;
 };
 
 /** sort order options */
@@ -69,43 +90,34 @@ export default function Tree({ title, filename = [], data }: Props) {
   /** collapse limit */
   const [collapse, setCollapse] = useState(999);
 
-  type Node = Item & {
-    /** key for comparing nodes */
-    key?: string;
-    /** distance from root (sum of ancestors dists) */
-    rootDist?: number;
-    /** distance from parent, collapsed if too large */
-    collapsedDist?: number;
-    /** collapsed distance from root */
-    collapsedRootDist?: number;
-    /** is node collapsed */
-    isCollapsed?: boolean;
-  };
-
   /** hierarchical data structure with convenient access methods */
-  const tree = hierarchy<Node>({ children: data });
+  const tree = hierarchy<Node>({ children: data } as Node);
 
   /** horizontal = depth */
   /** vertical = breadth */
 
   /** set fallbacks */
   tree.descendants().forEach((node) => {
-    node.data.key = [
-      node.depth,
-      node.data.label ?? "-",
-      node.data.type ?? "-",
-      node.data.dist ?? 0,
-    ].join("|");
     node.data.dist ??= node.depth > 0 ? 1 : 0;
-    node.data.collapsedDist = Math.min(node.data.dist!, collapse);
-    node.data.isCollapsed = node.data.dist! > collapse;
   });
 
-  /** calc distance from root */
+  /** unique id from path to node in tree */
+  tree.eachBefore((node) =>
+    node.children?.forEach(
+      (child, index) =>
+        (child.data.id = [node.data.id, index]
+          .filter((part) => part !== undefined)
+          .join("|")),
+    ),
+  );
+
+  /** calc distances */
   tree.descendants().forEach((node) => {
-    node.data.rootDist = sum(node.ancestors().map((node) => node.data.dist!));
+    node.data.collapsedDist = Math.min(node.data.dist, collapse);
+    node.data.isCollapsed = node.data.dist > collapse;
+    node.data.rootDist = sum(node.ancestors().map((node) => node.data.dist));
     node.data.collapsedRootDist = sum(
-      node.ancestors().map((node) => node.data.collapsedDist!),
+      node.ancestors().map((node) => node.data.collapsedDist),
     );
   });
 
@@ -116,7 +128,7 @@ export default function Tree({ title, filename = [], data }: Props) {
   /** https://github.com/d3/d3-hierarchy/blob/main/src/hierarchy/sort.js */
   tree.eachBefore((node) => {
     node.children?.sort((a, b) => {
-      if (sort === "dist") return b.data.dist! - a.data.dist!;
+      if (sort === "dist") return b.data.dist - a.data.dist;
       if (sort === "type")
         return (a.data.type ?? "").localeCompare(b.data.type ?? "");
       return 0;
@@ -125,14 +137,14 @@ export default function Tree({ title, filename = [], data }: Props) {
   });
 
   /** place nodes along depth */
-  tree.descendants().forEach((node) => (node.x = node.data.collapsedRootDist!));
+  tree.descendants().forEach((node) => (node.x = node.data.collapsedRootDist));
 
   /** normalize depth */
   const minX = min(map(tree.descendants(), "x")) ?? 0;
   const maxX = max(map(tree.descendants(), "x")) ?? 0;
   tree
     .descendants()
-    .forEach((node) => (node.x = (node.x! - minX) / (maxX - minX)));
+    .forEach((node) => (node.x = ((node.x ?? 0) - minX) / (maxX - minX)));
 
   /** place leaves evenly spaced along breadth */
   tree.leaves().forEach((node, index) => (node.y = index));
@@ -147,20 +159,20 @@ export default function Tree({ title, filename = [], data }: Props) {
   });
 
   /** snap breadth to grid */
-  tree.descendants().forEach((node) => (node.y = round(node.y!)));
+  tree.descendants().forEach((node) => (node.y = round(node.y ?? 0)));
 
   /** max node breadth */
   const maxY = max(map(tree.descendants(), "y")) ?? 0;
 
   /** selected nodes */
   const [selected, setSelected] = useState<string[]>([]);
-  const selectedA = tree.find((node) => node.data.key === selected[0]);
-  const selectedB = tree.find((node) => node.data.key === selected[1]);
+  const selectedA = tree.find((node) => node.data.id === selected[0]);
+  const selectedB = tree.find((node) => node.data.id === selected[1]);
 
   /** path between selected nodes */
   const selectedPath =
     selectedA && selectedB
-      ? selectedA.path(selectedB).map((node) => node.data.key!)
+      ? selectedA.path(selectedB).map((node) => node.data.id)
       : [];
 
   /** dist between selected nodes */
@@ -180,9 +192,9 @@ export default function Tree({ title, filename = [], data }: Props) {
   /** select node */
   const select = (node: HierarchyNode<Node>) =>
     setSelected(
-      selected.includes(node.data.key!)
-        ? selected.filter((key) => key !== node.data.key)
-        : selected.slice(0, 1).concat([node.data.key!]),
+      selected.includes(node.data.id)
+        ? selected.filter((id) => id !== node.data.id)
+        : selected.slice(0, 1).concat([node.data.id]),
     );
 
   return (
@@ -205,7 +217,7 @@ export default function Tree({ title, filename = [], data }: Props) {
           label="Collapse"
           tooltip="Collapse horizontal lines longer than this. Only affects drawing."
           min={1}
-          max={max(tree.descendants().map((node) => node.data.dist!))!}
+          max={max(tree.descendants().map((node) => node.data.dist)) ?? 0}
           value={collapse}
           onChange={setCollapse}
         />,
@@ -235,18 +247,18 @@ export default function Tree({ title, filename = [], data }: Props) {
                 /** is link selected */
                 const isSelected =
                   selected.length > 1
-                    ? selectedPath.includes(source.data.key!) &&
-                      selectedPath.includes(target.data.key!)
+                    ? selectedPath.includes(source.data.id) &&
+                      selectedPath.includes(target.data.id)
                     : selected.length === 1
                       ? false
                       : null;
 
                 /** start point */
-                const sourceX = source.x! * width;
-                const targetX = target.x! * width;
+                const sourceX = (source.x ?? 0) * width;
+                const targetX = (target.x ?? 0) * width;
                 /** end point */
-                const sourceY = source.y! * rowHeight;
-                const targetY = target.y! * rowHeight;
+                const sourceY = (source.y ?? 0) * rowHeight;
+                const targetY = (target.y ?? 0) * rowHeight;
 
                 /** collapse symbol position */
                 const breakX = targetX - 1.5 * nodeSize;
@@ -290,8 +302,8 @@ export default function Tree({ title, filename = [], data }: Props) {
               {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => {
                 /** is node selected */
                 const isSelected = selected.length
-                  ? selected.includes(node.data.key!) ||
-                    selectedPath.includes(node.data.key!)
+                  ? selected.includes(node.data.id) ||
+                    selectedPath.includes(node.data.id)
                   : null;
 
                 return (
@@ -345,8 +357,8 @@ export default function Tree({ title, filename = [], data }: Props) {
                         className="cursor-help"
                         points={shapeToString(
                           shapeMap[node.data.type ?? ""],
-                          node.x! * width,
-                          node.y! * rowHeight,
+                          (node.x ?? 0) * width,
+                          (node.y ?? 0) * rowHeight,
                           nodeSize / 2,
                         )}
                         fill={
@@ -394,13 +406,13 @@ export default function Tree({ title, filename = [], data }: Props) {
                 <g fill={theme["--color-black"]}>
                   <text x={labelWidth / 2} y={0 * rowHeight}>
                     {truncateWidth(
-                      selectedA?.data.label ?? "",
+                      selectedA?.data.label ?? "-",
                       width - labelWidth / 2,
                     )}
                   </text>
                   <text x={labelWidth / 2} y={1 * rowHeight}>
                     {truncateWidth(
-                      selectedB?.data.label ?? "",
+                      selectedB?.data.label ?? "-",
                       width - labelWidth / 2,
                     )}
                   </text>

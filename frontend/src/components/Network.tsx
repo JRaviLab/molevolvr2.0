@@ -18,7 +18,7 @@ import type { FcoseLayoutOptions } from "cytoscape-fcose";
 import type { KlayLayoutOptions } from "cytoscape-klay";
 import type { Option } from "@/components/SelectSingle";
 import type { Filename } from "@/util/download";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   useDebounceFn,
   useFullscreen,
@@ -288,72 +288,93 @@ export default function Network({
   const [expanded, setExpanded] = useLocalStorage("network-expanded", false);
 
   /** list of node types */
-  const nodeTypes = _nodes.map((node) => node.type ?? "");
-
+  const nodeTypes = useMemo(
+    () => _nodes.map((node) => node.type ?? ""),
+    [_nodes],
+  );
   /** map of node types to colors */
   const nodeColors = useColorMap(nodeTypes, "mode");
   /** map of node types to shapes */
-  const nodeShapes = getShapeMap(nodeTypes);
-
+  const nodeShapes = useMemo(() => getShapeMap(nodeTypes), [nodeTypes]);
   /** range of node strengths */
-  const [minNodeStrength = 0, maxNodeStrength = 1] = extent(
-    _nodes.flatMap((node) => node.strength ?? []),
+  const [minNodeStrength = 0, maxNodeStrength = 1] = useMemo(
+    () => extent(_nodes.flatMap((node) => node.strength ?? [])),
+    [_nodes],
   );
   /** derive and map properties for each node */
-  const nodes = orderBy(_nodes, "strength")
-    .slice(0, maxNodes)
-    .map((node) => ({
-      ...node,
-      label: node.label ?? node.id,
-      shortLabel: truncate(node.label ?? node.id, {
-        length: 4 * (minNodeSize / fontSize),
-      }),
-      type: node.type ?? "",
-      size: linMap(
-        node.strength ?? minNodeStrength,
-        minNodeStrength,
-        maxNodeStrength,
-        minNodeSize,
-        maxNodeSize,
-      ),
-      color: nodeColors[node.type ?? ""] ?? "",
-      shape: shapeToList(nodeShapes[node.type ?? ""]),
-    }));
+  const nodes = useMemo(
+    () =>
+      orderBy(_nodes, "strength")
+        .slice(0, maxNodes)
+        .map((node) => ({
+          ...node,
+          label: node.label ?? node.id,
+          shortLabel: truncate(node.label ?? node.id, {
+            length: 4 * (minNodeSize / fontSize),
+          }),
+          type: node.type ?? "",
+          size: linMap(
+            node.strength ?? minNodeStrength,
+            minNodeStrength,
+            maxNodeStrength,
+            minNodeSize,
+            maxNodeSize,
+          ),
+          color: nodeColors[node.type ?? ""] ?? "",
+          shape: shapeToList(nodeShapes[node.type ?? ""]),
+        })),
+    [
+      _nodes,
+      nodeColors,
+      nodeShapes,
+      maxNodes,
+      minNodeStrength,
+      maxNodeStrength,
+    ],
+  );
 
   type Node = (typeof nodes)[number];
   type Edge = (typeof edges)[number];
 
   /** list of edge types */
-  const edgeTypes = _edges.map((edge) => edge.type ?? "");
+  const edgeTypes = useMemo(
+    () => _edges.map((edge) => edge.type ?? ""),
+    [_edges],
+  );
   /** map of edge types to colors */
   const edgeColors = useColorMap(edgeTypes, "mode");
   /** range of edge strengths */
-  const [minEdgeStrength = 0, maxEdgeStrength = 1] = extent(
-    _edges.flatMap((edge) => edge.strength ?? []),
+  const [minEdgeStrength = 0, maxEdgeStrength = 1] = useMemo(
+    () => extent(_edges.flatMap((edge) => edge.strength ?? [])),
+    [_edges],
   );
   /** derive and map properties for each edge */
-  const edges = _edges
-    .map((edge) => ({
-      ...edge,
-      label: edge.label ?? edge.id,
-      /** truncated later on node position update */
-      shortLabel: edge.label ?? edge.id,
-      type: edge.type ?? "",
-      size: linMap(
-        edge.strength ?? minEdgeStrength,
-        minEdgeStrength,
-        maxEdgeStrength,
-        minEdgeSize,
-        maxEdgeSize,
-      ),
-      color: edgeColors[edge.type ?? ""] ?? "",
-    }))
-    /** remove edges whose source/target nodes have been filtered out */
-    .filter(
-      (edge) =>
-        nodes.find((node) => node.id === edge.source) &&
-        nodes.find((node) => node.id === edge.target),
-    );
+  const edges = useMemo(
+    () =>
+      _edges
+        .map((edge) => ({
+          ...edge,
+          label: edge.label ?? edge.id,
+          /** truncated later on node position update */
+          shortLabel: edge.label ?? edge.id,
+          type: edge.type ?? "",
+          size: linMap(
+            edge.strength ?? minEdgeStrength,
+            minEdgeStrength,
+            maxEdgeStrength,
+            minEdgeSize,
+            maxEdgeSize,
+          ),
+          color: edgeColors[edge.type ?? ""] ?? "",
+        }))
+        /** remove edges whose source/target nodes have been filtered out */
+        .filter(
+          (edge) =>
+            nodes.find((node) => node.id === edge.source) &&
+            nodes.find((node) => node.id === edge.target),
+        ),
+    [_edges, edgeColors, nodes, minEdgeStrength, maxEdgeStrength],
+  );
 
   /** fit view to contents */
   const fit = async () => graphRef.current?.fit(undefined, padding);
