@@ -52,6 +52,7 @@ export default function NumberBox({
       minValue={min}
       maxValue={max}
       step={step}
+      commitBehavior="validate"
       value={value}
       onChange={(value) => {
         preserveScroll(ref.current);

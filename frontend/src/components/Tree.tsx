@@ -1,11 +1,12 @@
 import type { HierarchyNode } from "d3";
 import type { Filename } from "@/util/download";
-import { Fragment, useMemo, useState } from "react";
-import { curveStepBefore, hierarchy, line } from "d3";
+import { Fragment, useState } from "react";
+import { hierarchy } from "d3";
 import { map, mapValues, max, min, orderBy, sum } from "lodash";
 import Chart from "@/components/Chart";
 import CheckBox from "@/components/CheckBox";
 import Legend from "@/components/Legend";
+import NumberBox from "@/components/NumberBox";
 import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
@@ -21,6 +22,8 @@ const nodeSize = 20;
 const lineWidth = 1;
 /** label size */
 const labelWidth = 200;
+/** dash pattern */
+const dash = [2 * lineWidth, 4 * lineWidth].join(" ");
 
 type Props = {
   /** title text */
@@ -42,23 +45,11 @@ export type Item = {
   children?: Item[];
 };
 
-/** link line generator */
-const link = line().curve(curveStepBefore);
-
 /** sort order options */
 const sortOptions = [
-  {
-    id: "input",
-    primary: "Input",
-  },
-  {
-    id: "dist",
-    primary: "Distance",
-  },
-  {
-    id: "type",
-    primary: "Type",
-  },
+  { id: "input", primary: "Input" },
+  { id: "dist", primary: "Distance" },
+  { id: "type", primary: "Type" },
 ] as const;
 
 /** tree/hierarchy plot */
@@ -75,94 +66,106 @@ export default function Tree({ title, filename = [], data }: Props) {
   /** sort direction */
   const [flip, setFlip] = useState(false);
 
+  /** collapse limit */
+  const [collapse, setCollapse] = useState(999);
+
   type Node = Item & {
+    /** key for comparing nodes */
+    key?: string;
     /** distance from root (sum of ancestors dists) */
     rootDist?: number;
+    /** distance from parent, collapsed if too large */
+    collapsedDist?: number;
+    /** collapsed distance from root */
+    collapsedRootDist?: number;
+    /** is node collapsed */
+    isCollapsed?: boolean;
   };
 
   /** hierarchical data structure with convenient access methods */
-  const tree = useMemo(() => {
-    const tree = hierarchy<Node>({ children: data });
+  const tree = hierarchy<Node>({ children: data });
 
-    /** horizontal = depth */
-    /** vertical = breadth */
+  /** horizontal = depth */
+  /** vertical = breadth */
 
-    /** set fallbacks */
-    tree.descendants().forEach((node) => {
-      node.data.dist ??= node.depth > 0 ? 1 : 0;
+  /** set fallbacks */
+  tree.descendants().forEach((node) => {
+    node.data.key = [
+      node.depth,
+      node.data.label ?? "-",
+      node.data.type ?? "-",
+      node.data.dist ?? 0,
+    ].join("|");
+    node.data.dist ??= node.depth > 0 ? 1 : 0;
+    node.data.collapsedDist = Math.min(node.data.dist!, collapse);
+    node.data.isCollapsed = node.data.dist! > collapse;
+  });
+
+  /** calc distance from root */
+  tree.descendants().forEach((node) => {
+    node.data.rootDist = sum(node.ancestors().map((node) => node.data.dist!));
+    node.data.collapsedRootDist = sum(
+      node.ancestors().map((node) => node.data.collapsedDist!),
+    );
+  });
+
+  /** list of node types */
+  const nodeTypes = map(tree.descendants(), (node) => node.data.type ?? "");
+
+  /** sort breadth by dist */
+  /** https://github.com/d3/d3-hierarchy/blob/main/src/hierarchy/sort.js */
+  tree.eachBefore((node) => {
+    node.children?.sort((a, b) => {
+      if (sort === "dist") return b.data.dist! - a.data.dist!;
+      if (sort === "type")
+        return (a.data.type ?? "").localeCompare(b.data.type ?? "");
+      return 0;
     });
+    if (flip) node.children?.reverse();
+  });
 
-    /** calc distance from root */
-    tree.descendants().forEach((node) => {
-      node.data.rootDist = sum(node.ancestors().map((node) => node.data.dist!));
-    });
+  /** place nodes along depth */
+  tree.descendants().forEach((node) => (node.x = node.data.collapsedRootDist!));
 
-    /** sort breadth by dist */
-    /** https://github.com/d3/d3-hierarchy/blob/main/src/hierarchy/sort.js */
-    tree.eachBefore((node) => {
-      node.children?.sort((a, b) => {
-        if (sort === "dist") return b.data.dist! - a.data.dist!;
-        if (sort === "type")
-          return (a.data.type ?? "").localeCompare(b.data.type ?? "");
-        return 0;
-      });
-      if (flip) node.children?.reverse();
-    });
+  /** normalize depth */
+  const minX = min(map(tree.descendants(), "x")) ?? 0;
+  const maxX = max(map(tree.descendants(), "x")) ?? 0;
+  tree
+    .descendants()
+    .forEach((node) => (node.x = (node.x! - minX) / (maxX - minX)));
 
-    /** place nodes along depth */
-    tree.descendants().forEach((node) => {
-      node.x = node.data.rootDist!;
-    });
+  /** place leaves evenly spaced along breadth */
+  tree.leaves().forEach((node, index) => (node.y = index));
 
-    /** normalize depth */
-    const minX = min(map(tree.descendants(), "x")) ?? 0;
-    const maxX = max(map(tree.descendants(), "x")) ?? 0;
-    tree.descendants().forEach((node) => {
-      node.x = (node.x! - minX) / (maxX - minX);
-    });
+  /** go up tree */
+  orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
+    if (!node.y) {
+      /** position node breadth in middle of children */
+      const ys = map(node.children ?? [], "y");
+      node.y = ((min(ys) ?? 0) + (max(ys) ?? 0)) / 2;
+    }
+  });
 
-    /** place leaves evenly spaced along breadth */
-    tree.leaves().forEach((node, index) => {
-      node.y = index;
-    });
-
-    /** go up tree */
-    orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
-      if (!node.y) {
-        /** position node breadth in middle of children */
-        const ys = map(node.children ?? [], "y");
-        node.y = ((min(ys) ?? 0) + (max(ys) ?? 0)) / 2;
-      }
-    });
-
-    /** snap breadth to grid */
-    tree.descendants().forEach((node) => {
-      node.y = round(node.y!);
-    });
-
-    return tree;
-  }, [data, sort, flip]);
+  /** snap breadth to grid */
+  tree.descendants().forEach((node) => (node.y = round(node.y!)));
 
   /** max node breadth */
   const maxY = max(map(tree.descendants(), "y")) ?? 0;
 
   /** selected nodes */
-  const [selected, setSelected] = useState<HierarchyNode<Node>[]>([]);
-  const selectedA = selected[0];
-  const selectedB = selected[1];
+  const [selected, setSelected] = useState<string[]>([]);
+  const selectedA = tree.find((node) => node.data.key === selected[0]);
+  const selectedB = tree.find((node) => node.data.key === selected[1]);
 
   /** path between selected nodes */
-  const selectedPath = selectedA && selectedB ? selectedA.path(selectedB) : [];
+  const selectedPath =
+    selectedA && selectedB
+      ? selectedA.path(selectedB).map((node) => node.data.key!)
+      : [];
 
   /** dist between selected nodes */
   const selectedDist = Math.abs(
     (selectedA?.data.rootDist ?? 0) - (selectedB?.data.rootDist ?? 0),
-  );
-
-  /** list of node types */
-  const nodeTypes = map(
-    hierarchy<Node>({ children: data }).descendants(),
-    (node) => node.data.type ?? "",
   );
 
   /** map of node types to colors */
@@ -177,9 +180,9 @@ export default function Tree({ title, filename = [], data }: Props) {
   /** select node */
   const select = (node: HierarchyNode<Node>) =>
     setSelected(
-      selected.includes(node)
-        ? selected.filter((n) => n !== node)
-        : selected.slice(0, 1).concat([node]),
+      selected.includes(node.data.key!)
+        ? selected.filter((key) => key !== node.data.key)
+        : selected.slice(0, 1).concat([node.data.key!]),
     );
 
   return (
@@ -197,6 +200,15 @@ export default function Tree({ title, filename = [], data }: Props) {
           onChange={setSort}
         />,
         <CheckBox key="flip" label="Flip" value={flip} onChange={setFlip} />,
+        <NumberBox
+          key="collapse"
+          label="Collapse"
+          tooltip="Collapse horizontal lines longer than this. Only affects drawing."
+          min={1}
+          max={max(tree.descendants().map((node) => node.data.dist!))!}
+          value={collapse}
+          onChange={setCollapse}
+        />,
       ]}
     >
       {({ width }) => {
@@ -223,15 +235,44 @@ export default function Tree({ title, filename = [], data }: Props) {
                 /** is link selected */
                 const isSelected =
                   selected.length > 1
-                    ? selectedPath.includes(source) &&
-                      selectedPath.includes(target)
+                    ? selectedPath.includes(source.data.key!) &&
+                      selectedPath.includes(target.data.key!)
                     : selected.length === 1
                       ? false
                       : null;
 
+                /** start point */
+                const sourceX = source.x! * width;
+                const targetX = target.x! * width;
+                /** end point */
+                const sourceY = source.y! * rowHeight;
+                const targetY = target.y! * rowHeight;
+
+                /** collapse symbol position */
+                const breakX = targetX - 1.5 * nodeSize;
+                const breakSize = nodeSize / 6;
+
+                /** path to draw */
+                const points = !target.data.isCollapsed
+                  ? [
+                      ["M", sourceX, sourceY],
+                      ["L", sourceX, targetY],
+                      ["L", targetX, targetY],
+                    ]
+                  : [
+                      ["M", sourceX, sourceY],
+                      ["L", sourceX, targetY],
+                      ["L", breakX - 1.5 * breakSize, targetY],
+                      ["L", breakX - 0.5 * breakSize, targetY - breakSize * 2],
+                      ["L", breakX + 0.5 * breakSize, targetY + breakSize * 2],
+                      ["L", breakX + 1.5 * breakSize, targetY],
+                      ["L", targetX, targetY],
+                    ];
+
                 return (
                   <path
                     key={index}
+                    d={points.map((line) => line.join(" ")).join(" ")}
                     fill="none"
                     stroke={
                       isSelected
@@ -240,12 +281,6 @@ export default function Tree({ title, filename = [], data }: Props) {
                     }
                     strokeWidth={isSelected ? 2 * lineWidth : lineWidth}
                     opacity={isSelected === false ? 0.25 : 1}
-                    d={
-                      link([
-                        [(source.x ?? 0) * width, (source.y ?? 0) * rowHeight],
-                        [(target.x ?? 0) * width, (target.y ?? 0) * rowHeight],
-                      ]) ?? ""
-                    }
                   />
                 );
               })}
@@ -255,7 +290,8 @@ export default function Tree({ title, filename = [], data }: Props) {
               {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => {
                 /** is node selected */
                 const isSelected = selected.length
-                  ? selected.includes(node) || selectedPath.includes(node)
+                  ? selected.includes(node.data.key!) ||
+                    selectedPath.includes(node.data.key!)
                   : null;
 
                 return (
@@ -270,7 +306,7 @@ export default function Tree({ title, filename = [], data }: Props) {
                           y2={(node.y ?? 0) * rowHeight}
                           stroke={theme["--color-black"]}
                           strokeWidth={lineWidth}
-                          strokeDasharray={[lineWidth, 2 * lineWidth].join(" ")}
+                          strokeDasharray={dash}
                         />
                         <text
                           x={width + rowHeight}

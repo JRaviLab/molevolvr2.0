@@ -141,14 +141,18 @@ export const treeItem = (depth: number): TreeItem => ({
   type: type(),
   dist: random(1, true) < 0.9 ? random(1, 10) : 100,
   ...(depth > 0 && {
-    children: Array(random(1, 4))
+    children: Array(random(1, 3))
       .fill(null)
       .map(() => treeItem(depth - 1)),
   }),
 });
 
 /** fake sunburst data */
-export const tree = [treeItem(random(1, 4))];
+export const tree = [
+  treeItem(random(1, 3)),
+  treeItem(random(1, 3)),
+  treeItem(random(1, 3)),
+];
 
 /** fake node data */
 export const nodes = Array(200)
