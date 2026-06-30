@@ -76,6 +76,7 @@ export default function MSA({
     <Chart
       title={title}
       filename={[...filename, "msa"]}
+      className="w-full"
       controls={[
         <CheckBox
           label="Wrap"
@@ -84,7 +85,6 @@ export default function MSA({
           onChange={setWrap}
         />,
       ]}
-      containerProps={{ className: "w-full" }}
     >
       {({ width }) => {
         console.debug("msa chart render");

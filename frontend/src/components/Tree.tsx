@@ -12,7 +12,7 @@ import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import { useTextSize, useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
-import { getShapeMap, shapeToString } from "@/util/shapes";
+import { getShapeMap, shapeToString } from "@/util/shape";
 
 /** row height */
 const rowHeight = 30;
@@ -201,26 +201,32 @@ export default function Tree({ title, filename = [], data }: Props) {
     <Chart
       title={title}
       filename={[...filename, "tree"]}
+      className="w-full"
       onClick={deselect}
-      containerProps={{ className: "w-full" }}
       controls={[
-        <SelectSingle
-          key="sort"
-          label="Sort"
-          options={sortOptions}
-          value={sort}
-          onChange={setSort}
-        />,
-        <CheckBox key="flip" label="Flip" value={flip} onChange={setFlip} />,
-        <NumberBox
-          key="collapse"
-          label="Collapse"
-          tooltip="Collapse horizontal lines longer than this. Only affects drawing."
-          min={1}
-          max={max(tree.descendants().map((node) => node.data.dist)) ?? 0}
-          value={collapse}
-          onChange={setCollapse}
-        />,
+        [
+          <div className="flex items-center gap-2">
+            <SelectSingle
+              key="sort"
+              label="Sort"
+              options={sortOptions}
+              value={sort}
+              onChange={setSort}
+            />
+          </div>,
+          <CheckBox key="flip" label="Flip" value={flip} onChange={setFlip} />,
+          <div className="flex items-center gap-2">
+            <NumberBox
+              key="collapse"
+              label="Collapse"
+              tooltip="Visually collapse horizontal lines longer than this"
+              min={1}
+              max={max(tree.descendants().map((node) => node.data.dist)) ?? 0}
+              value={collapse}
+              onChange={setCollapse}
+            />
+          </div>,
+        ],
       ]}
     >
       {({ width }) => {

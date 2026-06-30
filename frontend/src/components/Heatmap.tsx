@@ -119,24 +119,31 @@ export default function Heatmap({
       title={title}
       filename={[...filename, "heatmap"]}
       controls={[
-        <SelectSingle
-          label="Gradient"
-          options={gradientOptions(reverse)}
-          value={gradient}
-          onChange={setGradient}
-        />,
-        <CheckBox
-          label="Reverse"
-          tooltip="Reverse gradient direction"
-          value={reverse}
-          onChange={setReverse}
-        />,
-        <CheckBox
-          label="Swap"
-          tooltip="Swap rows & cols (transpose)"
-          value={swap}
-          onChange={setSwap}
-        />,
+        [
+          <div className="flex items-center gap-2">
+            <SelectSingle
+              key="gradient"
+              label="Gradient"
+              options={gradientOptions(reverse)}
+              value={gradient}
+              onChange={setGradient}
+            />
+          </div>,
+          <CheckBox
+            key="reverse"
+            label="Reverse"
+            tooltip="Reverse gradient direction"
+            value={reverse}
+            onChange={setReverse}
+          />,
+          <CheckBox
+            key="swap"
+            label="Swap"
+            tooltip="Swap rows & cols (transpose)"
+            value={swap}
+            onChange={setSwap}
+          />,
+        ],
       ]}
     >
       {void console.debug("heatmap chart render")}

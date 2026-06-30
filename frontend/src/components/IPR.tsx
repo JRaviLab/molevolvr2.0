@@ -113,7 +113,7 @@ export default function IPR({ title, filename = [], sequence, tracks }: Props) {
     <Chart
       title={title}
       filename={[...filename, "ipr"]}
-      containerProps={{ className: "w-full" }}
+      className="w-full"
       controls={[
         <Help
           tooltip={

@@ -1,7 +1,8 @@
+import type { Point } from "@/util/shape";
 import { clamp, mapKeys, max, startCase } from "lodash";
 import Tooltip from "@/components/Tooltip";
 import { useTextSize, useTheme } from "@/util/hooks";
-import { shapeToString } from "@/util/shapes";
+import { shapeToString } from "@/util/shape";
 
 /** entry symbol size */
 const rowHeight = 20;
@@ -29,7 +30,7 @@ type Entry = {
   /** fill color */
   color?: string;
   /** shape points, from [-1, -1] to [1, 1] */
-  shape?: { x: number; y: number }[];
+  shape?: Point[];
   /** whether to stroke shape outline instead of fill */
   stroke?: boolean;
 };

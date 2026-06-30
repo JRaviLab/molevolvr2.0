@@ -65,11 +65,11 @@ export const useChanged = <Value>(value: Value) => {
 const appElement = document.getElementById("app")!;
 
 /** print state and action hook */
-export const usePrint = (filename: Filename) => {
+export const usePrint = () => {
   /** printing state */
   const [printing, setPrinting] = useState(false);
 
-  const print = useCallback(async () => {
+  const print = useCallback(async (filename: Filename) => {
     /** save scroll */
     const scrollY = window.scrollY;
     /** save title */
@@ -94,7 +94,7 @@ export const usePrint = (filename: Filename) => {
     await sleep(100);
     /** restore scroll */
     window.scrollTo(0, scrollY);
-  }, [filename]);
+  }, []);
 
   return { printing, print };
 };

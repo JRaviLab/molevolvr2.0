@@ -1,6 +1,6 @@
 import { cos, sin } from "@/util/math";
 
-type Point = { x: number; y: number };
+export type Point = { x: number; y: number };
 
 /** make regular polygon or star */
 const makePolygon = (sides: number, starInset = 1) =>

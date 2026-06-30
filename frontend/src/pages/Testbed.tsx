@@ -87,7 +87,7 @@ import {
 import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
 import { seed } from "@/util/seed";
-import { getShapeMap } from "@/util/shapes";
+import { getShapeMap } from "@/util/shape";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
 
