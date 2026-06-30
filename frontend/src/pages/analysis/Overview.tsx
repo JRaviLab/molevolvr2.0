@@ -4,7 +4,7 @@ import Alert from "@/components/Alert";
 import Heading from "@/components/Heading";
 import { useAnalysis } from "@/pages/Analysis";
 
-const Overview = () => {
+export default function Overview() {
   const { id, name, type, started, status } = useAnalysis();
 
   return (
@@ -30,6 +30,4 @@ const Overview = () => {
       {status?.type === "error" && <Alert type="error">{status.info}</Alert>}
     </section>
   );
-};
-
-export default Overview;
+}

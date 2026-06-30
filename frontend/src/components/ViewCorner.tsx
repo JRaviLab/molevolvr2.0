@@ -5,7 +5,7 @@ import Button from "@/components/Button";
 import Feedback from "@/components/Feedback";
 
 /** buttons that stay in corner of view at all times. singleton. */
-const ViewCorner = () => {
+export default function ViewCorner() {
   const scrolled = useScrolled();
 
   return (
@@ -21,9 +21,7 @@ const ViewCorner = () => {
       <Feedback />
     </div>
   );
-};
-
-export default ViewCorner;
+}
 
 /** has user scrolled down a bit */
 const useScrolled = () => {

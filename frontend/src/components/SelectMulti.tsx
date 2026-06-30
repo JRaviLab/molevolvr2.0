@@ -37,13 +37,13 @@ export type Option<ID = string | number> = {
 };
 
 /** multi select box */
-const SelectMulti = <O extends Option>({
+export default function SelectMulti<O extends Option>({
   label,
   tooltip,
   value,
   onChange,
   options,
-}: Props<O>) => {
+}: Props<O>) {
   /** link to parent form component */
   const form = useForm();
 
@@ -71,7 +71,7 @@ const SelectMulti = <O extends Option>({
         if (count === 0) selectedLabel = "None selected";
         else if (count === 1)
           selectedLabel =
-            options.find((option) => option.id === value[0])?.primary || "";
+            options.find((option) => option.id === value[0])?.primary || "-";
         else if (count === options.length) selectedLabel = "All selected";
         else selectedLabel = count + " selected";
 
@@ -84,7 +84,7 @@ const SelectMulti = <O extends Option>({
             </Label>
 
             {/* button */}
-            <ListboxButton className="gap-2 border-b border-current p-2 text-accent *:leading-none hover:text-deep">
+            <ListboxButton className="min-h-10 gap-2 border-b border-current p-2 text-accent *:leading-none hover:text-deep">
               <span className="grow truncate py-1">{selectedLabel}</span>
               <ChevronDown />
             </ListboxButton>
@@ -100,7 +100,7 @@ const SelectMulti = <O extends Option>({
                   {({ focus, selected }) => (
                     <li
                       className={clsx(
-                        `flex max-w-[calc(100dvw--spacing(20))] cursor-pointer items-center gap-2 p-2 *:leading-none`,
+                        `flex cursor-pointer items-center gap-2 p-2 *:leading-none`,
                         focus && "bg-off-white",
                       )}
                     >
@@ -134,6 +134,4 @@ const SelectMulti = <O extends Option>({
       }}
     </Listbox>
   );
-};
-
-export default SelectMulti;
+}

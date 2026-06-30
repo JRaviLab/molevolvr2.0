@@ -9,7 +9,7 @@ type Props = {
 };
 
 /** popup of interactive content when hovering or focusing children */
-const Popover = ({ content, children }: Props) => {
+export default function Popover({ content, children }: Props) {
   return (
     <Root>
       <Trigger asChild>{children}</Trigger>
@@ -28,6 +28,4 @@ const Popover = ({ content, children }: Props) => {
       </Portal>
     </Root>
   );
-};
-
-export default Popover;
+}

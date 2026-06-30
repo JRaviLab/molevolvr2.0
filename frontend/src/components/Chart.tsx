@@ -3,12 +3,11 @@ import type { Filename, Tabular } from "@/util/download";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useDebounce, useElementSize, useFullscreen } from "@reactuses/core";
-import clsx from "clsx";
 import { clamp } from "lodash";
-import { Crop, Maximize, Printer } from "lucide-react";
+import { Maximize, Printer } from "lucide-react";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
-import Tooltip from "@/components/Tooltip";
+import Frame from "@/components/Frame";
 import { isSafari } from "@/util/browser";
 import { getViewBoxFit } from "@/util/dom";
 import { usePrint, useTextSize, useTheme } from "@/util/hooks";
@@ -32,12 +31,9 @@ type Props = {
   /** svg content. use data-fit-ignore to ignore element from fit calc. */
   children: ReactNode | ((props: ChildrenProps) => ReactNode);
 
-  /** container click */
-  onClick?: ComponentProps<"div">["onClick"];
-
-  containerProps?: ComponentProps<"div">;
+  /** props on svg */
   svgProps?: ComponentProps<"svg">;
-};
+} & Omit<ComponentProps<typeof Frame>, "children">;
 
 type ChildrenProps = {
   /** chart container width */
@@ -47,18 +43,17 @@ type ChildrenProps = {
 };
 
 /** generic chart wrapper */
-const Chart = ({
+export default function Chart({
   title,
   filename,
   tabular,
   text,
   json,
-  controls,
+  controls = [[]],
   children,
-  onClick,
-  containerProps: { className: containerClassName, ...containerProps } = {},
   svgProps = {},
-}: Props) => {
+  ...props
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const titleRef = useRef<SVGTextElement>(null);
@@ -142,26 +137,11 @@ const Chart = ({
   /** fullscreen */
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
 
-  const { printing, print } = usePrint(filename);
+  const { printing, print } = usePrint();
 
   /** chart content */
   const chart = (
-    // rely on component consumer handling keyboard appropriately
-    <div
-      ref={containerRef}
-      className={clsx(
-        `relative grid max-w-full resize place-items-center overflow-auto p-4 [&:is([style*='width'],[style*='height'])>.reset-handle]:grid`,
-        printing
-          ? `aspect-auto h-screen max-h-none min-h-0 w-auto max-w-none min-w-0 resize-none overflow-visible rounded-none border-0 bg-white p-0 shadow-none`
-          : "rounded-md bg-white shadow-sm",
-        containerClassName,
-      )}
-      // https://github.com/dequelabs/axe-core/issues/4566
-
-      tabIndex={0}
-      onClick={onClick}
-      {...containerProps}
-    >
+    <Frame ref={containerRef} {...props}>
       <svg ref={svgRef} dominantBaseline="central" {...svgProps}>
         {/* title */}
         {title && (
@@ -169,7 +149,7 @@ const Chart = ({
             ref={titleRef}
             textAnchor="middle"
             dominantBaseline="hanging"
-            fill={theme["--black"]}
+            fill={theme["--color-black"]}
             style={{ fontWeight: theme["--bold"] }}
             data-fit-ignore
           />
@@ -179,26 +159,7 @@ const Chart = ({
           ? children({ width, parentWidth })
           : children}
       </svg>
-
-      {/* reset handle */}
-      <Tooltip content="Reset size">
-        <Button
-          icon={<Crop />}
-          tooltip="Reset size"
-          design="hollow"
-          /* eslint-disable better-tailwindcss/no-unknown-classes */
-          className="reset-handle absolute right-0 bottom-0 hidden"
-          /* eslint-enable better-tailwindcss/no-unknown-classes */
-          onClick={() => {
-            /** reset resize */
-            const target = containerRef.current;
-            if (!target) return;
-            target.style.width = String(containerProps.style?.width ?? "");
-            target.style.height = "";
-          }}
-        />
-      </Tooltip>
-    </div>
+    </Frame>
   );
 
   if (printing) return createPortal(chart, document.body);
@@ -208,22 +169,12 @@ const Chart = ({
       {chart}
 
       {/* controls */}
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="controls">
         {controls?.map((row, index) => (
-          <div key={index} className="flex items-center justify-center gap-4">
-            {row}
-          </div>
+          <div key={index}>{row}</div>
         ))}
 
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {/* fullscreen */}
-          <Button
-            icon={<Maximize />}
-            tooltip="Full screen"
-            design="hollow"
-            onClick={toggleFullscreen}
-          />
-
+        <div className="gap-0">
           {/* download */}
           <Download
             filename={filename}
@@ -237,13 +188,19 @@ const Chart = ({
               icon={<Printer />}
               text="PDF"
               tooltip="Print as pdf"
-              onClick={print}
+              onClick={() => print(filename)}
             />
           </Download>
+
+          {/* fullscreen */}
+          <Button
+            icon={<Maximize />}
+            tooltip="Full screen"
+            design="hollow"
+            onClick={toggleFullscreen}
+          />
         </div>
       </div>
     </div>
   );
-};
-
-export default Chart;
+}

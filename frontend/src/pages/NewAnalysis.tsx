@@ -147,7 +147,7 @@ const parseTable = (
 
 type TableInput = ReturnType<typeof parseTable> | null;
 
-const NewAnalysis = () => {
+export default function NewAnalysis() {
   const navigate = useNavigate();
 
   /** "input" state */
@@ -484,6 +484,4 @@ const NewAnalysis = () => {
       </Form>
     </>
   );
-};
-
-export default NewAnalysis;
+}

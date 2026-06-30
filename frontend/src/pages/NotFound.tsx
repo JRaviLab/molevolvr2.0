@@ -3,7 +3,7 @@ import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Meta from "@/components/Meta";
 
-const NotFound = () => {
+export default function NotFound() {
   return (
     <>
       <Meta title="Not Found" />
@@ -19,6 +19,4 @@ const NotFound = () => {
       </section>
     </>
   );
-};
-
-export default NotFound;
+}

@@ -4,7 +4,7 @@ import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import { useAnalysis } from "@/pages/Analysis";
 
-const Actions = () => {
+export default function Actions() {
   const { id } = useAnalysis();
 
   const { mutate: edit } = useMutation({
@@ -44,6 +44,4 @@ const Actions = () => {
       </div>
     </section>
   );
-};
-
-export default Actions;
+}

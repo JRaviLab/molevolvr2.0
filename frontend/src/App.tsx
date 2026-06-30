@@ -28,12 +28,12 @@ import { useChanged } from "@/util/hooks";
 import { getRedirect } from "@/util/url";
 
 /** app entrypoint */
-const App = () => <RouterProvider router={router} />;
-
-export default App;
+export default function App() {
+  return <RouterProvider router={router} />;
+}
 
 /** route layout */
-const Layout = () => {
+function Layout() {
   /** current route info */
   const { hash, pathname, search } = useLocation();
 
@@ -58,7 +58,7 @@ const Layout = () => {
       <ViewCorner />
     </QueryClientProvider>
   );
-};
+}
 
 /** route definitions */
 const routes = [

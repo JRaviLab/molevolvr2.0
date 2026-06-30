@@ -22,10 +22,8 @@ import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   useDebounceFn,
   useFullscreen,
-  useLocalStorage,
   useResizeObserver,
 } from "@reactuses/core";
-import clsx from "clsx";
 import cytoscape from "cytoscape";
 import avsdf from "cytoscape-avsdf";
 import cola from "cytoscape-cola";
@@ -35,9 +33,10 @@ import klay from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
 import { mapValues, omit, orderBy, startCase, truncate } from "lodash";
-import { Crop, FoldHorizontal, Maximize, UnfoldHorizontal } from "lucide-react";
+import { Crop, Maximize } from "lucide-react";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
+import Frame from "@/components/Frame";
 import Legend from "@/components/Legend";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
@@ -46,7 +45,7 @@ import { parseFont } from "@/util/dom";
 import { useTheme } from "@/util/hooks";
 import { linMap } from "@/util/math";
 import { sleep } from "@/util/misc";
-import { getShapeMap } from "@/util/shapes";
+import { getShapeMap, shapeToList } from "@/util/shape";
 import { formatNumber } from "@/util/string";
 
 /** settings */
@@ -255,7 +254,13 @@ const layoutOptions = layouts.map(({ name, label }) => ({
   primary: label,
 })) satisfies Option[];
 
-const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
+export default function Network({
+  filename = [],
+  nodes: _nodes,
+  edges: _edges,
+}: Props) {
+  console.debug("network render");
+
   const ref = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const graphRef = useRef<Core | null>(null);
@@ -278,9 +283,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   const layoutParams =
     layouts.find((layout) => layout.name === selectedLayout) ?? layouts[0]!;
 
-  /** full width */
-  const [expanded, setExpanded] = useLocalStorage("network-expanded", false);
-
+  /** list of node types */
   const nodeTypes = useMemo(
     () => _nodes.map((node) => node.type ?? ""),
     [_nodes],
@@ -288,10 +291,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   /** map of node types to colors */
   const nodeColors = useColorMap(nodeTypes, "mode");
   /** map of node types to shapes */
-  const nodeShapes = useMemo(
-    () => getShapeMap(_nodes.map((node) => node.type ?? "")),
-    [_nodes],
-  );
+  const nodeShapes = useMemo(() => getShapeMap(nodeTypes), [nodeTypes]);
   /** range of node strengths */
   const [minNodeStrength = 0, maxNodeStrength = 1] = useMemo(
     () => extent(_nodes.flatMap((node) => node.strength ?? [])),
@@ -317,21 +317,22 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
             maxNodeSize,
           ),
           color: nodeColors[node.type ?? ""] ?? "",
-          shape: nodeShapes[node.type ?? ""] ?? "",
+          shape: shapeToList(nodeShapes[node.type ?? ""]),
         })),
     [
       _nodes,
+      nodeColors,
+      nodeShapes,
       maxNodes,
       minNodeStrength,
       maxNodeStrength,
-      nodeColors,
-      nodeShapes,
     ],
   );
 
   type Node = (typeof nodes)[number];
   type Edge = (typeof edges)[number];
 
+  /** list of edge types */
   const edgeTypes = useMemo(
     () => _edges.map((edge) => edge.type ?? ""),
     [_edges],
@@ -368,7 +369,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
             nodes.find((node) => node.id === edge.source) &&
             nodes.find((node) => node.id === edge.target),
         ),
-    [_edges, nodes, minEdgeStrength, maxEdgeStrength, edgeColors],
+    [_edges, edgeColors, nodes, minEdgeStrength, maxEdgeStrength],
   );
 
   /** fit view to contents */
@@ -596,126 +597,118 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
   /** fullscreen */
   const [, { toggleFullscreen }] = useFullscreen(containerRef);
 
-  /** json download data */
-  const [json, setJson] = useState<object | null>(null);
-
-  useEffect(() => {
-    if (!graphRef.current) return;
-    setJson(graphRef.current.json());
-  }, [nodes, edges]);
-
   return (
     <div className="flex w-full flex-col items-center gap-4">
-      <div
-        ref={ref}
-        className={clsx(
-          `grid w-full grid-cols-[max-content_auto] rounded-md bg-white shadow-sm`,
-          expanded && "h-[75dvh]! w-[calc(100dvw-(--spacing(20)))]!",
-        )}
-        style={{ aspectRatio: expanded ? "" : aspectRatio }}
-      >
-        {/* panel */}
-        <div className="flex h-0 min-h-full max-w-50 flex-col items-start justify-start gap-8 overflow-x-hidden overflow-y-auto p-4 wrap-anywhere">
-          {selectedItems.length ? (
-            /** show info about selected nodes/edges */
-            <>
-              <div className="flex flex-col items-start gap-4">
-                <strong>Selected items</strong>
-                {selectedItems.map((node, index) => (
-                  <Fragment key={index}>
-                    <hr />
-                    <dl>
-                      <dt>Name</dt>
-                      <dd>{node.label}</dd>
-                      {Object.entries(
-                        omit(node, [
-                          "id",
-                          "source",
-                          "target",
-                          "label",
-                          "direction",
-                          "strength",
-                          "size",
-                          "color",
-                          "shape",
-                        ]),
-                      ).map(([key, value]) => (
-                        <Fragment key={key}>
-                          <dt>{startCase(key)}</dt>
-                          <dd>{value}</dd>
-                        </Fragment>
-                      ))}
-                    </dl>
-                  </Fragment>
-                ))}
-              </div>
-            </>
-          ) : (
-            /** if nothing selected, show color key */
-            <>
-              <div className="flex flex-col items-start gap-4">
-                <div>
-                  <strong>Nodes</strong>{" "}
-                  <span className="text-dark-gray">
-                    {formatNumber(nodes.length)}
-                  </span>
+      <Frame ref={ref} className="h-100 w-full">
+        <div className="grid size-full grow grid-cols-[max-content_auto]">
+          {/* panel */}
+          <div className="flex h-0 min-h-full max-w-50 flex-col items-start justify-start gap-8 overflow-x-hidden overflow-y-auto p-4 wrap-anywhere">
+            {selectedItems.length ? (
+              /** show info about selected nodes/edges */
+              <>
+                <div className="flex flex-col items-start gap-4">
+                  <strong>Selected items</strong>
+                  {selectedItems.map((node, index) => (
+                    <Fragment key={index}>
+                      <hr />
+                      <dl>
+                        <dt>Name</dt>
+                        <dd>{node.label}</dd>
+                        {Object.entries(
+                          omit(node, [
+                            "id",
+                            "source",
+                            "target",
+                            "label",
+                            "direction",
+                            "strength",
+                            "size",
+                            "color",
+                            "shape",
+                          ]),
+                        ).map(([key, value]) => (
+                          <Fragment key={key}>
+                            <dt>{startCase(key)}</dt>
+                            <dd>{value}</dd>
+                          </Fragment>
+                        ))}
+                      </dl>
+                    </Fragment>
+                  ))}
+                </div>
+              </>
+            ) : (
+              /** if nothing selected, show color key */
+              <>
+                <div className="flex flex-col items-start gap-4">
+                  <div>
+                    <strong>Nodes</strong>{" "}
+                    <span className="text-dark-gray">
+                      {formatNumber(nodes.length)}
+                    </span>
+                  </div>
+
+                  <Legend
+                    entries={mapValues(nodeColors, (color, type) => ({
+                      color,
+                      shape: nodeShapes[type],
+                    }))}
+                  />
                 </div>
 
-                <Legend
-                  entries={mapValues(nodeColors, (color, type) => ({
-                    color,
-                    shape: nodeShapes[type],
-                  }))}
-                />
-              </div>
+                <div className="flex flex-col items-start gap-4">
+                  <div>
+                    <strong>Edges</strong>{" "}
+                    <span className="text-dark-gray">
+                      {formatNumber(edges.length)}
+                    </span>
+                  </div>
 
-              <div className="flex flex-col items-start gap-4">
-                <div>
-                  <strong>Edges</strong>{" "}
-                  <span className="text-dark-gray">
-                    {formatNumber(edges.length)}
-                  </span>
+                  <Legend
+                    entries={mapValues(edgeColors, (color) => ({
+                      color,
+                      shape: [
+                        { x: -0.75, y: 0.75 },
+                        { x: 0.75, y: -0.75 },
+                      ],
+                      stroke: true,
+                    }))}
+                  />
                 </div>
+              </>
+            )}
+          </div>
 
-                <Legend
-                  entries={mapValues(edgeColors, (color) => ({
-                    color,
-                    shape: [-0.75, 0.75, 0.75, -0.75],
-                    stroke: true,
-                  }))}
-                />
-              </div>
-            </>
-          )}
+          {/* cytoscape mount container */}
+          <div ref={containerRef} className="size-full *:size-full!" />
         </div>
-
-        {/* cytoscape mount container */}
-        <div ref={containerRef} className="bg-white *:size-full!"></div>
-      </div>
+      </Frame>
 
       {/* controls */}
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="flex items-center gap-2">
-          <Slider
-            label="Max Nodes"
-            min={1}
-            max={100}
-            step={1}
-            value={maxNodes}
-            onChange={setMaxNodes}
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <SelectSingle
-            label="Layout"
-            options={layoutOptions}
-            value={selectedLayout}
-            onChange={setSelectedLayout}
-          />
+      <div className="controls">
+        <div>
+          <div className="flex items-center gap-2">
+            <Slider
+              label="Max Nodes"
+              min={1}
+              max={100}
+              step={1}
+              value={maxNodes}
+              onChange={setMaxNodes}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <SelectSingle
+              label="Layout"
+              options={layoutOptions}
+              value={selectedLayout}
+              onChange={setSelectedLayout}
+            />
+          </div>
         </div>
 
         {/* buttons */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div>
           <Download
             filename={[...filename, "network"]}
             raster={ref}
@@ -733,7 +726,7 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
                 filename: "edges",
               },
             ]}
-            json={json}
+            json={() => graphRef.current?.json()}
           />
 
           <Button
@@ -741,13 +734,6 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
             tooltip="Fit view to contents"
             design="hollow"
             onClick={fit}
-          />
-
-          <Button
-            icon={expanded ? <FoldHorizontal /> : <UnfoldHorizontal />}
-            tooltip={expanded ? "Collapse width" : "Expand width"}
-            design="hollow"
-            onClick={() => setExpanded(!expanded)}
           />
 
           <Button
@@ -760,6 +746,4 @@ const Network = ({ filename = [], nodes: _nodes, edges: _edges }: Props) => {
       </div>
     </div>
   );
-};
-
-export default Network;
+}

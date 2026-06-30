@@ -28,7 +28,7 @@ const hold = 3;
 gsap.defaults({ ease: "power1.inOut" });
 
 /** fun bg visualization */
-const Viz = () => {
+export default function Viz() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const ctx = useRef<CanvasRenderingContext2D>(null);
 
@@ -82,9 +82,7 @@ const Viz = () => {
       className="absolute inset-0 -z-10 size-full place-self-center opacity-10"
     />
   );
-};
-
-export default Viz;
+}
 
 /** generate objects to draw and animations for each object */
 const generate = (svgs: string[], onComplete: () => void) => {

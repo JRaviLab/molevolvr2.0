@@ -47,7 +47,7 @@ type _Button = Pick<
  * looks like a button and either goes somewhere (link) or does something
  * (button)
  */
-const Button = ({
+export default function Button({
   ref,
   text,
   icon,
@@ -57,7 +57,7 @@ const Button = ({
   className,
   tooltip,
   ...props
-}: Props) => {
+}: Props) {
   /** contents of main element */
   const children = flip ? (
     <>
@@ -73,7 +73,7 @@ const Button = ({
 
   /** class name string */
   const _class = clsx(
-    "gap-2 leading-none",
+    "min-h-10 min-w-10 gap-2 leading-none",
     size === "compact" ? "p-1" : "p-3",
     !!icon && !text ? "rounded-full" : "rounded-md",
     design === "hollow" && `text-accent hover:text-deep`,
@@ -111,6 +111,4 @@ const Button = ({
         </button>
       </Tooltip>
     );
-};
-
-export default Button;
+}

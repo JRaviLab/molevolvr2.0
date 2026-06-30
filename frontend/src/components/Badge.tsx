@@ -12,16 +12,16 @@ type Props = {
  * small circle with a few chars of text. for use in other components, not
  * directly.
  */
-const Badge = ({ className, children }: Props) => (
-  <span
-    className={clsx(
-      `grid size-[1.5em] place-items-center rounded-full bg-pale text-[1rem] font-bold text-deep`,
-      className,
-    )}
-    aria-hidden
-  >
-    {children}
-  </span>
-);
-
-export default Badge;
+export default function Badge({ className, children }: Props) {
+  return (
+    <span
+      className={clsx(
+        `grid size-[1.5em] place-items-center rounded-full bg-pale text-[1rem] font-bold text-deep`,
+        className,
+      )}
+      aria-hidden
+    >
+      {children}
+    </span>
+  );
+}

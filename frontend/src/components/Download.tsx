@@ -32,13 +32,13 @@ type Props = {
   /** text string */
   text?: string;
   /** json data */
-  json?: unknown;
+  json?: unknown | (() => unknown);
   /** extra buttons */
   children?: ReactNode;
 };
 
 /** chart download button */
-const Download = ({
+export default function Download({
   filename,
   raster,
   vector,
@@ -46,7 +46,9 @@ const Download = ({
   text,
   json,
   children,
-}: Props) => {
+}: Props) {
+  const _json = typeof json === "function" ? json() : json;
+
   return (
     <Popover
       content={
@@ -113,7 +115,7 @@ const Download = ({
               icon={<Braces />}
               text="JSON"
               tooltip="JSON data"
-              onClick={() => downloadJson(json, filename)}
+              onClick={() => downloadJson(_json, filename)}
             />
           )}
           {children}
@@ -123,6 +125,4 @@ const Download = ({
       <Button icon={<DownloadIcon />} tooltip="Download" design="hollow" />
     </Popover>
   );
-};
-
-export default Download;
+}

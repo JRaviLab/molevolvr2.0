@@ -30,7 +30,7 @@ const timeouts: Record<keyof typeof types, number> = {
 };
 
 /** list of "toasts" (notifications) in corner of screen. singleton. */
-const Toasts = () => {
+export default function Toasts() {
   const toasts = useAtomValue(toastsAtom);
 
   if (toasts.length === 0) return null;
@@ -62,9 +62,7 @@ const Toasts = () => {
     </div>,
     document.body,
   );
-};
-
-export default Toasts;
+}
 
 /** global toasts */
 const toastsAtom = atom<Toast[]>([]);

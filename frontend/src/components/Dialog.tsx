@@ -28,13 +28,13 @@ type Props = {
 type Content = ReactNode | ((close: () => void, open: () => void) => ReactNode);
 
 /** "fullscreen" dialog of interactive content when clicking children */
-const Dialog = ({
+export default function Dialog({
   title,
   content,
   bottomContent,
   onChange,
   children,
-}: Props) => {
+}: Props) {
   const [isOpen, setOpen] = useState(false);
 
   const open = () => {
@@ -89,6 +89,4 @@ const Dialog = ({
       </Root>
     </>
   );
-};
-
-export default Dialog;
+}

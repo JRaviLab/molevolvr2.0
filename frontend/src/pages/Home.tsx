@@ -51,7 +51,7 @@ export const examples = [
   },
 ] satisfies Analysis[];
 
-const Home = () => {
+export default function Home() {
   /** app stats */
   const { data: stats, status: status } = useQuery({
     queryKey: ["stats"],
@@ -232,6 +232,4 @@ const Home = () => {
       </section>
     </>
   );
-};
-
-export default Home;
+}

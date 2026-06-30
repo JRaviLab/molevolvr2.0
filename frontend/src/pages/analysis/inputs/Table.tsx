@@ -1,3 +1,3 @@
-const Table = () => <>Lorem ipsum dolor sit amet.</>;
-
-export default Table;
+export default function Table() {
+  return <>Lorem ipsum dolor sit amet.</>;
+}

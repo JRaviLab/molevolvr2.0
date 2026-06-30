@@ -34,7 +34,13 @@ export const headingsAtom = atom<Heading[]>([]);
  * demarcates a new section/level of content. only use one level 1 per page.
  * don't use levels below 4.
  */
-const Heading = ({ level, icon, anchor, className, children }: Props) => {
+export default function Heading({
+  level,
+  icon,
+  anchor,
+  className,
+  children,
+}: Props) {
   const ref = useRef<HTMLHeadingElement>(null);
 
   /** heading tag */
@@ -95,6 +101,4 @@ const Heading = ({ level, icon, anchor, className, children }: Props) => {
       </Link>
     </Tag>
   );
-};
-
-export default Heading;
+}

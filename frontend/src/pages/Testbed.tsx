@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useElementSize } from "@reactuses/core";
 import { mapValues, sample, startCase, uniq } from "lodash";
 import {
@@ -76,6 +76,7 @@ import {
   iprSequence,
   iprTracks,
   label,
+  legend,
   msaTracks,
   nodes,
   sunburst,
@@ -86,12 +87,12 @@ import {
 import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
 import { seed } from "@/util/seed";
-import { getShapeMap } from "@/util/shapes";
+import { getShapeMap } from "@/util/shape";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
 
 /** test and example usage of formatting, elements, components, etc. */
-const TestbedPage = () => {
+export default function TestbedPage() {
   return (
     <>
       <Meta title="Testbed" />
@@ -148,12 +149,10 @@ const TestbedPage = () => {
       <SectionForm />
     </>
   );
-};
-
-export default TestbedPage;
+}
 
 /* regular html elements and css classes for basic formatting */
-const SectionElements = () => {
+function SectionElements() {
   /** palettes for color maps */
   const lightColorMap = uniq(Object.values(useColorMap(words, "mode")));
   const darkColorMap = uniq(Object.values(useColorMap(words, "invert")));
@@ -283,38 +282,32 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
       </table>
     </section>
   );
-};
+}
 
-const SectionHeading = () => (
-  <section className="items-center">
-    <Heading level={2} icon="X">
-      Heading 2
-    </Heading>
-    <Heading level={3} icon="Y">
-      Heading 3
-    </Heading>
-    <Heading level={4} icon="Z">
-      Heading 4
-    </Heading>
-  </section>
-);
+function SectionHeading() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon="X">
+        Heading 2
+      </Heading>
+      <Heading level={3} icon="Y">
+        Heading 3
+      </Heading>
+      <Heading level={4} icon="Z">
+        Heading 4
+      </Heading>
+    </section>
+  );
+}
 
-const SectionLegend = () => {
+function SectionLegend() {
   const ref = useRef<HTMLDivElement>(null);
 
   const [width] = useElementSize(ref);
 
-  const labels = useMemo(
-    () =>
-      Array(10)
-        .fill(null)
-        .map(label)
-        .map((label) => label || ""),
-    [],
-  );
-  const shapesMap = useMemo(() => getShapeMap(labels), [labels]);
-  const colorMap = useColorMap(labels, "mode");
-  const [entries] = useState(() =>
+  const shapesMap = getShapeMap(legend);
+  const colorMap = useColorMap(legend, "mode");
+  const { data, control } = useData(() =>
     mapValues(colorMap, (color, label) => ({
       color,
       shape: shapesMap[label],
@@ -332,150 +325,196 @@ const SectionLegend = () => {
         ref={ref}
         className="w-100 max-w-full resize overflow-auto rounded-md p-4 shadow-sm"
       >
-        <Legend entries={entries} x={0} y={0} w={width} />
+        <Legend entries={data} x={0} y={0} w={width} />
+      </div>
+
+      {control}
+    </section>
+  );
+}
+
+function SectionUpset() {
+  const { data, control } = useData(() => upset);
+
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<Frown />}>
+        Upset
+      </Heading>
+
+      <Upset title={label()} filename={[analysis]} {...data} />
+
+      {control}
+    </section>
+  );
+}
+
+function SectionSunburst() {
+  const { data, control } = useData(() => sunburst);
+
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<ChartPie />}>
+        Sunburst
+      </Heading>
+
+      <Sunburst title={label()} filename={[analysis]} data={data} />
+
+      {control}
+    </section>
+  );
+}
+
+function SectionHeatmap() {
+  const { data, control } = useData(() => heatmap);
+
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<Grid3X3 />}>
+        Heatmap
+      </Heading>
+
+      <Heatmap title={label()} filename={[analysis]} {...data} />
+
+      {control}
+    </section>
+  );
+}
+
+function SectionTree() {
+  const { data, control } = useData(() => tree);
+
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<NetworkIcon />}>
+        Tree
+      </Heading>
+
+      <Tree title={label()} filename={[analysis]} data={data} />
+
+      {control}
+    </section>
+  );
+}
+
+function SectionNetwork() {
+  const { data, control } = useData(() => ({ nodes, edges }));
+
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<Waypoints />}>
+        Network
+      </Heading>
+
+      <Network filename={[analysis]} {...data} />
+
+      {control}
+    </section>
+  );
+}
+
+function SectionMSA() {
+  const { data, control } = useData(() => msaTracks);
+
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<TableColumnsSplit />}>
+        MSA
+      </Heading>
+
+      <MSA
+        title={label()}
+        filename={[analysis]}
+        tracks={data}
+        getType={clustalType}
+        colorMap={clustalColors}
+      />
+
+      {control}
+    </section>
+  );
+}
+
+function SectionIPR() {
+  const { data, control } = useData(() => ({
+    sequence: iprSequence,
+    tracks: iprTracks,
+  }));
+
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<TableCellsMerge />}>
+        IPR
+      </Heading>
+
+      <IPR title={label()} filename={[analysis]} {...data} />
+
+      {control}
+    </section>
+  );
+}
+
+function SectionLink() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<LinkIcon />}>
+        Link
+      </Heading>
+
+      <p className="flex gap-4">
+        <Link to="/">Internal Link</Link>
+        <Link to="https://medschool.cuanschutz.edu/dbmi">External Link</Link>
+      </p>
+    </section>
+  );
+}
+
+function SectionButton() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<Square />}>
+        Button
+      </Heading>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <Button
+          to="/about"
+          icon={<ArrowRight />}
+          tooltip="Tooltip"
+          text="As Link"
+          design="hollow"
+        />
+        <Button to="/about" text="As Link" tooltip="Tooltip" />
+        <Button
+          to="/about"
+          icon={<CustomIcon />}
+          tooltip="Tooltip"
+          design="critical"
+        />
+        <Button
+          text="As Button"
+          tooltip="Tooltip"
+          design="hollow"
+          onClick={() => window.alert("Hello World")}
+        />
+        <Button
+          icon={<ArrowRight />}
+          text="As Button"
+          tooltip="Tooltip"
+          onClick={() => window.alert("Hello World")}
+        />
+        <Button
+          icon={<CustomIcon />}
+          tooltip="Tooltip"
+          design="critical"
+          onClick={() => window.alert("Hello World")}
+        />
       </div>
     </section>
   );
-};
+}
 
-const SectionUpset = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<Frown />}>
-      Upset
-    </Heading>
-
-    <Upset title={label()} filename={[analysis]} {...upset} />
-  </section>
-);
-
-const SectionSunburst = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<ChartPie />}>
-      Sunburst
-    </Heading>
-
-    <Sunburst title={label()} filename={[analysis]} data={sunburst} />
-  </section>
-);
-
-const SectionHeatmap = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<Grid3X3 />}>
-      Heatmap
-    </Heading>
-
-    <Heatmap title={label()} filename={[analysis]} {...heatmap} />
-  </section>
-);
-
-const SectionTree = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<NetworkIcon />}>
-      Tree
-    </Heading>
-
-    <Tree title={label()} filename={[analysis]} data={tree} />
-  </section>
-);
-
-const SectionNetwork = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<Waypoints />}>
-      Network
-    </Heading>
-
-    <Network filename={[analysis]} nodes={nodes} edges={edges} />
-  </section>
-);
-
-const SectionMSA = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<TableColumnsSplit />}>
-      MSA
-    </Heading>
-
-    <MSA
-      title={label()}
-      filename={[analysis]}
-      tracks={msaTracks}
-      getType={clustalType}
-      colorMap={clustalColors}
-    />
-  </section>
-);
-
-const SectionIPR = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<TableCellsMerge />}>
-      IPR
-    </Heading>
-
-    <IPR
-      title={label()}
-      filename={[analysis]}
-      sequence={iprSequence}
-      tracks={iprTracks}
-    />
-  </section>
-);
-
-const SectionLink = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<LinkIcon />}>
-      Link
-    </Heading>
-
-    <p className="flex gap-4">
-      <Link to="/">Internal Link</Link>
-      <Link to="https://medschool.cuanschutz.edu/dbmi">External Link</Link>
-    </p>
-  </section>
-);
-
-const SectionButton = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<Square />}>
-      Button
-    </Heading>
-
-    <div className="flex flex-wrap items-center gap-4">
-      <Button
-        to="/about"
-        icon={<ArrowRight />}
-        tooltip="Tooltip"
-        text="As Link"
-        design="hollow"
-      />
-      <Button to="/about" text="As Link" tooltip="Tooltip" />
-      <Button
-        to="/about"
-        icon={<CustomIcon />}
-        tooltip="Tooltip"
-        design="critical"
-      />
-      <Button
-        text="As Button"
-        tooltip="Tooltip"
-        design="hollow"
-        onClick={() => window.alert("Hello World")}
-      />
-      <Button
-        icon={<ArrowRight />}
-        text="As Button"
-        tooltip="Tooltip"
-        onClick={() => window.alert("Hello World")}
-      />
-      <Button
-        icon={<CustomIcon />}
-        tooltip="Tooltip"
-        design="critical"
-        onClick={() => window.alert("Hello World")}
-      />
-    </div>
-  </section>
-);
-
-const SectionTextBox = () => {
+function SectionTextBox() {
   const [value, setValue] = useState("");
 
   return (
@@ -504,9 +543,9 @@ const SectionTextBox = () => {
       </div>
     </section>
   );
-};
+}
 
-const SectionSelect = () => {
+function SectionSelect() {
   const singleOptions = [
     { id: "1", primary: "Lorem" },
     { id: "2", primary: "Ipsum" },
@@ -556,9 +595,9 @@ const SectionSelect = () => {
       </div>
     </section>
   );
-};
+}
 
-const SectionCheckBox = () => {
+function SectionCheckBox() {
   const [value, setValue] = useState(false);
 
   return (
@@ -575,9 +614,9 @@ const SectionCheckBox = () => {
       />
     </section>
   );
-};
+}
 
-const SectionSlider = () => {
+function SectionSlider() {
   const [singleValue, setSingleValue] = useState(0);
   const [multiValue, setMultiValue] = useState<number[]>([0, 1000]);
 
@@ -610,9 +649,9 @@ const SectionSlider = () => {
       </div>
     </section>
   );
-};
+}
 
-const SectionNumberBox = () => {
+function SectionNumberBox() {
   const [value, setValue] = useState(0);
 
   return (
@@ -643,9 +682,9 @@ const SectionNumberBox = () => {
       </div>
     </section>
   );
-};
+}
 
-const SectionRadios = () => {
+function SectionRadios() {
   const options = [
     { id: "first", primary: "Primary lorem ipsum" },
     {
@@ -681,278 +720,322 @@ const SectionRadios = () => {
       </div>
     </section>
   );
-};
+}
 
-const SectionAgo = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<Hourglass />}>
-      Ago
-    </Heading>
+function SectionAgo() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<Hourglass />}>
+        Ago
+      </Heading>
 
-    <div className="flex flex-wrap items-center gap-4">
-      <Ago date={new Date()} />
-      <Ago date="Nov 12 2023" />
-      <Ago date="Jun 1 2020" />
-    </div>
-  </section>
-);
+      <div className="flex flex-wrap items-center gap-4">
+        <Ago date={new Date()} />
+        <Ago date="Nov 12 2023" />
+        <Ago date="Jun 1 2020" />
+      </div>
+    </section>
+  );
+}
 
-const SectionAlert = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<Info />}>
-      Alert
-    </Heading>
+function SectionAlert() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<Info />}>
+        Alert
+      </Heading>
 
-    <div className="flex flex-col items-center gap-4">
-      <Alert>
-        Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua.
-      </Alert>
-      {Object.keys(types).map((type) => (
-        <Alert key={type} type={type as keyof typeof types}>
-          {startCase(type)}
+      <div className="flex flex-col items-center gap-4">
+        <Alert>
+          Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua.
         </Alert>
-      ))}
-    </div>
-  </section>
-);
+        {Object.keys(types).map((type) => (
+          <Alert key={type} type={type as keyof typeof types}>
+            {startCase(type)}
+          </Alert>
+        ))}
+      </div>
+    </section>
+  );
+}
 
-const SectionTabs = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<Folder />}>
-      Tabs
-    </Heading>
+function SectionTabs() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<Folder />}>
+        Tabs
+      </Heading>
 
-    <Tabs syncWithUrl="tab" defaultValue="drinks">
-      <Tab text="Animals" icon={<Dog />} tooltip="Tooltip">
-        <ul>
-          <li>Cat</li>
-          <li>Dog</li>
-          <li>Bird</li>
-        </ul>
-      </Tab>
-      <Tab text="Drinks" icon={<Beer />} tooltip="Tooltip">
-        <ul>
-          <li>Soda</li>
-          <li>Beer</li>
-          <li>Water</li>
-        </ul>
-      </Tab>
-      <Tab text="Colors" icon={<Palette />}>
-        <ul>
-          <li>Red</li>
-          <li>Purple</li>
-          <li>Blue</li>
-        </ul>
-      </Tab>
-    </Tabs>
-  </section>
-);
+      <Tabs syncWithUrl="tab" defaultValue="drinks">
+        <Tab text="Animals" icon={<Dog />} tooltip="Tooltip">
+          <ul>
+            <li>Cat</li>
+            <li>Dog</li>
+            <li>Bird</li>
+          </ul>
+        </Tab>
+        <Tab text="Drinks" icon={<Beer />} tooltip="Tooltip">
+          <ul>
+            <li>Soda</li>
+            <li>Beer</li>
+            <li>Water</li>
+          </ul>
+        </Tab>
+        <Tab text="Colors" icon={<Palette />}>
+          <ul>
+            <li>Red</li>
+            <li>Purple</li>
+            <li>Blue</li>
+          </ul>
+        </Tab>
+      </Tabs>
+    </section>
+  );
+}
 
-const SectionToast = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<Wine />}>
-      Toast
-    </Heading>
+function SectionToast() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<Wine />}>
+        Toast
+      </Heading>
 
-    <div className="flex flex-wrap gap-4">
-      <Button
-        text="Unique Toast"
-        onClick={() =>
-          toast(
-            sample(["Apple", "Banana", "Cantaloupe", "Durian", "Elderberry"]),
-          )
-        }
+      <div className="flex flex-wrap gap-4">
+        <Button
+          text="Unique Toast"
+          onClick={() =>
+            toast(
+              sample(["Apple", "Banana", "Cantaloupe", "Durian", "Elderberry"]),
+            )
+          }
+        />
+        <Button
+          text="Overwriting Toast"
+          onClick={() => {
+            toast(
+              <>
+                Toast modified in place <b>{sample(words)}</b>
+              </>,
+              sample(["info", "success", "warning", "error"]),
+              "ABC",
+            );
+          }}
+        />
+      </div>
+    </section>
+  );
+}
+
+function SectionCollapsible() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<ArrowUpDown />}>
+        Collapsible
+      </Heading>
+
+      <Collapsible title="Expand Me" tooltip="Tooltip">
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Facilisis sed odio
+          morbi quis commodo odio aenean sed. Urna cursus eget nunc scelerisque
+          viverra mauris in aliquam. Elementum integer enim neque volutpat ac
+          tincidunt vitae semper quis. Non diam phasellus vestibulum lorem sed
+          risus. Amet luctus venenatis lectus magna.
+        </p>
+      </Collapsible>
+    </section>
+  );
+}
+
+function SectionTile() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<CustomIcon />}>
+        Tile
+      </Heading>
+
+      <div className="flex flex-wrap gap-8">
+        <Tile
+          icon={<Hourglass />}
+          primary={formatNumber(1234)}
+          secondary="Sequences"
+        />
+        <Tile
+          icon={<CustomIcon />}
+          primary={formatNumber(5678)}
+          secondary="Proteins"
+        />
+        <Tile
+          icon={<Menu />}
+          primary={formatNumber(99999)}
+          secondary="Analyses"
+        />
+      </div>
+    </section>
+  );
+}
+
+function SectionTable() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<TableIcon />}>
+        Table
+      </Heading>
+
+      <Table
+        cols={[
+          {
+            key: "name",
+            name: "Name",
+          },
+          {
+            key: "age",
+            name: "Age",
+            filterType: "number",
+          },
+          {
+            key: "status",
+            name: "Status",
+            filterType: "enum",
+          },
+          {
+            key: "text",
+            name: "Long text",
+            filterType: "string",
+            show: false,
+            render: (cell) => <div className="line-clamp-5 p-1">{cell}</div>,
+          },
+        ]}
+        rows={tableData}
       />
-      <Button
-        text="Overwriting Toast"
-        onClick={() => {
-          toast(
-            <>
-              Toast modified in place <b>{sample(words)}</b>
-            </>,
-            sample(["info", "success", "warning", "error"]),
-            "ABC",
-          );
-        }}
-      />
-    </div>
-  </section>
-);
+    </section>
+  );
+}
 
-const SectionCollapsible = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<ArrowUpDown />}>
-      Collapsible
-    </Heading>
+function SectionTooltip() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<MessageSquare />}>
+        Tooltip
+      </Heading>
 
-    <Collapsible title="Expand Me" tooltip="Tooltip">
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Facilisis sed odio
-        morbi quis commodo odio aenean sed. Urna cursus eget nunc scelerisque
-        viverra mauris in aliquam. Elementum integer enim neque volutpat ac
-        tincidunt vitae semper quis. Non diam phasellus vestibulum lorem sed
-        risus. Amet luctus venenatis lectus magna.
-      </p>
-    </Collapsible>
-  </section>
-);
-
-const SectionTile = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<CustomIcon />}>
-      Tile
-    </Heading>
-
-    <div className="flex flex-wrap gap-8">
-      <Tile
-        icon={<Hourglass />}
-        primary={formatNumber(1234)}
-        secondary="Sequences"
-      />
-      <Tile
-        icon={<CustomIcon />}
-        primary={formatNumber(5678)}
-        secondary="Proteins"
-      />
-      <Tile
-        icon={<Menu />}
-        primary={formatNumber(99999)}
-        secondary="Analyses"
-      />
-    </div>
-  </section>
-);
-
-const SectionTable = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<TableIcon />}>
-      Table
-    </Heading>
-
-    <Table
-      cols={[
-        {
-          key: "name",
-          name: "Name",
-        },
-        {
-          key: "age",
-          name: "Age",
-          filterType: "number",
-        },
-        {
-          key: "status",
-          name: "Status",
-          filterType: "enum",
-        },
-        {
-          key: "text",
-          name: "Long text",
-          filterType: "string",
-          show: false,
-          render: (cell) => <div className="line-clamp-5 p-1">{cell}</div>,
-        },
-      ]}
-      rows={tableData}
-    />
-  </section>
-);
-
-const SectionTooltip = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<MessageSquare />}>
-      Tooltip
-    </Heading>
-
-    <div className="flex flex-wrap gap-4">
-      <Tooltip content="Minimal, non-interactive help or contextual info">
-        <span className="text-tooltip" tabIndex={0} role="button">
-          Plain content
-        </span>
-      </Tooltip>
-      <Tooltip
-        content={
-          <span>
-            <em>Minimal</em>, <strong>non-interactive</strong> help or
-            contextual info
+      <div className="flex flex-wrap gap-4">
+        <Tooltip content="Minimal, non-interactive help or contextual info">
+          <span className="text-tooltip" tabIndex={0} role="button">
+            Plain content
           </span>
+        </Tooltip>
+        <Tooltip
+          content={
+            <span>
+              <em>Minimal</em>, <strong>non-interactive</strong> help or
+              contextual info
+            </span>
+          }
+        >
+          <span className="text-tooltip" tabIndex={0} role="button">
+            Rich content
+          </span>
+        </Tooltip>
+      </div>
+    </section>
+  );
+}
+
+function SectionPopover() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<MessageSquareDot />}>
+        Popover
+      </Heading>
+
+      <Popover
+        content={
+          <>
+            <p>
+              <Link to="https://medschool.cuanschutz.edu/dbmi">
+                Interactive
+              </Link>{" "}
+              content
+            </p>
+            <Button text="Save" />
+            <SelectSingle
+              label="Select"
+              options={
+                [
+                  { id: "csv", primary: "CSV" },
+                  { id: "tsv", primary: "TSV" },
+                  { id: "pdf", primary: "PDF" },
+                ] as const
+              }
+              value="csv"
+              onChange={() => null}
+            />
+          </>
         }
       >
-        <span className="text-tooltip" tabIndex={0} role="button">
-          Rich content
-        </span>
-      </Tooltip>
-    </div>
-  </section>
-);
+        <Tooltip content="Click to open">
+          <Button text="Popover" />
+        </Tooltip>
+      </Popover>
+    </section>
+  );
+}
 
-const SectionPopover = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<MessageSquareDot />}>
-      Popover
-    </Heading>
+function SectionDialog() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<AppWindowMac />}>
+        Dialog
+      </Heading>
 
-    <Popover
-      content={
-        <>
-          <p>
-            <Link to="https://medschool.cuanschutz.edu/dbmi">Interactive</Link>{" "}
-            content
-          </p>
-          <Button text="Save" />
-          <SelectSingle
-            label="Select"
-            options={
-              [
-                { id: "csv", primary: "CSV" },
-                { id: "tsv", primary: "TSV" },
-                { id: "pdf", primary: "PDF" },
-              ] as const
-            }
-            value="csv"
-            onChange={() => null}
-          />
-        </>
-      }
-    >
-      <Tooltip content="Click to open">
-        <Button text="Popover" />
-      </Tooltip>
-    </Popover>
-  </section>
-);
+      <Dialog
+        title="Lorem ipsum"
+        content={
+          <>
+            <Tabs>
+              <Tab text="One" tooltip="Tooltip">
+                <p>
+                  <Tooltip content="Odio semper orci ante varius porttitor. Ultricies torquent venenatis cursus praesent vel lacus ligula nostra iaculis. Parturient mauris id eget metus varius.">
+                    <span className="text-tooltip" tabIndex={0} role="button">
+                      Lorem
+                    </span>
+                  </Tooltip>{" "}
+                  ipsum odor amet, consectetuer adipiscing elit. Semper taciti
+                  viverra ultricies mus aenean ligula. Donec dis torquent orci
+                  in odio. Nulla cras ex orci ridiculus augue malesuada. Mattis
+                  urna congue imperdiet dolor sapien himenaeos praesent vitae
+                  ut. Congue sapien a dapibus bibendum dolor feugiat etiam
+                  sodales. Phasellus mattis feugiat augue iaculis; non venenatis
+                  dolor. Litora magnis nec fames quam phasellus placerat.
+                  Maximus fusce volutpat convallis taciti quam nam posuere.
+                </p>
 
-const SectionDialog = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<AppWindowMac />}>
-      Dialog
-    </Heading>
+                <Collapsible title="Collapsible">
+                  <p>
+                    Odio semper orci ante varius porttitor. Ultricies torquent
+                    venenatis cursus praesent vel lacus ligula nostra iaculis.
+                    Parturient mauris id eget metus varius. Nulla suscipit
+                    suspendisse natoque praesent ridiculus nisi molestie. Taciti
+                    suscipit luctus morbi mauris; sem ante id orci. Venenatis
+                    suspendisse dui finibus ipsum mus lorem placerat vitae.
+                    Mattis nullam quisque morbi tempor, ex consectetur urna
+                    odio. Class cras dapibus, augue suspendisse volutpat justo.
+                    Blandit imperdiet conubia penatibus euismod condimentum
+                    maecenas pharetra. Per ad ultricies viverra erat et massa
+                    ante.
+                  </p>
+                </Collapsible>
 
-    <Dialog
-      title="Lorem ipsum"
-      content={
-        <>
-          <Tabs>
-            <Tab text="One" tooltip="Tooltip">
-              <p>
-                <Tooltip content="Odio semper orci ante varius porttitor. Ultricies torquent venenatis cursus praesent vel lacus ligula nostra iaculis. Parturient mauris id eget metus varius.">
-                  <span className="text-tooltip" tabIndex={0} role="button">
-                    Lorem
-                  </span>
-                </Tooltip>{" "}
-                ipsum odor amet, consectetuer adipiscing elit. Semper taciti
-                viverra ultricies mus aenean ligula. Donec dis torquent orci in
-                odio. Nulla cras ex orci ridiculus augue malesuada. Mattis urna
-                congue imperdiet dolor sapien himenaeos praesent vitae ut.
-                Congue sapien a dapibus bibendum dolor feugiat etiam sodales.
-                Phasellus mattis feugiat augue iaculis; non venenatis dolor.
-                Litora magnis nec fames quam phasellus placerat. Maximus fusce
-                volutpat convallis taciti quam nam posuere.
-              </p>
+                <Popover content="Odio semper orci ante varius porttitor.">
+                  <Tooltip content="Click to open">
+                    <Button text="Popover" />
+                  </Tooltip>
+                </Popover>
+              </Tab>
 
-              <Collapsible title="Collapsible">
+              <Tab text="Two" tooltip="Tooltip">
                 <p>
                   Odio semper orci ante varius porttitor. Ultricies torquent
                   venenatis cursus praesent vel lacus ligula nostra iaculis.
@@ -965,94 +1048,90 @@ const SectionDialog = () => (
                   imperdiet conubia penatibus euismod condimentum maecenas
                   pharetra. Per ad ultricies viverra erat et massa ante.
                 </p>
-              </Collapsible>
+              </Tab>
 
-              <Popover content="Odio semper orci ante varius porttitor.">
-                <Tooltip content="Click to open">
-                  <Button text="Popover" />
-                </Tooltip>
-              </Popover>
-            </Tab>
+              <Tab text="Three" tooltip="Tooltip">
+                <p>
+                  Leo dolor non arcu scelerisque tincidunt cursus suspendisse
+                  natoque. Nunc proin iaculis massa mi leo ipsum, mattis libero.
+                  Ad malesuada orci luctus urna integer tempor urna. Netus eu
+                  sagittis rutrum sagittis viverra vitae posuere. Eros laoreet
+                  gravida orci etiam nam nisi vitae ultricies. Litora luctus
+                  parturient elementum taciti, facilisis justo.
+                </p>
+              </Tab>
+            </Tabs>
+          </>
+        }
+        bottomContent={(close) => (
+          <>
+            <SelectSingle
+              label="Select"
+              options={
+                [
+                  { id: "csv", primary: "CSV" },
+                  { id: "tsv", primary: "TSV" },
+                  { id: "pdf", primary: "PDF" },
+                ] as const
+              }
+              value="csv"
+              onChange={() => null}
+            />
+            <Button
+              text="Nevermind"
+              onClick={() => {
+                console.debug("Cancel");
+                close();
+              }}
+            />
+            <Button
+              text="Yes, delete"
+              design="critical"
+              onClick={() => {
+                console.debug("Delete");
+                close();
+              }}
+            />
+          </>
+        )}
+      >
+        <Tooltip content="Click to open">
+          <Button text="Dialog" />
+        </Tooltip>
+      </Dialog>
+    </section>
+  );
+}
 
-            <Tab text="Two" tooltip="Tooltip">
-              <p>
-                Odio semper orci ante varius porttitor. Ultricies torquent
-                venenatis cursus praesent vel lacus ligula nostra iaculis.
-                Parturient mauris id eget metus varius. Nulla suscipit
-                suspendisse natoque praesent ridiculus nisi molestie. Taciti
-                suscipit luctus morbi mauris; sem ante id orci. Venenatis
-                suspendisse dui finibus ipsum mus lorem placerat vitae. Mattis
-                nullam quisque morbi tempor, ex consectetur urna odio. Class
-                cras dapibus, augue suspendisse volutpat justo. Blandit
-                imperdiet conubia penatibus euismod condimentum maecenas
-                pharetra. Per ad ultricies viverra erat et massa ante.
-              </p>
-            </Tab>
+function SectionForm() {
+  return (
+    <section className="items-center">
+      <Heading level={2} icon={<TextCursorInput />}>
+        Form
+      </Heading>
 
-            <Tab text="Three" tooltip="Tooltip">
-              <p>
-                Leo dolor non arcu scelerisque tincidunt cursus suspendisse
-                natoque. Nunc proin iaculis massa mi leo ipsum, mattis libero.
-                Ad malesuada orci luctus urna integer tempor urna. Netus eu
-                sagittis rutrum sagittis viverra vitae posuere. Eros laoreet
-                gravida orci etiam nam nisi vitae ultricies. Litora luctus
-                parturient elementum taciti, facilisis justo.
-              </p>
-            </Tab>
-          </Tabs>
-        </>
-      }
-      bottomContent={(close) => (
-        <>
-          <SelectSingle
-            label="Select"
-            options={
-              [
-                { id: "csv", primary: "CSV" },
-                { id: "tsv", primary: "TSV" },
-                { id: "pdf", primary: "PDF" },
-              ] as const
-            }
-            value="csv"
-            onChange={() => null}
-          />
-          <Button
-            text="Nevermind"
-            onClick={() => {
-              console.debug("Cancel");
-              close();
-            }}
-          />
-          <Button
-            text="Yes, delete"
-            design="critical"
-            onClick={() => {
-              console.debug("Delete");
-              close();
-            }}
-          />
-        </>
-      )}
-    >
-      <Tooltip content="Click to open">
-        <Button text="Dialog" />
-      </Tooltip>
-    </Dialog>
-  </section>
-);
+      <Form onSubmit={() => console.info("Form submitted")}>
+        <div className="flex flex-wrap items-center gap-4">
+          <TextBox label="Name" value="Test" onChange={() => null} />
+          <Button text="Button" />
+          <Button text="Submit" type="submit" />
+        </div>
+      </Form>
+    </section>
+  );
+}
 
-const SectionForm = () => (
-  <section className="items-center">
-    <Heading level={2} icon={<TextCursorInput />}>
-      Form
-    </Heading>
+const useData = <Data,>(initial: Data | (() => Data)) => {
+  const [data, setData] = useState<Data>(initial);
 
-    <Form onSubmit={() => console.info("Form submitted")}>
-      <div className="flex flex-wrap items-center gap-4">
-        <TextBox label="Name" value="Test" onChange={() => null} />
-        <Button text="Button" />
-        <Button text="Submit" type="submit" />
-      </div>
-    </Form>
-  </section>
-);
+  const control = (
+    <TextBox
+      placeholder="raw data"
+      multi
+      value={JSON.stringify(data, null, 2)}
+      onChange={(value) => setData(JSON.parse(value))}
+    />
+  );
+
+  return { data, control };
+};

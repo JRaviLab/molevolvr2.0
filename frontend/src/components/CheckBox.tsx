@@ -19,7 +19,13 @@ type Props = {
 };
 
 /** simple checkbox with label */
-const CheckBox = ({ label, tooltip, value, onChange, required }: Props) => {
+export default function CheckBox({
+  label,
+  tooltip,
+  value,
+  onChange,
+  required,
+}: Props) {
   /** link to parent form component */
   const form = useForm();
 
@@ -47,6 +53,4 @@ const CheckBox = ({ label, tooltip, value, onChange, required }: Props) => {
       {required && <Asterisk />}
     </label>
   );
-};
-
-export default CheckBox;
+}

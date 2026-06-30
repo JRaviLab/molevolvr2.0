@@ -16,7 +16,12 @@ type Props = {
 };
 
 /** button with expandable/collapsible content beneath */
-const Collapsible = ({ title, tooltip, className, children }: Props) => {
+export default function Collapsible({
+  title,
+  tooltip,
+  className,
+  children,
+}: Props) {
   /** open state */
   const [open, setOpen] = useState(false);
 
@@ -29,7 +34,7 @@ const Collapsible = ({ title, tooltip, className, children }: Props) => {
       <Tooltip content={tooltip}>
         <summary
           className={clsx(
-            `flex items-center gap-2 rounded-md border border-dashed border-current p-2 text-accent hover:text-deep`,
+            `flex min-h-10 items-center gap-2 rounded-md border border-dashed border-current p-2 text-accent hover:text-deep`,
             className,
           )}
         >
@@ -42,6 +47,4 @@ const Collapsible = ({ title, tooltip, className, children }: Props) => {
       {children}
     </details>
   );
-};
-
-export default Collapsible;
+}

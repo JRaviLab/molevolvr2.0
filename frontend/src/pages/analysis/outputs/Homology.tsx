@@ -1,3 +1,3 @@
-const Homology = () => <>Lorem ipsum dolor sit amet.</>;
-
-export default Homology;
+export default function Homology() {
+  return <>Lorem ipsum dolor sit amet.</>;
+}

@@ -3,11 +3,11 @@ import clsx from "clsx";
 import Mark from "@/components/Mark";
 
 /** static box of certain type with icon and text contents */
-const Alert = ({
+export default function Alert({
   className,
   children,
   ...props
-}: ComponentProps<typeof Mark>) => {
+}: ComponentProps<typeof Mark>) {
   return (
     <Mark
       className={clsx("max-w-full rounded-md bg-current/10 p-4", className)}
@@ -16,6 +16,4 @@ const Alert = ({
       <p className="text-black">{children}</p>
     </Mark>
   );
-};
-
-export default Alert;
+}

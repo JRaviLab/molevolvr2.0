@@ -8,7 +8,7 @@ import type {
 import type { Option as OptionMulti } from "@/components/SelectMulti";
 import type { Option as OptionSingle } from "@/components/SelectSingle";
 import type { Filename } from "@/util/download";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useLocalStorage } from "@reactuses/core";
 import {
   createColumnHelper,
@@ -125,13 +125,13 @@ type PerPage = (typeof perPageOptions)[number]["id"];
  * reference:
  * https://codesandbox.io/p/devbox/tanstack-table-example-kitchen-sink-vv4871
  */
-const Table = <Datum extends object>({
+export default function Table<Datum extends object>({
   cols,
   rows,
   sort,
   filename = [],
   showControls = true,
-}: Props<Datum>) => {
+}: Props<Datum>) {
   "use no memo";
 
   const filterRef = useRef<HTMLDivElement>(null);
@@ -159,62 +159,56 @@ const Table = <Datum extends object>({
   const [search, setSearch] = useState("");
 
   /** get column definition (from props) by id */
-  const getCol = useCallback((id: string) => cols[Number(id)], [cols]);
+  const getCol = (id: string) => cols[Number(id)];
 
   /** individual column filter func */
-  const filterFunc = useMemo<FilterFn<Datum>>(
-    () => (row, columnId, filterValue: unknown) => {
-      const type = getCol(columnId)?.filterType ?? "string";
-      if (!type) return true;
+  const filterFunc: FilterFn<Datum> = (row, columnId, filterValue: unknown) => {
+    const type = getCol(columnId)?.filterType ?? "string";
+    if (!type) return true;
 
-      /** string column */
-      if (type === "string") {
-        const value = (filterValue as string).trim();
-        if (!value) return true;
-        const cell = (row.getValue(columnId) as string).trim();
-        if (!cell) return true;
-        return !!cell.match(new RegExp(value, "i"));
-      }
-
-      /** number col */
-      if (type === "number") {
-        const value = filterValue as [number, number];
-        const cell = row.getValue(columnId) as number;
-        return cell >= value[0] && cell <= value[1];
-      }
-
-      /** enumerated col */
-      if (type === "enum") {
-        const cell = row.getValue(columnId) as string;
-        const value = filterValue as OptionMulti["id"][];
-        if (!value.length) return true;
-        return !!value.find((option) => option === cell);
-      }
-
-      /** boolean col */
-      if (type === "boolean") {
-        const cell = row.getValue(columnId);
-        const value = filterValue as OptionSingle["id"];
-        if (value === "all") return true;
-        else return String(cell) === value;
-      }
-
-      return true;
-    },
-    [getCol],
-  );
-
-  /** global search func */
-  const searchFunc = useMemo<FilterFn<Datum>>(
-    () => (row, columnId, filterValue: unknown) => {
+    /** string column */
+    if (type === "string") {
       const value = (filterValue as string).trim();
       if (!value) return true;
-      const cell = String(row.getValue(columnId)).trim();
+      const cell = (row.getValue(columnId) as string).trim();
       if (!cell) return true;
       return !!cell.match(new RegExp(value, "i"));
-    },
-    [],
-  );
+    }
+
+    /** number col */
+    if (type === "number") {
+      const value = filterValue as [number, number];
+      const cell = row.getValue(columnId) as number;
+      return cell >= value[0] && cell <= value[1];
+    }
+
+    /** enumerated col */
+    if (type === "enum") {
+      const cell = row.getValue(columnId) as string;
+      const value = filterValue as OptionMulti["id"][];
+      if (!value.length) return true;
+      return !!value.find((option) => option === cell);
+    }
+
+    /** boolean col */
+    if (type === "boolean") {
+      const cell = row.getValue(columnId);
+      const value = filterValue as OptionSingle["id"];
+      if (value === "all") return true;
+      else return String(cell) === value;
+    }
+
+    return true;
+  };
+
+  /** global search func */
+  const searchFunc: FilterFn<Datum> = (row, columnId, filterValue: unknown) => {
+    const value = (filterValue as string).trim();
+    if (!value) return true;
+    const cell = String(row.getValue(columnId)).trim();
+    if (!cell) return true;
+    return !!cell.match(new RegExp(value, "i"));
+  };
 
   const columnHelper = createColumnHelper<Datum>();
   /** column definitions */
@@ -557,9 +551,7 @@ const Table = <Datum extends object>({
       )}
     </div>
   );
-};
-
-export default Table;
+}
 
 type FilterProps<Datum extends object> = {
   column: Column<Datum>;
@@ -567,7 +559,7 @@ type FilterProps<Datum extends object> = {
 };
 
 /** content of filter popup for column */
-const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
+function Filter<Datum extends object>({ column, def }: FilterProps<Datum>) {
   /** type of filter */
   const type = def?.filterType ?? "string";
 
@@ -689,7 +681,7 @@ const Filter = <Datum extends object>({ column, def }: FilterProps<Datum>) => {
       />
     </div>
   );
-};
+}
 
 /** default cell formatter based on detected type */
 const defaultFormat = (cell: unknown) => {

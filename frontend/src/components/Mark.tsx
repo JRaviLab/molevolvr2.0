@@ -32,14 +32,19 @@ export const types = {
 export type Type = keyof typeof types;
 
 /** icon and text with color */
-const Mark = ({ type = "info", icon, className, children }: Props) => (
-  <div
-    className={clsx("inline-flex items-center gap-4", className)}
-    style={{ color: types[type].color }}
-  >
-    {icon ?? types[type].icon}
-    <div>{children}</div>
-  </div>
-);
-
-export default Mark;
+export default function Mark({
+  type = "info",
+  icon,
+  className,
+  children,
+}: Props) {
+  return (
+    <div
+      className={clsx("inline-flex items-center gap-4", className)}
+      style={{ color: types[type].color }}
+    >
+      {icon ?? types[type].icon}
+      <div>{children}</div>
+    </div>
+  );
+}

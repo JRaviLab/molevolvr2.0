@@ -21,7 +21,7 @@ import { sleep } from "@/util/misc";
  * floating table of contents that outlines sections/headings on page.
  * singleton.
  */
-const TableOfContents = () => {
+export default function TableOfContents() {
   const ref = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLAnchorElement>(null);
@@ -127,6 +127,4 @@ const TableOfContents = () => {
       )}
     </aside>
   );
-};
-
-export default TableOfContents;
+}

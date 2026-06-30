@@ -257,3 +257,7 @@
 @utility text-tooltip {
   @apply text-dark-gray cursor-help underline decoration-dashed;
 }
+
+@utility controls {
+  @apply flex flex-wrap items-center justify-center gap-8 *:flex *:flex-wrap *:items-center *:justify-center *:gap-4;
+}
