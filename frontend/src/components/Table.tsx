@@ -419,7 +419,7 @@ export default function Table<Datum extends object>({
             ) : (
               <tr>
                 <td
-                  className="p-8 text-center text-light-gray"
+                  className="p-8 text-center text-off-white"
                   colSpan={cols.length}
                 >
                   No Rows

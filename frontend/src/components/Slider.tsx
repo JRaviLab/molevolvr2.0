@@ -103,12 +103,12 @@ export default function Slider({
             />
 
             {/* min marker */}
-            <div className="absolute bottom-full left-0 -translate-x-1/2 translate-y-3 whitespace-nowrap opacity-0 transition group-focus-within:opacity-50 group-hover:opacity-50">
+            <div className="absolute bottom-full left-0 -translate-x-1/2 translate-y-3 whitespace-nowrap opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100">
               {formatNumber(min, true)}
             </div>
 
             {/* max marker */}
-            <div className="absolute right-0 bottom-full translate-x-1/2 translate-y-3 whitespace-nowrap opacity-0 transition group-focus-within:opacity-50 group-hover:opacity-50">
+            <div className="absolute right-0 bottom-full translate-x-1/2 translate-y-3 whitespace-nowrap opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100">
               {formatNumber(max, true)}
             </div>
 

@@ -115,8 +115,8 @@ export default function TableOfContents() {
               ref={active === index ? activeRef : undefined}
               style={{ "--level": level } as CSSProperties}
               className={clsx(
-                "flex items-center gap-2 p-2 pl-[calc(var(--level)*(--spacing(4)))] text-black no-underline hover:bg-light-gray hover:text-deep",
-                active === index && "bg-light-gray text-deep",
+                "flex items-center gap-2 p-2 pl-[calc(var(--level)*(--spacing(4)))] text-black no-underline hover:bg-off-white hover:text-deep",
+                active === index && "bg-off-white text-deep",
               )}
               to={{ hash: "#" + id }}
               replace

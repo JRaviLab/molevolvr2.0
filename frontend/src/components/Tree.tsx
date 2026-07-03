@@ -365,7 +365,7 @@ export default function Tree({ title, filename = [], data }: Props) {
                         )}
                         fill={
                           isSelected === false
-                            ? theme["--color-light-gray"]
+                            ? theme["--color-off-white"]
                             : colorMap[node.data.type ?? ""]
                         }
                         stroke={theme["--color-black"]}

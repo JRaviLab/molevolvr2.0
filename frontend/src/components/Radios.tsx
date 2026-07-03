@@ -63,7 +63,7 @@ export default function Radios<O extends Option>({
         {options.map((option, index) => (
           <label
             key={index}
-            className="flex cursor-pointer items-center gap-4 rounded-md p-2 transition hover:bg-light-gray"
+            className="flex cursor-pointer items-center gap-4 rounded-md p-2 transition hover:bg-off-white"
           >
             <input
               className="sr-only"

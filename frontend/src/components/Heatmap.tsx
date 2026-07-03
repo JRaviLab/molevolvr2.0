@@ -172,7 +172,7 @@ export default function Heatmap({
                 fill={
                   col
                     ? colorScale(valueScale(col))
-                    : theme["--color-light-gray"]
+                    : theme["--color-off-white"]
                 }
                 tabIndex={0}
                 role="graphics-symbol"

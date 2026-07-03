@@ -107,7 +107,7 @@ export default function SelectMulti<O extends Option>({
                     <li
                       className={clsx(
                         "flex cursor-pointer items-center gap-2 p-1",
-                        focus && "bg-light-gray",
+                        focus && "bg-off-white",
                       )}
                     >
                       {/* check mark */}

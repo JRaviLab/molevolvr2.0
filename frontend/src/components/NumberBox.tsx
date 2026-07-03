@@ -71,7 +71,7 @@ export default function NumberBox({
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <Group className="flex min-h-10 grow resize items-center justify-between rounded-md border border-gray bg-white transition hover:border-accent">
+          <Group className="flex min-h-10 grow resize items-center justify-between rounded-md border border-light-gray bg-white transition hover:border-accent">
             <Button slot="decrement" className="size-6 hover:text-accent">
               <Minus />
             </Button>

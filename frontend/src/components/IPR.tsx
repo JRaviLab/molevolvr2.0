@@ -268,7 +268,7 @@ export default function IPR({ title, filename = [], sequence, tracks }: Props) {
                 width={width}
                 height={(2 + tracks.length) * (rowHeight + rowGap)}
                 fill={theme["--color-white"]}
-                stroke={theme["--color-light-gray"]}
+                stroke={theme["--color-off-white"]}
               />
               <clipPath id={clipId}>
                 <rect
@@ -372,7 +372,7 @@ export default function IPR({ title, filename = [], sequence, tracks }: Props) {
                   y={0}
                   width={width}
                   height={scrollHeight}
-                  fill={theme["--color-light-gray"]}
+                  fill={theme["--color-off-white"]}
                 />
                 <rect
                   x={scrollX - scrollSpan / 2}
@@ -444,7 +444,7 @@ function Char({
         y={-rowHeight / 2}
         width={cellWidth}
         height={rowHeight}
-        fill={theme["--color-light-gray"]}
+        fill={theme["--color-off-white"]}
         opacity={position % 2 === 0 ? 0.25 : 0.5}
       />
       <text

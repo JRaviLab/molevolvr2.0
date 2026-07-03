@@ -22,10 +22,10 @@ export default function AnalysisCard({
   return (
     <Link
       to={`/analysis/${id}`}
-      className="flex flex-col items-start gap-2 rounded-md bg-light-gray p-4 text-current no-underline hover:bg-light-gray"
+      className="flex flex-col items-start gap-2 rounded-md border border-light-gray p-4 text-current no-underline hover:border-accent"
       showArrow={false}
     >
-      <div>{name}</div>
+      <div className="font-medium">{name}</div>
       <div className="text-dark-gray">{type}</div>
       {info && <div className="text-dark-gray">{info}</div>}
       {started && <Ago className="text-dark-gray" date={started} />}

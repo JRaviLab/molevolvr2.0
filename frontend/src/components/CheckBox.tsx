@@ -30,7 +30,7 @@ export default function CheckBox({
   const form = useForm();
 
   return (
-    <label className="group cursor-pointer rounded-md p-2 transition hover:bg-light-gray">
+    <label className="group cursor-pointer rounded-md p-2 transition hover:bg-off-white">
       <div className="relative size-5 shrink-0 text-deep *:absolute *:size-full group-hover:text-accent has-focus-visible:outline-2">
         <input
           type="checkbox"

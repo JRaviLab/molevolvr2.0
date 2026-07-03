@@ -159,7 +159,7 @@ export default function Upset({
                 cx={(xScale(colIndex) ?? 0) + xScale.bandwidth() / 2}
                 cy={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
                 r={nodeSize}
-                fill={col ? theme["--color-deep"] : theme["--color-light-gray"]}
+                fill={col ? theme["--color-deep"] : theme["--color-off-white"]}
               />
             )),
           )}

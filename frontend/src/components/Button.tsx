@@ -36,7 +36,7 @@ export default function Button({
     size === "sm" && "min-h-6 min-w-6 p-1",
     size === "md" && "min-h-10 min-w-10 p-2",
     design === "hollow" && "text-accent hover:text-deep",
-    design === "plain" && "bg-light-gray text-black hover:text-accent",
+    design === "plain" && "bg-off-white text-black hover:text-accent",
     design === "accent" && "bg-accent text-white hover:bg-deep",
     design === "critical" && "bg-black text-white hover:bg-deep",
     className,

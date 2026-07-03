@@ -8,10 +8,11 @@
   --color-pale: oklch(95% 0.03 70);
 
   --color-black: oklch(0% 0 315);
-  --color-dark-gray: oklch(40% 0 315);
-  --color-gray: oklch(80% 0 315);
-  --color-light-gray: oklch(95% 0 315);
-  --color-alt-white: oklch(98.5% 0 315);
+  --color-dark-gray: oklch(35% 0 315);
+  --color-gray: oklch(65% 0 315);
+  --color-light-gray: oklch(85% 0 315);
+  --color-off-white: oklch(95% 0 315);
+  --color-alt-white: oklch(98% 0 315);
   --color-white: oklch(100% 0 315);
 
   --color-shadow: #00000020;
@@ -53,9 +54,10 @@
   --color-pale: oklch(25% 0.01 70);
 
   --color-black: oklch(100% 0 315);
-  --color-dark-gray: oklch(80% 0 315);
-  --color-gray: oklch(40% 0 315);
-  --color-light-gray: oklch(25% 0 315);
+  --color-dark-gray: oklch(85% 0 315);
+  --color-gray: oklch(60% 0 315);
+  --color-light-gray: oklch(35% 0 315);
+  --color-off-white: oklch(25% 0 315);
   --color-alt-white: oklch(15% 0 315);
   --color-white: oklch(0% 0 315);
 
@@ -118,7 +120,7 @@
   }
 
   hr {
-    @apply bg-light-gray h-px w-full border-0;
+    @apply bg-off-white h-px w-full border-0;
   }
 
   strong,
@@ -182,7 +184,7 @@
   }
 
   thead tr {
-    @apply bg-alt-white border-light-gray border-b;
+    @apply bg-alt-white border-off-white border-b;
   }
 
   tbody tr {
@@ -195,7 +197,7 @@
 
   th,
   td {
-    @apply not-last:border-light-gray p-2 not-last:border-r;
+    @apply not-last:border-off-white p-2 not-last:border-r;
   }
 
   dl {
@@ -237,7 +239,7 @@
   }
 
   :not(html) ::-webkit-scrollbar {
-    @apply bg-light-gray size-2 rounded-full;
+    @apply bg-off-white size-2 rounded-full;
   }
 
   :not(html) ::-webkit-scrollbar-thumb {
