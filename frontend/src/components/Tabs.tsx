@@ -2,8 +2,9 @@ import type { ReactElement, ReactNode } from "react";
 import { Fragment, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { kebabCase } from "lodash";
+import Button from "@/components/Button";
 import { deleteParam, mergeTo } from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
 
@@ -74,17 +75,17 @@ export default function Tabs({
       <List className="flex flex-wrap items-center justify-center gap-4">
         {tabs.map((tab, index) => (
           <Tooltip key={index} content={tab.tooltip}>
-            <Trigger
-              value={tab.id}
-              className={clsx(
-                `min-h-10 cursor-pointer gap-2 rounded-t-md border-b border-current p-2 hover:bg-current/5 hover:text-deep`,
-                tab.id === selected
-                  ? "bg-current/5 text-accent"
-                  : `text-dark-gray`,
-              )}
-            >
-              {tab.text}
-              {tab.icon}
+            <Trigger asChild value={tab.id}>
+              <Button
+                design={tab.id === selected ? "accent" : "hollow"}
+                className={clsx(
+                  "border",
+                  tab.id === selected ? "border-transparent" : "",
+                )}
+              >
+                {tab.icon}
+                {tab.text}
+              </Button>
             </Trigger>
           </Tooltip>
         ))}

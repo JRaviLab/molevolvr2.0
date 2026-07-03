@@ -8,7 +8,7 @@ const { VITE_EMAIL, VITE_LAB_NAME, VITE_LAB_WEBSITE, VITE_LAB_GITHUB } =
 /** at bottom of every page. singleton. */
 export default function Footer() {
   return (
-    <footer className="z-10 flex flex-col items-center gap-2 bg-deep p-6 text-white shadow-md max-md:p-2">
+    <footer className="z-10 flex flex-col items-center gap-2 bg-deep p-6 text-white shadow-md max-md:p-2 [&_a]:text-white">
       <div className="flex gap-2 *:p-2 *:hover:text-gray">
         <Link to={`mailto:${VITE_EMAIL}`} showArrow={false} tooltip="Email us">
           <Mail />
@@ -20,7 +20,7 @@ export default function Footer() {
 
       <p>
         A project of the{" "}
-        <Link to={VITE_LAB_WEBSITE} showArrow={false} className="text-white">
+        <Link to={VITE_LAB_WEBSITE} showArrow={false}>
           {VITE_LAB_NAME}
         </Link>{" "}
         &copy; 2025

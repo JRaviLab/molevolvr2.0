@@ -687,28 +687,28 @@ export default function Network({
       {/* controls */}
       <div className="controls">
         <div>
-          <div className="flex items-center gap-2">
-            <Slider
-              label="Max Nodes"
-              min={1}
-              max={100}
-              step={1}
-              value={maxNodes}
-              onChange={setMaxNodes}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <SelectSingle
-              label="Layout"
-              options={layoutOptions}
-              value={selectedLayout}
-              onChange={setSelectedLayout}
-            />
-          </div>
+          <Slider
+            label="Max Nodes"
+            min={1}
+            max={100}
+            step={1}
+            value={maxNodes}
+            onChange={setMaxNodes}
+          />
+          <SelectSingle
+            label="Layout"
+            options={layoutOptions}
+            value={selectedLayout}
+            onChange={setSelectedLayout}
+          />
         </div>
 
         {/* buttons */}
-        <div>
+        <div className="gap-2">
+          <Button design="hollow" tooltip="Fit view to contents" onClick={fit}>
+            <Crop />
+          </Button>
+
           <Download
             filename={[...filename, "network"]}
             raster={ref}
@@ -730,18 +730,12 @@ export default function Network({
           />
 
           <Button
-            icon={<Crop />}
-            tooltip="Fit view to contents"
             design="hollow"
-            onClick={fit}
-          />
-
-          <Button
-            icon={<Maximize />}
             tooltip="Full screen"
-            design="hollow"
             onClick={toggleFullscreen}
-          />
+          >
+            <Maximize />
+          </Button>
         </div>
       </div>
     </div>

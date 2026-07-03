@@ -6,7 +6,7 @@ import { ArrowRight, History } from "lucide-react";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";
 import Form from "@/components/Form";
-import Heading from "@/components/Heading";
+import { H1, H2 } from "@/components/Heading";
 import Meta from "@/components/Meta";
 import TextBox from "@/components/TextBox";
 import { toast } from "@/components/Toasts";
@@ -27,9 +27,7 @@ export default function LoadAnalysis() {
       <Meta title="Load Analysis" />
 
       <section className="items-center">
-        <Heading level={1} icon={<ArrowRight />}>
-          Load Analysis
-        </Heading>
+        <H1 icon={<ArrowRight />}>Load Analysis</H1>
 
         <Form
           onSubmit={() => {
@@ -39,17 +37,18 @@ export default function LoadAnalysis() {
         >
           <div className="flex flex-wrap gap-4">
             <TextBox placeholder="Analysis ID" value={id} onChange={setId} />
-            <Button icon={<ArrowRight />} text="Lookup" type="submit" />
+            <Button type="submit">
+              Load
+              <ArrowRight />
+            </Button>
           </div>
         </Form>
       </section>
 
-      <section className="items-center">
-        <Heading level={2} icon={<History />}>
-          History
-        </Heading>
+      <section>
+        <H2 icon={<History />}>History</H2>
 
-        <p className="font-medium">Analyses submitted on this device</p>
+        <p className="self-center">Analyses submitted on this device</p>
 
         {!!history?.length && (
           <div className="grid-layout">
@@ -60,16 +59,15 @@ export default function LoadAnalysis() {
         )}
 
         {/* empty */}
-        {!history?.length && <div>Nothing yet!</div>}
+        {!history?.length && <div className="self-center">Nothing yet!</div>}
 
         {/* for testing */}
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4 self-center">
           For testing:
-          <Button
-            text="Add Fakes"
-            onClick={() => setHistory(analyses as Analysis[])}
-          />
-          <Button text="Clear" onClick={() => setHistory([])} />
+          <Button onClick={() => setHistory(analyses as Analysis[])}>
+            Add Fakes
+          </Button>
+          <Button onClick={() => setHistory([])}>Clear</Button>
         </div>
       </section>
     </>

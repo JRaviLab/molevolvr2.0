@@ -47,12 +47,12 @@ export default function Link({
   const _showArrow = showArrow ?? target;
 
   /** class name string */
-  const _class = clsx("inline-flex items-center gap-1", className);
+  className = clsx("inline-flex items-center gap-1", className);
 
   /** full element to render */
   const element = external ? (
     /** "external" plain link */
-    <a ref={ref} href={to} target={target} className={_class} {...props}>
+    <a ref={ref} href={to} target={target} className={className} {...props}>
       {children}
       {_showArrow && <ExternalLink />}
     </a>
@@ -66,7 +66,7 @@ export default function Link({
         "state" in props ? props.state : undefined,
       )}
       target={target}
-      className={_class}
+      className={className}
       {...props}
     >
       {children}

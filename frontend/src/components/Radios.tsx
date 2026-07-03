@@ -53,7 +53,7 @@ export default function Radios<O extends Option>({
   });
 
   return (
-    <div role="group" className="contents">
+    <div role="group" className="flex flex-col gap-2">
       <legend className="flex items-center gap-2">
         {label}
         {tooltip && <Help tooltip={tooltip} />}
@@ -63,7 +63,7 @@ export default function Radios<O extends Option>({
         {options.map((option, index) => (
           <label
             key={index}
-            className="flex items-start gap-4 p-2 hover:bg-off-white"
+            className="flex cursor-pointer items-center gap-4 rounded-md p-2 transition hover:bg-light-gray"
           >
             <input
               className="sr-only"
@@ -76,9 +76,9 @@ export default function Radios<O extends Option>({
 
             {/* check mark */}
             {value === option.id ? (
-              <CircleCheckBig className="h-lh w-[1.1em] text-accent" />
+              <CircleCheckBig className="h-lh w-[1.1em] self-start text-accent" />
             ) : (
-              <Circle className="h-lh w-[1.1em] text-gray" />
+              <Circle className="h-lh w-[1.1em] self-start text-gray" />
             )}
 
             {/* text content */}

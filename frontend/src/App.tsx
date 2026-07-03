@@ -1,7 +1,5 @@
 import "@/styles.css";
-import "@fontsource/poppins/300.css";
-import "@fontsource/poppins/500.css";
-import "@fontsource/poppins/600.css";
+import "@fontsource-variable/outfit/wght.css";
 import "@fontsource-variable/jetbrains-mono";
 import {
   createBrowserRouter,

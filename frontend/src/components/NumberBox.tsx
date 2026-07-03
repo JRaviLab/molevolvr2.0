@@ -7,6 +7,7 @@ import {
   Label,
   NumberField,
 } from "react-aria-components";
+import { clsx } from "clsx";
 import { Minus, Plus } from "lucide-react";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -28,6 +29,8 @@ type Props = {
   value: number;
   /** on number state change */
   onChange: (value: number) => void;
+  /** class on root */
+  className?: string;
 };
 
 /** number input box. use for numeric values that need precise adjustment. */
@@ -39,6 +42,7 @@ export default function NumberBox({
   step = 1,
   value,
   onChange,
+  className,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -48,7 +52,7 @@ export default function NumberBox({
   return (
     <NumberField
       ref={ref}
-      className="contents"
+      className={clsx("flex gap-2", className)}
       minValue={min}
       maxValue={max}
       step={step}
@@ -62,18 +66,17 @@ export default function NumberBox({
     >
       {({ state }) => (
         <>
-          <Label className="flex items-center gap-1">
+          <Label className="flex items-center gap-2">
             {label}
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <Group className="flex justify-between border-b border-current text-accent hover:text-deep">
-            <Button slot="decrement">
+          <Group className="flex min-h-10 grow resize items-center justify-between rounded-md border border-gray bg-white transition hover:border-accent">
+            <Button slot="decrement" className="size-6 hover:text-accent">
               <Minus />
             </Button>
-            {/* Poppins unfortunately doesn't support tabular nums */}
             <Input
-              className="field-sizing-content min-h-10 px-2 py-1 text-center font-mono"
+              className="field-sizing-content min-h-10 p-2 text-center tabular-nums"
               form={form}
               onBlurCapture={(event) => {
                 /** https://github.com/adobe/react-spectrum/discussions/6261 */
@@ -86,7 +89,8 @@ export default function NumberBox({
                   isFirefox ? state.inputValue.length + 1 + "em" : undefined,
               }}
             />
-            <Button slot="increment">
+
+            <Button slot="increment" className="size-6 hover:text-accent">
               <Plus />
             </Button>
           </Group>

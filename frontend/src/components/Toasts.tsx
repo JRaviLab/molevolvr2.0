@@ -44,7 +44,7 @@ export default function Toasts() {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className="grid grid-cols-[min-content_1fr_min-content] items-center rounded-md bg-white shadow-sm"
+          className="grid grid-cols-[min-content_1fr_min-content] items-center rounded-md bg-white shadow-md"
           style={{ color: types[toast.type].color }}
         >
           <div className="p-4">{types[toast.type].icon}</div>
@@ -52,11 +52,12 @@ export default function Toasts() {
             {toast.content}
           </div>
           <Button
-            icon={<X />}
-            tooltip="Dismiss notification"
             design="hollow"
+            tooltip="Dismiss notification"
             onClick={() => removeToast(toast.id)}
-          />
+          >
+            <X />
+          </Button>
         </div>
       ))}
     </div>,

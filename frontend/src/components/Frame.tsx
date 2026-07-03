@@ -54,7 +54,7 @@ export default function Frame({
         "relative grid resize place-items-center overflow-auto p-4 *:col-start-1 *:row-start-1 [&:is([style*='width'],[style*='height'])>.reset-handle]:grid",
         printing
           ? "aspect-auto h-screen max-h-none min-h-0 w-auto max-w-none min-w-0 resize-none overflow-visible rounded-none border-0 bg-white p-0 shadow-none"
-          : "rounded-md bg-white shadow-sm",
+          : "rounded-md bg-white shadow-md",
         className,
       )}
       // https://github.com/dequelabs/axe-core/issues/4566
@@ -69,9 +69,8 @@ export default function Frame({
       <Tooltip content="Reset size">
         {/* Sticky zero-size anchor keeps the button pinned to the scroll viewport corner. */}
         <Button
-          icon={<RotateCcw />}
-          tooltip="Reset size"
           design="hollow"
+          tooltip="Reset size"
           /* eslint-disable better-tailwindcss/no-unknown-classes */
           className="reset-handle sticky right-0 bottom-0 z-10 hidden translate-4 place-self-end"
           onClick={() => {
@@ -81,7 +80,9 @@ export default function Frame({
             target.style.width = String(props.style?.width ?? "");
             target.style.height = "";
           }}
-        />
+        >
+          <RotateCcw />
+        </Button>
       </Tooltip>
     </div>
   );

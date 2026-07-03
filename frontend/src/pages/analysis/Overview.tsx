@@ -1,7 +1,7 @@
 import { FileChartPie } from "lucide-react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
-import Heading from "@/components/Heading";
+import { H1 } from "@/components/Heading";
 import { useAnalysis } from "@/pages/Analysis";
 
 export default function Overview() {
@@ -9,9 +9,7 @@ export default function Overview() {
 
   return (
     <section className="items-center">
-      <Heading level={1} icon={<FileChartPie />}>
-        {name}
-      </Heading>
+      <H1 icon={<FileChartPie />}>{name}</H1>
 
       <dl>
         <dt>ID</dt>

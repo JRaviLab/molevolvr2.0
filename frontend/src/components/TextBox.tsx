@@ -2,6 +2,7 @@ import type { ComponentProps, ReactElement, ReactNode } from "react";
 import type { RequireAtLeastOne } from "type-fest";
 import { useId, useRef } from "react";
 import { useElementBounding } from "@reactuses/core";
+import { clsx } from "clsx";
 import { Copy, X } from "lucide-react";
 import Asterisk from "@/components/Asterisk";
 import Button from "@/components/Button";
@@ -19,6 +20,8 @@ type Base = {
   value: string;
   /** on text state change */
   onChange: (value: string) => void;
+  /** class on root */
+  className?: string;
 };
 
 type Description =
@@ -32,12 +35,12 @@ type Description =
 type Single = {
   /** single line */
   multi?: false;
-} & Pick<ComponentProps<"input">, "type" | "autoComplete" | "required">;
+} & Omit<ComponentProps<"input">, "onChange">;
 
 type Multi = {
   /** multi-line */
   multi: true;
-} & Pick<ComponentProps<"textarea">, "autoComplete" | "required">;
+} & Omit<ComponentProps<"textarea">, "onChange">;
 
 /** single or multi-line text input box */
 export default function TextBox({
@@ -47,6 +50,7 @@ export default function TextBox({
   icon,
   value,
   onChange,
+  className,
   ...props
 }: Props) {
   const sideRef = useRef<HTMLDivElement>(null);
@@ -64,39 +68,27 @@ export default function TextBox({
       <>
         {multi && (
           <Button
-            icon={<Copy />}
-            tooltip="Copy text"
+            className="translate-x-2"
             design="hollow"
-            className="rounded-none"
+            tooltip="Copy text"
             onClick={async () => {
               await window.navigator.clipboard.writeText(value);
               toast("Copied text", "success");
             }}
-          />
+          >
+            <Copy />
+          </Button>
         )}
         <Button
-          icon={<X />}
-          tooltip="Clear text"
           design="hollow"
-          className="rounded-none"
+          tooltip="Clear text"
           onClick={() => onChange("")}
-        />
+        >
+          <X />
+        </Button>
       </>
     );
-  else if (icon)
-    side = (
-      <>
-        {multi && <div />}
-        <div>{icon}</div>
-      </>
-    );
-  else
-    side = (
-      <>
-        {multi && <div />}
-        <div />
-      </>
-    );
+  else if (icon) side = <div>{icon}</div>;
 
   /** extra padding needed for side element */
   const sidePadding = useElementBounding(sideRef).width;
@@ -105,28 +97,29 @@ export default function TextBox({
   const input = multi ? (
     <textarea
       id={id}
-      className="min-h-10 grow resize rounded-md border border-light-gray bg-white p-2 hover:border-accent"
+      className="size-full p-2"
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
       value={value}
       onChange={(event) => onChange(event.target.value)}
+      rows={3}
       form={form}
-      {...props}
+      {...(props as ComponentProps<"textarea">)}
     />
   ) : (
     <input
       id={id}
-      className="grow rounded-md border border-light-gray bg-white p-2 hover:border-accent"
+      className="size-full h-10 p-2"
       style={{ paddingRight: sidePadding ? sidePadding : "" }}
       value={value}
       onChange={(event) => onChange(event.target.value)}
       form={form}
-      {...props}
+      {...(props as ComponentProps<"input">)}
     />
   );
   return (
-    <>
+    <div className={clsx("flex gap-2", className)}>
       {(label || props.required) && (
-        <label className="flex items-center gap-1" htmlFor={id}>
+        <label className="flex items-center gap-2" htmlFor={id}>
           {label}
           {tooltip && <Help tooltip={tooltip} />}
           {props.required && <Asterisk />}
@@ -135,16 +128,21 @@ export default function TextBox({
 
       {/* if no label but need tooltip, put it around input */}
       <Tooltip content={!label && tooltip ? tooltip : undefined}>
-        <div className="relative flex items-start">
+        <div
+          className={clsx(
+            "relative flex min-h-10 overflow-hidden rounded-md border border-gray bg-white hover:border-accent has-[input:focus-visible]:focus has-[textarea:focus-visible]:focus",
+            multi && "resize",
+          )}
+        >
           {input}
           <div
             ref={sideRef}
-            className="absolute top-0 right-0 flex items-start text-dark-gray *:grid *:size-10 *:place-items-center *:p-0"
+            className="absolute -top-px right-0 flex text-dark-gray *:grid *:size-10 *:place-items-center"
           >
             {side}
           </div>
         </div>
       </Tooltip>
-    </>
+    </div>
   );
 }

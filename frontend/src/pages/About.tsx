@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import GitHub from "@/assets/github.svg?react";
 import Button from "@/components/Button";
-import Heading from "@/components/Heading";
+import { H1, H2, H3, H4 } from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import Table from "@/components/Table";
@@ -31,21 +31,17 @@ export default function About() {
       <Meta title="About" />
 
       <section>
-        <Heading level={1} icon={<PenTool />}>
-          About
-        </Heading>
+        <H1 icon={<PenTool />}>About</H1>
       </section>
 
       <section>
-        <Heading level={2} icon={<MessageCircleMore />}>
-          FAQs
-        </Heading>
+        <H2 icon={<MessageCircleMore />}>FAQs</H2>
 
         <div className="flex flex-col gap-4">
-          <Heading level={3}>
+          <H3>
             How will I know when my analysis is done? Where are my past
             analyses?
-          </Heading>
+          </H3>
 
           <p>
             When you submit an analysis, you'll be taken to a dedicated page for
@@ -66,7 +62,7 @@ export default function About() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <Heading level={3}>When can I expect my results?</Heading>
+          <H3>When can I expect my results?</H3>
 
           <p>
             The time it takes to complete an analysis can be as little as a few
@@ -87,7 +83,7 @@ export default function About() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <Heading level={3}>How do I upload protein sequences?</Heading>
+          <H3>How do I upload protein sequences?</H3>
 
           <p>
             <strong>Protein sequence formats</strong> we support:
@@ -195,13 +191,11 @@ export default function About() {
       </section>
 
       <section>
-        <Heading level={2} icon={<DoorOpen />}>
-          Behind MolEvolvR
-        </Heading>
+        <H2 icon={<DoorOpen />}>Behind MolEvolvR</H2>
 
         <div className="grid-layout gap-8 [--min:--spacing(100)]">
           <div className="flex flex-col gap-4">
-            <Heading level={3}>Technologies</Heading>
+            <H3>Technologies</H3>
 
             <p>
               MolEvolvR is a coordination of several different technologies,
@@ -240,7 +234,7 @@ export default function About() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <Heading level={3}>Data sources</Heading>
+            <H3>Data sources</H3>
 
             <ul>
               <li>NCBI Taxonomy</li>
@@ -254,9 +248,7 @@ export default function About() {
       </section>
 
       <section>
-        <Heading level={2} icon={<Book />}>
-          Case studies
-        </Heading>
+        <H2 icon={<Book />}>Case studies</H2>
 
         <div className="flex flex-col gap-4">
           <p>
@@ -272,9 +264,9 @@ export default function About() {
 
         <div className="grid-layout gap-8 [--min:--spacing(100)]">
           <div className="flex flex-col gap-4">
-            <Heading level={3}>
+            <H3>
               Surface layer proteins in Gram-positive bacteria (Bacillota)
-            </Heading>
+            </H3>
 
             <ul>
               <li>
@@ -292,7 +284,7 @@ export default function About() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <Heading level={3}>Helicase operators in bacteria</Heading>
+            <H3>Helicase operators in bacteria</H3>
 
             <ul>
               <li>
@@ -310,7 +302,7 @@ export default function About() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <Heading level={3}>Novel internalin P homologs in Listeria</Heading>
+            <H3>Novel internalin P homologs in Listeria</H3>
 
             <ul>
               <li>
@@ -328,11 +320,9 @@ export default function About() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <Heading level={3}>
-              Staphylococcus aureus sulfur acquisition
-            </Heading>
+            <H3>Staphylococcus aureus sulfur acquisition</H3>
 
-            <Heading level={4}>Glutathione import system</Heading>
+            <H4>Glutathione import system</H4>
 
             <ul>
               <li>
@@ -347,7 +337,7 @@ export default function About() {
               </li>
             </ul>
 
-            <Heading level={4}>Cystine transporters</Heading>
+            <H4>Cystine transporters</H4>
 
             <ul>
               <li>
@@ -362,7 +352,7 @@ export default function About() {
               </li>
             </ul>
 
-            <Heading level={4}>V. cholerae phage defense system</Heading>
+            <H4>V. cholerae phage defense system</H4>
 
             <ul>
               <li>
@@ -371,7 +361,6 @@ export default function About() {
                 </Link>
               </li>
               <li>
-                {" "}
                 <Link to="https://jravilab.cuanschutz.edu/molevolvr/?r=vcpdef&p=resultsSummary">
                   MolEvolvR results
                 </Link>
@@ -382,9 +371,7 @@ export default function About() {
       </section>
 
       <section>
-        <Heading level={2} icon={<Users />}>
-          Team
-        </Heading>
+        <H2 icon={<Users />}>Team</H2>
 
         <Table
           cols={[
@@ -414,7 +401,7 @@ export default function About() {
           showControls={false}
         />
 
-        <Heading level={3}>Funding</Heading>
+        <H3>Funding</H3>
 
         <p>
           We would like to thank our funding sources: Endowed Research Funds
@@ -427,9 +414,7 @@ export default function About() {
       </section>
 
       <section>
-        <Heading level={2} icon={<ArrowLeftRight />}>
-          Compatibility
-        </Heading>
+        <H2 icon={<ArrowLeftRight />}>Compatibility</H2>
 
         <div className="grid-layout gap-8 [--min:--spacing(100)]">
           <div className="flex flex-col gap-4">
@@ -460,9 +445,7 @@ export default function About() {
       </section>
 
       <section>
-        <Heading level={2} icon={<Mail />}>
-          Contact
-        </Heading>
+        <H2 icon={<Mail />}>Contact</H2>
 
         <p>
           <strong>Before contacting us privately</strong>, we prefer that you
@@ -473,20 +456,20 @@ export default function About() {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <Button
-            to={`mailto:${VITE_EMAIL}`}
-            icon={<Mail />}
-            text={VITE_EMAIL}
-          />
+          <Button to={`mailto:${VITE_EMAIL}`}>
+            <Mail />
+            {VITE_EMAIL}
+          </Button>
 
-          <Button
-            to={VITE_LAB_WEBSITE}
-            icon={<Microscope />}
-            text={VITE_LAB_NAME}
-            tooltip={`${VITE_LAB_NAME} website`}
-          />
+          <Button to={VITE_LAB_WEBSITE} tooltip={`${VITE_LAB_NAME} website`}>
+            <Microscope />
+            {VITE_LAB_NAME}
+          </Button>
 
-          <Button to={VITE_LAB_GITHUB} icon={<GitHub />} text="GitHub" />
+          <Button to={VITE_LAB_GITHUB}>
+            <GitHub />
+            GitHub
+          </Button>
         </div>
       </section>
     </>

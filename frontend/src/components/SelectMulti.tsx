@@ -9,6 +9,7 @@ import {
 } from "@headlessui/react";
 import clsx from "clsx";
 import { Check, ChevronDown } from "lucide-react";
+import Button from "@/components/Button";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 
@@ -23,6 +24,8 @@ type Props<O extends Option> = {
   value: O["id"][];
   /** on selected options state change */
   onChange: (value: O["id"][], count: number | "all" | "none") => void;
+  /** class on root */
+  className?: string;
 };
 
 export type Option<ID = string | number> = {
@@ -43,6 +46,7 @@ export default function SelectMulti<O extends Option>({
   value,
   onChange,
   options,
+  className,
 }: Props<O>) {
   /** link to parent form component */
   const form = useForm();
@@ -76,22 +80,24 @@ export default function SelectMulti<O extends Option>({
         else selectedLabel = count + " selected";
 
         return (
-          <>
+          <div className={clsx("flex gap-2", className)}>
             {/* label */}
-            <Label className="flex items-center gap-1">
+            <Label className="flex items-center gap-2">
               {label}
               {tooltip && <Help tooltip={tooltip} />}
             </Label>
 
             {/* button */}
-            <ListboxButton className="min-h-10 gap-2 border-b border-current p-2 text-accent *:leading-none hover:text-deep">
-              <span className="grow truncate py-1">{selectedLabel}</span>
-              <ChevronDown />
+            <ListboxButton as={Fragment}>
+              <Button>
+                <span className="grow truncate">{selectedLabel}</span>
+                <ChevronDown />
+              </Button>
             </ListboxButton>
 
             {/* dropdown */}
             <ListboxOptions
-              className="z-20 min-w-(--button-width) bg-white shadow-sm"
+              className="z-20 min-w-(--button-width) rounded-md bg-white shadow-md"
               anchor={{ to: "bottom start", padding: 10 }}
               modal={false}
             >
@@ -100,8 +106,8 @@ export default function SelectMulti<O extends Option>({
                   {({ focus, selected }) => (
                     <li
                       className={clsx(
-                        `flex cursor-pointer items-center gap-2 p-2 *:leading-none`,
-                        focus && "bg-off-white",
+                        "flex cursor-pointer items-center gap-2 p-1",
+                        focus && "bg-light-gray",
                       )}
                     >
                       {/* check mark */}
@@ -129,7 +135,7 @@ export default function SelectMulti<O extends Option>({
                 </ListboxOption>
               ))}
             </ListboxOptions>
-          </>
+          </div>
         );
       }}
     </Listbox>

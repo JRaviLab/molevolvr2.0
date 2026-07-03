@@ -5,7 +5,7 @@ import Tooltip from "@/components/Tooltip";
 export default function Asterisk() {
   return (
     <Tooltip content="Required">
-      <AsteriskIcon className="relative -ml-1 -translate-y-2 scale-75 text-error" />
+      <AsteriskIcon className="text-error" />
     </Tooltip>
   );
 }

@@ -174,7 +174,7 @@ export default function Chart({
           <div key={index}>{row}</div>
         ))}
 
-        <div className="gap-0">
+        <div className="gap-2">
           {/* download */}
           <Download
             filename={filename}
@@ -184,21 +184,20 @@ export default function Chart({
             text={text}
             json={json}
           >
-            <Button
-              icon={<Printer />}
-              text="PDF"
-              tooltip="Print as pdf"
-              onClick={() => print(filename)}
-            />
+            <Button tooltip="Print as pdf" onClick={() => print(filename)}>
+              <Printer />
+              PDF
+            </Button>
           </Download>
 
           {/* fullscreen */}
           <Button
-            icon={<Maximize />}
-            tooltip="Full screen"
             design="hollow"
+            tooltip="Full screen"
             onClick={toggleFullscreen}
-          />
+          >
+            <Maximize />
+          </Button>
         </div>
       </div>
     </div>

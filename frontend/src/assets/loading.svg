@@ -24,7 +24,7 @@
     r="40"
     fill="none"
     stroke="currentColor"
-    stroke-width="20"
+    stroke-width="10"
     pathLength="1"
   />
 </svg>

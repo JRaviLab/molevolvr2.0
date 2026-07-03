@@ -4,19 +4,15 @@
   --color-*: initial;
 
   --color-accent: oklch(55% 0.08 195);
-  --color-accent-light: oklch(75% 0.08 195);
   --color-deep: oklch(45% 0.08 315);
-  --color-deep-light: oklch(60% 0.08 315);
   --color-pale: oklch(95% 0.03 70);
 
-  --color-black: hsl(0, 0%, 0%);
-  --color-off-black: hsl(0, 0%, 15%);
-  --color-dark-gray: hsl(0, 0%, 40%);
-  --color-gray: hsl(0, 0%, 70%);
-  --color-light-gray: hsl(0, 0%, 85%);
-  --color-off-white: hsl(0, 0%, 95%);
-  --color-alt-white: hsl(0, 0%, 98%);
-  --color-white: hsl(0, 0%, 100%);
+  --color-black: oklch(0% 0 315);
+  --color-dark-gray: oklch(40% 0 315);
+  --color-gray: oklch(80% 0 315);
+  --color-light-gray: oklch(95% 0 315);
+  --color-alt-white: oklch(98.5% 0 315);
+  --color-white: oklch(100% 0 315);
 
   --color-shadow: #00000020;
   --color-overlay: #00000080;
@@ -27,20 +23,19 @@
 
   --content: --spacing(300);
 
-  --radius: 5px;
-  --shadow-sm: 0 0 2px var(--color-shadow), 0 2px 5px var(--color-shadow);
-  --shadow-md:
-    0 0 5px var(--color-shadow), 0 1px 10px var(--color-shadow),
-    0 2px 15px var(--color-shadow);
+  --radius-*: initial;
+  --radius-md: 7px;
+
+  --shadow-md: 0 0 2px var(--color-shadow), 0 0 10px var(--color-shadow);
   --shadow-overlay: 0 0 0 9999px var(--color-overlay);
 
   --font-weight-*: initial;
 
-  --font-weight-normal: 300;
+  --font-weight-regular: 300;
   --font-weight-medium: 500;
   --font-weight-bold: 600;
 
-  --font-sans: "Poppins", sans-serif;
+  --font-sans: "Outfit Variable", sans-serif;
   --font-mono: "JetBrains Mono Variable", monospace;
 
   --breakpoint-xs: 20rem;
@@ -54,19 +49,15 @@
 
 .dark {
   --color-accent: oklch(80% 0.08 195);
-  --color-accent-light: oklch(40% 0.08 195);
   --color-deep: oklch(70% 0.08 315);
-  --color-deep-light: oklch(50% 0.08 315);
   --color-pale: oklch(25% 0.01 70);
 
-  --color-black: hsl(0, 0%, 100%);
-  --color-off-black: hsl(0, 0%, 95%);
-  --color-dark-gray: hsl(0, 0%, 85%);
-  --color-gray: hsl(0, 0%, 65%);
-  --color-light-gray: hsl(0, 0%, 40%);
-  --color-off-white: hsl(0, 0%, 15%);
-  --color-alt-white: hsl(0, 0%, 10%);
-  --color-white: hsl(0, 0%, 0%);
+  --color-black: oklch(100% 0 315);
+  --color-dark-gray: oklch(80% 0 315);
+  --color-gray: oklch(40% 0 315);
+  --color-light-gray: oklch(25% 0 315);
+  --color-alt-white: oklch(15% 0 315);
+  --color-white: oklch(0% 0 315);
 
   --color-shadow: #ffffff20;
   --color-overlay: #ffffff80;
@@ -77,8 +68,13 @@
 }
 
 @layer base {
+  * {
+    @apply outline-accent underline-offset-2 outline-offset-2;
+  }
+
   html {
-    @apply font-sans leading-normal font-normal text-black underline-offset-2;
+    @apply font-regular bg-white font-sans leading-normal text-black;
+    font-size: 105%;
   }
 
   body {
@@ -94,35 +90,35 @@
   }
 
   section {
-    --width: 300;
-    @apply even:bg-alt-white relative z-0 flex flex-col gap-12 bg-white px-[max(var(--pad),(100%-(--spacing(1))*var(--width))/2)] py-(--pad) [--pad:--spacing(12)] last:grow max-md:[--pad:--spacing(8)];
+    --width: 250;
+    @apply even:bg-alt-white relative isolate flex flex-col gap-8 bg-white px-[max(--spacing(12),(100%-(--spacing(1))*var(--width))/2)] py-12 last:grow;
   }
 
   h1,
   h2,
   h3,
   h4 {
-    @apply text-deep flex w-full scroll-mt-8 items-center gap-[0.75em] leading-normal font-medium;
+    @apply text-deep flex scroll-mt-8 items-center gap-[0.75em] leading-normal font-medium tracking-wide not-first:mt-8;
   }
 
   h1 {
-    @apply justify-center text-center text-3xl tracking-widest uppercase;
+    @apply justify-center text-center text-3xl uppercase;
   }
 
   h2 {
-    @apply justify-center text-center text-2xl tracking-wider uppercase;
+    @apply justify-center text-center text-2xl uppercase first:mb-8;
   }
 
   h3 {
-    @apply text-xl tracking-wide;
+    @apply text-xl;
   }
 
   h4 {
-    @apply text-lg tracking-wide;
+    @apply text-lg;
   }
 
   hr {
-    @apply h-px w-full border-0 bg-current/25;
+    @apply bg-light-gray h-px w-full border-0;
   }
 
   strong,
@@ -130,16 +126,34 @@
     @apply font-bold;
   }
 
+  img,
+  svg {
+    @apply [display:unset] shrink-0 overflow-visible;
+  }
+
   p {
     @apply leading-loose;
   }
 
-  p a {
-    @apply text-accent underline hover:text-current;
+  a {
+    @apply text-accent underline transition hover:text-current;
   }
 
-  svg {
-    @apply overflow-visible;
+  button,
+  summary {
+    @apply flex cursor-pointer items-center justify-center transition;
+  }
+
+  label {
+    @apply flex items-center gap-2;
+  }
+
+  input {
+    @apply min-w-0 transition;
+  }
+
+  textarea {
+    @apply min-w-0 resize-none transition;
   }
 
   ul,
@@ -147,61 +161,36 @@
     @apply flex list-[revert] flex-col pl-6 leading-loose;
   }
 
+  ol {
+    @apply list-decimal;
+
+    ol {
+      @apply list-[lower-alpha];
+
+      ol {
+        @apply list-[lower-roman];
+      }
+    }
+  }
+
   li {
     @apply pl-2;
   }
 
-  li:has(ul, ol) {
-    @apply list-none;
-  }
-
-  button,
-  summary {
-    @apply flex cursor-pointer items-center justify-center leading-none;
-  }
-
-  label {
-    @apply flex cursor-pointer items-center gap-2 rounded-md;
-  }
-
-  input {
-    @apply min-w-0;
-  }
-
-  textarea {
-    @apply min-w-0;
-  }
-
-  pre {
-    @apply bg-off-black max-w-full overflow-auto rounded-md p-4 text-white;
-  }
-
-  :not(pre) > code {
-    @apply rounded-md bg-current/10 px-0.5 py-px;
-  }
-
-  blockquote {
-    @apply border-l-4 border-current/10 pl-8 leading-loose;
-  }
-
-  dl {
-    @apply grid max-w-max grid-cols-[repeat(var(--cols),auto)] gap-x-4 gap-y-2 [--cols:2];
-  }
-
-  dt {
-    @apply text-gray;
-  }
-
-  dd:empty {
-    @apply before:text-gray before:content-['-'];
-  }
-
   table {
-    @apply border-collapse rounded-md;
+    @apply border-collapse;
+  }
+
+  thead tr {
+    @apply bg-alt-white border-light-gray border-b;
+  }
+
+  tbody tr {
+    @apply even:bg-alt-white bg-white;
   }
 
   th {
-    @apply font-medium;
+    @apply text-left font-medium;
   }
 
   th,
@@ -209,39 +198,59 @@
     @apply not-last:border-light-gray p-2 not-last:border-r;
   }
 
-  thead tr {
-    @apply bg-off-white;
+  dl {
+    --cols: 2;
+    @apply grid grid-cols-[repeat(var(--cols),auto)] gap-x-8 gap-y-2;
   }
 
-  tr {
-    @apply even:bg-alt-white bg-white;
+  dt {
+    @apply font-medium;
+  }
+
+  dd {
+    @apply wrap-anywhere;
+  }
+
+  dd:empty {
+    @apply before:text-gray before:content-['-'];
+  }
+
+  :not(pre) > code {
+    @apply bg-dark-gray rounded-[0.25em] px-1 font-mono text-white;
+  }
+
+  pre {
+    @apply bg-dark-gray max-w-full overflow-x-auto rounded-md p-4 font-mono text-white;
+  }
+
+  blockquote {
+    @apply border-light-gray rounded-r-md border-l-4 p-4 leading-loose;
   }
 
   .icon,
   .lucide {
-    @apply inline-block h-[1.1em] w-[unset];
+    @apply h-[1.1em] w-[unset];
+  }
+
+  [aria-disabled="true"] {
+    @apply cursor-not-allowed opacity-50 grayscale;
   }
 
   :not(html) ::-webkit-scrollbar {
-    @apply bg-off-white size-2 rounded-full;
+    @apply bg-light-gray size-2 rounded-full;
   }
 
   :not(html) ::-webkit-scrollbar-thumb {
     @apply bg-gray rounded-full;
   }
 
-  :focus-visible,
-  label:has(input:focus-visible) {
-    @apply outline-2;
-  }
-
-  [aria-disabled="true"] {
-    @apply cursor-not-allowed opacity-50 grayscale;
+  :focus-visible {
+    @apply focus;
   }
 }
 
 @utility width-sm {
-  --width: 150;
+  --width: 120;
 }
 
 @utility width-full {
@@ -250,14 +259,18 @@
 
 @utility grid-layout {
   --min: --spacing(50);
-  @apply grid w-full items-start gap-4;
+  @apply grid gap-4;
   grid-template-columns: repeat(auto-fit, minmax(var(--min), 1fr));
 }
 
 @utility text-tooltip {
-  @apply text-dark-gray cursor-help underline decoration-dashed;
+  @apply cursor-help underline decoration-dashed;
 }
 
 @utility controls {
   @apply flex flex-wrap items-center justify-center gap-8 *:flex *:flex-wrap *:items-center *:justify-center *:gap-4;
+}
+
+@utility focus {
+  @apply outline-accent rounded-md outline-2 outline-offset-2;
 }

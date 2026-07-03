@@ -205,27 +205,23 @@ export default function Tree({ title, filename = [], data }: Props) {
       onClick={deselect}
       controls={[
         [
-          <div className="flex items-center gap-2">
-            <SelectSingle
-              key="sort"
-              label="Sort"
-              options={sortOptions}
-              value={sort}
-              onChange={setSort}
-            />
-          </div>,
+          <SelectSingle
+            key="sort"
+            label="Sort"
+            options={sortOptions}
+            value={sort}
+            onChange={setSort}
+          />,
           <CheckBox key="flip" label="Flip" value={flip} onChange={setFlip} />,
-          <div className="flex items-center gap-2">
-            <NumberBox
-              key="collapse"
-              label="Collapse"
-              tooltip="Visually collapse horizontal lines longer than this"
-              min={1}
-              max={max(tree.descendants().map((node) => node.data.dist)) ?? 0}
-              value={collapse}
-              onChange={setCollapse}
-            />
-          </div>,
+          <NumberBox
+            key="collapse"
+            label="Collapse"
+            tooltip="Visually collapse horizontal lines longer than this"
+            min={1}
+            max={max(tree.descendants().map((node) => node.data.dist)) ?? 0}
+            value={collapse}
+            onChange={setCollapse}
+          />,
         ],
       ]}
     >

@@ -23,7 +23,7 @@ export const types = {
   warning: { color: "var(--color-warning)", icon: <CircleAlert /> },
   error: { color: "var(--color-error)", icon: <TriangleAlert /> },
   analyzing: {
-    color: "var(--color-deep-light)",
+    color: "var(--color-deep)",
     icon: <Logo data-animated className="h-[1.5em]" />,
   },
 };

@@ -48,7 +48,7 @@ export default function Tooltip({ ref, content, children, ...props }: Props) {
             side="top"
           >
             {content}
-            <Arrow className="scale-110 fill-off-white" />
+            <Arrow className="scale-110 fill-light-gray" />
           </Content>
         </Portal>
       </Root>

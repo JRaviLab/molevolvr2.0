@@ -34,7 +34,7 @@ export default function Collapsible({
       <Tooltip content={tooltip}>
         <summary
           className={clsx(
-            `flex min-h-10 items-center gap-2 rounded-md border border-dashed border-current p-2 text-accent hover:text-deep`,
+            "flex min-h-10 items-center gap-2 rounded-md bg-light-gray p-2 hover:text-accent",
             className,
           )}
         >

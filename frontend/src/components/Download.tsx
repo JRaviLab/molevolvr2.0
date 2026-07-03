@@ -51,78 +51,88 @@ export default function Download({
 
   return (
     <Popover
+      className="gap-2!"
       content={
-        <div className="flex flex-col gap-2">
+        <>
           {raster && (
             <>
               <Button
-                icon={<Image />}
-                text="PNG"
                 tooltip="High-resolution image"
                 onClick={async () => {
                   if (!raster.current) return;
                   downloadPng(raster.current, filename);
                 }}
-              />
+              >
+                <Image />
+                PNG
+              </Button>
               <Button
-                icon={<Image />}
-                text="JPEG"
                 tooltip="Compressed image"
                 onClick={async () => {
                   if (!raster.current) return;
                   downloadJpg(raster.current, filename);
                 }}
-              />
+              >
+                <Image />
+                JPEG
+              </Button>
             </>
           )}
           {vector && (
             <Button
-              icon={<Spline />}
-              text="SVG"
               tooltip="Vector image"
               onClick={() => {
                 if (!vector.current) return;
                 downloadSvg(vector.current, filename);
               }}
-            />
+            >
+              <Spline />
+              SVG
+            </Button>
           )}
           {tabular && (
             <>
               <Button
-                icon={<Table />}
-                text="TSV"
                 tooltip="Tab-separated data"
                 onClick={() => downloadTsv(tabular, filename)}
-              />
+              >
+                <Table />
+                TSV
+              </Button>
               <Button
-                icon={<Table />}
-                text="CSV"
-                tooltip="Tab-separated data"
+                tooltip="Comma-separated data"
                 onClick={() => downloadCsv(tabular, filename)}
-              />
+              >
+                <Table />
+                CSV
+              </Button>
             </>
           )}
           {text && (
             <Button
-              icon={<Terminal />}
-              text="Text"
               tooltip="Raw text data"
               onClick={() => downloadTxt(text, filename)}
-            />
+            >
+              <Terminal />
+              TXT
+            </Button>
           )}
           {!!json && (
             <Button
-              icon={<Braces />}
-              text="JSON"
               tooltip="JSON data"
               onClick={() => downloadJson(_json, filename)}
-            />
+            >
+              <Braces />
+              JSON
+            </Button>
           )}
           {children}
-        </div>
+        </>
       }
     >
-      <Button icon={<DownloadIcon />} tooltip="Download" design="hollow" />
+      <Button design="hollow" tooltip="Download">
+        <DownloadIcon />
+      </Button>
     </Popover>
   );
 }

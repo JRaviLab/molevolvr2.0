@@ -34,10 +34,13 @@ export default function TableOfContents() {
   /** auto-close if covering something important */
   const autoClose = useDebounceFn(() => {
     if (open && isCovering(ref.current)) setOpen(false);
-  }, 1000);
+  }, 500);
 
   /** when path changes */
-  if (useChanged(pathname)) autoClose.flush();
+  if (useChanged(pathname)) {
+    autoClose.run();
+    autoClose.flush();
+  }
 
   /** full heading details */
   const headings = useAtomValue(headingsAtom);
@@ -50,6 +53,7 @@ export default function TableOfContents() {
     /** wait for any element inside toc to lose focus */
     await sleep();
     /** auto-close */
+    autoClose.run();
     autoClose.flush();
   });
 
@@ -78,10 +82,11 @@ export default function TableOfContents() {
   return (
     <aside
       ref={ref}
-      className="fixed z-20 flex max-w-60 flex-col bg-white shadow-sm"
+      className="fixed z-20 flex max-w-80 flex-col bg-white shadow-md"
+      style={{ maxHeight: `calc(100vh - var(--header-height))` }}
       aria-label="Table of contents"
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 shadow-md">
         {/* top text */}
         {open && (
           <span className="grow p-3 font-medium">Table Of Contents</span>
@@ -90,37 +95,35 @@ export default function TableOfContents() {
         {/* toggle button */}
         <Tooltip content={open ? "Close" : "Table of contents"}>
           <Button
-            icon={open ? <X /> : <Menu />}
-            tooltip={open ? "Close" : "Table of contents"}
-            design="hollow"
             className="rounded-none"
+            design="hollow"
+            tooltip={open ? "Close" : "Table of contents"}
             aria-expanded={open}
             onClick={() => setOpen(!open)}
-          ></Button>
+          >
+            {open ? <X /> : <Menu />}
+          </Button>
         </Tooltip>
       </div>
 
       {/* links */}
       {open && (
-        <div
-          ref={listRef}
-          className="flex max-h-[40dvh] flex-col overflow-y-auto"
-        >
+        <div ref={listRef} className="flex flex-col overflow-y-auto">
           {headings.map(({ id, level, content, icon }, index) => (
             <Link
               key={index}
               ref={active === index ? activeRef : undefined}
               style={{ "--level": level } as CSSProperties}
               className={clsx(
-                `flex items-center gap-2 p-1 pl-[calc(var(--level)*(--spacing(4)))] hover:bg-off-white hover:text-deep`,
-                active === index && "bg-off-white text-deep",
+                "flex items-center gap-2 p-2 pl-[calc(var(--level)*(--spacing(4)))] text-black no-underline hover:bg-light-gray hover:text-deep",
+                active === index && "bg-light-gray text-deep",
               )}
               to={{ hash: "#" + id }}
               replace
               onClick={() => scrollTo("#" + id)}
             >
-              {icon}
-              <span className="grow truncate py-1">{content}</span>
+              <span className="text-gray">{icon}</span>
+              <span className="grow truncate">{content}</span>
             </Link>
           ))}
         </div>

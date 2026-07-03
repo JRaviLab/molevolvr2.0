@@ -1,47 +1,22 @@
-import type {
-  ComponentPropsWithRef,
-  ReactElement,
-  ReactNode,
-  Ref,
-} from "react";
+import type { ComponentProps, ReactNode, Ref } from "react";
 import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
 
-type Props = Base & Description & (_Link | _Button);
+type Props = Base & (_Button | _Anchor);
 
 type Base = {
-  /** icon to show next to text */
-  icon?: ReactElement;
-  /** whether to flip text/icon sides */
-  flip?: boolean;
   /** look */
-  design?: "normal" | "hollow" | "critical";
-  /** sizing */
-  size?: "compact" | "normal";
-  /** class on button */
-  className?: string;
+  design?: "hollow" | "plain" | "accent" | "critical";
+  /** size */
+  size?: "sm" | "md";
+  /** tooltip */
+  tooltip?: ReactNode;
 };
 
-type Description =
-  /** require text and/or tooltip for accessibility */
-  { text: string; tooltip?: ReactNode } | { text?: string; tooltip: ReactNode };
-
-type _Link = Pick<ComponentPropsWithRef<typeof Link>, "ref" | "to" | "style">;
-
-type _Button = Pick<
-  ComponentPropsWithRef<"button">,
-  | "ref"
-  | "type"
-  | "style"
-  | "onClick"
-  | "onDrag"
-  | "onDragEnter"
-  | "onDragLeave"
-  | "onDragOver"
-  | "onDrop"
->;
+type _Button = ComponentProps<"button">;
+type _Anchor = ComponentProps<typeof Link>;
 
 /**
  * looks like a button and either goes somewhere (link) or does something
@@ -49,36 +24,21 @@ type _Button = Pick<
  */
 export default function Button({
   ref,
-  text,
-  icon,
-  flip = false,
-  design = "normal",
-  size = "normal",
+  design = "plain",
+  size = "md",
   className,
   tooltip,
   ...props
 }: Props) {
-  /** contents of main element */
-  const children = flip ? (
-    <>
-      {icon}
-      {text}
-    </>
-  ) : (
-    <>
-      {text}
-      {icon}
-    </>
-  );
-
   /** class name string */
-  const _class = clsx(
-    "min-h-10 min-w-10 gap-2 leading-none",
-    size === "compact" ? "p-1" : "p-3",
-    !!icon && !text ? "rounded-full" : "rounded-md",
-    design === "hollow" && `text-accent hover:text-deep`,
-    design === "normal" && `bg-accent text-white hover:bg-deep`,
-    design === "critical" && `bg-black text-white hover:bg-deep`,
+  className = clsx(
+    "flex items-center justify-center gap-2 rounded-md no-underline",
+    size === "sm" && "min-h-6 min-w-6 p-1",
+    size === "md" && "min-h-10 min-w-10 p-2",
+    design === "hollow" && "text-accent hover:text-deep",
+    design === "plain" && "bg-light-gray text-black hover:text-accent",
+    design === "accent" && "bg-accent text-white hover:bg-deep",
+    design === "critical" && "bg-black text-white hover:bg-deep",
     className,
   );
 
@@ -90,25 +50,22 @@ export default function Button({
     return (
       <Link
         ref={ref as Ref<HTMLAnchorElement>}
-        className={_class}
+        className={className}
         tooltip={tooltip}
         showArrow={false}
         {...props}
-      >
-        {children}
-      </Link>
+      />
     );
   /** otherwise, render as button */ else
     return (
       <Tooltip content={tooltip}>
         <button
           ref={ref as Ref<HTMLButtonElement>}
-          className={_class}
+          className={className}
           form={form}
+          type="button"
           {...props}
-        >
-          {children}
-        </button>
+        />
       </Tooltip>
     );
 }

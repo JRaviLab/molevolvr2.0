@@ -3,7 +3,6 @@ import { useElementSize } from "@reactuses/core";
 import { mapValues, sample, startCase, uniq } from "lodash";
 import {
   AppWindowMac,
-  ArrowRight,
   ArrowUpDown,
   Beer,
   Brush,
@@ -27,7 +26,7 @@ import {
   Shapes,
   SlidersHorizontal,
   Square,
-  SquareCheck,
+  SquareCheckBig,
   TableCellsMerge,
   TableColumnsSplit,
   TableIcon,
@@ -37,6 +36,7 @@ import {
   Wine,
 } from "lucide-react";
 import CustomIcon from "@/assets/custom-icon.svg?react";
+import Logo from "@/assets/logo.svg?react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
@@ -44,7 +44,7 @@ import CheckBox from "@/components/CheckBox";
 import Collapsible from "@/components/Collapsible";
 import Dialog from "@/components/Dialog";
 import Form from "@/components/Form";
-import Heading from "@/components/Heading";
+import { H1, H2, H3, H4 } from "@/components/Heading";
 import Heatmap from "@/components/Heatmap";
 import IPR from "@/components/IPR";
 import Legend from "@/components/Legend";
@@ -98,7 +98,7 @@ export default function TestbedPage() {
       <Meta title="Testbed" />
 
       <section className="items-center">
-        <Heading level={1}>Testbed</Heading>
+        <H1>Testbed</H1>
 
         <dl>
           <dt>Fake Analysis ID</dt>
@@ -129,24 +129,26 @@ export default function TestbedPage() {
       {/* generic components */}
 
       <SectionLink />
-      <SectionButton />
       <SectionTextBox />
-      <SectionSelect />
-      <SectionCheckBox />
-      <SectionSlider />
       <SectionNumberBox />
-      <SectionRadios />
-      <SectionAgo />
-      <SectionAlert />
-      <SectionTabs />
-      <SectionToast />
+      <SectionButton />
+      <SectionSelect />
       <SectionCollapsible />
-      <SectionTile />
-      <SectionTable />
+      <SectionTabs />
+      <SectionCheckBox />
+      <SectionRadios />
+      <SectionSlider />
+      <SectionAlert />
+      <SectionToast />
       <SectionTooltip />
       <SectionPopover />
       <SectionDialog />
+      <SectionTable />
+      <SectionTile />
+      <SectionAgo />
       <SectionForm />
+
+      <SectionIcons />
     </>
   );
 }
@@ -159,9 +161,7 @@ function SectionElements() {
 
   return (
     <section className="items-center">
-      <Heading level={2} icon={<Brush />}>
-        Elements
-      </Heading>
+      <H2 icon={<Brush />}>Elements</H2>
 
       {/* main color palette */}
       <div className="flex flex-wrap">
@@ -287,15 +287,9 @@ popup.innerText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed 
 function SectionHeading() {
   return (
     <section className="items-center">
-      <Heading level={2} icon="X">
-        Heading 2
-      </Heading>
-      <Heading level={3} icon="Y">
-        Heading 3
-      </Heading>
-      <Heading level={4} icon="Z">
-        Heading 4
-      </Heading>
+      <H2 icon="X">Heading 2</H2>
+      <H3 icon="Y">Heading 3</H3>
+      <H4 icon="Z">Heading 4</H4>
     </section>
   );
 }
@@ -317,13 +311,11 @@ function SectionLegend() {
 
   return (
     <section className="items-center">
-      <Heading level={2} icon={<Shapes />}>
-        Legend
-      </Heading>
+      <H2 icon={<Shapes />}>Legend</H2>
 
       <div
         ref={ref}
-        className="w-100 max-w-full resize overflow-auto rounded-md p-4 shadow-sm"
+        className="w-100 max-w-full resize overflow-auto rounded-md p-4 shadow-md"
       >
         <Legend entries={data} x={0} y={0} w={width} />
       </div>
@@ -338,9 +330,7 @@ function SectionUpset() {
 
   return (
     <section className="items-center">
-      <Heading level={2} icon={<Frown />}>
-        Upset
-      </Heading>
+      <H2 icon={<Frown />}>Upset</H2>
 
       <Upset title={label()} filename={[analysis]} {...data} />
 
@@ -354,9 +344,7 @@ function SectionSunburst() {
 
   return (
     <section className="items-center">
-      <Heading level={2} icon={<ChartPie />}>
-        Sunburst
-      </Heading>
+      <H2 icon={<ChartPie />}>Sunburst</H2>
 
       <Sunburst title={label()} filename={[analysis]} data={data} />
 
@@ -370,9 +358,7 @@ function SectionHeatmap() {
 
   return (
     <section className="items-center">
-      <Heading level={2} icon={<Grid3X3 />}>
-        Heatmap
-      </Heading>
+      <H2 icon={<Grid3X3 />}>Heatmap</H2>
 
       <Heatmap title={label()} filename={[analysis]} {...data} />
 
@@ -386,9 +372,7 @@ function SectionTree() {
 
   return (
     <section className="items-center">
-      <Heading level={2} icon={<NetworkIcon />}>
-        Tree
-      </Heading>
+      <H2 icon={<NetworkIcon />}>Tree</H2>
 
       <Tree title={label()} filename={[analysis]} data={data} />
 
@@ -402,9 +386,7 @@ function SectionNetwork() {
 
   return (
     <section className="items-center">
-      <Heading level={2} icon={<Waypoints />}>
-        Network
-      </Heading>
+      <H2 icon={<Waypoints />}>Network</H2>
 
       <Network filename={[analysis]} {...data} />
 
@@ -418,9 +400,7 @@ function SectionMSA() {
 
   return (
     <section className="items-center">
-      <Heading level={2} icon={<TableColumnsSplit />}>
-        MSA
-      </Heading>
+      <H2 icon={<TableColumnsSplit />}>MSA</H2>
 
       <MSA
         title={label()}
@@ -443,9 +423,7 @@ function SectionIPR() {
 
   return (
     <section className="items-center">
-      <Heading level={2} icon={<TableCellsMerge />}>
-        IPR
-      </Heading>
+      <H2 icon={<TableCellsMerge />}>IPR</H2>
 
       <IPR title={label()} filename={[analysis]} {...data} />
 
@@ -457,9 +435,7 @@ function SectionIPR() {
 function SectionLink() {
   return (
     <section className="items-center">
-      <Heading level={2} icon={<LinkIcon />}>
-        Link
-      </Heading>
+      <H2 icon={<LinkIcon />}>Link</H2>
 
       <p className="flex gap-4">
         <Link to="/">Internal Link</Link>
@@ -469,59 +445,12 @@ function SectionLink() {
   );
 }
 
-function SectionButton() {
-  return (
-    <section className="items-center">
-      <Heading level={2} icon={<Square />}>
-        Button
-      </Heading>
-
-      <div className="flex flex-wrap items-center gap-4">
-        <Button
-          to="/about"
-          icon={<ArrowRight />}
-          tooltip="Tooltip"
-          text="As Link"
-          design="hollow"
-        />
-        <Button to="/about" text="As Link" tooltip="Tooltip" />
-        <Button
-          to="/about"
-          icon={<CustomIcon />}
-          tooltip="Tooltip"
-          design="critical"
-        />
-        <Button
-          text="As Button"
-          tooltip="Tooltip"
-          design="hollow"
-          onClick={() => window.alert("Hello World")}
-        />
-        <Button
-          icon={<ArrowRight />}
-          text="As Button"
-          tooltip="Tooltip"
-          onClick={() => window.alert("Hello World")}
-        />
-        <Button
-          icon={<CustomIcon />}
-          tooltip="Tooltip"
-          design="critical"
-          onClick={() => window.alert("Hello World")}
-        />
-      </div>
-    </section>
-  );
-}
-
 function SectionTextBox() {
   const [value, setValue] = useState("");
 
   return (
     <section className="items-center">
-      <Heading level={2} icon={<Type />}>
-        Text Box
-      </Heading>
+      <H2 icon={<Type />}>Text Box</H2>
 
       <div className="flex flex-wrap items-center gap-4">
         <TextBox
@@ -540,6 +469,61 @@ function SectionTextBox() {
           value={value}
           onChange={setValue}
         />
+      </div>
+    </section>
+  );
+}
+
+function SectionNumberBox() {
+  const [value, setValue] = useState(0);
+
+  return (
+    <section className="items-center">
+      <H2 icon={<Hash />}>Number Box</H2>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <NumberBox
+          label="Number"
+          tooltip="Tooltip"
+          min={0}
+          max={100}
+          step={1}
+          value={value}
+          onChange={setValue}
+        />
+        <NumberBox
+          label="Big steps"
+          tooltip="Tooltip"
+          min={-10000}
+          max={10000}
+          step={100}
+          value={value}
+          onChange={setValue}
+        />
+      </div>
+    </section>
+  );
+}
+
+function SectionButton() {
+  return (
+    <section className="items-center">
+      <H2 icon={<Square />}>Button</H2>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <Button to="/about" design="hollow" tooltip="Tooltip">
+          Button
+        </Button>
+        <Button to="/about" tooltip="Tooltip">
+          Button
+        </Button>
+        <Button to="/about" design="accent" tooltip="Tooltip">
+          <CustomIcon />
+          Button
+        </Button>
+        <Button to="/about" design="critical" tooltip="Tooltip">
+          <CustomIcon />
+        </Button>
       </div>
     </section>
   );
@@ -573,9 +557,7 @@ function SectionSelect() {
 
   return (
     <section className="items-center">
-      <Heading level={2} icon={<ListCheck />}>
-        Select
-      </Heading>
+      <H2 icon={<ListCheck />}>Select</H2>
 
       <div className="flex flex-wrap items-center gap-4">
         <SelectSingle
@@ -597,165 +579,21 @@ function SectionSelect() {
   );
 }
 
-function SectionCheckBox() {
-  const [value, setValue] = useState(false);
-
+function SectionCollapsible() {
   return (
     <section className="items-center">
-      <Heading level={2} icon={<SquareCheck />}>
-        Check Box
-      </Heading>
+      <H2 icon={<ArrowUpDown />}>Collapsible</H2>
 
-      <CheckBox
-        label="Accept terms and conditions"
-        tooltip="Tooltip"
-        value={value}
-        onChange={setValue}
-      />
-    </section>
-  );
-}
-
-function SectionSlider() {
-  const [singleValue, setSingleValue] = useState(0);
-  const [multiValue, setMultiValue] = useState<number[]>([0, 1000]);
-
-  return (
-    <section className="items-center">
-      <Heading level={2} icon={<SlidersHorizontal />}>
-        Slider
-      </Heading>
-
-      <div className="flex flex-wrap items-center gap-4">
-        <Slider
-          label="Single"
-          tooltip="Tooltip"
-          min={0}
-          max={100}
-          step={1}
-          value={singleValue}
-          onChange={setSingleValue}
-        />
-        <Slider
-          label="Range"
-          tooltip="Tooltip"
-          multi
-          min={0}
-          max={10000}
-          step={100}
-          value={multiValue}
-          onChange={setMultiValue}
-        />
-      </div>
-    </section>
-  );
-}
-
-function SectionNumberBox() {
-  const [value, setValue] = useState(0);
-
-  return (
-    <section className="items-center">
-      <Heading level={2} icon={<Hash />}>
-        Number Box
-      </Heading>
-
-      <div className="flex flex-wrap items-center gap-4">
-        <NumberBox
-          label="Number"
-          tooltip="Tooltip"
-          min={0}
-          max={100}
-          step={1}
-          value={value}
-          onChange={setValue}
-        />
-        <NumberBox
-          label="Big steps"
-          tooltip="Tooltip"
-          min={-10000}
-          max={10000}
-          step={100}
-          value={value}
-          onChange={setValue}
-        />
-      </div>
-    </section>
-  );
-}
-
-function SectionRadios() {
-  const options = [
-    { id: "first", primary: "Primary lorem ipsum" },
-    {
-      id: "second",
-      primary: "Primary lorem ipsum",
-      secondary: "Secondary lorem ipsum",
-    },
-    {
-      id: "third",
-      primary: "Primar lorem ipsum",
-      icon: <Dog />,
-    },
-  ] as const;
-
-  const [value, setValue] = useState<(typeof options)[number]["id"]>(
-    options[0].id,
-  );
-
-  return (
-    <section className="items-center">
-      <Heading level={2} icon={<CircleCheckBig />}>
-        Radios
-      </Heading>
-
-      <div className="flex flex-col gap-2">
-        <Radios
-          label="Choice"
-          tooltip="Tooltip"
-          options={options}
-          value={value}
-          onChange={setValue}
-        />
-      </div>
-    </section>
-  );
-}
-
-function SectionAgo() {
-  return (
-    <section className="items-center">
-      <Heading level={2} icon={<Hourglass />}>
-        Ago
-      </Heading>
-
-      <div className="flex flex-wrap items-center gap-4">
-        <Ago date={new Date()} />
-        <Ago date="Nov 12 2023" />
-        <Ago date="Jun 1 2020" />
-      </div>
-    </section>
-  );
-}
-
-function SectionAlert() {
-  return (
-    <section className="items-center">
-      <Heading level={2} icon={<Info />}>
-        Alert
-      </Heading>
-
-      <div className="flex flex-col items-center gap-4">
-        <Alert>
+      <Collapsible title="Expand Me" tooltip="Tooltip">
+        <p>
           Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua.
-        </Alert>
-        {Object.keys(types).map((type) => (
-          <Alert key={type} type={type as keyof typeof types}>
-            {startCase(type)}
-          </Alert>
-        ))}
-      </div>
+          tempor incididunt ut labore et dolore magna aliqua. Facilisis sed odio
+          morbi quis commodo odio aenean sed. Urna cursus eget nunc scelerisque
+          viverra mauris in aliquam. Elementum integer enim neque volutpat ac
+          tincidunt vitae semper quis. Non diam phasellus vestibulum lorem sed
+          risus. Amet luctus venenatis lectus magna.
+        </p>
+      </Collapsible>
     </section>
   );
 }
@@ -763,9 +601,7 @@ function SectionAlert() {
 function SectionTabs() {
   return (
     <section className="items-center">
-      <Heading level={2} icon={<Folder />}>
-        Tabs
-      </Heading>
+      <H2 icon={<Folder />}>Tabs</H2>
 
       <Tabs syncWithUrl="tab" defaultValue="drinks">
         <Tab text="Animals" icon={<Dog />} tooltip="Tooltip">
@@ -794,24 +630,126 @@ function SectionTabs() {
   );
 }
 
+function SectionCheckBox() {
+  const [value, setValue] = useState(false);
+
+  return (
+    <section className="items-center">
+      <H2 icon={<SquareCheckBig />}>Check Box</H2>
+
+      <CheckBox
+        label="Accept terms and conditions"
+        tooltip="Tooltip"
+        value={value}
+        onChange={setValue}
+      />
+    </section>
+  );
+}
+
+function SectionRadios() {
+  const options = [
+    { id: "first", primary: "Primary lorem ipsum" },
+    {
+      id: "second",
+      primary: "Primary lorem ipsum",
+      secondary: "Secondary lorem ipsum",
+    },
+    {
+      id: "third",
+      primary: "Primar lorem ipsum",
+      icon: <Dog />,
+    },
+  ] as const;
+
+  const [value, setValue] = useState<(typeof options)[number]["id"]>(
+    options[0].id,
+  );
+
+  return (
+    <section className="items-center">
+      <H2 icon={<CircleCheckBig />}>Radios</H2>
+
+      <Radios
+        label="Choice"
+        tooltip="Tooltip"
+        options={options}
+        value={value}
+        onChange={setValue}
+      />
+    </section>
+  );
+}
+
+function SectionSlider() {
+  const [singleValue, setSingleValue] = useState(0);
+  const [multiValue, setMultiValue] = useState<number[]>([0, 1000]);
+
+  return (
+    <section className="items-center">
+      <H2 icon={<SlidersHorizontal />}>Slider</H2>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <Slider
+          label="Single"
+          tooltip="Tooltip"
+          min={0}
+          max={100}
+          step={1}
+          value={singleValue}
+          onChange={setSingleValue}
+        />
+        <Slider
+          label="Range"
+          tooltip="Tooltip"
+          multi
+          min={0}
+          max={10000}
+          step={100}
+          value={multiValue}
+          onChange={setMultiValue}
+        />
+      </div>
+    </section>
+  );
+}
+
+function SectionAlert() {
+  return (
+    <section className="items-center">
+      <H2 icon={<Info />}>Alert</H2>
+
+      <div className="flex flex-col items-center gap-4">
+        <Alert>
+          Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua.
+        </Alert>
+        {Object.keys(types).map((type) => (
+          <Alert key={type} type={type as keyof typeof types}>
+            {startCase(type)}
+          </Alert>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function SectionToast() {
   return (
     <section className="items-center">
-      <Heading level={2} icon={<Wine />}>
-        Toast
-      </Heading>
+      <H2 icon={<Wine />}>Toast</H2>
 
       <div className="flex flex-wrap gap-4">
         <Button
-          text="Unique Toast"
           onClick={() =>
             toast(
               sample(["Apple", "Banana", "Cantaloupe", "Durian", "Elderberry"]),
             )
           }
-        />
+        >
+          Unique Toast
+        </Button>
         <Button
-          text="Overwriting Toast"
           onClick={() => {
             toast(
               <>
@@ -821,94 +759,10 @@ function SectionToast() {
               "ABC",
             );
           }}
-        />
+        >
+          Overwriting Toast
+        </Button>
       </div>
-    </section>
-  );
-}
-
-function SectionCollapsible() {
-  return (
-    <section className="items-center">
-      <Heading level={2} icon={<ArrowUpDown />}>
-        Collapsible
-      </Heading>
-
-      <Collapsible title="Expand Me" tooltip="Tooltip">
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipiscing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua. Facilisis sed odio
-          morbi quis commodo odio aenean sed. Urna cursus eget nunc scelerisque
-          viverra mauris in aliquam. Elementum integer enim neque volutpat ac
-          tincidunt vitae semper quis. Non diam phasellus vestibulum lorem sed
-          risus. Amet luctus venenatis lectus magna.
-        </p>
-      </Collapsible>
-    </section>
-  );
-}
-
-function SectionTile() {
-  return (
-    <section className="items-center">
-      <Heading level={2} icon={<CustomIcon />}>
-        Tile
-      </Heading>
-
-      <div className="flex flex-wrap gap-8">
-        <Tile
-          icon={<Hourglass />}
-          primary={formatNumber(1234)}
-          secondary="Sequences"
-        />
-        <Tile
-          icon={<CustomIcon />}
-          primary={formatNumber(5678)}
-          secondary="Proteins"
-        />
-        <Tile
-          icon={<Menu />}
-          primary={formatNumber(99999)}
-          secondary="Analyses"
-        />
-      </div>
-    </section>
-  );
-}
-
-function SectionTable() {
-  return (
-    <section className="items-center">
-      <Heading level={2} icon={<TableIcon />}>
-        Table
-      </Heading>
-
-      <Table
-        cols={[
-          {
-            key: "name",
-            name: "Name",
-          },
-          {
-            key: "age",
-            name: "Age",
-            filterType: "number",
-          },
-          {
-            key: "status",
-            name: "Status",
-            filterType: "enum",
-          },
-          {
-            key: "text",
-            name: "Long text",
-            filterType: "string",
-            show: false,
-            render: (cell) => <div className="line-clamp-5 p-1">{cell}</div>,
-          },
-        ]}
-        rows={tableData}
-      />
     </section>
   );
 }
@@ -916,9 +770,7 @@ function SectionTable() {
 function SectionTooltip() {
   return (
     <section className="items-center">
-      <Heading level={2} icon={<MessageSquare />}>
-        Tooltip
-      </Heading>
+      <H2 icon={<MessageSquare />}>Tooltip</H2>
 
       <div className="flex flex-wrap gap-4">
         <Tooltip content="Minimal, non-interactive help or contextual info">
@@ -946,9 +798,7 @@ function SectionTooltip() {
 function SectionPopover() {
   return (
     <section className="items-center">
-      <Heading level={2} icon={<MessageSquareDot />}>
-        Popover
-      </Heading>
+      <H2 icon={<MessageSquareDot />}>Popover</H2>
 
       <Popover
         content={
@@ -959,7 +809,7 @@ function SectionPopover() {
               </Link>{" "}
               content
             </p>
-            <Button text="Save" />
+            <Button>Save</Button>
             <SelectSingle
               label="Select"
               options={
@@ -976,7 +826,7 @@ function SectionPopover() {
         }
       >
         <Tooltip content="Click to open">
-          <Button text="Popover" />
+          <Button>Popover</Button>
         </Tooltip>
       </Popover>
     </section>
@@ -986,9 +836,7 @@ function SectionPopover() {
 function SectionDialog() {
   return (
     <section className="items-center">
-      <Heading level={2} icon={<AppWindowMac />}>
-        Dialog
-      </Heading>
+      <H2 icon={<AppWindowMac />}>Dialog</H2>
 
       <Dialog
         title="Lorem ipsum"
@@ -1030,7 +878,7 @@ function SectionDialog() {
 
                 <Popover content="Odio semper orci ante varius porttitor.">
                   <Tooltip content="Click to open">
-                    <Button text="Popover" />
+                    <Button>Popover</Button>
                   </Tooltip>
                 </Popover>
               </Tab>
@@ -1078,27 +926,104 @@ function SectionDialog() {
               onChange={() => null}
             />
             <Button
-              text="Nevermind"
               onClick={() => {
                 console.debug("Cancel");
                 close();
               }}
-            />
+            >
+              Nevermind
+            </Button>
             <Button
-              text="Yes, delete"
               design="critical"
               onClick={() => {
                 console.debug("Delete");
                 close();
               }}
-            />
+            >
+              Yes, delete
+            </Button>
           </>
         )}
       >
         <Tooltip content="Click to open">
-          <Button text="Dialog" />
+          <Button>Dialog</Button>
         </Tooltip>
       </Dialog>
+    </section>
+  );
+}
+
+function SectionTable() {
+  return (
+    <section className="items-center">
+      <H2 icon={<TableIcon />}>Table</H2>
+
+      <Table
+        cols={[
+          {
+            key: "name",
+            name: "Name",
+          },
+          {
+            key: "age",
+            name: "Age",
+            filterType: "number",
+          },
+          {
+            key: "status",
+            name: "Status",
+            filterType: "enum",
+          },
+          {
+            key: "text",
+            name: "Long text",
+            filterType: "string",
+            show: false,
+            render: (cell) => <div className="line-clamp-5 p-1">{cell}</div>,
+          },
+        ]}
+        rows={tableData}
+      />
+    </section>
+  );
+}
+
+function SectionTile() {
+  return (
+    <section className="items-center">
+      <H2 icon={<CustomIcon />}>Tile</H2>
+
+      <div className="flex flex-wrap gap-8">
+        <Tile
+          icon={<Hourglass />}
+          primary={formatNumber(1234)}
+          secondary="Sequences"
+        />
+        <Tile
+          icon={<CustomIcon />}
+          primary={formatNumber(5678)}
+          secondary="Proteins"
+        />
+        <Tile
+          icon={<Menu />}
+          primary={formatNumber(99999)}
+          secondary="Analyses"
+        />
+      </div>
+    </section>
+  );
+}
+
+function SectionAgo() {
+  return (
+    <section className="items-center">
+      <H2 icon={<Hourglass />}>Ago</H2>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <Ago date={new Date()} />
+        <Ago date="Nov 12 2023" />
+        <Ago date="Jun 1 2020" />
+      </div>
     </section>
   );
 }
@@ -1106,17 +1031,29 @@ function SectionDialog() {
 function SectionForm() {
   return (
     <section className="items-center">
-      <Heading level={2} icon={<TextCursorInput />}>
-        Form
-      </Heading>
+      <H2 icon={<TextCursorInput />}>Form</H2>
 
       <Form onSubmit={() => console.info("Form submitted")}>
         <div className="flex flex-wrap items-center gap-4">
           <TextBox label="Name" value="Test" onChange={() => null} />
-          <Button text="Button" />
-          <Button text="Submit" type="submit" />
+          <Button>Button</Button>
+          <Button type="submit">Submit</Button>
         </div>
       </Form>
+    </section>
+  );
+}
+
+function SectionIcons() {
+  return (
+    <section>
+      <div className="flex size-100 items-center justify-center bg-deep text-white">
+        <Logo className="size-90" />
+      </div>
+      <div className="flex h-100 w-200 items-center justify-center gap-8 bg-deep text-5xl tracking-wide text-white uppercase">
+        <Logo className="size-32" />
+        {import.meta.env.VITE_TITLE}
+      </div>
     </section>
   );
 }

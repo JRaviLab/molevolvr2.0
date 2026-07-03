@@ -7,12 +7,12 @@ import { Download, MessageCircleMore, Send } from "lucide-react";
 import { createIssue } from "@/api/issue";
 import Alert from "@/components/Alert";
 import Button from "@/components/Button";
-import Collapsible from "@/components/Collapsible";
 import Dialog from "@/components/Dialog";
 import Form from "@/components/Form";
 import Help from "@/components/Help";
 import Link from "@/components/Link";
 import TextBox from "@/components/TextBox";
+import Tooltip from "@/components/Tooltip";
 import { userAgent } from "@/util/browser";
 import { downloadJpg } from "@/util/download";
 import { shortenUrl } from "@/util/string";
@@ -113,64 +113,49 @@ export default function Feedback() {
         content={() => (
           <>
             <div className="grid-layout">
-              <div className="flex flex-col">
-                <TextBox
-                  label="Name"
-                  placeholder="Your Name"
-                  tooltip="Optional. So we know who you are."
-                  value={name}
-                  onChange={setName}
-                />{" "}
-              </div>
-              <div className="flex flex-col">
-                <TextBox
-                  label="GitHub Username"
-                  placeholder="@yourname"
-                  tooltip="Optional. So we can tag you in the post and you can follow it."
-                  value={username}
-                  onChange={setUsername}
-                />
-              </div>
-              <div className="flex flex-col">
-                <TextBox
-                  label="Email"
-                  placeholder="your.name@email.com"
-                  tooltip="Optional. So we can contact you directly if needed."
-                  value={email}
-                  onChange={setEmail}
-                />
-              </div>
-            </div>
-            <div className="flex flex-col">
               <TextBox
-                label="Subject"
-                placeholder="Subject"
-                required
-                value={subject}
-                onChange={setSubject}
+                className="flex-col"
+                label="Name"
+                placeholder="Your Name"
+                tooltip="Optional. So we know who you are."
+                value={name}
+                onChange={setName}
+              />
+              <TextBox
+                className="flex-col"
+                label="GitHub Username"
+                placeholder="@yourname"
+                tooltip="Optional. So we can tag you in the post and you can follow it."
+                value={username}
+                onChange={setUsername}
+              />
+              <TextBox
+                className="flex-col"
+                label="Email"
+                placeholder="your.name@email.com"
+                tooltip="Optional. So we can contact you directly if needed."
+                value={email}
+                onChange={setEmail}
               />
             </div>
-            <div className="flex flex-col">
-              <TextBox
-                label="Feedback"
-                placeholder="Questions, suggestions, bugs, etc."
-                required
-                multi
-                value={feedback}
-                onChange={setFeedback}
-              />
-            </div>
-
-            <Collapsible title="Debug" className="self-center">
-              <dl className="self-center [--cols:6] max-lg:[--cols:4] max-md:[--cols:2]">
-                {Object.entries(details).map(([key, value]) => (
-                  <Fragment key={key}>
-                    <dt>{key}</dt>
-                    <dd>{value}</dd>
-                  </Fragment>
-                ))}
-              </dl>
-            </Collapsible>
+            <TextBox
+              className="flex-col"
+              label="Subject"
+              placeholder="Subject"
+              required
+              value={subject}
+              onChange={setSubject}
+            />
+            <TextBox
+              className="flex-col"
+              label="Feedback"
+              placeholder="Questions, suggestions, bugs, etc."
+              required
+              multi
+              rows={5}
+              value={feedback}
+              onChange={setFeedback}
+            />
 
             <Alert
               type={
@@ -186,9 +171,25 @@ export default function Feedback() {
               {status === "idle" && (
                 <>
                   Submitting will start a <strong>public post</strong> on{" "}
-                  <Link to={VITE_ISSUES}>our GitHub feedback tracker</Link> with{" "}
-                  <strong>all of the information above</strong>. You'll get a
-                  link to it once it's created.
+                  <Link to={VITE_ISSUES}>our feedback tracker</Link> with{" "}
+                  <strong>all of the above</strong> and{" "}
+                  <Tooltip
+                    content={
+                      <dl>
+                        {Object.entries(details).map(([key, value]) => (
+                          <Fragment key={key}>
+                            <dt>{key}</dt>
+                            <dd>{value}</dd>
+                          </Fragment>
+                        ))}
+                      </dl>
+                    }
+                  >
+                    <span className="text-tooltip" tabIndex={0} role="button">
+                      some debug info
+                    </span>
+                  </Tooltip>
+                  . You'll get a link to it once it's created.
                 </>
               )}
               {status === "pending" && "Submitting feedback"}
@@ -216,16 +217,16 @@ export default function Feedback() {
           <>
             <div className="flex flex-wrap gap-2">
               <Button
-                icon={<Download />}
-                text="Screenshot"
                 tooltip="Download a screenshot of the current page"
-                design="hollow"
                 onClick={async () => {
                   close();
                   await downloadJpg(document.body, ["screenshot"]);
                   open();
                 }}
-              />
+              >
+                <Download />
+                Screenshot
+              </Button>
               <Help
                 tooltip={
                   <div>
@@ -240,12 +241,17 @@ export default function Feedback() {
             <div className="grow" />
 
             {status === "idle" && (
-              <Button icon={<Send />} text="Submit" type="submit" />
+              <Button design="accent" type="submit">
+                <Send />
+                Submit
+              </Button>
             )}
           </>
         }
       >
-        <Button icon={<MessageCircleMore />} tooltip="Give us feedback" />
+        <Button design="accent" tooltip="Give us feedback">
+          <MessageCircleMore />
+        </Button>
       </Dialog>
     </Form>
   );

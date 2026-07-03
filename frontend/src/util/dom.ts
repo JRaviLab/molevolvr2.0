@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
+import { formatHex } from "culori";
 import { frame, waitFor, waitForStable } from "@/util/misc";
 
 export type Theme = Record<`--${string}`, string>;
@@ -20,7 +21,11 @@ export const getTheme = (): Theme => {
       .filter((cssRule) => cssRule instanceof CSSStyleRule)
       .flatMap((cssRule) => Array.from(cssRule.style))
       .filter((style) => style.startsWith("--"))
-      .map((variable) => [variable, rootStyles.getPropertyValue(variable)]),
+      .map((variable) => {
+        let value = rootStyles.getPropertyValue(variable);
+        value = formatHex(value) ?? value;
+        return [variable, value];
+      }),
   );
 };
 

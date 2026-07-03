@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { KeyboardEvent, ReactElement, ReactNode } from "react";
 import { Fragment, useEffect } from "react";
 import {
   Label,
@@ -8,7 +8,8 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import clsx from "clsx";
-import { ChevronDown, CircleSmall } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
+import Button from "@/components/Button";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 
@@ -23,6 +24,8 @@ type Props<O extends Option> = {
   value: O["id"];
   /** on selected option state change */
   onChange: (value: O["id"]) => void;
+  /** class on root */
+  className?: string;
 };
 
 export type Option<ID = string | number> = {
@@ -43,6 +46,7 @@ export default function SelectSingle<O extends Option>({
   value,
   onChange,
   options,
+  className,
 }: Props<O>) {
   /** link to parent form component */
   const form = useForm();
@@ -59,43 +63,44 @@ export default function SelectSingle<O extends Option>({
 
   return (
     <Listbox
-      className="contents"
+      className={clsx("flex gap-2", className)}
       as="div"
       form={form}
       value={value}
       onChange={onChange}
     >
       {/* label */}
-      <Label className="flex items-center gap-1">
+      <Label className="flex items-center gap-2">
         {label}
         {tooltip && <Help tooltip={tooltip} />}
       </Label>
 
       {/* button */}
-      <ListboxButton
-        className="min-h-10 gap-2 border-b border-current p-2 text-accent *:leading-none hover:text-deep"
-        onKeyDown={({ key }) => {
-          if (index === -1) return;
+      <ListboxButton as={Fragment}>
+        <Button
+          onKeyDown={({ key }: KeyboardEvent<HTMLButtonElement>) => {
+            if (index === -1) return;
 
-          if (!(key === "ArrowLeft" || key === "ArrowRight")) return;
+            if (!(key === "ArrowLeft" || key === "ArrowRight")) return;
 
-          /** inc/dec selected index */
-          if (key === "ArrowLeft" && index > 0) index--;
-          if (key === "ArrowRight" && index < options.length - 1) index++;
+            /** inc/dec selected index */
+            if (key === "ArrowLeft" && index > 0) index--;
+            if (key === "ArrowRight" && index < options.length - 1) index++;
 
-          /** new selected index */
-          const selected = options[index];
-          if (selected) onChange(selected.id);
-        }}
-      >
-        {selected?.icon}
-        <span className="grow truncate py-1">{selected?.primary}</span>
-        <ChevronDown />
+            /** new selected index */
+            const selected = options[index];
+            if (selected) onChange(selected.id);
+          }}
+        >
+          {selected?.icon}
+          <span className="grow truncate">{selected?.primary}</span>
+          <ChevronDown />
+        </Button>
       </ListboxButton>
 
       {/* dropdown */}
       <ListboxOptions
-        className="z-20 min-w-(--button-width) bg-white shadow-sm"
+        className="z-20 min-w-(--button-width) rounded-md bg-white shadow-md"
         anchor={{ to: "bottom start", padding: 10 }}
         modal={false}
       >
@@ -104,12 +109,12 @@ export default function SelectSingle<O extends Option>({
             {({ focus, selected }) => (
               <li
                 className={clsx(
-                  `flex cursor-pointer items-center gap-2 p-2 *:leading-none`,
-                  focus && "bg-off-white",
+                  "flex cursor-pointer items-center gap-2 p-1",
+                  focus && "bg-light-gray",
                 )}
               >
                 {/* check mark */}
-                <CircleSmall
+                <Check
                   className={clsx(
                     "text-accent",
                     selected ? "opacity-100" : "opacity-0",

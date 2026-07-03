@@ -372,7 +372,7 @@ export default function IPR({ title, filename = [], sequence, tracks }: Props) {
                   y={0}
                   width={width}
                   height={scrollHeight}
-                  fill={theme["--color-off-white"]}
+                  fill={theme["--color-light-gray"]}
                 />
                 <rect
                   x={scrollX - scrollSpan / 2}

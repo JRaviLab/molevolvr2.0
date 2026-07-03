@@ -120,15 +120,13 @@ export default function Heatmap({
       filename={[...filename, "heatmap"]}
       controls={[
         [
-          <div className="flex items-center gap-2">
-            <SelectSingle
-              key="gradient"
-              label="Gradient"
-              options={gradientOptions(reverse)}
-              value={gradient}
-              onChange={setGradient}
-            />
-          </div>,
+          <SelectSingle
+            key="gradient"
+            label="Gradient"
+            options={gradientOptions(reverse)}
+            value={gradient}
+            onChange={setGradient}
+          />,
           <CheckBox
             key="reverse"
             label="Reverse"

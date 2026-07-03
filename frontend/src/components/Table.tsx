@@ -9,7 +9,6 @@ import type { Option as OptionMulti } from "@/components/SelectMulti";
 import type { Option as OptionSingle } from "@/components/SelectSingle";
 import type { Filename } from "@/util/download";
 import { useRef, useState } from "react";
-import { useLocalStorage } from "@reactuses/core";
 import {
   createColumnHelper,
   flexRender,
@@ -143,7 +142,7 @@ export default function Table<Datum extends object>({
   if (!showControls) perPage = perPageOptions[4].id;
 
   /** expanded state */
-  const [expanded, setExpanded] = useLocalStorage("table-expanded", false);
+  const [expanded, setExpanded] = useState(false);
 
   /** column visibility options for multi-select */
   const visibleOptions = cols.map(colToOption);
@@ -286,13 +285,18 @@ export default function Table<Datum extends object>({
     <div
       className={clsx(
         "flex flex-col items-center gap-4",
-        expanded ? "w-[calc(100dvw-(--spacing(40)))]" : "max-w-full",
+        expanded && "w-[calc(100dvw-(--spacing(40)))] self-center",
       )}
     >
-      <div className="max-w-full overflow-x-auto rounded-md shadow-sm">
+      <div
+        className={clsx(
+          "overflow-x-auto rounded-md shadow-md",
+          expanded && "w-full",
+        )}
+      >
         {/* table */}
         <table
-          className="w-full max-w-[min(max-content,var(--content))]"
+          className={clsx(expanded && "w-full")}
           aria-rowcount={table.getPrePaginationRowModel().rows.length}
           aria-colcount={cols.length}
         >
@@ -309,7 +313,7 @@ export default function Table<Datum extends object>({
                     {...getCol(header.column.id)?.attrs}
                   >
                     {header.isPlaceholder ? null : (
-                      <div className="flex items-center justify-start [&_button]:p-1 [&_button]:text-gray [&_button]:hover:text-deep">
+                      <div className="flex items-center justify-start">
                         {/* header label */}
                         <span className="mr-2">
                           {flexRender(
@@ -326,19 +330,25 @@ export default function Table<Datum extends object>({
                         {/* header sort */}
                         {header.column.getCanSort() && (
                           <Tooltip content="Sort this column">
-                            <button
+                            <Button
+                              className={clsx(
+                                !header.column.getIsSorted() &&
+                                  "not-hover:opacity-25",
+                              )}
+                              design="hollow"
+                              size="sm"
                               onClick={header.column.getToggleSortingHandler()}
                             >
                               {header.column.getIsSorted() ? (
                                 header.column.getIsSorted() === "asc" ? (
-                                  <ArrowUp className="text-accent" />
+                                  <ArrowUp />
                                 ) : (
-                                  <ArrowDown className="text-accent" />
+                                  <ArrowDown />
                                 )
                               ) : (
                                 <ArrowDownUp />
                               )}
-                            </button>
+                            </Button>
                           </Tooltip>
                         )}
 
@@ -353,13 +363,20 @@ export default function Table<Datum extends object>({
                             }
                           >
                             <Tooltip content="Filter this column">
-                              <button>
+                              <Button
+                                className={clsx(
+                                  !header.column.getIsFiltered() &&
+                                    "not-hover:opacity-25",
+                                )}
+                                design="hollow"
+                                size="sm"
+                              >
                                 {header.column.getIsFiltered() ? (
-                                  <FilterX className="text-accent" />
+                                  <FilterX />
                                 ) : (
                                   <FilterIcon />
                                 )}
-                              </button>
+                              </Button>
                             </Tooltip>
                           </Popover>
                         ) : null}
@@ -415,58 +432,64 @@ export default function Table<Datum extends object>({
 
       {/* controls */}
       {showControls && (
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-8">
           {/* pagination */}
-          <div className="flex gap-2">
+          <div className="flex">
             <Button
-              icon={<ChevronsLeft />}
-              tooltip="First page"
               design="hollow"
-              size="compact"
+              size="sm"
+              tooltip="First page"
               aria-disabled={!table.getCanPreviousPage()}
               onClick={() => table.setPageIndex(0)}
-            />
+            >
+              <ChevronsLeft />
+            </Button>
             <Button
-              icon={<ChevronLeft />}
-              tooltip="Previous page"
               design="hollow"
-              size="compact"
+              size="sm"
+              tooltip="Previous page"
               aria-disabled={!table.getCanPreviousPage()}
               onClick={table.previousPage}
-            />
+            >
+              <ChevronLeft />
+            </Button>
             <Tooltip content="Jump to page">
               <Button
-                text={[
-                  "Page",
-                  formatNumber(table.getState().pagination.pageIndex + 1),
-                  "of",
-                  formatNumber(table.getPageCount()),
-                ].join(" ")}
                 design="hollow"
-                size="compact"
+                size="sm"
                 onClick={() => {
                   const page = parseInt(window.prompt("Jump to page") || "");
                   if (Number.isNaN(page)) return;
                   table.setPageIndex(clamp(page, 1, table.getPageCount()) - 1);
                 }}
-              />
+              >
+                {[
+                  "Page",
+                  formatNumber(table.getState().pagination.pageIndex + 1),
+                  "of",
+                  formatNumber(table.getPageCount()),
+                ].join(" ")}
+              </Button>
             </Tooltip>
             <Button
-              icon={<ChevronRight />}
-              tooltip="Next page"
               design="hollow"
-              size="compact"
+              size="sm"
+              tooltip="Next page"
               aria-disabled={!table.getCanNextPage()}
               onClick={table.nextPage}
-            />
+            >
+              <ChevronRight />
+            </Button>
+
             <Button
-              icon={<ChevronsRight />}
-              tooltip="Last page"
               design="hollow"
-              size="compact"
+              size="sm"
+              tooltip="Last page"
               aria-disabled={!table.getCanNextPage()}
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            />
+            >
+              <ChevronsRight />
+            </Button>
           </div>
 
           {/* filters */}
@@ -490,34 +513,33 @@ export default function Table<Datum extends object>({
               value={visibleCols}
               onChange={setVisibleCols}
             />
+            {/* table-wide search */}
+            <TextBox
+              placeholder="Search"
+              tooltip="Search entire table (regex)"
+              icon={<Search />}
+              value={search}
+              onChange={setSearch}
+            />
           </div>
 
-          {/* table-wide search */}
-          <TextBox
-            placeholder="Search"
-            tooltip="Search entire table (regex)"
-            icon={<Search />}
-            value={search}
-            onChange={setSearch}
-          />
-
           {/* actions */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center">
             {/* clear filters */}
             <Button
-              icon={<FilterX />}
-              tooltip="Clear all filters"
               design="hollow"
+              tooltip="Clear all filters"
               onClick={() => {
                 table.resetColumnFilters();
                 setSearch("");
               }}
-            />
+            >
+              <FilterX />
+            </Button>
             {/* download */}
             <Button
-              icon={<Download />}
-              tooltip="Download table data as .csv"
               design="hollow"
+              tooltip="Download table data as .csv"
               onClick={() => {
                 /** get col defs that are visible */
                 const defs = visibleCols.map(
@@ -538,14 +560,17 @@ export default function Table<Datum extends object>({
                 /** download */
                 downloadCsv([names, ...data], [...filename, "table"]);
               }}
-            />
+            >
+              <Download />
+            </Button>
             {/* expand/collapse */}
             <Button
-              icon={expanded ? <FoldHorizontal /> : <UnfoldHorizontal />}
-              tooltip={expanded ? "Collapse table" : "Expand table"}
               design="hollow"
+              tooltip={expanded ? "Collapse table" : "Expand table"}
               onClick={() => setExpanded(!expanded)}
-            />
+            >
+              {expanded ? <FoldHorizontal /> : <UnfoldHorizontal />}
+            </Button>
           </div>
         </div>
       )}
@@ -568,27 +593,23 @@ function Filter<Datum extends object>({ column, def }: FilterProps<Datum>) {
     const [min = 0, max = 100] = column.getFacetedMinMaxValues() ?? [];
 
     return (
-      <div className="flex flex-col gap-2">
-        <Slider
-          label="Filter by number"
-          min={min}
-          max={max}
-          step={(max - min) / 100}
-          multi
-          value={
-            (column.getFilterValue() as [number, number] | undefined) ?? [
-              min,
-              max,
-            ]
-          }
-          onChange={(value) => {
-            /** return as "unfiltered" if value equals min/max range */
-            column.setFilterValue(
-              isEqual(value, [min, max]) ? undefined : value,
-            );
-          }}
-        />
-      </div>
+      <Slider
+        label="Filter by number"
+        min={min}
+        max={max}
+        step={(max - min) / 100}
+        multi
+        value={
+          (column.getFilterValue() as [number, number] | undefined) ?? [
+            min,
+            max,
+          ]
+        }
+        onChange={(value) => {
+          /** return as "unfiltered" if value equals min/max range */
+          column.setFilterValue(isEqual(value, [min, max]) ? undefined : value);
+        }}
+      />
     );
   }
 
@@ -607,22 +628,20 @@ function Filter<Datum extends object>({ column, def }: FilterProps<Datum>) {
     }));
 
     return (
-      <div className="flex flex-col gap-2">
-        <SelectMulti
-          label="Filter by types"
-          options={options}
-          value={
-            (column.getFilterValue() as OptionMulti["id"][] | undefined) ??
-            options.map((option) => option.id)
-          }
-          onChange={(value, count) =>
-            /** return as "unfiltered" if all or none are selected */
-            column.setFilterValue(
-              count === "all" || count === "none" ? undefined : value,
-            )
-          }
-        />
-      </div>
+      <SelectMulti
+        label="Filter by types"
+        options={options}
+        value={
+          (column.getFilterValue() as OptionMulti["id"][] | undefined) ??
+          options.map((option) => option.id)
+        }
+        onChange={(value, count) =>
+          /** return as "unfiltered" if all or none are selected */
+          column.setFilterValue(
+            count === "all" || count === "none" ? undefined : value,
+          )
+        }
+      />
     );
   }
 
@@ -652,34 +671,30 @@ function Filter<Datum extends object>({ column, def }: FilterProps<Datum>) {
     ];
 
     return (
-      <div className="flex flex-col gap-2">
-        <SelectSingle
-          label="Filter by type"
-          options={options}
-          value={
-            (column.getFilterValue() as OptionSingle["id"] | undefined) ??
-            options[0]!.id
-          }
-          onChange={(value) =>
-            /** return as "unfiltered" if all are selected */
-            column.setFilterValue(value === "all" ? undefined : value)
-          }
-        />
-      </div>
+      <SelectSingle
+        label="Filter by type"
+        options={options}
+        value={
+          (column.getFilterValue() as OptionSingle["id"] | undefined) ??
+          options[0]!.id
+        }
+        onChange={(value) =>
+          /** return as "unfiltered" if all are selected */
+          column.setFilterValue(value === "all" ? undefined : value)
+        }
+      />
     );
   }
 
   /** filter as text */
   return (
-    <div className="flex flex-col gap-2">
-      <TextBox
-        label="Filter by text (regex)"
-        placeholder="Search"
-        icon={<Search />}
-        value={(column.getFilterValue() as string | undefined) ?? ""}
-        onChange={column.setFilterValue}
-      />
-    </div>
+    <TextBox
+      label="Filter by text (regex)"
+      placeholder="Search"
+      icon={<Search />}
+      value={(column.getFilterValue() as string | undefined) ?? ""}
+      onChange={column.setFilterValue}
+    />
   );
 }
 

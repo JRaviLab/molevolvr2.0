@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { FileChartPie } from "lucide-react";
 import { getAnalysis } from "@/api/analysis";
 import Alert from "@/components/Alert";
-import Heading from "@/components/Heading";
+import { H1 } from "@/components/Heading";
 import Meta from "@/components/Meta";
 import Actions from "@/pages/analysis/Actions";
 import Inputs from "@/pages/analysis/Inputs";
@@ -48,9 +48,7 @@ export default function Analysis() {
       <Meta title="Analysis" />
 
       <section className="items-center">
-        <Heading level={1} icon={<FileChartPie />}>
-          Analysis
-        </Heading>
+        <H1 icon={<FileChartPie />}>Analysis</H1>
 
         {status === "pending" && (
           <Alert type="loading">

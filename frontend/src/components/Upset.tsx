@@ -159,11 +159,7 @@ export default function Upset({
                 cx={(xScale(colIndex) ?? 0) + xScale.bandwidth() / 2}
                 cy={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
                 r={nodeSize}
-                fill={
-                  col
-                    ? theme["--color-deep-light"]
-                    : theme["--color-light-gray"]
-                }
+                fill={col ? theme["--color-deep"] : theme["--color-light-gray"]}
               />
             )),
           )}
@@ -174,7 +170,7 @@ export default function Upset({
           {links.map(([[col1, row1], [col2, row2]], index) => (
             <line
               key={index}
-              stroke={theme["--color-deep-light"]}
+              stroke={theme["--color-deep"]}
               strokeWidth={strokeWidth}
               x1={(xScale(col1) ?? 0) + xScale.bandwidth() / 2}
               y1={(yScale(row1) ?? 0) + yScale.bandwidth() / 2}
@@ -202,7 +198,7 @@ export default function Upset({
         />
 
         {/* bars */}
-        <g fill={theme["--color-deep-light"]}>
+        <g fill={theme["--color-deep"]}>
           {x.data.map((col, colIndex) => (
             <Tooltip key={colIndex} content={col.value}>
               <rect
@@ -235,7 +231,7 @@ export default function Upset({
         />
 
         {/* bars */}
-        <g fill={theme["--color-deep-light"]}>
+        <g fill={theme["--color-deep"]}>
           {y.data.map((row, rowIndex) => (
             <Fragment key={rowIndex}>
               <Tooltip content={row.value}>
