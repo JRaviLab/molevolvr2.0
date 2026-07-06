@@ -303,7 +303,6 @@ function SectionLegend() {
   const { data, control } = useData(legend);
   const shapesMap = getShapeMap(data);
   const colorMap = useColorMap(data, "mode");
-  console.log(shapesMap);
 
   const entries = Object.fromEntries(
     data.map((key) => [
