@@ -85,15 +85,15 @@ export default function Radios<O extends Option>({
             <div className="flex flex-col items-start gap-2">
               <span>{option.primary}</span>
               {option.secondary && (
-                <span className="text-dark-gray">{option.secondary}</span>
+                <span className="text-gray">{option.secondary}</span>
               )}
               {option.tertiary && (
-                <span className="text-gray">{option.tertiary}</span>
+                <span className="text-sm text-gray">{option.tertiary}</span>
               )}
             </div>
 
             {/* icon */}
-            {option.icon && <div className="text-dark-gray">{option.icon}</div>}
+            {option.icon && <div className="text-gray">{option.icon}</div>}
           </label>
         ))}
       </div>

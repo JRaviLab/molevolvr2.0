@@ -276,7 +276,7 @@ export default function NewAnalysis() {
                   }{" "}
                   input
                   {!isEmpty(stats) && (
-                    <span className="text-dark-gray">
+                    <span className="text-gray">
                       (
                       {Object.entries(stats)
                         .map(([key, value]) => `${value} ${startCase(key)}`)

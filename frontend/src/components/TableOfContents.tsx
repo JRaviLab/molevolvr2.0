@@ -82,29 +82,29 @@ export default function TableOfContents() {
   return (
     <aside
       ref={ref}
-      className="fixed z-20 flex max-w-80 flex-col bg-white shadow-md"
-      style={{ maxHeight: `calc(100vh - var(--header-height))` }}
+      className={clsx(
+        "fixed z-20 flex max-w-80 flex-col",
+        open && "bg-white shadow-md",
+      )}
+      style={{ maxHeight: "calc(100vh - var(--header-height))" }}
       aria-label="Table of contents"
     >
-      <div className="flex items-center gap-4 shadow-md">
-        {/* top text */}
-        {open && (
-          <span className="grow p-3 font-medium">Table Of Contents</span>
-        )}
-
-        {/* toggle button */}
-        <Tooltip content={open ? "Close" : "Table of contents"}>
-          <Button
-            className="rounded-none"
-            design="hollow"
-            tooltip={open ? "Close" : "Table of contents"}
-            aria-expanded={open}
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <X /> : <Menu />}
-          </Button>
-        </Tooltip>
-      </div>
+      {/* toggle button */}
+      <Tooltip content={open ? "Close" : "Table of contents"}>
+        <Button
+          className={clsx(
+            "rounded-none",
+            open ? "justify-between! shadow-md" : "bg-white shadow-md",
+          )}
+          design="hollow"
+          tooltip={open ? "Close" : "Table of contents"}
+          aria-expanded={open}
+          onClick={() => setOpen(!open)}
+        >
+          {open && <>Table Of Contents</>}
+          {open ? <X /> : <Menu />}
+        </Button>
+      </Tooltip>
 
       {/* links */}
       {open && (
@@ -122,7 +122,9 @@ export default function TableOfContents() {
               replace
               onClick={() => scrollTo("#" + id)}
             >
-              <span className="text-gray">{icon}</span>
+              {icon && (
+                <div className="grid place-items-center text-gray">{icon}</div>
+              )}
               <span className="grow truncate">{content}</span>
             </Link>
           ))}

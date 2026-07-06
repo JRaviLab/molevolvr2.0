@@ -108,7 +108,7 @@
   }
 
   h2 {
-    @apply justify-center text-center text-2xl uppercase first:mb-8;
+    @apply justify-center text-center text-2xl uppercase;
   }
 
   h3 {

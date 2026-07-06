@@ -130,14 +130,14 @@ export default function TextBox({
       <Tooltip content={!label && tooltip ? tooltip : undefined}>
         <div
           className={clsx(
-            "relative flex min-h-10 overflow-hidden rounded-md border border-light-gray bg-white hover:border-accent has-[input:focus-visible]:focus has-[textarea:focus-visible]:focus",
+            "relative flex max-h-fit min-h-10 overflow-hidden rounded-md border border-light-gray bg-white transition hover:border-accent has-[input:focus-visible]:focus has-[textarea:focus-visible]:focus",
             multi && "resize",
           )}
         >
           {input}
           <div
             ref={sideRef}
-            className="absolute -top-px right-0 flex text-dark-gray *:grid *:size-10 *:place-items-center"
+            className="absolute -top-px right-0 flex text-gray *:grid *:size-10 *:place-items-center"
           >
             {side}
           </div>

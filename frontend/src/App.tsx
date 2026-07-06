@@ -1,6 +1,7 @@
 import "@/styles.css";
 import "@fontsource-variable/outfit/wght.css";
 import "@fontsource-variable/jetbrains-mono";
+import type { Location } from "react-router";
 import {
   createBrowserRouter,
   Outlet,
@@ -22,8 +23,9 @@ import NewAnalysis from "@/pages/NewAnalysis";
 import NotFound from "@/pages/NotFound";
 import Testbed from "@/pages/Testbed";
 import { scrollTo } from "@/util/dom";
-import { useChanged } from "@/util/hooks";
 import { getRedirect } from "@/util/url";
+import { useEffect, useRef } from "react";
+import { waitFor } from "@/util/misc";
 
 /** app entrypoint */
 export default function App() {
@@ -32,17 +34,26 @@ export default function App() {
 
 /** route layout */
 function Layout() {
-  /** current route info */
-  const { hash, pathname, search } = useLocation();
+  /** current route */
+  const location = useLocation();
+  /** previous route */
+  const previousLocation = useRef<Location>(null);
 
-  /** did any key part of url change */
-  const changed = useChanged({ pathname, search, hash });
-  /** did hash change */
-  const hashChanged = useChanged(hash);
-
-  if (changed)
-    /** if just hash changed, scroll immediately. else, wait for layout shifts */
-    scrollTo(hash, undefined, hashChanged);
+  /** scroll to hash */
+  useEffect(() => {
+    /** if page load or new page */
+    if (location.pathname !== previousLocation.current?.pathname)
+      (async () => {
+        /** wait for page to finish loading */
+        await waitFor(() => document.readyState === "complete");
+        /** wait for layout shifts to stabilize */
+        scrollTo(location.hash, undefined, true);
+      })();
+    /** if just hash changed (e.g. user clicked TOC link), scroll immediately */
+    else if (location.hash !== previousLocation.current?.hash)
+      scrollTo(location.hash, { behavior: "smooth", block: "start" });
+    previousLocation.current = location;
+  }, [location]);
 
   return (
     <QueryClientProvider client={queryClient}>

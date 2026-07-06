@@ -643,7 +643,7 @@ export default function Network({
                 <div className="flex flex-col items-start gap-4">
                   <div>
                     <strong>Nodes</strong>{" "}
-                    <span className="text-dark-gray">
+                    <span className="text-gray">
                       {formatNumber(nodes.length)}
                     </span>
                   </div>
@@ -659,7 +659,7 @@ export default function Network({
                 <div className="flex flex-col items-start gap-4">
                   <div>
                     <strong>Edges</strong>{" "}
-                    <span className="text-dark-gray">
+                    <span className="text-gray">
                       {formatNumber(edges.length)}
                     </span>
                   </div>

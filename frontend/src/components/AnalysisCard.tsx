@@ -26,9 +26,9 @@ export default function AnalysisCard({
       showArrow={false}
     >
       <div className="font-medium">{name}</div>
-      <div className="text-dark-gray">{type}</div>
-      {info && <div className="text-dark-gray">{info}</div>}
-      {started && <Ago className="text-dark-gray" date={started} />}
+      <div className="text-gray">{type}</div>
+      {info && <div className="text-gray">{info}</div>}
+      {started && <Ago className="text-gray" date={started} />}
       {status && <Mark type={statusToMark[status.type]}>{status.info}</Mark>}
     </Link>
   );

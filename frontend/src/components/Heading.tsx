@@ -81,7 +81,9 @@ export function Heading({ level, icon, anchor, className, children }: Props) {
   return (
     <Tag id={id} ref={ref} className={className}>
       <Link to={"#" + id} className="contents! text-current no-underline">
-        {icon && <span className="text-gray">{icon}</span>}
+        {icon && (
+          <div className="grid place-items-center text-gray">{icon}</div>
+        )}
         {children}
       </Link>
     </Tag>

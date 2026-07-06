@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { useForm } from "@/components/Form";
 import Link from "@/components/Link";
 import Tooltip from "@/components/Tooltip";
+import { preserveScroll } from "@/util/dom";
 
 type Props = Base & (_Button | _Anchor);
 
@@ -56,16 +57,24 @@ export default function Button({
         {...props}
       />
     );
-  /** otherwise, render as button */ else
+  else {
+    /** otherwise, render as button */
+    const { type = "button", onClick, ...rest } = props;
     return (
       <Tooltip content={tooltip}>
         <button
           ref={ref as Ref<HTMLButtonElement>}
           className={className}
           form={form}
-          type="button"
-          {...props}
+          type={type}
+          onClick={(event) => {
+            /** prevent click action when disabled */
+            if (!rest["aria-disabled"]) onClick?.(event);
+            preserveScroll(event.currentTarget);
+          }}
+          {...rest}
         />
       </Tooltip>
     );
+  }
 }

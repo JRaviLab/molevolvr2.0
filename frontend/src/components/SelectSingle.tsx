@@ -1,5 +1,5 @@
 import type { KeyboardEvent, ReactElement, ReactNode } from "react";
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import {
   Label,
   Listbox,
@@ -12,6 +12,7 @@ import { Check, ChevronDown } from "lucide-react";
 import Button from "@/components/Button";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
+import { preserveScroll } from "@/util/dom";
 
 type Props<O extends Option> = {
   /** label content */
@@ -48,6 +49,8 @@ export default function SelectSingle<O extends Option>({
   options,
   className,
 }: Props<O>) {
+  const ref = useRef<HTMLButtonElement>(null);
+
   /** link to parent form component */
   const form = useForm();
 
@@ -67,7 +70,10 @@ export default function SelectSingle<O extends Option>({
       as="div"
       form={form}
       value={value}
-      onChange={onChange}
+      onChange={(value) => {
+        onChange(value);
+        preserveScroll(ref.current);
+      }}
     >
       {/* label */}
       <Label className="flex items-center gap-2">
@@ -78,6 +84,7 @@ export default function SelectSingle<O extends Option>({
       {/* button */}
       <ListboxButton as={Fragment}>
         <Button
+          ref={ref}
           onKeyDown={({ key }: KeyboardEvent<HTMLButtonElement>) => {
             if (index === -1) return;
 
@@ -109,7 +116,7 @@ export default function SelectSingle<O extends Option>({
             {({ focus, selected }) => (
               <li
                 className={clsx(
-                  "flex cursor-pointer items-center gap-2 p-1",
+                  "flex cursor-pointer items-center gap-2 px-2 py-1",
                   focus && "bg-off-white",
                 )}
               >

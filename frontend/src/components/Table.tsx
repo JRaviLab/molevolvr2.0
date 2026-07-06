@@ -46,7 +46,6 @@ import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import TextBox from "@/components/TextBox";
 import Tooltip from "@/components/Tooltip";
-import { preserveScroll } from "@/util/dom";
 import { downloadCsv } from "@/util/download";
 import { formatDate, formatNumber } from "@/util/string";
 
@@ -109,11 +108,11 @@ const colToOption = <Datum extends object>(
 
 /** per page options */
 const perPageOptions = [
+  { id: 5, primary: formatNumber(5) },
   { id: 10, primary: formatNumber(10) },
-  { id: 25, primary: formatNumber(25) },
   { id: 50, primary: formatNumber(50) },
   { id: 100, primary: formatNumber(100) },
-  { id: 10000, primary: "All" },
+  { id: 99999, primary: "All" },
 ] as const;
 
 type PerPage = (typeof perPageOptions)[number]["id"];
@@ -167,11 +166,11 @@ export default function Table<Datum extends object>({
 
     /** string column */
     if (type === "string") {
-      const value = (filterValue as string).trim();
+      const value = filterValue as string;
       if (!value) return true;
       const cell = (row.getValue(columnId) as string).trim();
       if (!cell) return true;
-      return !!cell.match(new RegExp(value, "i"));
+      return !!cell.match(value);
     }
 
     /** number col */
@@ -200,13 +199,25 @@ export default function Table<Datum extends object>({
     return true;
   };
 
+  /** transform filter value once per search */
+  filterFunc.resolveFilterValue = (value: unknown) => {
+    if (typeof value === "string") return parseRegex(value.trim());
+    return value;
+  };
+
   /** global search func */
   const searchFunc: FilterFn<Datum> = (row, columnId, filterValue: unknown) => {
-    const value = (filterValue as string).trim();
+    const value = filterValue as string;
     if (!value) return true;
     const cell = String(row.getValue(columnId)).trim();
     if (!cell) return true;
-    return !!cell.match(new RegExp(value, "i"));
+    return !!cell.match(value);
+  };
+
+  /** transform filter value once per search */
+  searchFunc.resolveFilterValue = (value: unknown) => {
+    if (typeof value === "string") return parseRegex(value.trim());
+    return value;
   };
 
   const columnHelper = createColumnHelper<Datum>();
@@ -419,7 +430,7 @@ export default function Table<Datum extends object>({
             ) : (
               <tr>
                 <td
-                  className="p-8 text-center text-off-white"
+                  className="p-8 text-center text-light-gray"
                   colSpan={cols.length}
                 >
                   No Rows
@@ -456,19 +467,30 @@ export default function Table<Datum extends object>({
             <Tooltip content="Jump to page">
               <Button
                 design="hollow"
-                size="sm"
                 onClick={() => {
                   const page = parseInt(window.prompt("Jump to page") || "");
                   if (Number.isNaN(page)) return;
-                  table.setPageIndex(clamp(page, 1, table.getPageCount()) - 1);
+                  table.setPageIndex(
+                    clamp(page, 0, Math.ceil(table.getPageCount())) - 1,
+                  );
                 }}
               >
-                {[
-                  "Page",
-                  formatNumber(table.getState().pagination.pageIndex + 1),
-                  "of",
-                  formatNumber(table.getPageCount()),
-                ].join(" ")}
+                {(() => {
+                  const rows = table.getPrePaginationRowModel().rows.length;
+                  const { pageIndex, pageSize } = table.getState().pagination;
+                  return [
+                    formatNumber(rows ? pageIndex * pageSize + 1 : 0),
+                    "–",
+                    formatNumber(
+                      Math.min(
+                        (pageIndex + 1) * Math.min(pageSize, rows),
+                        rows,
+                      ),
+                    ),
+                    "of",
+                    formatNumber(rows),
+                  ].join(" ");
+                })()}
               </Button>
             </Tooltip>
             <Button
@@ -503,7 +525,6 @@ export default function Table<Datum extends object>({
                 const number = Number(option) as PerPage;
                 setPerPage(number);
                 table.setPageSize(number);
-                preserveScroll(filterRef.current);
               }}
             />
             {/* visible columns */}
@@ -516,7 +537,7 @@ export default function Table<Datum extends object>({
             {/* table-wide search */}
             <TextBox
               placeholder="Search"
-              tooltip="Search entire table (regex)"
+              tooltip="Filter table by text"
               icon={<Search />}
               value={search}
               onChange={setSearch}
@@ -689,7 +710,7 @@ function Filter<Datum extends object>({ column, def }: FilterProps<Datum>) {
   /** filter as text */
   return (
     <TextBox
-      label="Filter by text (regex)"
+      label="Filter by text"
       placeholder="Search"
       icon={<Search />}
       value={(column.getFilterValue() as string | undefined) ?? ""}
@@ -710,4 +731,15 @@ const defaultFormat = (cell: unknown) => {
     return Object.keys(cell).length.toLocaleString();
   if (typeof cell === "string") return cell;
   return String(cell);
+};
+
+/** parse regexp entered by user */
+const parseRegex = (match: string) => {
+  const [, regex = match, flags = "i"] =
+    match.match(/^\/(.*?)\/([a-z]*)$/) ?? [];
+  try {
+    return new RegExp(regex, flags);
+  } catch {
+    return new RegExp(RegExp.escape(match), "i");
+  }
 };

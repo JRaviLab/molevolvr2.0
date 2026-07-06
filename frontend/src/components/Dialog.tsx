@@ -37,6 +37,9 @@ export default function Dialog({
 }: Props) {
   const [isOpen, setOpen] = useState(false);
 
+  /** prevent if trigger disabled */
+  if (children.props["aria-disabled"]) return children;
+
   const open = () => {
     setOpen(true);
     onChange?.(true);

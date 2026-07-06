@@ -158,14 +158,14 @@ export default function Home() {
         </div>
       </section>
 
-      <section>
+      <section className="items-center">
         <H2 icon={<ChartScatter />}>Stats</H2>
 
         {status === "pending" && <Alert type="loading">Loading stats</Alert>}
         {status === "error" && <Alert type="error">Error loading stats</Alert>}
 
         {stats && (
-          <div className="mt-4 grid grid-cols-3 gap-8 self-center">
+          <div className="mt-4 grid grid-cols-3 gap-8">
             <Tile
               icon={<MonitorCheck />}
               primary={formatNumber(stats.running, true)}
