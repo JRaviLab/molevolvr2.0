@@ -62,8 +62,8 @@ export default function Heatmap({
   /** selected gradient */
   const [gradient, setGradient] = useState(defaultGradient);
 
-  /** reverse gradient */
-  const [reverse, setReverse] = useState(false);
+  /** flip gradient */
+  const [flip, setFlip] = useState(false);
 
   /** swap rows/cols */
   const [swap, setSwap] = useState(false);
@@ -101,7 +101,7 @@ export default function Heatmap({
   /** value to % */
   const valueScale = scaleLinear([min, max], [0, 1]);
   /** % to color */
-  const colorScale = gradientFunc(gradient, reverse);
+  const colorScale = gradientFunc(gradient, flip);
 
   /** main chart area */
   const width = (xScale(cols - 1) ?? 0) + xScale.bandwidth();
@@ -123,21 +123,21 @@ export default function Heatmap({
           <SelectSingle
             key="gradient"
             label="Gradient"
-            options={gradientOptions(reverse)}
+            options={gradientOptions(flip)}
             value={gradient}
             onChange={setGradient}
           />,
           <CheckBox
-            key="reverse"
-            label="Reverse"
+            key="flip"
+            label="Flip"
             tooltip="Reverse gradient direction"
-            value={reverse}
-            onChange={setReverse}
+            value={flip}
+            onChange={setFlip}
           />,
           <CheckBox
             key="swap"
             label="Swap"
-            tooltip="Swap rows & cols (transpose)"
+            tooltip="Transpose rows & cols"
             value={swap}
             onChange={setSwap}
           />,
@@ -260,7 +260,7 @@ export default function Heatmap({
         {/* gradient rect */}
         <Gradient
           id={gradient}
-          reverse={reverse}
+          flip={flip}
           direction="vertical"
           x={-0.25 * cellSize}
           y={0}

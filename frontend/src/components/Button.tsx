@@ -35,7 +35,7 @@ export default function Button({
     "flex items-center justify-center gap-2 rounded-md no-underline",
     size === "sm" && "min-h-6 min-w-6 p-1",
     size === "md" && "min-h-10 min-w-10 p-2",
-    design === "hollow" && "text-accent hover:text-deep",
+    design === "hollow" && "text-accent hover:bg-off-white hover:text-deep",
     design === "plain" && "bg-off-white text-black hover:text-accent",
     design === "accent" && "bg-accent text-white hover:bg-deep",
     design === "critical" && "bg-black text-white hover:bg-deep",

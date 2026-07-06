@@ -7,14 +7,14 @@ import { gradientFunc, gradients } from "@/util/gradient";
 
 type Props = {
   id: Id;
-  reverse?: boolean;
+  flip?: boolean;
   direction?: "horizontal" | "vertical";
 } & ComponentProps<"svg">;
 
 /** gradient */
 export function Gradient({
   id,
-  reverse = false,
+  flip = false,
   direction = "horizontal",
   ...props
 }: Props) {
@@ -33,7 +33,7 @@ export function Gradient({
               <stop
                 key={index}
                 offset={`${100 * percent}%`}
-                stopColor={gradientFunc(id, reverse)(percent)}
+                stopColor={gradientFunc(id, flip)(percent)}
               />
             ))}
         </linearGradient>
@@ -44,9 +44,9 @@ export function Gradient({
 }
 
 /** gradient options for select */
-export const gradientOptions = (reverse: boolean): Option<Id>[] =>
+export const gradientOptions = (flip: boolean): Option<Id>[] =>
   Object.keys(gradients).map((id) => ({
     id: id as Id,
     primary: id,
-    icon: <Gradient id={id as Id} reverse={reverse} width="3em" height="1em" />,
+    icon: <Gradient id={id as Id} flip={flip} width="3em" height="1em" />,
   }));

@@ -72,5 +72,5 @@ export const gradients = {
 } as const;
 
 /** get gradient interpolator func */
-export const gradientFunc = (id: Id, reverse: boolean) => (value: number) =>
-  gradients[id](reverse ? 1 - value : value);
+export const gradientFunc = (id: Id, flip: boolean) => (value: number) =>
+  gradients[id](flip ? 1 - value : value);
