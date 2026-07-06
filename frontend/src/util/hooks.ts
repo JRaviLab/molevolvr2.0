@@ -8,29 +8,21 @@ import { getStyles, getTheme, getWidth, truncateWidth } from "@/util/dom";
 import { getFilename } from "@/util/download";
 import { sleep } from "@/util/misc";
 
-/** trigger update when anything that could affect theme or styles changes */
-const useCssChange = (update: () => void) => {
-  /** update theme variables when dark mode changes */
-  if (useChanged(useAtomValue(darkModeAtom))) update();
-  /** when document done loading */
-  useEventListener("load", update, window);
-  /** when fonts done loading */
-  useEventListener("loadingdone", update, document.fonts);
-};
-
-/** reactive theme variables */
-export const useTheme = () => {
-  const [theme, setTheme] = useState(getTheme);
-  useCssChange(useCallback(() => setTheme(getTheme()), []));
-  return theme;
-};
-
 /** reactive styles */
 export const useStyles = () => {
   const [styles, setStyles] = useState(getStyles);
-  useCssChange(useCallback(() => setStyles(getStyles()), []));
+  const update = useCallback(async () => setStyles(getStyles()), []);
+  /** update when dark mode changes */
+  if (useChanged(useAtomValue(darkModeAtom))) update();
+  /** update when document done loading */
+  useEventListener("load", update, window);
+  /** update when fonts done loading */
+  useEventListener("loadingdone", update, document.fonts);
   return styles;
 };
+
+/** reactive theme variables */
+export const useTheme = () => getTheme(useStyles());
 
 /** reactive text size and funcs */
 export const useTextSize = () => {

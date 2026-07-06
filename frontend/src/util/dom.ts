@@ -7,9 +7,8 @@ export type Theme = Record<`--${string}`, string>;
 
 /** https://stackoverflow.com/a/78994961/2180570 */
 /** get all css variables on root */
-export const getTheme = (): Theme => {
-  const rootStyles = getStyles();
-  return Object.fromEntries(
+export const getTheme = (styles = getStyles()): Theme =>
+  Object.fromEntries(
     Array.from(document.styleSheets)
       .flatMap((styleSheet) => {
         try {
@@ -22,12 +21,11 @@ export const getTheme = (): Theme => {
       .flatMap((cssRule) => Array.from(cssRule.style))
       .filter((style) => style.startsWith("--"))
       .map((variable) => {
-        let value = rootStyles.getPropertyValue(variable);
+        let value = styles.getPropertyValue(variable);
         value = formatHex(value) ?? value;
         return [variable, value];
       }),
   );
-};
 
 /** get styles on target element */
 export const getStyles = (target?: Element | null) =>

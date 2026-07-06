@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import { useElementSize } from "@reactuses/core";
-import { mapValues, sample, startCase, uniq } from "lodash";
+import { useDeepCompareEffect, useElementSize } from "@reactuses/core";
+import { sample, startCase, uniq } from "lodash";
 import {
   AppWindowMac,
   ArrowUpDown,
@@ -90,6 +90,7 @@ import { seed } from "@/util/seed";
 import { getShapeMap } from "@/util/shape";
 import { formatDate, formatNumber } from "@/util/string";
 import tableData from "../../fixtures/table.json";
+import seedrandom from "seedrandom";
 
 /** test and example usage of formatting, elements, components, etc. */
 export default function TestbedPage() {
@@ -299,14 +300,20 @@ function SectionLegend() {
 
   const [width] = useElementSize(ref);
 
-  const shapesMap = getShapeMap(legend);
-  const colorMap = useColorMap(legend, "mode");
-  const { data, control } = useData(() =>
-    mapValues(colorMap, (color, label) => ({
-      color,
-      shape: shapesMap[label],
-      stroke: Math.random() > 0.75,
-    })),
+  const { data, control } = useData(legend);
+  const shapesMap = getShapeMap(data);
+  const colorMap = useColorMap(data, "mode");
+  console.log(shapesMap);
+
+  const entries = Object.fromEntries(
+    data.map((key) => [
+      key,
+      {
+        shape: shapesMap[key],
+        color: colorMap[key],
+        stroke: seedrandom(key)() > 0.5,
+      },
+    ]),
   );
 
   return (
@@ -317,7 +324,7 @@ function SectionLegend() {
         ref={ref}
         className="w-100 max-w-full resize overflow-auto rounded-md p-4 shadow-md"
       >
-        <Legend entries={data} x={0} y={0} w={width} />
+        <Legend entries={entries} x={0} y={0} w={width} />
       </div>
 
       {control}
@@ -326,7 +333,7 @@ function SectionLegend() {
 }
 
 function SectionUpset() {
-  const { data, control } = useData(() => upset);
+  const { data, control } = useData(upset);
 
   return (
     <section className="items-center">
@@ -340,7 +347,7 @@ function SectionUpset() {
 }
 
 function SectionSunburst() {
-  const { data, control } = useData(() => sunburst);
+  const { data, control } = useData(sunburst);
 
   return (
     <section className="items-center">
@@ -354,7 +361,7 @@ function SectionSunburst() {
 }
 
 function SectionHeatmap() {
-  const { data, control } = useData(() => heatmap);
+  const { data, control } = useData(heatmap);
 
   return (
     <section className="items-center">
@@ -368,7 +375,7 @@ function SectionHeatmap() {
 }
 
 function SectionTree() {
-  const { data, control } = useData(() => tree);
+  const { data, control } = useData(tree);
 
   return (
     <section className="items-center">
@@ -382,7 +389,7 @@ function SectionTree() {
 }
 
 function SectionNetwork() {
-  const { data, control } = useData(() => ({ nodes, edges }));
+  const { data, control } = useData({ nodes, edges });
 
   return (
     <section className="items-center">
@@ -396,7 +403,7 @@ function SectionNetwork() {
 }
 
 function SectionMSA() {
-  const { data, control } = useData(() => msaTracks);
+  const { data, control } = useData(msaTracks);
 
   return (
     <section className="items-center">
@@ -416,10 +423,10 @@ function SectionMSA() {
 }
 
 function SectionIPR() {
-  const { data, control } = useData(() => ({
+  const { data, control } = useData({
     sequence: iprSequence,
     tracks: iprTracks,
-  }));
+  });
 
   return (
     <section className="items-center">
@@ -1058,9 +1065,14 @@ function SectionIcons() {
   );
 }
 
-const useData = <Data,>(initial: Data | (() => Data)) => {
+const useData = <Data,>(initial: Data) => {
   const [data, setData] = useState<Data>(initial);
-  const [text, setText] = useState(JSON.stringify(data, null, 2));
+  const [text, setText] = useState(JSON.stringify(initial, null, 2));
+
+  useDeepCompareEffect(() => {
+    setData(initial);
+    setText(JSON.stringify(initial, null, 2));
+  }, [initial]);
 
   const control = (
     <TextBox
