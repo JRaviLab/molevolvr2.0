@@ -44,11 +44,11 @@ export default function Tooltip({ ref, content, children, ...props }: Props) {
                */
               shrinkWrap(element, 0, -3);
             }}
-            className="dark z-20 flex max-w-80 flex-col gap-2 rounded-md bg-white p-4 text-black"
+            className="z-20 flex max-w-80 flex-col gap-2 rounded-md bg-black p-4 text-white"
             side="top"
           >
             {content}
-            <Arrow className="scale-110 fill-off-white" />
+            <Arrow className="scale-110 fill-black" />
           </Content>
         </Portal>
       </Root>

@@ -703,7 +703,7 @@ export default function Network({
           />
         </div>
 
-        {/* buttons */}
+        {/* actions */}
         <div className="gap-2">
           <Button design="hollow" tooltip="Fit view to contents" onClick={fit}>
             <Crop />

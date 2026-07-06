@@ -432,9 +432,9 @@ export default function Table<Datum extends object>({
 
       {/* controls */}
       {showControls && (
-        <div className="flex flex-wrap items-center justify-center gap-8">
+        <div className="controls">
           {/* pagination */}
-          <div className="flex">
+          <div className="gap-1">
             <Button
               design="hollow"
               size="sm"
@@ -493,7 +493,7 @@ export default function Table<Datum extends object>({
           </div>
 
           {/* filters */}
-          <div ref={filterRef} className="flex flex-wrap items-center gap-4">
+          <div ref={filterRef}>
             {/* per page */}
             <SelectSingle
               label="Rows"
@@ -524,7 +524,7 @@ export default function Table<Datum extends object>({
           </div>
 
           {/* actions */}
-          <div className="flex flex-wrap items-center">
+          <div className="gap-2">
             {/* clear filters */}
             <Button
               design="hollow"

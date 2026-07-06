@@ -1060,13 +1060,19 @@ function SectionIcons() {
 
 const useData = <Data,>(initial: Data | (() => Data)) => {
   const [data, setData] = useState<Data>(initial);
+  const [text, setText] = useState(JSON.stringify(data, null, 2));
 
   const control = (
     <TextBox
       placeholder="raw data"
       multi
-      value={JSON.stringify(data, null, 2)}
-      onChange={(value) => setData(JSON.parse(value))}
+      value={text}
+      onChange={(value) => {
+        setText(value);
+        try {
+          setData(JSON.parse(value));
+        } catch {}
+      }}
     />
   );
 

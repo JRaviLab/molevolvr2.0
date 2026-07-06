@@ -18,7 +18,7 @@ export default function Help({ tooltip, children }: Props) {
   return (
     <Tooltip content={tooltip}>
       <button
-        className="cursor-help text-dark-gray"
+        className="cursor-help text-gray"
         onClick={async (event) => {
           const target = event.currentTarget;
           /** force open tooltip */

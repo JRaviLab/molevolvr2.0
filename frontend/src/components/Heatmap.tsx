@@ -170,9 +170,7 @@ export default function Heatmap({
                 width={xScale.bandwidth() ?? 0}
                 height={yScale.bandwidth() ?? 0}
                 fill={
-                  col
-                    ? colorScale(valueScale(col))
-                    : theme["--color-off-white"]
+                  col ? colorScale(valueScale(col)) : theme["--color-off-white"]
                 }
                 tabIndex={0}
                 role="graphics-symbol"
