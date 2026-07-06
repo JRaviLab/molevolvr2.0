@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { FileChartPie } from "lucide-react";
 import { getAnalysis } from "@/api/analysis";
 import Alert from "@/components/Alert";
-import Heading from "@/components/Heading";
+import { H1 } from "@/components/Heading";
 import Meta from "@/components/Meta";
 import Actions from "@/pages/analysis/Actions";
 import Inputs from "@/pages/analysis/Inputs";
@@ -16,7 +16,7 @@ import { examples } from "@/pages/Home";
 const AnalysisContext = createContext<_Analysis>(examples[0]!);
 export const useAnalysis = () => useContext(AnalysisContext);
 
-const Analysis = () => {
+export default function Analysis() {
   /** get id from url */
   const { id = "Analysis" } = useParams();
 
@@ -48,9 +48,7 @@ const Analysis = () => {
       <Meta title="Analysis" />
 
       <section className="items-center">
-        <Heading level={1} icon={<FileChartPie />}>
-          Analysis
-        </Heading>
+        <H1 icon={<FileChartPie />}>Analysis</H1>
 
         {status === "pending" && (
           <Alert type="loading">
@@ -65,6 +63,4 @@ const Analysis = () => {
       </section>
     </>
   );
-};
-
-export default Analysis;
+}

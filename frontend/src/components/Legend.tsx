@@ -1,6 +1,8 @@
+import type { Point } from "@/util/shape";
 import { clamp, mapKeys, max, startCase } from "lodash";
 import Tooltip from "@/components/Tooltip";
 import { useTextSize, useTheme } from "@/util/hooks";
+import { shapeToString } from "@/util/shape";
 
 /** entry symbol size */
 const rowHeight = 20;
@@ -28,19 +30,19 @@ type Entry = {
   /** fill color */
   color?: string;
   /** shape points, from [-1, -1] to [1, 1] */
-  shape?: number[];
+  shape?: Point[];
   /** whether to stroke shape outline instead of fill */
   stroke?: boolean;
 };
 
 /** general purpose legend with colored symbols and labels */
-const Legend = ({
+export default function Legend({
   entries,
   x: rootX = 0,
   y: rootY = 0,
   w: rootW = maxEntryWidth,
   anchor = [0, 0],
-}: Props) => {
+}: Props) {
   const theme = useTheme();
 
   const { fontSize, getWidth, truncateWidth } = useTextSize();
@@ -119,9 +121,7 @@ const Legend = ({
       )}
     </svg>
   );
-};
-
-export default Legend;
+}
 
 type CellProps = {
   index: number;
@@ -135,7 +135,7 @@ type CellProps = {
 
 /** split into sub-components for slight performance optimization */
 
-const Cell = ({
+function Cell({
   index,
   label,
   labelX,
@@ -146,7 +146,7 @@ const Cell = ({
   stroke,
   theme,
   truncateWidth,
-}: CellProps) => {
+}: CellProps) {
   /** wrap to grid of rows/cols */
   const row = Math.floor(index / cols);
   const col = index % cols;
@@ -154,7 +154,10 @@ const Cell = ({
   const y = row * (rowHeight + gapSize);
 
   /** scale shape points */
-  shape = shape?.map((p) => rowHeight / 2 + p * (rowHeight / 2));
+  shape = shape?.map(({ x, y }) => ({
+    x: rowHeight / 2 + x * (rowHeight / 2),
+    y: rowHeight / 2 + y * (rowHeight / 2),
+  }));
 
   return (
     <g key={index} transform={`translate(${x}, ${y})`}>
@@ -171,17 +174,17 @@ const Cell = ({
               <polygon
                 fill="none"
                 strokeWidth={5 * strokeWidth}
-                points={shape.join(" ")}
+                points={shapeToString(shape)}
               />
               <polygon
                 fill="none"
                 stroke={color}
                 strokeWidth={3 * strokeWidth}
-                points={shape.join(" ")}
+                points={shapeToString(shape)}
               />
             </>
           ) : (
-            <polygon points={shape.join(" ")} />
+            <polygon points={shapeToString(shape)} />
           )
         ) : (
           <circle cx={rowHeight / 2} cy={rowHeight / 2} r={rowHeight / 2} />
@@ -199,4 +202,4 @@ const Cell = ({
       </Tooltip>
     </g>
   );
-};
+}

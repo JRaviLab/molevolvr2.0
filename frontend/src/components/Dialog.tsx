@@ -28,14 +28,17 @@ type Props = {
 type Content = ReactNode | ((close: () => void, open: () => void) => ReactNode);
 
 /** "fullscreen" dialog of interactive content when clicking children */
-const Dialog = ({
+export default function Dialog({
   title,
   content,
   bottomContent,
   onChange,
   children,
-}: Props) => {
+}: Props) {
   const [isOpen, setOpen] = useState(false);
+
+  /** prevent if trigger disabled */
+  if (children.props["aria-disabled"]) return children;
 
   const open = () => {
     setOpen(true);
@@ -54,30 +57,27 @@ const Dialog = ({
         /** prevent implicit submission of wrapping form */
         type: "button",
       })}
-      <Root open={isOpen} onClose={close}>
+      <Root as={Fragment} open={isOpen} onClose={close}>
         <div className="fixed inset-0 z-20 flex items-center justify-center p-8">
           <Content as={Fragment}>
-            <div className="relative flex max-h-full w-(--content) max-w-full flex-col rounded-md bg-white shadow-overlay">
+            <div className="relative flex size-full max-h-max max-w-max flex-col rounded-md bg-white shadow-overlay">
               {/* top */}
-              <div className="flex items-center justify-center p-2 shadow-sm">
-                <Title>{title}</Title>
+              <div className="flex items-center justify-center gap-4 p-4 shadow-md">
+                <Title className="m-0 grow">{title}</Title>
                 <Description className="sr-only">{title}</Description>
-                <Button
-                  icon={<X />}
-                  tooltip="Close dialog"
-                  design="hollow"
-                  onClick={close}
-                />
+                <Button design="hollow" tooltip="Close dialog" onClick={close}>
+                  <X />
+                </Button>
               </div>
 
               {/* middle */}
-              <div className="flex w-full flex-col gap-4 overflow-y-auto p-4">
+              <div className="flex flex-col gap-4 overflow-y-auto p-4">
                 {typeof content === "function" ? content(close, open) : content}
               </div>
 
               {/* bottom */}
               {bottomContent && (
-                <div className="flex flex-wrap items-center justify-center gap-4 p-4 shadow-sm">
+                <div className="flex flex-wrap items-center justify-center gap-4 p-4 shadow-md">
                   {typeof bottomContent === "function"
                     ? bottomContent(close, open)
                     : bottomContent}
@@ -89,6 +89,4 @@ const Dialog = ({
       </Root>
     </>
   );
-};
-
-export default Dialog;
+}

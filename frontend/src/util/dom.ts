@@ -1,14 +1,14 @@
 import type { ReactNode } from "react";
 import { deepMap, onlyText } from "react-children-utilities";
+import { formatHex } from "culori";
 import { frame, waitFor, waitForStable } from "@/util/misc";
 
 export type Theme = Record<`--${string}`, string>;
 
 /** https://stackoverflow.com/a/78994961/2180570 */
 /** get all css variables on root */
-export const getTheme = (): Theme => {
-  const rootStyles = getStyles();
-  return Object.fromEntries(
+export const getTheme = (styles = getStyles()): Theme =>
+  Object.fromEntries(
     Array.from(document.styleSheets)
       .flatMap((styleSheet) => {
         try {
@@ -20,9 +20,12 @@ export const getTheme = (): Theme => {
       .filter((cssRule) => cssRule instanceof CSSStyleRule)
       .flatMap((cssRule) => Array.from(cssRule.style))
       .filter((style) => style.startsWith("--"))
-      .map((variable) => [variable, rootStyles.getPropertyValue(variable)]),
+      .map((variable) => {
+        let value = styles.getPropertyValue(variable);
+        value = formatHex(value) ?? value;
+        return [variable, value];
+      }),
   );
-};
 
 /** get styles on target element */
 export const getStyles = (target?: Element | null) =>
@@ -185,7 +188,12 @@ export const scrollTo = async (
   if (!element) return;
 
   /** wait for layout shifts to stabilize */
-  if (waitForLayoutShift) await waitForStable(() => getDocBbox(element).top);
+  if (waitForLayoutShift)
+    await waitForStable(
+      () => getDocBbox(element).top,
+      /** wait proportionally to doc size */
+      document.body.scrollHeight / 30,
+    );
 
   /** scroll to element */
   element.scrollIntoView(options);

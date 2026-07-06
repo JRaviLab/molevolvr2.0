@@ -5,25 +5,25 @@ import Button from "@/components/Button";
 import Feedback from "@/components/Feedback";
 
 /** buttons that stay in corner of view at all times. singleton. */
-const ViewCorner = () => {
+export default function ViewCorner() {
   const scrolled = useScrolled();
 
   return (
-    <div className="fixed right-0 bottom-0 z-20 flex flex-col items-end gap-2 p-2 *:shadow-md">
+    <div className="fixed right-0 bottom-0 z-20 flex flex-col items-end gap-2 p-2 *:rounded-full!">
       {scrolled && (
         <Button
-          icon={<ChevronUp />}
+          design="accent"
           tooltip="Scroll to top of page"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        />
+        >
+          <ChevronUp />
+        </Button>
       )}
 
       <Feedback />
     </div>
   );
-};
-
-export default ViewCorner;
+}
 
 /** has user scrolled down a bit */
 const useScrolled = () => {

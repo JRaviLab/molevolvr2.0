@@ -1,4 +1,5 @@
 import type { ComponentProps } from "react";
+import { clsx } from "clsx";
 import { getDefaultStore, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { Moon, Sun } from "lucide-react";
@@ -22,13 +23,13 @@ getDefaultStore().sub(darkModeAtom, update);
 type Props = ComponentProps<"button">;
 
 /** dark mode toggle */
-export const DarkMode = ({ className }: Props) => {
+export function DarkMode({ className }: Props) {
   const [darkMode, setDarkMode] = useAtom(darkModeAtom);
 
   return (
     <Tooltip content={`Switch to ${darkMode ? "light" : "dark"} mode`}>
       <button
-        className={className}
+        className={clsx("text-current", className)}
         onClick={() => setDarkMode(!darkMode)}
         role="switch"
         aria-checked={darkMode}
@@ -37,4 +38,4 @@ export const DarkMode = ({ className }: Props) => {
       </button>
     </Tooltip>
   );
-};
+}

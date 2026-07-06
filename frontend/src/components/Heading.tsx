@@ -1,7 +1,6 @@
-import type { JSX, ReactElement, ReactNode } from "react";
+import type { JSX, ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { atom, useSetAtom } from "jotai";
-import Badge from "@/components/Badge";
 import Link from "@/components/Link";
 import { renderText } from "@/util/dom";
 import { slugify } from "@/util/string";
@@ -10,7 +9,7 @@ type Props = {
   /** "indent" level */
   level: 1 | 2 | 3 | 4;
   /** icon element or badge */
-  icon?: ReactElement<{ className: string }> | string;
+  icon?: ReactNode;
   /** manually set anchor link instead of automatically from children text */
   anchor?: string;
   /** class on heading */
@@ -30,20 +29,12 @@ type Heading = {
 /** global list of headings */
 export const headingsAtom = atom<Heading[]>([]);
 
-/**
- * demarcates a new section/level of content. only use one level 1 per page.
- * don't use levels below 4.
- */
-const Heading = ({ level, icon, anchor, className, children }: Props) => {
+/** demarcates a new section/level of content */
+export function Heading({ level, icon, anchor, className, children }: Props) {
   const ref = useRef<HTMLHeadingElement>(null);
 
   /** heading tag */
   const Tag: keyof JSX.IntrinsicElements = `h${level}`;
-
-  /** icon or badge */
-  let iconElement: ReactNode = null;
-  if (typeof icon === "string") iconElement = <Badge>{icon}</Badge>;
-  else if (icon) iconElement = <div className="flex opacity-25">{icon}</div>;
 
   const setHeadings = useSetAtom(headingsAtom);
 
@@ -69,7 +60,7 @@ const Heading = ({ level, icon, anchor, className, children }: Props) => {
           element,
           id,
           level,
-          icon: iconElement,
+          icon,
           content: children,
         };
 
@@ -85,16 +76,32 @@ const Heading = ({ level, icon, anchor, className, children }: Props) => {
         headings.filter((heading) => heading.element !== element),
       );
     };
-  }, [id, children, iconElement, level, setHeadings]);
+  }, [id, children, icon, level, setHeadings]);
 
   return (
     <Tag id={id} ref={ref} className={className}>
       <Link to={"#" + id} className="contents! text-current no-underline">
-        {iconElement}
+        {icon && (
+          <div className="grid place-items-center text-gray">{icon}</div>
+        )}
         {children}
       </Link>
     </Tag>
   );
-};
+}
 
-export default Heading;
+export function H1(props: Omit<Props, "level">) {
+  return <Heading level={1} {...props} />;
+}
+
+export function H2(props: Omit<Props, "level">) {
+  return <Heading level={2} {...props} />;
+}
+
+export function H3(props: Omit<Props, "level">) {
+  return <Heading level={3} {...props} />;
+}
+
+export function H4(props: Omit<Props, "level">) {
+  return <Heading level={4} {...props} />;
+}

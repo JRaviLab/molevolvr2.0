@@ -1,3 +1,3 @@
-const Summary = () => <>Lorem ipsum dolor sit amet.</>;
-
-export default Summary;
+export default function Summary() {
+  return <>Lorem ipsum dolor sit amet.</>;
+}

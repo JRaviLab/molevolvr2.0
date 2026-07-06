@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
-import { useElementSize } from "@reactuses/core";
+import { useElementSize, useWindowScroll } from "@reactuses/core";
 import clsx from "clsx";
 import { Menu, X } from "lucide-react";
 import Logo from "@/assets/logo.svg?react";
@@ -19,7 +19,7 @@ const links = [
 ];
 
 /** at top of every page. singleton. */
-const Header = () => {
+export default function Header() {
   const { pathname } = useLocation();
 
   /** nav menu expanded/collapsed state */
@@ -33,22 +33,25 @@ const Header = () => {
   useEffect(() => {
     /** make sure all scrolls take into account header height */
     doc.style.scrollPaddingTop = height + "px";
+    /** add var */
+    doc.style.setProperty("--header-height", height + "px");
   }, [height]);
 
-  const _class =
-    "rounded-md p-2 tracking-wide hover:bg-current/10 leading-none";
+  const className = "rounded-md p-2 hover:bg-current/10";
+
+  const { y } = useWindowScroll();
 
   return (
     <header
       ref={ref}
-      className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-8 bg-deep p-4 text-white shadow-md max-md:p-2"
+      className={clsx(
+        "sticky top-0 z-10 flex flex-wrap items-center justify-between gap-8 bg-deep text-white shadow-md transition-all **:no-underline max-md:p-2 [&_a]:text-lg [&_a]:leading-none [&_a]:text-white",
+        y > 0 ? "p-2" : "p-4",
+      )}
     >
       <div className="flex items-center gap-2">
         <Logo className="size-8" />
-        <Link
-          to="/"
-          className={clsx("text-lg tracking-wider uppercase", _class)}
-        >
+        <Link to="/" className={clsx("tracking-wide uppercase", className)}>
           {import.meta.env.VITE_TITLE}
         </Link>
       </div>
@@ -56,7 +59,7 @@ const Header = () => {
       {/* nav toggle */}
       <Tooltip content={open ? "Collapse menu" : "Expand menu"}>
         <button
-          className={clsx("md:hidden", _class)}
+          className={clsx("md:hidden", className)}
           onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-controls="nav"
@@ -69,7 +72,7 @@ const Header = () => {
       <nav
         id="nav"
         className={clsx(
-          `flex items-center gap-2 max-md:w-full max-md:flex-col max-md:items-end`,
+          "flex items-center gap-2 max-md:w-full max-md:flex-col max-md:items-end",
           !open && "max-md:hidden",
         )}
       >
@@ -77,16 +80,14 @@ const Header = () => {
           <Link
             key={to}
             to={to}
-            className={clsx(pathname === to && "bg-current/10", _class)}
+            className={clsx(pathname === to && "opacity-50", className)}
           >
             {name}
           </Link>
         ))}
 
-        <DarkMode className={_class} />
+        <DarkMode className={className} />
       </nav>
     </header>
   );
-};
-
-export default Header;
+}

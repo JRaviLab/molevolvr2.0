@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 /** type defs for .env file */
-// eslint-disable-next-line
+// eslint-disable-next-line -- for declaration merging
 interface ImportMetaEnv {
   readonly VITE_TITLE: string;
   readonly VITE_DESCRIPTION: string;
@@ -15,7 +15,7 @@ interface ImportMetaEnv {
   readonly VITE_LAB_GITHUB: string;
 }
 
-// eslint-disable-next-line
+// eslint-disable-next-line -- for declaration merging
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }

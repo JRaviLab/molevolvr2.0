@@ -5,7 +5,7 @@ import {
   Flame,
   TableIcon,
 } from "lucide-react";
-import Heading from "@/components/Heading";
+import { H2 } from "@/components/Heading";
 import Tabs, { Tab } from "@/components/Tabs";
 import { useAnalysis } from "@/pages/Analysis";
 import DomainArch from "@/pages/analysis/inputs/DomainArch";
@@ -13,14 +13,12 @@ import Heatmap from "@/pages/analysis/inputs/Heatmap";
 import Summary from "@/pages/analysis/inputs/Summary";
 import Table from "@/pages/analysis/inputs/Table";
 
-const Inputs = () => {
+export default function Inputs() {
   const { status } = useAnalysis();
 
   return (
     <section>
-      <Heading level={2} icon={<ArrowRightToLine />}>
-        Inputs
-      </Heading>
+      <H2 icon={<ArrowRightToLine />}>Inputs</H2>
 
       {status?.type === "complete" ? (
         /** if complete, show all tabs */
@@ -44,6 +42,4 @@ const Inputs = () => {
       )}
     </section>
   );
-};
-
-export default Inputs;
+}

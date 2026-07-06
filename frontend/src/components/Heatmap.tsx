@@ -4,9 +4,10 @@ import { extent, scaleBand, scaleLinear, transpose } from "d3";
 import { cloneDeep, range } from "lodash";
 import Chart from "@/components/Chart";
 import CheckBox from "@/components/CheckBox";
-import { Gradient, gradientFunc, gradientOptions } from "@/components/Gradient";
+import { Gradient, gradientOptions } from "@/components/Gradient";
 import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
+import { defaultGradient, gradientFunc } from "@/util/gradient";
 import { useTextSize, useTheme } from "@/util/hooks";
 
 /** width/height of cells */
@@ -42,7 +43,7 @@ type Props = {
 };
 
 /** heatmap plot */
-const Heatmap = ({
+export default function Heatmap({
   title,
   filename = [],
   x: _x,
@@ -51,16 +52,18 @@ const Heatmap = ({
   legend,
   min,
   max,
-}: Props) => {
+}: Props) {
+  console.debug("heatmap render");
+
   /** clone props to avoid mutating original data */
   let x = cloneDeep(_x);
   let y = cloneDeep(_y);
 
   /** selected gradient */
-  const [gradient, setGradient] = useState(gradientOptions(false)[0]!.id);
+  const [gradient, setGradient] = useState(defaultGradient);
 
-  /** reverse gradient */
-  const [reverse, setReverse] = useState(false);
+  /** flip gradient */
+  const [flip, setFlip] = useState(false);
 
   /** swap rows/cols */
   const [swap, setSwap] = useState(false);
@@ -98,7 +101,7 @@ const Heatmap = ({
   /** value to % */
   const valueScale = scaleLinear([min, max], [0, 1]);
   /** % to color */
-  const colorScale = (value: number) => gradientFunc(gradient, reverse, value);
+  const colorScale = gradientFunc(gradient, flip);
 
   /** main chart area */
   const width = (xScale(cols - 1) ?? 0) + xScale.bandwidth();
@@ -116,26 +119,33 @@ const Heatmap = ({
       title={title}
       filename={[...filename, "heatmap"]}
       controls={[
-        <SelectSingle
-          label="Gradient"
-          options={gradientOptions(reverse)}
-          value={gradient}
-          onChange={setGradient}
-        />,
-        <CheckBox
-          label="Reverse"
-          tooltip="Reverse gradient direction"
-          value={reverse}
-          onChange={setReverse}
-        />,
-        <CheckBox
-          label="Swap"
-          tooltip="Swap rows & cols (transpose)"
-          value={swap}
-          onChange={setSwap}
-        />,
+        [
+          <SelectSingle
+            key="gradient"
+            label="Gradient"
+            options={gradientOptions(flip)}
+            value={gradient}
+            onChange={setGradient}
+          />,
+          <CheckBox
+            key="flip"
+            label="Flip"
+            tooltip="Reverse gradient direction"
+            value={flip}
+            onChange={setFlip}
+          />,
+          <CheckBox
+            key="swap"
+            label="Swap"
+            tooltip="Transpose rows & cols"
+            value={swap}
+            onChange={setSwap}
+          />,
+        ],
       ]}
     >
+      {void console.debug("heatmap chart render")}
+
       {/* cells */}
       <g className="group">
         {data.map((row, rowIndex) =>
@@ -160,9 +170,7 @@ const Heatmap = ({
                 width={xScale.bandwidth() ?? 0}
                 height={yScale.bandwidth() ?? 0}
                 fill={
-                  col
-                    ? colorScale(valueScale(col))
-                    : theme["--color-light-gray"]
+                  col ? colorScale(valueScale(col)) : theme["--color-off-white"]
                 }
                 tabIndex={0}
                 role="graphics-symbol"
@@ -252,7 +260,7 @@ const Heatmap = ({
         {/* gradient rect */}
         <Gradient
           id={gradient}
-          reverse={reverse}
+          flip={flip}
           direction="vertical"
           x={-0.25 * cellSize}
           y={0}
@@ -271,6 +279,4 @@ const Heatmap = ({
       </g>
     </Chart>
   );
-};
-
-export default Heatmap;
+}

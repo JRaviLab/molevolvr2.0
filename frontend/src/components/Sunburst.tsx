@@ -1,9 +1,9 @@
 import type { ReactElement } from "react";
 import type { HierarchyNode } from "d3";
 import type { Filename } from "@/util/download";
-import { Fragment, useId, useMemo, useState } from "react";
+import { Fragment, useId, useState } from "react";
 import { arc, hierarchy } from "d3";
-import { inRange, mapValues, sumBy } from "lodash";
+import { inRange, map, mapValues, sumBy } from "lodash";
 import Chart from "@/components/Chart";
 import Legend from "@/components/Legend";
 import Tooltip from "@/components/Tooltip";
@@ -42,11 +42,17 @@ export type Item = {
   children?: Item[];
 };
 
-type Derived = {
-  label: string;
-  type: string;
+type Node = {
+  /** human-readable label */
+  label?: string;
+  /** arbitrary type/category */
+  type?: string;
+  /** arbitrary value, normalized to determine segment % */
   value: number;
-  children: Derived[];
+  /** children items */
+  children: Node[];
+  /** unique identifier of item */
+  id: string;
   /** color mapped from type */
   color: string;
   /** percent of full circle that item takes up, from 0 to 1 */
@@ -61,12 +67,10 @@ type Derived = {
   childAngle: number;
 };
 
-type Node = HierarchyNode<Derived>;
-
 /** sunburst plot */
-const Sunburst = ({ title, filename = [], data }: Props) => {
+export default function Sunburst({ title, filename = [], data }: Props) {
   /** "breadcrumb trail" of selected nodes */
-  const [selected, setSelected] = useState<Node[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const { fontSize, truncateWidth } = useTextSize();
 
@@ -74,64 +78,61 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
   const anySelected = !!selected.length;
 
   /** hierarchical data structure with convenient access methods */
-  const tree = useMemo(() => {
-    const tree = hierarchy<Derived>({ children: data } as Derived);
+  const tree = hierarchy<Node>({ children: data } as Node);
 
-    /** set fallbacks */
-    for (const { data } of tree) {
-      data.label ??= "";
-      data.type ??= "";
-      data.value ??= 0;
-      data.color ??= "";
-      data.percent ??= 1;
-      data.angle ??= 0;
-      data.childAngle ??= 0;
-    }
+  /** set fallbacks */
+  for (const { data } of tree) {
+    data.color ??= "";
+    data.percent ??= 1;
+    data.angle ??= 0;
+    data.childAngle ??= 0;
+  }
 
-    /** go down tree recursively */
-    tree.eachBefore(({ data, parent }) => {
-      if (!parent) return;
-      /** get total of siblings' values */
-      const total = sumBy(parent?.children, (d) => d.data.value);
-      /** get this node's value as percent of total */
-      const percent = data.value / total || 0;
-      /** get percent of relative to parent, i.e. percent of full circle */
-      data.percent = parent.data.percent * percent;
-      /** set angle from parent's current child angle */
-      data.angle = parent.data.childAngle;
-      data.childAngle = parent.data.childAngle;
-      /** increment parent's child angle */
-      parent.data.childAngle += data.percent;
-    });
+  /** unique id from path to node in tree */
+  tree.eachBefore((node) =>
+    node.children?.forEach(
+      (child, index) =>
+        (child.data.id = [node.data.id, index]
+          .filter((part) => part !== undefined)
+          .join("|")),
+    ),
+  );
 
-    return tree;
-  }, [data]);
+  /** go down tree recursively */
+  tree.eachBefore(({ data, parent }) => {
+    if (!parent) return;
+    /** get total of siblings' values */
+    const total = sumBy(parent?.children, (d) => d.data.value);
+    /** get this node's value as percent of total */
+    const percent = data.value / total || 0;
+    /** get percent of relative to parent, i.e. percent of full circle */
+    data.percent = parent.data.percent * percent;
+    /** set angle from parent's current child angle */
+    data.angle = parent.data.childAngle;
+    data.childAngle = parent.data.childAngle;
+    /** increment parent's child angle */
+    parent.data.childAngle += data.percent;
+  });
 
-  /** get all nodes' types */
-  const types = useMemo(() => {
-    const types: string[] = [];
-    tree.each((node) => types.push(node.data.type));
-    return types;
-  }, [tree]);
+  /** list of node types */
+  const nodeTypes = map(tree.descendants(), (node) => node.data.type ?? "");
 
   /** map of node type to color */
-  const colorMap = useColorMap(types, "mode");
+  const colorMap = useColorMap(nodeTypes, "mode");
 
   /** convert node tree to list and derive some more props */
-  const nodes = useMemo(
-    () =>
-      [...tree].map((node) => {
-        /** assign color from type */
-        node.data.color = colorMap[node.data.type]!;
+  const nodes = [...tree].map((node) => {
+    /** assign color from type */
+    node.data.color = colorMap[node.data.type ?? ""] ?? "";
 
-        /** selected state */
-        node.data.selected = anySelected ? selected.includes(node) : null;
-        node.data.lastSelected = anySelected ? selected.at(-1) === node : null;
+    /** selected state */
+    node.data.selected = anySelected ? selected.includes(node.data.id) : null;
+    node.data.lastSelected = anySelected
+      ? selected.at(-1) === node.data.id
+      : null;
 
-        return node;
-      }),
-    [tree, colorMap, selected, anySelected],
-  );
+    return node;
+  });
 
   /** clear selection */
   const deselect = () => setSelected([]);
@@ -161,7 +162,13 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
                 select={() =>
                   node.data.lastSelected
                     ? deselect()
-                    : setSelected(node.ancestors().slice(0, -1).reverse())
+                    : setSelected(
+                        node
+                          .ancestors()
+                          .slice(0, -1)
+                          .reverse()
+                          .map((node) => node.data.id),
+                      )
                 }
                 deselect={deselect}
                 node={node}
@@ -173,10 +180,11 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
 
       {/* selected breadcrumbs */}
       <g>
-        {selected.map((node, index) => {
+        {selected.map((id, index) => {
           const h = 1.5 * fontSize;
           const x = maxR + ringSize;
           const y = maxR - (index + 1) * (h + gapSize);
+          const node = nodes.find((node) => node.data.id === id)!;
 
           return (
             <NodeTooltip key={index} {...node.data}>
@@ -190,7 +198,7 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
                 />
                 <text x={x + gapSize} y={y} tabIndex={0}>
                   {truncateWidth(
-                    node.data.label || "-",
+                    node.data.label ?? "-",
                     panelWidth - 2 * gapSize,
                   )}
                 </text>
@@ -201,18 +209,16 @@ const Sunburst = ({ title, filename = [], data }: Props) => {
       </g>
     </Chart>
   );
-};
-
-export default Sunburst;
+}
 
 type SegmentProps = {
-  node: Node;
+  node: HierarchyNode<Node>;
   select: () => void;
   deselect: () => void;
 };
 
 /** single arc segment */
-const Segment = ({ node, select, deselect }: SegmentProps) => {
+function Segment({ node, select, deselect }: SegmentProps) {
   /** unique segment id */
   const id = useId();
 
@@ -229,43 +235,36 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
   const radius = (depth + startDepth - 0.5) * ringSize;
 
   /** get enclosed shape to fill */
-  const fill = useMemo(
-    () =>
-      arc<null>()
-        .innerRadius(radius - ringSize / 2 + gapSize / 2)
-        .outerRadius(radius + ringSize / 2 - gapSize / 2)
-        .startAngle(angle * tau)
-        .endAngle(end * tau)
-        .padRadius(gapSize)
-        .padAngle(1)(null) ?? "",
-    [radius, angle, end],
-  );
+  const fill =
+    arc<null>()
+      .innerRadius(radius - ringSize / 2 + gapSize / 2)
+      .outerRadius(radius + ringSize / 2 - gapSize / 2)
+      .startAngle(angle * tau)
+      .endAngle(end * tau)
+      .padRadius(gapSize)
+      .padAngle(1)(null) ?? "";
+
+  /** if angle midpoint in lower half of circle, flip text so not upside down */
+  const flip = inRange((angle + end) / 2, 0.25, 0.75);
 
   /** get stroke path */
-  const stroke = useMemo(() => {
-    /** if angle midpoint in lower half of circle, flip text so not upside down */
-    const flip = inRange((angle + end) / 2, 0.25, 0.75);
+  let stroke =
+    arc<null>()
+      /** center line of segment */
+      .innerRadius(radius)
+      /**
+       * centerline, minus some thickness to ensure there is L command. d3 does
+       * A command(s) for larger radius first, and we will only keep that, so
+       * thickness can be arbitrary.
+       */
+      .outerRadius(radius - 999)
+      .startAngle((flip ? end : angle) * tau)
+      .endAngle((flip ? angle : end) * tau)
+      .padRadius(3 * gapSize)
+      .padAngle(1)(null) ?? "";
 
-    let stroke =
-      arc<null>()
-        /** center line of segment */
-        .innerRadius(radius)
-        /**
-         * centerline, minus some thickness to ensure there is L command. d3
-         * does A command(s) for larger radius first, and we will only keep
-         * that, so thickness can be arbitrary.
-         */
-        .outerRadius(radius - 999)
-        .startAngle((flip ? end : angle) * tau)
-        .endAngle((flip ? angle : end) * tau)
-        .padRadius(3 * gapSize)
-        .padAngle(1)(null) ?? "";
-
-    /** extract just first half of path, center-line of segment */
-    stroke = stroke.slice(0, stroke.indexOf("L"));
-
-    return stroke;
-  }, [radius, angle, end]);
+  /** extract just first half of path, center-line of segment */
+  stroke = stroke.slice(0, stroke.indexOf("L"));
 
   /** length of arc centerline */
   const arcLength = radius * Math.abs(end - angle) * tau - 2 * gapSize;
@@ -304,38 +303,40 @@ const Segment = ({ node, select, deselect }: SegmentProps) => {
         fill={theme["--color-black"]}
       >
         <textPath href={`#${id}`} startOffset="50%">
-          {truncateWidth(label || "-", arcLength)}
+          {truncateWidth(label ?? "-", arcLength)}
         </textPath>
       </text>
     </g>
   );
-};
+}
 
 /** tooltip for data node */
-const NodeTooltip = ({
+function NodeTooltip({
   label,
   value,
   percent,
   type,
   children,
-}: Omit<Derived, "children"> & { children: ReactElement }) => (
-  <Tooltip
-    content={
-      <dl>
-        <dt>Name</dt>
-        <dd>{label}</dd>
-        <dt>Value</dt>
-        <dd>{formatNumber(value)}</dd>
-        <dt>Percent</dt>
-        <dd>{formatPercent(percent)}</dd>
-        <dt>Type</dt>
-        <dd>{type}</dd>
-      </dl>
-    }
-  >
-    {children}
-  </Tooltip>
-);
+}: Omit<Node, "children"> & { children: ReactElement }) {
+  return (
+    <Tooltip
+      content={
+        <dl>
+          <dt>Name</dt>
+          <dd>{label}</dd>
+          <dt>Value</dt>
+          <dd>{formatNumber(value)}</dd>
+          <dt>Percent</dt>
+          <dd>{formatPercent(percent)}</dd>
+          <dt>Type</dt>
+          <dd>{type}</dd>
+        </dl>
+      }
+    >
+      {children}
+    </Tooltip>
+  );
+}
 
 /** format 0-1 as % */
 const formatPercent = (percent = 0) => `${(100 * percent).toFixed(0)}%`;

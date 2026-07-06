@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
-import { Fragment } from "react";
+import { Fragment, useRef } from "react";
 import {
   Label,
   Listbox,
@@ -9,8 +9,10 @@ import {
 } from "@headlessui/react";
 import clsx from "clsx";
 import { Check, ChevronDown } from "lucide-react";
+import Button from "@/components/Button";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
+import { preserveScroll } from "@/util/dom";
 
 type Props<O extends Option> = {
   /** label content */
@@ -23,6 +25,8 @@ type Props<O extends Option> = {
   value: O["id"][];
   /** on selected options state change */
   onChange: (value: O["id"][], count: number | "all" | "none") => void;
+  /** class on root */
+  className?: string;
 };
 
 export type Option<ID = string | number> = {
@@ -37,13 +41,16 @@ export type Option<ID = string | number> = {
 };
 
 /** multi select box */
-const SelectMulti = <O extends Option>({
+export default function SelectMulti<O extends Option>({
   label,
   tooltip,
   value,
   onChange,
   options,
-}: Props<O>) => {
+  className,
+}: Props<O>) {
+  const ref = useRef<HTMLButtonElement>(null);
+
   /** link to parent form component */
   const form = useForm();
 
@@ -54,7 +61,7 @@ const SelectMulti = <O extends Option>({
       multiple
       form={form}
       value={value}
-      onChange={(value) =>
+      onChange={(value) => {
         onChange(
           value,
           value.length === 0
@@ -62,8 +69,9 @@ const SelectMulti = <O extends Option>({
             : value.length === options.length
               ? "all"
               : value.length,
-        )
-      }
+        );
+        preserveScroll(ref.current);
+      }}
     >
       {({ value }) => {
         let selectedLabel: ReactNode = "";
@@ -71,27 +79,29 @@ const SelectMulti = <O extends Option>({
         if (count === 0) selectedLabel = "None selected";
         else if (count === 1)
           selectedLabel =
-            options.find((option) => option.id === value[0])?.primary || "";
+            options.find((option) => option.id === value[0])?.primary || "-";
         else if (count === options.length) selectedLabel = "All selected";
         else selectedLabel = count + " selected";
 
         return (
-          <>
+          <div className={clsx("flex gap-2", className)}>
             {/* label */}
-            <Label className="flex items-center gap-1">
+            <Label className="flex items-center gap-2">
               {label}
               {tooltip && <Help tooltip={tooltip} />}
             </Label>
 
             {/* button */}
-            <ListboxButton className="gap-2 border-b border-current p-2 text-accent *:leading-none hover:text-deep">
-              <span className="grow truncate py-1">{selectedLabel}</span>
-              <ChevronDown />
+            <ListboxButton as={Fragment}>
+              <Button ref={ref}>
+                <span className="grow truncate">{selectedLabel}</span>
+                <ChevronDown />
+              </Button>
             </ListboxButton>
 
             {/* dropdown */}
             <ListboxOptions
-              className="z-20 min-w-(--button-width) bg-white shadow-sm"
+              className="z-20 min-w-(--button-width) rounded-md bg-white shadow-md"
               anchor={{ to: "bottom start", padding: 10 }}
               modal={false}
             >
@@ -100,7 +110,7 @@ const SelectMulti = <O extends Option>({
                   {({ focus, selected }) => (
                     <li
                       className={clsx(
-                        `flex max-w-[calc(100dvw--spacing(20))] cursor-pointer items-center gap-2 p-2 *:leading-none`,
+                        "flex cursor-pointer items-center gap-2 px-2 py-1",
                         focus && "bg-off-white",
                       )}
                     >
@@ -129,11 +139,9 @@ const SelectMulti = <O extends Option>({
                 </ListboxOption>
               ))}
             </ListboxOptions>
-          </>
+          </div>
         );
       }}
     </Listbox>
   );
-};
-
-export default SelectMulti;
+}

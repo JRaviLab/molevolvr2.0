@@ -14,13 +14,13 @@ type Props = {
 } & ComponentProps<typeof Button>;
 
 /** file dialog or drag & drop button */
-const UploadButton = ({
+export default function UploadButton({
   onUpload,
   accept = [],
   tooltip,
   className,
   ...props
-}: Props) => {
+}: Props) {
   const ref = useRef<HTMLInputElement>(null);
 
   /** dragging */
@@ -59,7 +59,7 @@ const UploadButton = ({
     <>
       <Button
         className={clsx(
-          drag && `outline-dashed *:pointer-events-none`,
+          drag && "outline-dashed *:pointer-events-none",
           className,
         )}
         tooltip={
@@ -89,6 +89,4 @@ const UploadButton = ({
       />
     </>
   );
-};
-
-export default UploadButton;
+}

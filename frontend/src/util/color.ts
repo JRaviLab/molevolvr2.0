@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useDeepCompareEffect } from "@reactuses/core";
-import { lch } from "d3";
+import { formatHex } from "culori";
 import { useAtomValue } from "jotai";
+import colors from "tailwindcss/colors";
 import { darkModeAtom } from "@/components/DarkMode";
 import { getEntries } from "@/util/types";
-import colors from "./colors.json";
 
 /**
  * https://tailwindcss.com/docs/customizing-colors
@@ -41,22 +41,18 @@ type Shade = "light" | "dark";
 
 /** get neutral color from shade */
 const getNeutral = (shade: Shade) => {
-  if (shade === "dark") return colors[neutral]["800"];
-  else return colors[neutral]["200"];
+  if (shade === "dark") return process(colors[neutral]["700"]);
+  else return process(colors[neutral]["300"]);
 };
 
 /** get (colorful) color from hue and shade */
 const getColor = (hue: Hue, shade: Shade) => {
-  if (shade === "dark") return desaturate(colors[hue]["800"]);
-  else return desaturate(colors[hue]["200"]);
+  if (shade === "dark") return process(colors[hue]["700"]);
+  else return process(colors[hue]["300"]);
 };
 
-/** pleasantly desaturate color */
-const desaturate = (color: string) => {
-  const _color = lch(color);
-  _color.c = 20;
-  return _color.formatHex();
-};
+/** process color */
+const process = (color: string) => formatHex(color) ?? "";
 
 /** map enumerated values to colors */
 const getColorMap = <Value extends string>(

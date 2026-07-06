@@ -9,9 +9,9 @@ type Props = {
 };
 
 /** summary card for analysis */
-const AnalysisCard = ({
+export default function AnalysisCard({
   analysis: { id, name, type, info, started, status },
-}: Props) => {
+}: Props) {
   /** analysis status type to mark type */
   const statusToMark: Record<NonNullable<Analysis["status"]>["type"], Type> = {
     analyzing: "loading",
@@ -22,16 +22,14 @@ const AnalysisCard = ({
   return (
     <Link
       to={`/analysis/${id}`}
-      className="flex flex-col items-start gap-2 rounded-md border border-light-gray bg-white p-4 hover:border-accent"
+      className="flex flex-col items-start gap-2 rounded-md border border-light-gray p-4 text-current no-underline hover:border-accent"
       showArrow={false}
     >
-      <div className="font-bold">{name}</div>
-      <div className="text-dark-gray">{type}</div>
-      {info && <div className="text-dark-gray">{info}</div>}
-      {started && <Ago className="text-dark-gray" date={started} />}
+      <div className="font-medium">{name}</div>
+      <div className="text-gray">{type}</div>
+      {info && <div className="text-gray">{info}</div>}
+      {started && <Ago className="text-gray" date={started} />}
       {status && <Mark type={statusToMark[status.type]}>{status.info}</Mark>}
     </Link>
   );
-};
-
-export default AnalysisCard;
+}

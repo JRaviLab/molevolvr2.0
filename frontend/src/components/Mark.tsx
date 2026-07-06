@@ -23,7 +23,7 @@ export const types = {
   warning: { color: "var(--color-warning)", icon: <CircleAlert /> },
   error: { color: "var(--color-error)", icon: <TriangleAlert /> },
   analyzing: {
-    color: "var(--color-deep-light)",
+    color: "var(--color-deep)",
     icon: <Logo data-animated className="h-[1.5em]" />,
   },
 };
@@ -32,14 +32,19 @@ export const types = {
 export type Type = keyof typeof types;
 
 /** icon and text with color */
-const Mark = ({ type = "info", icon, className, children }: Props) => (
-  <div
-    className={clsx("inline-flex items-center gap-4", className)}
-    style={{ color: types[type].color }}
-  >
-    {icon ?? types[type].icon}
-    <div>{children}</div>
-  </div>
-);
-
-export default Mark;
+export default function Mark({
+  type = "info",
+  icon,
+  className,
+  children,
+}: Props) {
+  return (
+    <div
+      className={clsx("inline-flex items-center gap-4", className)}
+      style={{ color: types[type].color }}
+    >
+      {icon ?? types[type].icon}
+      <div>{children}</div>
+    </div>
+  );
+}

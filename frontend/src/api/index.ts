@@ -19,12 +19,12 @@ type CombinedOptions = Omit<RequestInit, "body"> & {
 };
 
 /** general request */
-export async function request<Response>(
+export const request = async <Response>(
   /** request url */
   url: string | URL,
   /** raw request options plus extra options */
   combinedOptions: CombinedOptions = {},
-) {
+) => {
   /** extract extra options */
   const { params = {}, body, parse = "json", ...rest } = combinedOptions;
   /** raw request options */
@@ -61,4 +61,4 @@ export async function request<Response>(
   /** throw error after details have been logged */
   if (error || parsed === undefined) throw Error(error);
   return parsed;
-}
+};

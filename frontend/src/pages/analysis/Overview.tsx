@@ -1,17 +1,15 @@
 import { FileChartPie } from "lucide-react";
 import Ago from "@/components/Ago";
 import Alert from "@/components/Alert";
-import Heading from "@/components/Heading";
+import { H1 } from "@/components/Heading";
 import { useAnalysis } from "@/pages/Analysis";
 
-const Overview = () => {
+export default function Overview() {
   const { id, name, type, started, status } = useAnalysis();
 
   return (
     <section className="items-center">
-      <Heading level={1} icon={<FileChartPie />}>
-        {name}
-      </Heading>
+      <H1 icon={<FileChartPie />}>{name}</H1>
 
       <dl>
         <dt>ID</dt>
@@ -30,6 +28,4 @@ const Overview = () => {
       {status?.type === "error" && <Alert type="error">{status.info}</Alert>}
     </section>
   );
-};
-
-export default Overview;
+}

@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { Pencil, Trash } from "lucide-react";
 import Button from "@/components/Button";
-import Heading from "@/components/Heading";
+import { H2 } from "@/components/Heading";
 import { useAnalysis } from "@/pages/Analysis";
 
-const Actions = () => {
+export default function Actions() {
   const { id } = useAnalysis();
 
   const { mutate: edit } = useMutation({
@@ -25,25 +25,18 @@ const Actions = () => {
 
   return (
     <section className="items-center">
-      <Heading level={2} className="sr-only">
-        Actions
-      </Heading>
+      <H2 className="sr-only">Actions</H2>
 
       <div className="flex flex-wrap gap-4">
-        <Button
-          icon={<Pencil />}
-          text="Duplicate and Edit"
-          onClick={() => edit()}
-        />
-        <Button
-          icon={<Trash />}
-          text="Delete Analysis"
-          design="critical"
-          onClick={() => _delete()}
-        />
+        <Button onClick={() => edit()}>
+          <Pencil />
+          Duplicate and Edit
+        </Button>
+        <Button design="critical" onClick={() => _delete()}>
+          <Trash />
+          Delete Analysis
+        </Button>
       </div>
     </section>
   );
-};
-
-export default Actions;
+}

@@ -56,6 +56,12 @@ export const sequence = (chars?: string, min = 10, max = 100) =>
     .map(() => char(chars))
     .join("");
 
+/** fake legend data */
+export const legend = Array(10)
+  .fill(null)
+  .map(label)
+  .map((label) => label || "");
+
 /** fake upset data */
 const upsetCols = random(3, 10);
 const upsetRows = random(3, 10);
@@ -133,7 +139,7 @@ export const heatmap = {
 export const treeItem = (depth: number): TreeItem => ({
   label: label(),
   type: type(),
-  dist: random(1, 10),
+  dist: random(1, true) < 0.9 ? random(1, 10) : 100,
   ...(depth > 0 && {
     children: Array(random(1, 3))
       .fill(null)
@@ -142,7 +148,11 @@ export const treeItem = (depth: number): TreeItem => ({
 });
 
 /** fake sunburst data */
-export const tree = [treeItem(random(1, 3)), treeItem(random(1, 3))];
+export const tree = [
+  treeItem(random(1, 3)),
+  treeItem(random(1, 3)),
+  treeItem(random(1, 3)),
+];
 
 /** fake node data */
 export const nodes = Array(200)

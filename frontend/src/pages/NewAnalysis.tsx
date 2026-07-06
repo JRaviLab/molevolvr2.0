@@ -18,7 +18,7 @@ import Alert from "@/components/Alert";
 import Button from "@/components/Button";
 import CheckBox from "@/components/CheckBox";
 import Form from "@/components/Form";
-import Heading from "@/components/Heading";
+import { H1, H2 } from "@/components/Heading";
 import Link from "@/components/Link";
 import Meta from "@/components/Meta";
 import NumberBox from "@/components/NumberBox";
@@ -147,7 +147,7 @@ const parseTable = (
 
 type TableInput = ReturnType<typeof parseTable> | null;
 
-const NewAnalysis = () => {
+export default function NewAnalysis() {
   const navigate = useNavigate();
 
   /** "input" state */
@@ -216,15 +216,11 @@ const NewAnalysis = () => {
 
       <Form onSubmit={onSubmit}>
         <section>
-          <Heading level={1} icon={<Plus />}>
-            New Analysis
-          </Heading>
+          <H1 icon={<Plus />}>New Analysis</H1>
         </section>
 
         <section>
-          <Heading level={2} icon={<ArrowRightToLine />}>
-            Input
-          </Heading>
+          <H2 icon={<ArrowRightToLine />}>Input</H2>
 
           {/* input questions */}
           <div className="grid w-full grid-cols-2 items-start gap-8 max-md:grid-cols-1">
@@ -270,35 +266,34 @@ const NewAnalysis = () => {
 
           {/* list input */}
           {inputType === "list" && (
-            <div className="flex flex-col gap-2">
-              <TextBox
-                label={
-                  <>
-                    {
-                      inputFormats[inputType].find((i) => i.id === inputFormat)
-                        ?.primary
-                    }{" "}
-                    input
-                    {!isEmpty(stats) && (
-                      <span className="text-dark-gray">
-                        (
-                        {Object.entries(stats)
-                          .map(([key, value]) => `${value} ${startCase(key)}`)
-                          .join(", ")}
-                        )
-                      </span>
-                    )}
-                  </>
-                }
-                placeholder={placeholders[inputFormat]
-                  .split("\n")
-                  .slice(0, 2)
-                  .join("\n")}
-                multi
-                value={listInput}
-                onChange={setListInput}
-              />
-            </div>
+            <TextBox
+              className="flex-col"
+              label={
+                <>
+                  {
+                    inputFormats[inputType].find((i) => i.id === inputFormat)
+                      ?.primary
+                  }{" "}
+                  input
+                  {!isEmpty(stats) && (
+                    <span className="text-gray">
+                      (
+                      {Object.entries(stats)
+                        .map(([key, value]) => `${value} ${startCase(key)}`)
+                        .join(", ")}
+                      )
+                    </span>
+                  )}
+                </>
+              }
+              placeholder={placeholders[inputFormat]
+                .split("\n")
+                .slice(0, 2)
+                .join("\n")}
+              multi
+              value={listInput}
+              onChange={setListInput}
+            />
           )}
 
           {/* table input */}
@@ -314,8 +309,6 @@ const NewAnalysis = () => {
           {/* controls */}
           <div className="flex items-center justify-center gap-4">
             <UploadButton
-              text="Upload"
-              icon={<Upload />}
               onUpload={async (file, filename, extension) => {
                 if (!name) setName(startCase(filename));
                 const contents = await file.text();
@@ -332,8 +325,14 @@ const NewAnalysis = () => {
                   );
               }}
               accept={accept}
-            />
-            <Button icon={<Lightbulb />} text="Example" onClick={onExample} />
+            >
+              <Upload />
+              Upload
+            </UploadButton>
+            <Button onClick={onExample}>
+              <Lightbulb />
+              Example
+            </Button>
           </div>
 
           {inputType === "external" && (
@@ -353,6 +352,7 @@ const NewAnalysis = () => {
               {!haveQuerySequences && (
                 <>
                   <TextBox
+                    className="flex-col"
                     label="Query Sequence"
                     placeholder={placeholders.accnum}
                     multi
@@ -360,15 +360,16 @@ const NewAnalysis = () => {
                     onChange={setQuerySequenceInput}
                   />
                   <UploadButton
-                    text="Upload Query Sequence Accession Numbers"
-                    icon={<Upload />}
                     design="hollow"
                     className="self-center"
                     onUpload={async (file) =>
                       setQuerySequenceInput(await file.text())
                     }
                     accept={["fa", "faa", "fasta", "txt"]}
-                  />
+                  >
+                    <Upload />
+                    Upload Query Sequence Accession Numbers
+                  </UploadButton>
                 </>
               )}
             </div>
@@ -376,40 +377,38 @@ const NewAnalysis = () => {
         </section>
 
         <section className="items-center">
-          <Heading level={2} icon={<Cog />}>
-            Options
-          </Heading>
+          <H2 icon={<Cog />}>Options</H2>
 
           <div className="flex flex-wrap justify-between gap-16">
-            <div className="flex flex-col gap-2">
-              <Radios
-                label="What type of analyses do you want to run?"
-                tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
-                /** allow specific analysis types based on input format */
-                options={analysisTypes.filter(({ id }) => {
-                  if (["fasta", "accnum", "msa"].includes(inputFormat))
-                    return true;
-                  if (inputFormat === "blast") return id === "phylogeny-domain";
-                  if (inputFormat === "interproscan")
-                    return ["phylogeny-domain", "domain"].includes(id);
-                })}
-                value={analysisType}
-                onChange={setAnalysisType}
-              />
-            </div>
+            <Radios
+              label="What type of analyses do you want to run?"
+              tooltip="These options may be limited depending on your input format. Some steps are necessarily performed together. Learn more on the about page."
+              /** allow specific analysis types based on input format */
+              options={analysisTypes.filter(({ id }) => {
+                if (["fasta", "accnum", "msa"].includes(inputFormat))
+                  return true;
+                if (inputFormat === "blast") return id === "phylogeny-domain";
+                if (inputFormat === "interproscan")
+                  return ["phylogeny-domain", "domain"].includes(id);
+              })}
+              value={analysisType}
+              onChange={setAnalysisType}
+            />
 
             {["homology-domain", "homology"].includes(analysisType) && (
               <div className="flex flex-col gap-4">
-                <div className="font-medium">BLAST Parameters</div>
+                <div>BLAST Parameters</div>
 
                 <div className="grid grid-cols-2 justify-start gap-x-8 gap-y-4">
                   <SelectSingle
+                    className="contents!"
                     label="Homology search DB"
                     options={homologyDatabases}
                     value={homologyDatabase}
                     onChange={setHomologyDatabase}
                   />
                   <Slider
+                    className="contents!"
                     label="Max hits"
                     min={10}
                     max={500}
@@ -417,6 +416,7 @@ const NewAnalysis = () => {
                     onChange={setMaxHits}
                   />
                   <NumberBox
+                    className="contents!"
                     label="E-value cutoff"
                     min={0}
                     max={1}
@@ -438,33 +438,29 @@ const NewAnalysis = () => {
         </section>
 
         <section className="width-sm">
-          <Heading level={2} icon={<Send />}>
-            Submit
-          </Heading>
+          <H2 icon={<Send />}>Submit</H2>
 
-          <div className="flex flex-col gap-2">
-            <TextBox
-              label="Analysis Name"
-              tooltip="Give your analysis a name to remember it by"
-              placeholder="New Analysis"
-              value={name}
-              onChange={setName}
-            />
-          </div>
+          <TextBox
+            className="flex-col"
+            label="Analysis Name"
+            tooltip="Give your analysis a name to remember it by"
+            placeholder="New Analysis"
+            value={name}
+            onChange={setName}
+          />
 
-          <div className="flex flex-col gap-2">
-            <TextBox
-              label={
-                <>
-                  <Bell /> Email me updates on this analysis
-                </>
-              }
-              placeholder="my-email@xyz.com"
-              tooltip="We can email you when this analysis starts (so you can keep track of it) and when it finishes."
-              value={email || ""}
-              onChange={setEmail}
-            />
-          </div>
+          <TextBox
+            className="flex-col"
+            label={
+              <>
+                <Bell /> Email me updates on this analysis
+              </>
+            }
+            placeholder="my-email@xyz.com"
+            tooltip="We can email you when this analysis starts (so you can keep track of it) and when it finishes."
+            value={email || ""}
+            onChange={setEmail}
+          />
 
           <Alert>
             An analysis takes <strong>several hours to run</strong>!{" "}
@@ -474,16 +470,12 @@ const NewAnalysis = () => {
             .
           </Alert>
 
-          <Button
-            icon={<Send />}
-            text="Submit"
-            design="critical"
-            type="submit"
-          />
+          <Button design="critical" type="submit">
+            <Send />
+            Submit Analysis
+          </Button>
         </section>
       </Form>
     </>
   );
-};
-
-export default NewAnalysis;
+}

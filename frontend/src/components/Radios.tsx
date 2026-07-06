@@ -34,13 +34,13 @@ export type Option<ID = string> = {
  * group of mutually-exclusive options. only use for 2-4 very important options
  * that all need to be simultaneously visible, otherwise use select.
  */
-const Radios = <O extends Option>({
+export default function Radios<O extends Option>({
   label,
   tooltip,
   options,
   value,
   onChange,
-}: Props<O>) => {
+}: Props<O>) {
   /** link to parent form component */
   const form = useForm();
 
@@ -53,7 +53,7 @@ const Radios = <O extends Option>({
   });
 
   return (
-    <div role="group" className="contents">
+    <div role="group" className="flex flex-col gap-2">
       <legend className="flex items-center gap-2">
         {label}
         {tooltip && <Help tooltip={tooltip} />}
@@ -63,7 +63,7 @@ const Radios = <O extends Option>({
         {options.map((option, index) => (
           <label
             key={index}
-            className="flex items-start gap-4 p-2 hover:bg-off-white"
+            className="flex cursor-pointer items-center gap-4 rounded-md p-2 transition hover:bg-off-white"
           >
             <input
               className="sr-only"
@@ -76,29 +76,27 @@ const Radios = <O extends Option>({
 
             {/* check mark */}
             {value === option.id ? (
-              <CircleCheckBig className="h-lh w-[1.1em] text-accent" />
+              <CircleCheckBig className="h-lh w-[1.1em] self-start text-accent" />
             ) : (
-              <Circle className="h-lh w-[1.1em] text-gray" />
+              <Circle className="h-lh w-[1.1em] self-start text-gray" />
             )}
 
             {/* text content */}
             <div className="flex flex-col items-start gap-2">
               <span>{option.primary}</span>
               {option.secondary && (
-                <span className="text-dark-gray">{option.secondary}</span>
+                <span className="text-gray">{option.secondary}</span>
               )}
               {option.tertiary && (
-                <span className="text-gray">{option.tertiary}</span>
+                <span className="text-sm text-gray">{option.tertiary}</span>
               )}
             </div>
 
             {/* icon */}
-            {option.icon && <div className="text-dark-gray">{option.icon}</div>}
+            {option.icon && <div className="text-gray">{option.icon}</div>}
           </label>
         ))}
       </div>
     </div>
   );
-};
-
-export default Radios;
+}

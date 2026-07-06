@@ -31,7 +31,7 @@ export const waitFor = async <Return>(
 export const waitForStable = async <Return>(
   func: () => Return,
   /** wait until func returns same value for at least this long */
-  wait = 1000,
+  wait = 500,
   /** check value every this many ms */
   interval = 2,
   /** hard limit on number of checks */

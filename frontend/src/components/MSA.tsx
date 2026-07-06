@@ -1,6 +1,6 @@
 import type { Hue } from "@/util/color";
 import type { Filename } from "@/util/download";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useState } from "react";
 import { pairs } from "d3";
 import { countBy, mapKeys, mapValues, max, orderBy, range } from "lodash";
 import Chart from "@/components/Chart";
@@ -11,7 +11,7 @@ import { useColorMap } from "@/util/color";
 import { useTextSize, useTheme } from "@/util/hooks";
 
 /** label size */
-const labelWidth = 150;
+const labelWidth = 200;
 /** seq char width */
 const charWidth = 12;
 /** row height */
@@ -43,13 +43,15 @@ type Track = {
 export type Combined = Record<string, number>;
 
 /** multiple sequence alignment plot */
-const MSA = ({
+export default function MSA({
   title,
   filename = [],
   tracks,
   getType = (char) => char,
   colorMap: manualColors = {},
-}: Props) => {
+}: Props) {
+  console.debug("msa render");
+
   /** whether to wrap sequence to separate "panels" */
   const [wrap, setWrap] = useState(true);
 
@@ -58,15 +60,13 @@ const MSA = ({
   const { fontSize, truncateWidth } = useTextSize();
 
   /** maximum sequence length */
-  const length = useMemo(
-    () => max(tracks.map((track) => track.sequence.length)) ?? 0,
-    [tracks],
-  );
+  const length = max(tracks.map((track) => track.sequence.length)) ?? 0;
 
   /** assign types */
-  const { combinedWithTypes, tracksWithTypes, types } = useMemo(
-    () => getDerived(tracks, length, getType),
-    [tracks, length, getType],
+  const { combinedWithTypes, tracksWithTypes, types } = getDerived(
+    tracks,
+    length,
+    getType,
   );
 
   /** map of type to color */
@@ -76,6 +76,7 @@ const MSA = ({
     <Chart
       title={title}
       filename={[...filename, "msa"]}
+      className="w-full"
       controls={[
         <CheckBox
           label="Wrap"
@@ -84,9 +85,10 @@ const MSA = ({
           onChange={setWrap}
         />,
       ]}
-      containerProps={{ className: "w-full" }}
     >
       {({ width }) => {
+        console.debug("msa chart render");
+
         /** max num of chars that can fit in width */
         const rowChars = wrap
           ? Math.max(
@@ -260,9 +262,7 @@ const MSA = ({
       }}
     </Chart>
   );
-};
-
-export default MSA;
+}
 
 /** get input data + derived data, e.g. assigning types */
 const getDerived = (

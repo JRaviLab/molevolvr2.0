@@ -26,7 +26,7 @@ import Alert from "@/components/Alert";
 import AnalysisCard from "@/components/AnalysisCard";
 import Button from "@/components/Button";
 import FeatureCard from "@/components/FeatureCard";
-import Heading from "@/components/Heading";
+import { H1, H2 } from "@/components/Heading";
 import Meta from "@/components/Meta";
 import Tile from "@/components/Tile";
 import Viz from "@/pages/viz/Viz";
@@ -51,7 +51,7 @@ export const examples = [
   },
 ] satisfies Analysis[];
 
-const Home = () => {
+export default function Home() {
   /** app stats */
   const { data: stats, status: status } = useQuery({
     queryKey: ["stats"],
@@ -68,31 +68,32 @@ const Home = () => {
       <section className="min-h-100 justify-center bg-pale width-sm">
         {!reduceMotion && <Viz />}
 
-        <Heading level={1} className="sr-only">
-          Home
-        </Heading>
+        <H1 className="sr-only">Home</H1>
 
         <p className="text-center text-xl text-balance">
           {import.meta.env.VITE_DESCRIPTION}
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <Button to="/new-analysis" icon={<Plus />} text="New Analysis" />
-          <Button
-            to="/load-analysis"
-            icon={<ArrowRight />}
-            text="Load Analysis"
-          />
-          <Button to="/testbed" icon={<FlaskConical />} text="Testbed" />
+          <Button to="/new-analysis" design="accent">
+            <Plus />
+            New Analysis
+          </Button>
+          <Button to="/load-analysis" design="accent">
+            <ArrowRight />
+            Load Analysis
+          </Button>
+          <Button to="/testbed" design="accent">
+            <FlaskConical />
+            Testbed
+          </Button>
         </div>
       </section>
 
-      <section className="items-center">
-        <Heading level={2} icon={<Lightbulb />}>
-          Examples
-        </Heading>
+      <section>
+        <H2 icon={<Lightbulb />}>Examples</H2>
 
-        <p className="font-medium">
+        <p className="self-center">
           See what MolEvolvR results look like without inputting anything
         </p>
 
@@ -104,11 +105,9 @@ const Home = () => {
       </section>
 
       <section className="items-center">
-        <Heading level={2} icon={<Eye />}>
-          Overview
-        </Heading>
+        <H2 icon={<Eye />}>Overview</H2>
 
-        <p className="font-medium">Select your inputs...</p>
+        <p>Select your inputs...</p>
 
         <div className="flex items-center gap-4 max-md:flex-col">
           <FeatureCard
@@ -130,7 +129,7 @@ const Home = () => {
           />
         </div>
 
-        <p className="font-medium">...then view your results...</p>
+        <p>...then view your results...</p>
 
         <div className="flex items-center gap-4 max-md:flex-col">
           <FeatureCard
@@ -160,15 +159,13 @@ const Home = () => {
       </section>
 
       <section className="items-center">
-        <Heading level={2} icon={<ChartScatter />}>
-          Stats
-        </Heading>
+        <H2 icon={<ChartScatter />}>Stats</H2>
 
         {status === "pending" && <Alert type="loading">Loading stats</Alert>}
         {status === "error" && <Alert type="error">Error loading stats</Alert>}
 
         {stats && (
-          <div className="flex flex-wrap gap-8">
+          <div className="mt-4 grid grid-cols-3 gap-8">
             <Tile
               icon={<MonitorCheck />}
               primary={formatNumber(stats.running, true)}
@@ -189,9 +186,7 @@ const Home = () => {
       </section>
 
       <section className="items-center">
-        <Heading level={2} icon={<Feather />}>
-          Abstract
-        </Heading>
+        <H2 icon={<Feather />}>Abstract</H2>
 
         <p>
           The MolEvolvR web-app integrates molecular evolution and phylogenetic
@@ -203,19 +198,19 @@ const Home = () => {
         </p>
 
         <div className="flex flex-wrap gap-4">
-          <Button
-            to="https://biorxiv.org/link-to-paper"
-            text="Read the Paper"
-            icon={<Newspaper />}
-          />
-          <Button to="/about" icon={<Info />} text="Learn More" />
+          <Button to="https://biorxiv.org/link-to-paper" design="accent">
+            <Newspaper />
+            Read the Paper
+          </Button>
+          <Button to="/about">
+            <Info />
+            Learn More
+          </Button>
         </div>
       </section>
 
       <section className="items-center">
-        <Heading level={2} icon={<Quote />}>
-          Cite
-        </Heading>
+        <H2 icon={<Quote />}>Cite</H2>
 
         <blockquote>
           <strong>
@@ -232,6 +227,4 @@ const Home = () => {
       </section>
     </>
   );
-};
-
-export default Home;
+}

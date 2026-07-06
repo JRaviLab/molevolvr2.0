@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Square, SquareCheck } from "lucide-react";
+import { Square, SquareCheckBig } from "lucide-react";
 import Asterisk from "@/components/Asterisk";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -19,34 +19,36 @@ type Props = {
 };
 
 /** simple checkbox with label */
-const CheckBox = ({ label, tooltip, value, onChange, required }: Props) => {
+export default function CheckBox({
+  label,
+  tooltip,
+  value,
+  onChange,
+  required,
+}: Props) {
   /** link to parent form component */
   const form = useForm();
 
   return (
-    <label className="group p-2 hover:bg-off-white">
-      <input
-        type="checkbox"
-        className="sr-only"
-        form={form}
-        required={required}
-        checked={value}
-        onChange={(event) => {
-          const value = event.currentTarget.checked;
-          preserveScroll(event.currentTarget);
-          onChange(value);
-        }}
-      />
-      {value ? (
-        <SquareCheck className="size-5 text-accent group-hover:text-deep" />
-      ) : (
-        <Square className="size-5 text-accent group-hover:text-deep" />
-      )}
+    <label className="group cursor-pointer rounded-md p-2 transition hover:bg-off-white">
+      <div className="relative size-5 shrink-0 text-deep *:absolute *:size-full group-hover:text-accent has-focus-visible:outline-2">
+        <input
+          type="checkbox"
+          className="opacity-0"
+          form={form}
+          required={required}
+          checked={value}
+          onChange={(event) => {
+            const value = event.currentTarget.checked;
+            preserveScroll(event.currentTarget);
+            onChange(value);
+          }}
+        />
+        {value ? <SquareCheckBig /> : <Square />}
+      </div>
       {label}
       {tooltip && <Help tooltip={tooltip} />}
       {required && <Asterisk />}
     </label>
   );
-};
-
-export default CheckBox;
+}

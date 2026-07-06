@@ -24,7 +24,7 @@ type _Anchor = ComponentProps<"a"> & { to: string };
 type _Router = ComponentProps<typeof RouterLink>;
 
 /** link to internal route or external url */
-const Link = ({
+export default function Link({
   ref,
   to,
   children,
@@ -33,7 +33,7 @@ const Link = ({
   tooltip,
   className,
   ...props
-}: Props) => {
+}: Props) {
   /** current route */
   const location = useLocation();
 
@@ -47,12 +47,12 @@ const Link = ({
   const _showArrow = showArrow ?? target;
 
   /** class name string */
-  const _class = clsx("inline-flex items-center gap-1", className);
+  className = clsx("inline-flex items-center gap-1", className);
 
   /** full element to render */
   const element = external ? (
     /** "external" plain link */
-    <a ref={ref} href={to} target={target} className={_class} {...props}>
+    <a ref={ref} href={to} target={target} className={className} {...props}>
       {children}
       {_showArrow && <ExternalLink />}
     </a>
@@ -66,7 +66,7 @@ const Link = ({
         "state" in props ? props.state : undefined,
       )}
       target={target}
-      className={_class}
+      className={className}
       {...props}
     >
       {children}
@@ -75,9 +75,7 @@ const Link = ({
   );
 
   return <Tooltip content={tooltip}>{element}</Tooltip>;
-};
-
-export default Link;
+}
 
 /** string to signify that param should be removed from url search */
 export const deleteParam = "undefined";

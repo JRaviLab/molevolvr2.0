@@ -1,13 +1,6 @@
 import type { D3DragEvent, D3ZoomEvent } from "d3";
 import type { Filename } from "@/util/download";
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useId, useRef, useState } from "react";
 import { drag, scaleLinear, select, zoom, zoomIdentity } from "d3";
 import { clamp, inRange, mapValues, range } from "lodash";
 import Chart from "@/components/Chart";
@@ -18,7 +11,7 @@ import { useColorMap } from "@/util/color";
 import { useTextSize, useTheme } from "@/util/hooks";
 
 /** label size */
-const labelWidth = 150;
+const labelWidth = 200;
 /** row height */
 const rowHeight = 20;
 /** gap between rows */
@@ -57,7 +50,9 @@ type Feature = {
 };
 
 /** interproscan result visualization */
-const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
+export default function IPR({ title, filename = [], sequence, tracks }: Props) {
+  console.debug("ipr render");
+
   const zoomRef = useRef<SVGGElement>(null);
   const dragRef = useRef<SVGGElement>(null);
 
@@ -79,51 +74,38 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
   const [transform, setTransform] = useState(zoomIdentity);
 
   /** pan/zoom behavior */
-  const zoomBehavior = useMemo(
-    () =>
-      zoom<SVGGElement, unknown>().on(
-        "zoom",
-        (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
-          setTransform(event.transform);
-        },
-      ),
-    [],
+  const zoomBehavior = zoom<SVGGElement, unknown>().on(
+    "zoom",
+    (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
+      setTransform(event.transform);
+    },
   );
 
   /** update zoom limit */
-  useEffect(() => {
-    zoomBehavior.scaleExtent([
-      /** min zoom out, chars fill width */
-      1,
-      /** max zoom in, by # of chars in view */
-      sequence.length / 3,
-    ]);
-  }, [zoomBehavior, sequence.length]);
+  zoomBehavior.scaleExtent([
+    /** min zoom out, chars fill width */
+    1,
+    /** max zoom in, by # of chars in view */
+    sequence.length / 3,
+  ]);
 
   type Drag = D3DragEvent<SVGSVGElement, unknown, unknown>;
 
-  const onDrag = useCallback(
-    ({ x }: Drag) => {
-      if (!zoomRef.current) return;
-      /** update zoom transform */
-      zoomBehavior.translateTo(select(zoomRef.current), x, 0);
-    },
-    [zoomBehavior],
-  );
+  const onDrag = ({ x }: Drag) => {
+    if (!zoomRef.current) return;
+    /** update zoom transform */
+    zoomBehavior.translateTo(select(zoomRef.current), x, 0);
+  };
 
   /** scrollbar drag behavior */
-  const dragBehavior = useMemo(
-    () =>
-      drag<SVGGElement, unknown>()
-        .container(function () {
-          return this;
-        })
-        // eslint-disable-next-line -- false positive https://github.com/react/react/issues/34775
-        .on("start", onDrag)
-        // eslint-disable-next-line -- false positive https://github.com/react/react/issues/34775
-        .on("drag", onDrag),
-    [onDrag],
-  );
+  const dragBehavior = drag<SVGGElement, unknown>()
+    .container(function () {
+      return this;
+    })
+    // eslint-disable-next-line -- false positive https://github.com/react/react/issues/34775
+    .on("start", onDrag)
+    // eslint-disable-next-line -- false positive https://github.com/react/react/issues/34775
+    .on("drag", onDrag);
 
   const prevWidth = useRef(0);
 
@@ -131,7 +113,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
     <Chart
       title={title}
       filename={[...filename, "ipr"]}
-      containerProps={{ className: "w-full" }}
+      className="w-full"
       controls={[
         <Help
           tooltip={
@@ -149,6 +131,8 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
       ]}
     >
       {({ width }) => {
+        console.debug("ipr chart render");
+
         /** width of main sequence view area */
         width = Math.max(width - labelWidth - 2 * rowHeight, labelWidth);
 
@@ -284,7 +268,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
                 width={width}
                 height={(2 + tracks.length) * (rowHeight + rowGap)}
                 fill={theme["--color-white"]}
-                stroke={theme["--color-light-gray"]}
+                stroke={theme["--color-off-white"]}
               />
               <clipPath id={clipId}>
                 <rect
@@ -412,9 +396,7 @@ const IPR = ({ title, filename = [], sequence, tracks }: Props) => {
       }}
     </Chart>
   );
-};
-
-export default IPR;
+}
 
 /** split into sub-components for slight performance optimization */
 
@@ -425,13 +407,15 @@ type LabelProps = {
 };
 
 /** track row label */
-const Label = ({ index, label, truncateWidth }: LabelProps) => (
-  <Tooltip content={label}>
-    <text x={0} y={(index + 0.5) * (rowHeight + rowGap)} tabIndex={0}>
-      {truncateWidth(label ?? "-", labelWidth)}
-    </text>
-  </Tooltip>
-);
+function Label({ index, label, truncateWidth }: LabelProps) {
+  return (
+    <Tooltip content={label}>
+      <text x={0} y={(index + 0.5) * (rowHeight + rowGap)} tabIndex={0}>
+        {truncateWidth(label ?? "-", labelWidth)}
+      </text>
+    </Tooltip>
+  );
+}
 
 type CharProps = {
   char: string;
@@ -444,7 +428,7 @@ type CharProps = {
 };
 
 /** sequence row char */
-const Char = ({
+function Char({
   char,
   position,
   scaleX,
@@ -452,27 +436,29 @@ const Char = ({
   rowHeight,
   theme,
   fontSize,
-}: CharProps) => (
-  <g transform={`translate(${scaleX(position + 0.5)}, 0)`}>
-    <rect
-      x={-cellWidth / 2}
-      y={-rowHeight / 2}
-      width={cellWidth}
-      height={rowHeight}
-      fill={theme["--color-light-gray"]}
-      opacity={position % 2 === 0 ? 0.25 : 0.5}
-    />
-    <text
-      x={0}
-      y={0}
-      fill={theme["--color-black"]}
-      transform={`scale(${clamp(cellWidth / fontSize, 0, 1)})`}
-      textAnchor="middle"
-    >
-      {char}
-    </text>
-  </g>
-);
+}: CharProps) {
+  return (
+    <g transform={`translate(${scaleX(position + 0.5)}, 0)`}>
+      <rect
+        x={-cellWidth / 2}
+        y={-rowHeight / 2}
+        width={cellWidth}
+        height={rowHeight}
+        fill={theme["--color-off-white"]}
+        opacity={position % 2 === 0 ? 0.25 : 0.5}
+      />
+      <text
+        x={0}
+        y={0}
+        fill={theme["--color-black"]}
+        transform={`scale(${clamp(cellWidth / fontSize, 0, 1)})`}
+        textAnchor="middle"
+      >
+        {char}
+      </text>
+    </g>
+  );
+}
 
 type FeatureProps = {
   id: string;
@@ -490,7 +476,7 @@ type FeatureProps = {
 };
 
 /** feature track */
-const Feature = ({
+function Feature({
   id,
   label,
   type,
@@ -503,7 +489,7 @@ const Feature = ({
   theme,
   fontSize,
   truncateWidth,
-}: FeatureProps) => {
+}: FeatureProps) {
   /** x in view */
   const drawX = clamp(scaleX(start - 1), 0, width);
   /** width in view */
@@ -548,4 +534,4 @@ const Feature = ({
       </g>
     </Tooltip>
   );
-};
+}

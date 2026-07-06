@@ -14,7 +14,7 @@ const FormContext = createContext<string | undefined>(undefined);
 export const useForm = () => useContext(FormContext);
 
 /** form wrapper around set of fields */
-const Form = ({ onSubmit, children, ...props }: Props) => {
+export default function Form({ onSubmit, children, ...props }: Props) {
   /** unique id to link form and controls */
   const id = useId();
 
@@ -57,6 +57,4 @@ const Form = ({ onSubmit, children, ...props }: Props) => {
       )}
     </>
   );
-};
-
-export default Form;
+}

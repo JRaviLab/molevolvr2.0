@@ -7,6 +7,7 @@ import {
   Label,
   NumberField,
 } from "react-aria-components";
+import { clsx } from "clsx";
 import { Minus, Plus } from "lucide-react";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
@@ -28,10 +29,12 @@ type Props = {
   value: number;
   /** on number state change */
   onChange: (value: number) => void;
+  /** class on root */
+  className?: string;
 };
 
 /** number input box. use for numeric values that need precise adjustment. */
-const NumberBox = ({
+export default function NumberBox({
   label,
   tooltip,
   min = 0,
@@ -39,7 +42,8 @@ const NumberBox = ({
   step = 1,
   value,
   onChange,
-}: Props) => {
+  className,
+}: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   /** link to parent form component */
@@ -48,10 +52,11 @@ const NumberBox = ({
   return (
     <NumberField
       ref={ref}
-      className="contents"
+      className={clsx("flex gap-2", className)}
       minValue={min}
       maxValue={max}
       step={step}
+      commitBehavior="validate"
       value={value}
       onChange={(value) => {
         preserveScroll(ref.current);
@@ -61,18 +66,17 @@ const NumberBox = ({
     >
       {({ state }) => (
         <>
-          <Label className="flex items-center gap-1">
+          <Label className="flex items-center gap-2">
             {label}
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <Group className="flex justify-between border-b border-current text-accent hover:text-deep">
-            <Button slot="decrement">
+          <Group className="flex min-h-10 grow resize items-center justify-between rounded-md border border-light-gray bg-white transition hover:border-accent">
+            <Button slot="decrement" className="size-6 hover:text-accent">
               <Minus />
             </Button>
-            {/* Poppins unfortunately doesn't support tabular nums */}
             <Input
-              className="field-sizing-content px-2 py-1 text-center font-mono"
+              className="field-sizing-content min-h-10 p-2 text-center tabular-nums"
               form={form}
               onBlurCapture={(event) => {
                 /** https://github.com/adobe/react-spectrum/discussions/6261 */
@@ -85,7 +89,8 @@ const NumberBox = ({
                   isFirefox ? state.inputValue.length + 1 + "em" : undefined,
               }}
             />
-            <Button slot="increment">
+
+            <Button slot="increment" className="size-6 hover:text-accent">
               <Plus />
             </Button>
           </Group>
@@ -93,6 +98,4 @@ const NumberBox = ({
       )}
     </NumberField>
   );
-};
-
-export default NumberBox;
+}

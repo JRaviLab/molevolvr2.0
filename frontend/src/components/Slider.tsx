@@ -5,6 +5,7 @@ import {
   SliderThumb,
   SliderTrack,
 } from "react-aria-components";
+import { clsx } from "clsx";
 import { useForm } from "@/components/Form";
 import Help from "@/components/Help";
 import { formatNumber } from "@/util/string";
@@ -24,6 +25,8 @@ type Base = {
   max?: number;
   /** inc/dec interval */
   step?: number;
+  /** class on root */
+  className?: string;
 };
 
 type Single = {
@@ -48,7 +51,7 @@ type Multi = {
  * single or multi-value number slider. use for numeric values that need quick
  * or imprecise adjustment.
  */
-const Slider = ({
+export default function Slider({
   label,
   tooltip,
   min = 0,
@@ -57,13 +60,14 @@ const Slider = ({
   multi,
   value,
   onChange,
-}: Props) => {
+  className,
+}: Props) {
   /** link to parent form component */
   const form = useForm();
 
   return (
     <RACSlider
-      className="contents"
+      className={clsx("group flex items-center gap-2", className)}
       minValue={min}
       maxValue={max}
       step={Math.min(step, max - min)}
@@ -75,18 +79,18 @@ const Slider = ({
     >
       {({ state }) => (
         <>
-          <Label className="flex items-center gap-1">
+          <Label className="flex items-center gap-2">
             {label}
             {tooltip && <Help tooltip={tooltip} />}
           </Label>
 
-          <SliderTrack className="group mx-2 flex h-9 min-w-40 cursor-pointer items-center rounded-full text-accent group-hover:text-deep">
+          <SliderTrack className="group mx-2 flex h-9 min-w-40 cursor-pointer items-center rounded-full text-deep transition group-hover:text-accent">
             {/* bg fill */}
             <div className="absolute h-1 w-full rounded-full bg-gray" />
 
             {/* active fill */}
             <div
-              className="absolute h-1 rounded-full bg-current"
+              className="absolute h-1 rounded-full bg-current transition"
               style={{
                 left: multi ? 100 * state.getThumbPercent(0) + "%" : "",
                 width:
@@ -99,12 +103,12 @@ const Slider = ({
             />
 
             {/* min marker */}
-            <div className="absolute bottom-full left-0 -translate-x-1/2 translate-y-2 whitespace-nowrap opacity-0 group-focus-within:opacity-50 group-hover:opacity-50">
+            <div className="absolute bottom-full left-0 -translate-x-1/2 translate-y-3 whitespace-nowrap opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100">
               {formatNumber(min, true)}
             </div>
 
             {/* max marker */}
-            <div className="absolute right-0 bottom-full translate-x-1/2 translate-y-2 whitespace-nowrap opacity-0 group-focus-within:opacity-50 group-hover:opacity-50">
+            <div className="absolute right-0 bottom-full translate-x-1/2 translate-y-3 whitespace-nowrap opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100">
               {formatNumber(max, true)}
             </div>
 
@@ -114,9 +118,9 @@ const Slider = ({
                 key={index}
                 index={index}
                 form={form}
-                className="top-1/2 size-4 cursor-pointer rounded-full bg-current focus-within:outline-2"
+                className="top-1/2 size-4 cursor-pointer rounded-full bg-current transition focus-within:outline-2"
               >
-                <div className="absolute top-full left-1/2 -translate-x-1/2 translate-y-1 text-center whitespace-nowrap">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
                   {formatNumber(value, true)}
                 </div>
               </SliderThumb>
@@ -126,6 +130,4 @@ const Slider = ({
       )}
     </RACSlider>
   );
-};
-
-export default Slider;
+}

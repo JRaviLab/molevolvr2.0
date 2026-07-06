@@ -1,23 +1,29 @@
 import type { HierarchyNode } from "d3";
 import type { Filename } from "@/util/download";
-import { Fragment, useMemo, useState } from "react";
-import { curveStepBefore, hierarchy, line } from "d3";
+import { Fragment, useState } from "react";
+import { hierarchy } from "d3";
 import { map, mapValues, max, min, orderBy, sum } from "lodash";
 import Chart from "@/components/Chart";
+import CheckBox from "@/components/CheckBox";
 import Legend from "@/components/Legend";
+import NumberBox from "@/components/NumberBox";
+import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import { useTextSize, useTheme } from "@/util/hooks";
 import { round } from "@/util/math";
+import { getShapeMap, shapeToString } from "@/util/shape";
 
-/** grid spacing */
-const size = 30;
+/** row height */
+const rowHeight = 30;
 /** circle size */
-const nodeSize = 6;
+const nodeSize = 20;
 /** line thickness */
 const lineWidth = 1;
-/** width of legend and labels */
-const sideWidth = 150;
+/** label size */
+const labelWidth = 200;
+/** dash pattern */
+const dash = [2 * lineWidth, 4 * lineWidth].join(" ");
 
 type Props = {
   /** title text */
@@ -34,97 +40,140 @@ export type Item = {
   /** arbitrary type/category */
   type?: string;
   /** distance from parent */
-  dist?: number;
+  dist: number;
   /** children items */
   children?: Item[];
 };
 
-/** link line generator */
-const link = line().curve(curveStepBefore);
+type Node = {
+  /** human-readable label */
+  label?: string;
+  /** arbitrary type/category */
+  type?: string;
+  /** distance from parent */
+  dist: number;
+  /** children items */
+  children: Node[];
+  /** unique identifier of item */
+  id: string;
+  /** distance from root (sum of ancestors dists) */
+  rootDist: number;
+  /** distance from parent, collapsed if too large */
+  collapsedDist: number;
+  /** collapsed distance from root */
+  collapsedRootDist: number;
+  /** is node collapsed */
+  isCollapsed: boolean;
+};
+
+/** sort order options */
+const sortOptions = [
+  { id: "input", primary: "Input" },
+  { id: "dist", primary: "Distance" },
+  { id: "type", primary: "Type" },
+] as const;
 
 /** tree/hierarchy plot */
-const Tree = ({ title, filename = [], data }: Props) => {
+export default function Tree({ title, filename = [], data }: Props) {
+  console.debug("tree render");
+
   const theme = useTheme();
 
   const { truncateWidth } = useTextSize();
 
-  type Node = Item & {
-    /** normalized distance from parent */
-    normDist?: number;
-    /** distance from root (sum of ancestors dists) */
-    rootDist?: number;
-    /** normalized distance from root (sum of ancestors normalized dists) */
-    normRootDist?: number;
-  };
+  /** sort mode */
+  const [sort, setSort] = useState<(typeof sortOptions)[number]["id"]>("dist");
 
-  const tree = useMemo(() => {
-    /** hierarchical data structure with convenient access methods */
-    const tree = hierarchy<Node>({ children: data });
+  /** sort direction */
+  const [flip, setFlip] = useState(false);
 
-    /** set fallbacks */
-    tree.descendants().forEach((node) => {
-      node.data.dist ??= node.depth > 0 ? 1 : 0;
+  /** collapse limit */
+  const [collapse, setCollapse] = useState(999);
+
+  /** hierarchical data structure with convenient access methods */
+  const tree = hierarchy<Node>({ children: data } as Node);
+
+  /** horizontal = depth */
+  /** vertical = breadth */
+
+  /** set fallbacks */
+  tree.descendants().forEach((node) => {
+    node.data.dist ??= node.depth > 0 ? 1 : 0;
+  });
+
+  /** unique id from path to node in tree */
+  tree.eachBefore((node) =>
+    node.children?.forEach(
+      (child, index) =>
+        (child.data.id = [node.data.id, index]
+          .filter((part) => part !== undefined)
+          .join("|")),
+    ),
+  );
+
+  /** calc distances */
+  tree.descendants().forEach((node) => {
+    node.data.collapsedDist = Math.min(node.data.dist, collapse);
+    node.data.isCollapsed = node.data.dist > collapse;
+    node.data.rootDist = sum(node.ancestors().map((node) => node.data.dist));
+    node.data.collapsedRootDist = sum(
+      node.ancestors().map((node) => node.data.collapsedDist),
+    );
+  });
+
+  /** list of node types */
+  const nodeTypes = map(tree.descendants(), (node) => node.data.type ?? "");
+
+  /** sort breadth by dist */
+  /** https://github.com/d3/d3-hierarchy/blob/main/src/hierarchy/sort.js */
+  tree.eachBefore((node) => {
+    node.children?.sort((a, b) => {
+      if (sort === "dist") return b.data.dist - a.data.dist;
+      if (sort === "type")
+        return (a.data.type ?? "").localeCompare(b.data.type ?? "");
+      return 0;
     });
+    if (flip) node.children?.reverse();
+  });
 
-    /** normalize distances */
-    const dists = tree.descendants().map((node) => node.data.dist!);
-    const minDist = min(dists)!;
-    const maxDist = max(dists)!;
-    tree.descendants().forEach((node) => {
-      node.data.normDist = (node.data.dist! + minDist) / (maxDist - minDist);
-    });
+  /** place nodes along depth */
+  tree.descendants().forEach((node) => (node.x = node.data.collapsedRootDist));
 
-    /** calc distance from root */
-    tree.descendants().forEach((node) => {
-      node.data.rootDist = sum(node.ancestors().map((node) => node.data.dist!));
-      node.data.normRootDist = sum(
-        node.ancestors().map((node) => node.data.normDist!),
-      );
-    });
+  /** normalize depth */
+  const minX = min(map(tree.descendants(), "x")) ?? 0;
+  const maxX = max(map(tree.descendants(), "x")) ?? 0;
+  tree
+    .descendants()
+    .forEach((node) => (node.x = ((node.x ?? 0) - minX) / (maxX - minX)));
 
-    /** sort breadth by dist */
-    tree.sort((a, b) => b.data.rootDist! - a.data.rootDist!);
+  /** place leaves evenly spaced along breadth */
+  tree.leaves().forEach((node, index) => (node.y = index));
 
-    /** calc depths */
-    tree.descendants().forEach((node) => {
-      node.y = node.data.normRootDist! * size;
-    });
+  /** go up tree */
+  orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
+    if (!node.y) {
+      /** position node breadth in middle of children */
+      const ys = map(node.children ?? [], "y");
+      node.y = ((min(ys) ?? 0) + (max(ys) ?? 0)) / 2;
+    }
+  });
 
-    /** make leaves evenly spaced breadth-wise */
-    tree.leaves().forEach((node, index) => {
-      node.x = index * size;
-    });
-
-    /** go up tree */
-    orderBy(tree.descendants(), "depth", "desc").forEach((node) => {
-      if (!node.x) {
-        /** position node breadth in middle of children */
-        const xs = map(node.children ?? [], "x");
-        node.x = ((min(xs) ?? 0) + (max(xs) ?? 0)) / 2;
-      }
-    });
-
-    /** snap breadth to grid */
-    tree.descendants().forEach((node) => {
-      node.x = round(node.x!, size);
-    });
-
-    return tree;
-  }, [data]);
-
-  /** selected nodes */
-  const [selected, setSelected] = useState<HierarchyNode<Node>[]>([]);
-  const selectedA = selected[0];
-  const selectedB = selected[1];
-
-  /** path between selected nodes */
-  const selectedPath = selectedA && selectedB ? selectedA.path(selectedB) : [];
-
-  /** max node depth */
-  const maxY = max(map(tree.descendants(), "y")) ?? 0;
+  /** snap breadth to grid */
+  tree.descendants().forEach((node) => (node.y = round(node.y ?? 0)));
 
   /** max node breadth */
-  const maxX = max(map(tree.descendants(), "x")) ?? 0;
+  const maxY = max(map(tree.descendants(), "y")) ?? 0;
+
+  /** selected nodes */
+  const [selected, setSelected] = useState<string[]>([]);
+  const selectedA = tree.find((node) => node.data.id === selected[0]);
+  const selectedB = tree.find((node) => node.data.id === selected[1]);
+
+  /** path between selected nodes */
+  const selectedPath =
+    selectedA && selectedB
+      ? selectedA.path(selectedB).map((node) => node.data.id)
+      : [];
 
   /** dist between selected nodes */
   const selectedDist = Math.abs(
@@ -132,10 +181,10 @@ const Tree = ({ title, filename = [], data }: Props) => {
   );
 
   /** map of node types to colors */
-  const colorMap = useColorMap(
-    map(tree.descendants(), (node) => node.data.type ?? ""),
-    "mode",
-  );
+  const colorMap = useColorMap(nodeTypes, "mode");
+
+  /** map of node types to shapes */
+  const shapeMap = getShapeMap(nodeTypes);
 
   /** clear selection */
   const deselect = () => setSelected([]);
@@ -143,173 +192,241 @@ const Tree = ({ title, filename = [], data }: Props) => {
   /** select node */
   const select = (node: HierarchyNode<Node>) =>
     setSelected(
-      selected.includes(node)
-        ? selected.filter((n) => n !== node)
-        : selected.slice(0, 1).concat([node]),
+      selected.includes(node.data.id)
+        ? selected.filter((id) => id !== node.data.id)
+        : selected.slice(0, 1).concat([node.data.id]),
     );
 
   return (
-    <Chart title={title} filename={[...filename, "tree"]} onClick={deselect}>
-      <Legend
-        x={-size}
-        y={maxX / 2}
-        w={sideWidth}
-        anchor={[1, 0.5]}
-        entries={mapValues(colorMap, (color) => ({ color }))}
-      />
+    <Chart
+      title={title}
+      filename={[...filename, "tree"]}
+      className="w-full"
+      onClick={deselect}
+      controls={[
+        [
+          <SelectSingle
+            key="sort"
+            label="Sort"
+            options={sortOptions}
+            value={sort}
+            onChange={setSort}
+          />,
+          <CheckBox key="flip" label="Flip" value={flip} onChange={setFlip} />,
+          <NumberBox
+            key="collapse"
+            label="Collapse"
+            tooltip="Visually collapse horizontal lines longer than this"
+            min={1}
+            max={max(tree.descendants().map((node) => node.data.dist)) ?? 0}
+            value={collapse}
+            onChange={setCollapse}
+          />,
+        ],
+      ]}
+    >
+      {({ width }) => {
+        console.debug("tree chart render");
 
-      <g>
-        {tree.links().map(({ source, target }, index) => {
-          /** is link selected */
-          const isSelected =
-            selected.length > 1
-              ? selectedPath.includes(source) && selectedPath.includes(target)
-              : selected.length === 1
-                ? false
-                : null;
+        /** width of tree view area */
+        width = Math.max(width - 2 * labelWidth - rowHeight, labelWidth);
 
-          return (
-            <path
-              key={index}
-              fill="none"
-              stroke={
-                isSelected ? theme["--color-accent"] : theme["--color-black"]
-              }
-              strokeWidth={isSelected ? 2 * lineWidth : lineWidth}
-              opacity={isSelected === false ? 0.25 : 1}
-              d={
-                link([
-                  [source.y ?? 0, source.x ?? 0],
-                  [target.y ?? 0, target.x ?? 0],
-                ]) ?? ""
-              }
+        return (
+          <>
+            <Legend
+              x={-rowHeight}
+              y={0}
+              w={labelWidth}
+              anchor={[1, 0]}
+              entries={mapValues(colorMap, (color, type) => ({
+                color,
+                shape: shapeMap[type],
+              }))}
             />
-          );
-        })}
-      </g>
 
-      <g>
-        {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => {
-          /** is node selected */
-          const isSelected = selected.length
-            ? selected.includes(node) || selectedPath.includes(node)
-            : null;
+            <g>
+              {tree.links().map(({ source, target }, index) => {
+                /** is link selected */
+                const isSelected =
+                  selected.length > 1
+                    ? selectedPath.includes(source.data.id) &&
+                      selectedPath.includes(target.data.id)
+                    : selected.length === 1
+                      ? false
+                      : null;
 
-          return (
-            <Fragment key={index}>
-              {!node.children && (
-                <>
-                  {/* leaf node label */}
-                  <line
-                    x1={node.y}
-                    x2={maxY}
-                    y1={node.x ?? 0}
-                    y2={node.x ?? 0}
-                    stroke={theme["--color-black"]}
-                    strokeWidth={lineWidth}
-                    strokeDasharray={[lineWidth, 2 * lineWidth].join(" ")}
-                  />
-                  <text
-                    x={maxY + 0.5 * size}
-                    y={node.x ?? 0}
-                    fill={theme["--color-black"]}
-                  >
-                    {truncateWidth(node.data.label ?? "-", sideWidth)}
-                  </text>
-                </>
-              )}
+                /** start point */
+                const sourceX = (source.x ?? 0) * width;
+                const targetX = (target.x ?? 0) * width;
+                /** end point */
+                const sourceY = (source.y ?? 0) * rowHeight;
+                const targetY = (target.y ?? 0) * rowHeight;
 
-              {/* node circle */}
-              <Tooltip
-                content={
-                  <>
-                    <dl>
-                      <dt>Name</dt>
-                      <dd>{node.data.label}</dd>
-                      <dt>Type</dt>
-                      <dd>{node.data.type}</dd>
-                      {node.ancestors().length > 1 && (
-                        <>
-                          <dt>Dist</dt>
-                          <dd>{node.data.dist?.toFixed(3)}</dd>
-                          <dt>From root</dt>
-                          <dd>{node.data.rootDist?.toFixed(3)}</dd>
-                        </>
-                      )}
-                    </dl>
-                    <hr />
-                    Click to select. Select two to see path between them.
-                  </>
-                }
-              >
-                <circle
-                  className="cursor-help"
-                  cx={node.y ?? 0}
-                  cy={node.x ?? 0}
-                  r={nodeSize}
-                  fill={
-                    isSelected === false
-                      ? theme["--color-light-gray"]
-                      : colorMap[node.data.type ?? ""]
-                  }
-                  stroke={theme["--color-black"]}
-                  strokeWidth={lineWidth}
-                  tabIndex={0}
-                  role="graphics-symbol"
-                  onClick={(event) => {
-                    /** prevent deselect from container onClick */
-                    event.stopPropagation();
-                    select(node);
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
-                      select(node);
+                /** collapse symbol position */
+                const breakX = targetX - 1.5 * nodeSize;
+                const breakSize = nodeSize / 6;
+
+                /** path to draw */
+                const points = !target.data.isCollapsed
+                  ? [
+                      ["M", sourceX, sourceY],
+                      ["L", sourceX, targetY],
+                      ["L", targetX, targetY],
+                    ]
+                  : [
+                      ["M", sourceX, sourceY],
+                      ["L", sourceX, targetY],
+                      ["L", breakX - 1.5 * breakSize, targetY],
+                      ["L", breakX - 0.5 * breakSize, targetY - breakSize * 2],
+                      ["L", breakX + 0.5 * breakSize, targetY + breakSize * 2],
+                      ["L", breakX + 1.5 * breakSize, targetY],
+                      ["L", targetX, targetY],
+                    ];
+
+                return (
+                  <path
+                    key={index}
+                    d={points.map((line) => line.join(" ")).join(" ")}
+                    fill="none"
+                    stroke={
+                      isSelected
+                        ? theme["--color-accent"]
+                        : theme["--color-black"]
                     }
-                    if (event.key === "Escape") deselect();
-                  }}
-                />
-              </Tooltip>
-            </Fragment>
-          );
-        })}
-      </g>
+                    strokeWidth={isSelected ? 2 * lineWidth : lineWidth}
+                    opacity={isSelected === false ? 0.25 : 1}
+                  />
+                );
+              })}
+            </g>
 
-      {/* selected */}
-      {selectedPath.length > 1 && (
-        <g transform={`translate(0, ${maxX + 2 * size})`}>
-          <g fill={theme["--color-gray"]}>
-            <text x={0} y={0 * size}>
-              From
-            </text>
-            <text x={0} y={1 * size}>
-              To
-            </text>
-            <text x={0} y={2 * size}>
-              Dist.
-            </text>
-          </g>
-          <g fill={theme["--color-black"]}>
-            <text x={2 * size} y={0 * size}>
-              {truncateWidth(
-                selectedA?.data.label ?? "",
-                maxY + sideWidth - 2 * size,
-              )}
-            </text>
-            <text x={2 * size} y={1 * size}>
-              {truncateWidth(
-                selectedB?.data.label ?? "",
-                maxY + sideWidth - 2 * size,
-              )}
-            </text>
-            <text x={2 * size} y={2 * size}>
-              {selectedDist.toFixed(2)}
-            </text>
-          </g>
-        </g>
-      )}
+            <g>
+              {orderBy(tree.descendants(), ["x", "y"]).map((node, index) => {
+                /** is node selected */
+                const isSelected = selected.length
+                  ? selected.includes(node.data.id) ||
+                    selectedPath.includes(node.data.id)
+                  : null;
+
+                return (
+                  <Fragment key={index}>
+                    {!node.children && (
+                      <>
+                        {/* leaf node label */}
+                        <line
+                          x1={(node.x ?? 0) * width}
+                          x2={width}
+                          y1={(node.y ?? 0) * rowHeight}
+                          y2={(node.y ?? 0) * rowHeight}
+                          stroke={theme["--color-black"]}
+                          strokeWidth={lineWidth}
+                          strokeDasharray={dash}
+                        />
+                        <text
+                          x={width + rowHeight}
+                          y={(node.y ?? 0) * rowHeight}
+                          fill={theme["--color-black"]}
+                        >
+                          {truncateWidth(node.data.label ?? "-", labelWidth)}
+                        </text>
+                      </>
+                    )}
+
+                    {/* node shape */}
+                    <Tooltip
+                      content={
+                        <>
+                          <dl>
+                            <dt>Name</dt>
+                            <dd>{node.data.label}</dd>
+                            <dt>Type</dt>
+                            <dd>{node.data.type}</dd>
+                            {node.ancestors().length > 1 && (
+                              <>
+                                <dt>Dist</dt>
+                                <dd>{node.data.dist?.toFixed(3)}</dd>
+                                <dt>From root</dt>
+                                <dd>{node.data.rootDist?.toFixed(3)}</dd>
+                              </>
+                            )}
+                          </dl>
+                          <hr />
+                          Click to select. Select two to see path between them.
+                        </>
+                      }
+                    >
+                      <polygon
+                        className="cursor-help"
+                        points={shapeToString(
+                          shapeMap[node.data.type ?? ""],
+                          (node.x ?? 0) * width,
+                          (node.y ?? 0) * rowHeight,
+                          nodeSize / 2,
+                        )}
+                        fill={
+                          isSelected === false
+                            ? theme["--color-off-white"]
+                            : colorMap[node.data.type ?? ""]
+                        }
+                        stroke={theme["--color-black"]}
+                        strokeWidth={lineWidth}
+                        tabIndex={0}
+                        role="graphics-symbol"
+                        onClick={(event) => {
+                          /** prevent deselect from container onClick */
+                          event.stopPropagation();
+                          select(node);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            select(node);
+                          }
+                          if (event.key === "Escape") deselect();
+                        }}
+                      />
+                    </Tooltip>
+                  </Fragment>
+                );
+              })}
+            </g>
+
+            {/* selected */}
+            {selectedPath.length > 1 && (
+              <g transform={`translate(0, ${(maxY + 2) * rowHeight})`}>
+                <g fill={theme["--color-gray"]}>
+                  <text x={0} y={0 * rowHeight}>
+                    From
+                  </text>
+                  <text x={0} y={1 * rowHeight}>
+                    To
+                  </text>
+                  <text x={0} y={2 * rowHeight}>
+                    Dist.
+                  </text>
+                </g>
+                <g fill={theme["--color-black"]}>
+                  <text x={labelWidth / 2} y={0 * rowHeight}>
+                    {truncateWidth(
+                      selectedA?.data.label ?? "-",
+                      width - labelWidth / 2,
+                    )}
+                  </text>
+                  <text x={labelWidth / 2} y={1 * rowHeight}>
+                    {truncateWidth(
+                      selectedB?.data.label ?? "-",
+                      width - labelWidth / 2,
+                    )}
+                  </text>
+                  <text x={labelWidth / 2} y={2 * rowHeight}>
+                    {selectedDist.toFixed(2)}
+                  </text>
+                </g>
+              </g>
+            )}
+          </>
+        );
+      }}
     </Chart>
   );
-};
-
-export default Tree;
+}
