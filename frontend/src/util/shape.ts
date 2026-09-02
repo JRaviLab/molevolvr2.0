@@ -3,27 +3,24 @@ import { cos, sin } from "@/util/math";
 export type Point = { x: number; y: number };
 
 /** make regular polygon or star */
-const makePolygon = (sides: number, starInset = 1) =>
+const makePolygon = (sides: number, starInset = 1, radius = 1, rotate = 0) =>
   Array(sides)
     .fill(null)
     .map((_, index) => {
-      const angle = -90 + 360 * (index / sides);
-      const radius = index % 2 === 0 ? 1 : starInset;
-      return { x: cos(angle) * radius, y: sin(angle) * radius };
+      const angle = -90 + 360 * (index / sides) + rotate;
+      const scale = index % 2 === 0 ? 1 : starInset;
+      return { x: cos(angle) * radius * scale, y: sin(angle) * radius * scale };
     })
     .flat();
+
+/** https://www.jdawiseman.com/papers/easymath/surds_star_inner_radius.html */
 
 /** shape options */
 const palette = [
   /** circle */
   makePolygon(50),
   /** square */
-  [
-    { x: -0.85, y: -0.85 },
-    { x: 0.85, y: -0.85 },
-    { x: 0.85, y: 0.85 },
-    { x: -0.85, y: 0.85 },
-  ],
+  makePolygon(4, 1, 1, 45),
   /** diamond */
   makePolygon(4),
   /** triangle */
@@ -34,10 +31,7 @@ const palette = [
   makePolygon(6),
   /** four pointed star */
   makePolygon(8, 0.5),
-  /**
-   * five pointed star
-   * https://www.jdawiseman.com/papers/easymath/surds_star_inner_radius.html
-   */
+  /** five pointed star */
   makePolygon(10, 0.382),
   /** rhombus */
   [
