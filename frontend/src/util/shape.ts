@@ -20,7 +20,7 @@ const palette = [
   /** circle */
   makePolygon(50),
   /** square */
-  makePolygon(4, 1, 1, 45),
+  makePolygon(4, 1, 1.1, 45),
   /** diamond */
   makePolygon(4),
   /** triangle */
@@ -28,11 +28,11 @@ const palette = [
   /** pentagon */
   makePolygon(5),
   /** hexagon */
-  makePolygon(6),
-  /** four pointed star */
-  makePolygon(8, 0.5),
-  /** five pointed star */
-  makePolygon(10, 0.382),
+  makePolygon(6, 1, 1, 30),
+  /** four point star */
+  makePolygon(8, 0.35, 1.1),
+  /** five point star */
+  makePolygon(10, 0.382, 1.1),
   /** rhombus */
   [
     { x: -0.5, y: -0.75 },
