@@ -8,7 +8,7 @@
     stroke="white"
     stroke-linecap="round"
     stroke-linejoin="round"
-    stroke-width="4"
+    stroke-width="6"
     mask="url(#logo-mask)"
   >
     <path
