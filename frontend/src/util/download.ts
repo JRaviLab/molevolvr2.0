@@ -1,5 +1,5 @@
 import { stringify } from "csv-stringify/browser/esm/sync";
-import { toJpeg, toPng } from "html-to-image";
+import { toJpeg, toPng } from "dom-to-image-more";
 import { getTheme } from "@/util/dom";
 
 export type Filename = (string | undefined)[];
@@ -28,13 +28,13 @@ const download = (
   url: string,
   /** single filename string or filename "parts" */
   filename: Filename,
-  /** extension, without dot */
-  ext: string,
+  /** extension, with dot */
+  extension: string,
 ) => {
   let download = getFilename(filename);
 
   /** add extension */
-  if (!download.endsWith("." + ext)) download += "." + ext;
+  if (!download.endsWith(extension)) download += extension;
 
   /** trigger download */
   const link = document.createElement("a");
@@ -72,26 +72,25 @@ const getCsv = (data: Tabular, delimiter = ",") =>
 
 /** download tabular data as csv */
 export const downloadCsv = (data: Tabular, filename: Filename) =>
-  download(getUrl(getCsv(data), "text/csv;charset=utf-8"), filename, "csv");
+  download(getUrl(getCsv(data), "text/csv;charset=utf-8"), filename, ".csv");
 
 /** download tabular data as tsv */
 export const downloadTsv = (data: Tabular, filename: Filename) =>
   download(
     getUrl(getCsv(data, "\t"), "text/tab-separated-values"),
     filename,
-    "tsv",
+    ".tsv",
   );
 
 /** download data as json */
 export const downloadJson = (data: unknown, filename: Filename) =>
-  download(getUrl(JSON.stringify(data), "application/json"), filename, "json");
+  download(getUrl(JSON.stringify(data), "application/json"), filename, ".json");
 
 /** download element as png */
 export const downloadPng = async (element: Element, filename: Filename) => {
   try {
-    // @ts-expect-error typing says lib funcs don't support svg elements, but in practice it does
-    const blob = await toPng(element, { backgroundColor: "transparent" });
-    download(getUrl(blob, "image/png"), filename, "png");
+    const blob = await toPng(element, { bgcolor: "transparent" });
+    download(getUrl(blob, "image/png"), filename, ".png");
   } catch (error) {
     console.error(error);
   }
@@ -100,11 +99,10 @@ export const downloadPng = async (element: Element, filename: Filename) => {
 /** download blob as jpg */
 export const downloadJpg = async (element: Element, filename: Filename) => {
   try {
-    // @ts-expect-error typing says lib funcs don't support svg elements, but in practice it does
     const blob = await toJpeg(element, {
-      backgroundColor: getTheme()["--color-white"],
+      bgcolor: getTheme()["--color-white"],
     });
-    download(getUrl(blob, "image/jpeg"), filename, "jpg");
+    download(getUrl(blob, "image/jpeg"), filename, ".jpg");
   } catch (error) {
     console.error(error);
   }
@@ -137,5 +135,5 @@ export const downloadSvg = (
         if (name.match(removeAttr)) element.removeAttribute(name);
 
   /** download clone source as svg file */
-  download(getUrl(clone.outerHTML, "image/svg+xml"), filename, "svg");
+  download(getUrl(clone.outerHTML, "image/svg+xml"), filename, ".svg");
 };

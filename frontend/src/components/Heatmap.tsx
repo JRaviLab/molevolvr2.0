@@ -65,7 +65,7 @@ export default function Heatmap({
   /** flip gradient */
   const [flip, setFlip] = useState(false);
 
-  /** swap rows/cols */
+  /** swap rows/columns */
   const [swap, setSwap] = useState(false);
 
   if (swap) {
@@ -82,12 +82,14 @@ export default function Heatmap({
     5 * cellSize,
   );
 
-  /** num of rows/cols */
-  const cols = x.labels.length;
+  /** num of rows/columns */
+  const columns = x.labels.length;
   const rows = y.labels.length;
 
-  /** col # to x coord */
-  const xScale = scaleBand(range(0, cols), [0, cols * cellSize]).padding(0);
+  /** column # to x coord */
+  const xScale = scaleBand(range(0, columns), [0, columns * cellSize]).padding(
+    0,
+  );
   /** row # to y coord */
   const yScale = scaleBand(range(0, rows), [0, rows * cellSize]).padding(0);
 
@@ -104,7 +106,7 @@ export default function Heatmap({
   const colorScale = gradientFunc(gradient, flip);
 
   /** main chart area */
-  const width = (xScale(cols - 1) ?? 0) + xScale.bandwidth();
+  const width = (xScale(columns - 1) ?? 0) + xScale.bandwidth();
   const height = (yScale(rows - 1) ?? 0) + yScale.bandwidth();
 
   /** legend info */
@@ -137,7 +139,7 @@ export default function Heatmap({
           <CheckBox
             key="swap"
             label="Swap"
-            tooltip="Transpose rows & cols"
+            tooltip="Transpose rows & columns"
             value={swap}
             onChange={setSwap}
           />,
@@ -149,28 +151,30 @@ export default function Heatmap({
       {/* cells */}
       <g className="group">
         {data.map((row, rowIndex) =>
-          row.map((col, colIndex) => (
+          row.map((column, columnIndex) => (
             <Tooltip
-              key={[colIndex, rowIndex].join("-")}
+              key={[columnIndex, rowIndex].join("-")}
               content={
                 <dl>
                   <dt>Value</dt>
-                  <dd>{col}</dd>
+                  <dd>{column}</dd>
                   <dt>{x.label}</dt>
-                  <dd>{x.labels[colIndex]}</dd>
+                  <dd>{x.labels[columnIndex]}</dd>
                   <dt>{y.label}</dt>
-                  <dd>{y.labels[colIndex]}</dd>
+                  <dd>{y.labels[columnIndex]}</dd>
                 </dl>
               }
             >
               <rect
                 className="stroke-transparent stroke-2 outline-none hover:stroke-black focus-visible:stroke-black [.group:has(&:focus)_&:not(:focus)]:opacity-25"
-                x={xScale(colIndex) ?? 0}
+                x={xScale(columnIndex) ?? 0}
                 y={yScale(rowIndex) ?? 0}
                 width={xScale.bandwidth() ?? 0}
                 height={yScale.bandwidth() ?? 0}
                 fill={
-                  col ? colorScale(valueScale(col)) : theme["--color-off-white"]
+                  column
+                    ? colorScale(valueScale(column))
+                    : theme["--color-off-white"]
                 }
                 tabIndex={0}
                 role="graphics-symbol"

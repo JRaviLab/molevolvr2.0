@@ -83,13 +83,13 @@ import {
   tree,
   upset,
   words,
+  table,
 } from "@/pages/testbed-data";
 import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
 import { seed } from "@/util/seed";
 import { getShapeMap } from "@/util/shape";
 import { formatDate, formatNumber } from "@/util/string";
-import tableData from "../../fixtures/table.json";
 import seedrandom from "seedrandom";
 
 /** test and example usage of formatting, elements, components, etc. */
@@ -965,30 +965,35 @@ function SectionTable() {
       <H2 icon={<TableIcon />}>Table</H2>
 
       <Table
-        cols={[
-          {
-            key: "name",
-            name: "Name",
-          },
-          {
-            key: "age",
-            name: "Age",
-            filterType: "number",
-          },
-          {
-            key: "status",
-            name: "Status",
-            filterType: "enum",
-          },
+        columns={[
           {
             key: "text",
-            name: "Long text",
-            filterType: "string",
+            name: "Text",
+          },
+          {
+            key: "number",
+            name: "Number",
+            filter: "number",
+          },
+          {
+            key: "enum",
+            name: "Enum",
+            filter: "enum",
+          },
+          {
+            key: "boolean",
+            name: "Boolean",
+            filter: "boolean",
+          },
+          {
+            key: "long",
+            name: "Long",
+            filter: "string",
             show: false,
             render: (cell) => <div className="line-clamp-5 p-1">{cell}</div>,
           },
         ]}
-        rows={tableData}
+        rows={table}
       />
     </section>
   );

@@ -71,11 +71,11 @@
 
 @layer base {
   * {
-    @apply outline-accent underline-offset-2 outline-offset-2;
+    @apply underline-offset-2 outline-offset-2 outline-accent;
   }
 
   html {
-    @apply font-regular bg-white font-sans leading-normal text-black;
+    @apply bg-white font-sans leading-normal font-regular text-black;
     font-size: 105%;
   }
 
@@ -93,14 +93,14 @@
 
   section {
     --width: 250;
-    @apply even:bg-alt-white relative isolate flex flex-col gap-8 bg-white px-[max(--spacing(12),(100%-(--spacing(1))*var(--width))/2)] py-12 last:grow;
+    @apply relative isolate flex flex-col gap-8 bg-white px-[max(--spacing(12),(100%-(--spacing(1))*var(--width))/2)] py-12 last:grow even:bg-alt-white;
   }
 
   h1,
   h2,
   h3,
   h4 {
-    @apply text-deep flex scroll-mt-8 items-center gap-[0.75em] leading-normal font-medium tracking-wide not-first:mt-8;
+    @apply flex scroll-mt-8 items-center gap-[0.75em] leading-normal font-medium tracking-wide text-deep not-first:mt-8;
   }
 
   h1 {
@@ -120,7 +120,7 @@
   }
 
   hr {
-    @apply bg-off-white h-px w-full border-0;
+    @apply h-px w-full border-0 bg-off-white;
   }
 
   strong,
@@ -184,11 +184,11 @@
   }
 
   thead tr {
-    @apply bg-alt-white border-off-white border-b;
+    @apply border-b border-off-white bg-alt-white;
   }
 
   tbody tr {
-    @apply even:bg-alt-white bg-white;
+    @apply bg-white even:bg-alt-white;
   }
 
   th {
@@ -197,7 +197,7 @@
 
   th,
   td {
-    @apply not-last:border-off-white p-2 not-last:border-r;
+    @apply p-2 not-last:border-r not-last:border-off-white;
   }
 
   dl {
@@ -218,15 +218,15 @@
   }
 
   :not(pre) > code {
-    @apply bg-dark-gray rounded-[0.25em] px-1 font-mono text-white;
+    @apply rounded-[0.25em] bg-dark-gray px-1 font-mono text-white;
   }
 
   pre {
-    @apply bg-dark-gray max-w-full overflow-x-auto rounded-md p-4 font-mono text-white;
+    @apply max-w-full overflow-x-auto rounded-md bg-dark-gray p-4 font-mono text-white;
   }
 
   blockquote {
-    @apply border-light-gray rounded-r-md border-l-4 p-4 leading-loose;
+    @apply rounded-r-md border-l-4 border-light-gray p-4 leading-loose;
   }
 
   .icon,
@@ -239,11 +239,11 @@
   }
 
   :not(html) ::-webkit-scrollbar {
-    @apply bg-off-white size-2 rounded-full;
+    @apply size-2 rounded-full bg-off-white;
   }
 
   :not(html) ::-webkit-scrollbar-thumb {
-    @apply bg-gray rounded-full;
+    @apply rounded-full bg-gray;
   }
 
   :focus-visible {
@@ -274,5 +274,5 @@
 }
 
 @utility focus {
-  @apply outline-accent rounded-md outline-2 outline-offset-2;
+  @apply rounded-md outline-2 outline-offset-2 outline-accent;
 }

@@ -72,41 +72,41 @@ export default function Upset({
 
   const { getWidth, truncateWidth } = useTextSize();
 
-  /** num of rows/cols */
-  const cols = x.data.length;
+  /** num of rows/columns */
+  const columns = x.data.length;
   const rows = y.data.length;
 
-  /** col #s, ordered by value */
+  /** column #s, ordered by value */
   const xOrder = sortedIndices(map(x.data, "value"));
   /** row #s, ordered by value */
   const yOrder = sortedIndices(map(y.data, "value"));
 
-  /** sort cols */
+  /** sort columns */
   x.data = xOrder.map((index) => x.data[index] ?? { value: 0 });
   data = data.map((row) => xOrder.map((index) => row[index] ?? false));
   /** sort rows */
   y.data = yOrder.map((index) => y.data[index] ?? { value: 0 });
   data = yOrder.map((index) => data[index] ?? []);
 
-  /** col # to x coord */
-  const xScale = scaleBand(xOrder, [0, cols * cellSize]).padding(0.5);
+  /** column # to x coord */
+  const xScale = scaleBand(xOrder, [0, columns * cellSize]).padding(0.5);
   /** row # to y coord */
   const yScale = scaleBand(yOrder, [0, rows * cellSize]).padding(0.5);
 
   /** links to draw between marked cells */
   const links = transpose(data)
-    .map((col, colIndex) =>
+    .map((column, columnIndex) =>
       pairs(
-        col
+        column
           .map((row, rowIndex) =>
-            row ? ([colIndex, rowIndex] as const) : null,
+            row ? ([columnIndex, rowIndex] as const) : null,
           )
           .filter((cell) => cell !== null),
       ),
     )
     .flat();
 
-  /** col bar scale */
+  /** column bar scale */
   const xBarScale = scaleLinear()
     .domain([0, max(map(x.data, "value")) ?? 0])
     .range([0, -barLength])
@@ -153,13 +153,15 @@ export default function Upset({
         {/* cells */}
         <g>
           {data.map((row, rowIndex) =>
-            row.map((col, colIndex) => (
+            row.map((column, columnIndex) => (
               <circle
-                key={[colIndex, rowIndex].join("-")}
-                cx={(xScale(colIndex) ?? 0) + xScale.bandwidth() / 2}
+                key={[columnIndex, rowIndex].join("-")}
+                cx={(xScale(columnIndex) ?? 0) + xScale.bandwidth() / 2}
                 cy={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
                 r={nodeSize}
-                fill={col ? theme["--color-deep"] : theme["--color-off-white"]}
+                fill={
+                  column ? theme["--color-deep"] : theme["--color-off-white"]
+                }
               />
             )),
           )}
@@ -167,14 +169,14 @@ export default function Upset({
 
         {/* lines */}
         <g>
-          {links.map(([[col1, row1], [col2, row2]], index) => (
+          {links.map(([[column1, row1], [column2, row2]], index) => (
             <line
               key={index}
               stroke={theme["--color-deep"]}
               strokeWidth={strokeWidth}
-              x1={(xScale(col1) ?? 0) + xScale.bandwidth() / 2}
+              x1={(xScale(column1) ?? 0) + xScale.bandwidth() / 2}
               y1={(yScale(row1) ?? 0) + yScale.bandwidth() / 2}
-              x2={(xScale(col2) ?? 0) + xScale.bandwidth() / 2}
+              x2={(xScale(column2) ?? 0) + xScale.bandwidth() / 2}
               y2={(yScale(row2) ?? 0) + yScale.bandwidth() / 2}
             />
           ))}
@@ -199,13 +201,13 @@ export default function Upset({
 
         {/* bars */}
         <g fill={theme["--color-deep"]}>
-          {x.data.map((col, colIndex) => (
-            <Tooltip key={colIndex} content={col.value}>
+          {x.data.map((column, columnIndex) => (
+            <Tooltip key={columnIndex} content={column.value}>
               <rect
-                x={xScale(colIndex)}
-                y={xBarScale(col.value)}
+                x={xScale(columnIndex)}
+                y={xBarScale(column.value)}
                 width={xScale.bandwidth() ?? 0}
-                height={-xBarScale(col.value)}
+                height={-xBarScale(column.value)}
                 tabIndex={0}
                 role="graphics-symbol"
               />

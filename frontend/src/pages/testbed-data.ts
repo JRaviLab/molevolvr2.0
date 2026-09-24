@@ -15,8 +15,8 @@ export const words =
   );
 
 /** generate random phrases of varying length */
-export const phrases = () =>
-  range(1, 10 + 1).map((index) =>
+export const phrases = (max = 10) =>
+  range(1, 1 + max).map((index) =>
     Array(index)
       .fill(null)
       .map(() => sample(words))
@@ -63,11 +63,11 @@ export const legend = Array(10)
   .map((label) => label || "");
 
 /** fake upset data */
-const upsetCols = random(3, 10);
+const upsetColumns = random(3, 10);
 const upsetRows = random(3, 10);
 export const upset = {
   x: {
-    data: Array(upsetCols)
+    data: Array(upsetColumns)
       .fill(null)
       .map(() => ({
         value: random(0, 100),
@@ -84,7 +84,7 @@ export const upset = {
   data: Array(upsetRows)
     .fill(null)
     .map(() =>
-      Array(upsetCols)
+      Array(upsetColumns)
         .fill(null)
         .map(() => Math.random() > 0.75),
     ),
@@ -110,14 +110,14 @@ export const sunburst = [
 ];
 
 /** fake heatmap data */
-const heatmapCols = random(5, 20);
+const heatmapColumns = random(5, 20);
 const heatmapRows = random(5, 20);
 const heatmapMin = random(-100, 0);
 const heatmapMax = random(0, 100);
 export const heatmap = {
   x: {
     label: "Lorem",
-    labels: Array(heatmapCols).fill(null).map(label),
+    labels: Array(heatmapColumns).fill(null).map(label),
   },
   y: {
     label: "Ipsum",
@@ -126,7 +126,7 @@ export const heatmap = {
   data: Array(heatmapRows)
     .fill(null)
     .map(() =>
-      Array(heatmapCols)
+      Array(heatmapColumns)
         .fill(null)
         .map(() =>
           Math.random() > 0.1 ? random(heatmapMin, heatmapMax) : undefined,
@@ -230,4 +230,15 @@ export const iprTracks = Array(random(5, 10))
         );
         return { id: uniqueId(), label: label(), type: type(), start, end };
       }),
+  }));
+
+/** fake table data */
+export const table = Array(random(1000, 2000))
+  .fill(null)
+  .map(() => ({
+    text: phrases(2).join(" "),
+    number: random(0, 100),
+    enum: type(),
+    boolean: sample([true, false]),
+    long: phrases().join(" "),
   }));

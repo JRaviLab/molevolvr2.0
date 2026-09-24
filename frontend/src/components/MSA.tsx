@@ -117,7 +117,7 @@ export default function MSA({
                   key={panelIndex}
                   transform={`translate(0, ${panelIndex * (4 + tracks.length) * rowHeight})`}
                 >
-                  {/* labels col */}
+                  {/* labels column */}
                   <g textAnchor="end" transform={`translate(${-rowHeight}, 0)`}>
                     <g fill={theme["--color-gray"]}>
                       <text x={0} y={-1.5 * rowHeight}>
@@ -149,11 +149,11 @@ export default function MSA({
                     transform={`translate(0, ${-2 * rowHeight})`}
                     style={{ fontFamily: theme["--color-mono"] }}
                   >
-                    {panelCombined.map((col, colIndex) => {
+                    {panelCombined.map((column, columnIndex) => {
                       let accumulatedPercent = 0;
-                      return Object.entries(col).map(
+                      return Object.entries(column).map(
                         ([char, { percent, type }], charIndex) => {
-                          const x = colIndex * charWidth;
+                          const x = columnIndex * charWidth;
                           const y = accumulatedPercent * rowHeight;
                           const width = charWidth;
                           const height = percent * rowHeight;
@@ -270,12 +270,12 @@ const getDerived = (
   length: number,
   getType: NonNullable<Props["getType"]>,
 ) => {
-  /** get top row where each col is combo of chars below it */
+  /** get top row where each column is combo of chars below it */
   const combined = range(0, length).map((index) => {
     /** get chars in column */
-    const col = tracks.map((track) => track.sequence[index]);
-    /** get percentage breakdown of each unique character in col */
-    let percents = mapValues(countBy(col), (value) => value / col.length);
+    const column = tracks.map((track) => track.sequence[index]);
+    /** get percentage breakdown of each unique character in column */
+    let percents = mapValues(countBy(column), (value) => value / column.length);
     /** catch undefined values */
     percents = mapKeys(percents, (_, key) => (key === "undefined" ? "" : key));
     /** put larger percents first */
@@ -285,19 +285,19 @@ const getDerived = (
   /** keep track of unique types */
   const types = new Set<string>();
 
-  const addType: typeof getType = (char, col) => {
+  const addType: typeof getType = (char, column) => {
     /** get type from provided func */
-    const type = getType(char, col);
+    const type = getType(char, column);
     /** add type */
     types.add(type);
     return type;
   };
 
-  /** derive type for each combined row col, just once */
-  const combinedWithTypes = combined.map((col) =>
-    mapValues(col, (percent, char) => ({
+  /** derive type for each combined row column, just once */
+  const combinedWithTypes = combined.map((column) =>
+    mapValues(column, (percent, char) => ({
       percent,
-      type: addType(char, col),
+      type: addType(char, column),
     })),
   );
 

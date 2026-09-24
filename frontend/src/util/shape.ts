@@ -3,12 +3,12 @@ import { cos, sin } from "@/util/math";
 export type Point = { x: number; y: number };
 
 /** make regular polygon or star */
-const makePolygon = (sides: number, starInset = 1, radius = 1, rotate = 0) =>
+const makePolygon = (sides: number, radius = 1, inset = 1, rotate = 0) =>
   Array(sides)
     .fill(null)
     .map((_, index) => {
       const angle = -90 + 360 * (index / sides) + rotate;
-      const scale = index % 2 === 0 ? 1 : starInset;
+      const scale = index % 2 === 0 ? 1 : inset;
       return { x: cos(angle) * radius * scale, y: sin(angle) * radius * scale };
     })
     .flat();
@@ -20,7 +20,7 @@ const palette = [
   /** circle */
   makePolygon(50),
   /** square */
-  makePolygon(4, 1, 1.1, 45),
+  makePolygon(4, 1.1, 1, 45),
   /** diamond */
   makePolygon(4),
   /** triangle */
@@ -30,9 +30,9 @@ const palette = [
   /** hexagon */
   makePolygon(6, 1, 1, 30),
   /** four point star */
-  makePolygon(8, 0.35, 1.1),
+  makePolygon(8, 1, 0.35),
   /** five point star */
-  makePolygon(10, 0.382, 1.1),
+  makePolygon(10, 1, 0.382),
   /** rhombus */
   [
     { x: -0.5, y: -0.75 },
@@ -53,6 +53,7 @@ export const getShapeMap = <Value extends string>(values: Value[]) => {
     if (value.trim())
       /** add value to shape map (if not already defined) */
       map[value] ??= shapes[index++ % shapes.length]!;
+
   return map;
 };
 

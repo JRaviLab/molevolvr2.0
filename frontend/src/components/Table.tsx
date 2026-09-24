@@ -1,8 +1,8 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import type {
-  Column,
-  FilterFn,
+  Column as TableColumn,
   NoInfer,
+  RowData,
   SortingState,
 } from "@tanstack/react-table";
 import type { Option as OptionMulti } from "@/components/SelectMulti";
@@ -10,16 +10,24 @@ import type { Option as OptionSingle } from "@/components/SelectSingle";
 import type { Filename } from "@/util/download";
 import { useRef, useState } from "react";
 import {
+  columnFacetingFeature,
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  constructFilterFn,
   createColumnHelper,
+  createFacetedMinMaxValues,
+  createFacetedRowModel,
+  createFacetedUniqueValues,
+  createFilteredRowModel,
+  createPaginatedRowModel,
+  createSortedRowModel,
   flexRender,
-  getCoreRowModel,
-  getFacetedMinMaxValues,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
+  globalFilteringFeature,
+  metaHelper,
+  rowPaginationFeature,
+  rowSortingFeature,
+  tableFeatures,
+  useTable,
 } from "@tanstack/react-table";
 import clsx from "clsx";
 import { clamp, isEqual, pick, sortBy, sum } from "lodash";
@@ -49,31 +57,26 @@ import Tooltip from "@/components/Tooltip";
 import { downloadCsv } from "@/util/download";
 import { formatDate, formatNumber } from "@/util/string";
 
-type Props<Datum extends object> = {
-  cols: _Col<Datum>[];
+type Props<Datum extends RowData> = {
+  columns: _Column<Datum>[];
   rows: Datum[];
   sort?: SortingState;
   filename?: Filename;
   showControls?: boolean;
 };
 
-type Col<
-  Datum extends object = object,
+type Column<
+  Datum extends RowData = RowData,
   Key extends keyof Datum = keyof Datum,
 > = {
   /** key of row object to access as cell value */
   key: Key;
   /** label for header */
-  name: string;
+  name: ReactNode;
   /** is sortable (default true) */
   sortable?: boolean;
-  /** whether col is individually filterable (default true) */
-  filterable?: boolean;
-  /**
-   * how to treat cell value when filtering individually or searching globally
-   * (default string)
-   */
-  filterType?: "string" | "number" | "enum" | "boolean";
+  /** how to filter column (default string, false to disable) */
+  filter?: "string" | "number" | "enum" | "boolean" | false;
   /** cell attributes */
   attrs?: HTMLAttributes<HTMLTableCellElement>;
   /** cell style */
@@ -82,10 +85,7 @@ type Col<
   show?: boolean;
   /** tooltip to show in header cell */
   tooltip?: ReactNode;
-  /**
-   * custom render function for cell. return undefined or null to fallback to
-   * default formatting.
-   */
+  /** custom render function for cell */
   render?: (cell: NoInfer<Datum[Key]>, row: Datum) => ReactNode;
 };
 
@@ -93,17 +93,37 @@ type Col<
  * https://stackoverflow.com/questions/68274805/typescript-reference-type-of-property-by-other-property-of-same-object
  * https://github.com/vuejs/core/discussions/8851
  */
-type _Col<Datum extends object> = {
-  [Key in keyof Datum]: Col<Datum, Key>;
+type _Column<Datum extends RowData> = {
+  [Key in keyof Datum]: Column<Datum, Key extends keyof Datum ? Key : never>;
 }[keyof Datum];
 
+type Meta = Pick<Column, "filter" | "attrs" | "style" | "tooltip">;
+
+const features = tableFeatures({
+  columnFilteringFeature,
+  globalFilteringFeature,
+  columnVisibilityFeature,
+  rowSortingFeature,
+  rowPaginationFeature,
+  columnFacetingFeature,
+  filteredRowModel: createFilteredRowModel(),
+  sortedRowModel: createSortedRowModel(),
+  paginatedRowModel: createPaginatedRowModel(),
+  facetedRowModel: createFacetedRowModel(),
+  facetedUniqueValues: createFacetedUniqueValues(),
+  facetedMinMaxValues: createFacetedMinMaxValues(),
+  columnMeta: metaHelper<Meta>(),
+});
+
+type Features = typeof features;
+
 /** map column definition to multi-select option */
-const colToOption = <Datum extends object>(
-  col: Props<Datum>["cols"][number],
+const columnToOption = <Datum extends RowData>(
+  column: Props<Datum>["columns"][number],
   index: number,
 ): OptionMulti => ({
   id: String(index),
-  primary: col.name,
+  primary: column.name,
 });
 
 /** per page options */
@@ -117,162 +137,143 @@ const perPageOptions = [
 
 type PerPage = (typeof perPageOptions)[number]["id"];
 
-/**
- * table with sorting, filtering, searching, pagination, etc.
- *
- * reference:
- * https://codesandbox.io/p/devbox/tanstack-table-example-kitchen-sink-vv4871
- */
-export default function Table<Datum extends object>({
-  cols,
+/** table with sorting, filtering, searching, pagination, etc. */
+export default function Table<Datum extends RowData>({
+  columns,
   rows,
   sort,
   filename = [],
   showControls = true,
 }: Props<Datum>) {
-  "use no memo";
-
   const filterRef = useRef<HTMLDivElement>(null);
 
   /** per page state */
   let [perPage, setPerPage] = useState<PerPage>(perPageOptions[0].id);
 
   /** if not showing controls, show max rows */
-  if (!showControls) perPage = perPageOptions[4].id;
+  if (!showControls) perPage = perPageOptions.at(-1)!.id;
 
   /** expanded state */
   const [expanded, setExpanded] = useState(false);
 
   /** column visibility options for multi-select */
-  const visibleOptions = cols.map(colToOption);
+  const visibleOptions = columns.map(columnToOption);
   /** visible columns */
-  const [visibleCols, setVisibleCols] = useState(
-    cols
-      .filter((col) => col.show === true || col.show === undefined)
-      .map(colToOption)
+  const [visibleColumns, setVisibleColumns] = useState(
+    columns
+      .filter((column) => column.show === true || column.show === undefined)
+      .map(columnToOption)
       .map((option) => option.id),
   );
 
   /** table-wide search */
   const [search, setSearch] = useState("");
 
-  /** get column definition (from props) by id */
-  const getCol = (id: string) => cols[Number(id)];
-
   /** individual column filter func */
-  const filterFunc: FilterFn<Datum> = (row, columnId, filterValue: unknown) => {
-    const type = getCol(columnId)?.filterType ?? "string";
-    if (!type) return true;
+  const filterFunc = constructFilterFn<Features, Datum>({
+    filter: (dataValue, filterValue, row, columnId) => {
+      const meta = row.table.getColumn(columnId)?.columnDef.meta;
+      const type = meta?.filter ?? "string";
+      if (!type) return true;
 
-    /** string column */
-    if (type === "string") {
-      const value = filterValue as string;
-      if (!value) return true;
-      const cell = (row.getValue(columnId) as string).trim();
-      if (!cell) return true;
-      return !!cell.match(value);
-    }
+      /** string column */
+      if (type === "string") {
+        const cell = String(dataValue).trim();
+        if (!cell) return true;
+        const value =
+          typeof filterValue === "string"
+            ? parseRegex(filterValue.trim())
+            : (filterValue as string | RegExp);
+        return !!cell.match(value);
+      }
 
-    /** number col */
-    if (type === "number") {
-      const value = filterValue as [number, number];
-      const cell = row.getValue(columnId) as number;
-      return cell >= value[0] && cell <= value[1];
-    }
+      /** number column */
+      if (type === "number") {
+        const value = filterValue as [number, number];
+        const cell = dataValue as number;
+        return cell >= value[0] && cell <= value[1];
+      }
 
-    /** enumerated col */
-    if (type === "enum") {
-      const cell = row.getValue(columnId) as string;
-      const value = filterValue as OptionMulti["id"][];
-      if (!value.length) return true;
-      return !!value.find((option) => option === cell);
-    }
+      /** enumerated column */
+      if (type === "enum") {
+        const cell = dataValue as string;
+        const value = filterValue as OptionMulti["id"][];
+        if (!value.length) return true;
+        return !!value.find((option) => option === cell);
+      }
 
-    /** boolean col */
-    if (type === "boolean") {
-      const cell = row.getValue(columnId);
-      const value = filterValue as OptionSingle["id"];
-      if (value === "all") return true;
-      else return String(cell) === value;
-    }
+      /** boolean column */
+      if (type === "boolean") {
+        const value = filterValue as OptionSingle["id"];
+        if (value === "all") return true;
+        else return String(dataValue) === value;
+      }
 
-    return true;
-  };
-
-  /** transform filter value once per search */
-  filterFunc.resolveFilterValue = (value: unknown) => {
-    if (typeof value === "string") return parseRegex(value.trim());
-    return value;
-  };
+      return true;
+    },
+  });
 
   /** global search func */
-  const searchFunc: FilterFn<Datum> = (row, columnId, filterValue: unknown) => {
-    const value = filterValue as string;
-    if (!value) return true;
-    const cell = String(row.getValue(columnId)).trim();
-    if (!cell) return true;
-    return !!cell.match(value);
-  };
+  const searchFunc = constructFilterFn<Features, Datum>({
+    filter: (dataValue, filterValue) => {
+      const cell = String(dataValue).trim();
+      if (!cell) return true;
+      return !!cell.match(filterValue as string | RegExp);
+    },
+    /** transform filter value once per search, not per row */
+    resolveFilterValue: (value: unknown) => {
+      if (typeof value === "string") return parseRegex(value.trim());
+      return value;
+    },
+  });
 
-  /** transform filter value once per search */
-  searchFunc.resolveFilterValue = (value: unknown) => {
-    if (typeof value === "string") return parseRegex(value.trim());
-    return value;
-  };
+  const columnHelper = createColumnHelper<Features, Datum>();
 
-  const columnHelper = createColumnHelper<Datum>();
-  /** column definitions */
-  const columns = cols.map((col, index) =>
-    columnHelper.accessor((row) => row[col.key], {
-      /** unique column id, from position in provided column list */
-      id: String(index),
-      /** name */
-      header: col.name,
-      /** sortable */
-      enableSorting: col.sortable ?? true,
-      /** individually filterable */
-      enableColumnFilter: col.filterable ?? true,
-      /** only include in table-wide search if column is visible */
-      enableGlobalFilter: visibleCols.includes(String(index)),
-      /** type of column */
-      meta: {
-        filterType: col.filterType,
-        attrs: col.attrs,
-        style: col.style,
-        tooltip: col.tooltip,
-      },
-      /** func to use for filtering individual column */
-      filterFn: filterFunc,
-      /** render func for cell */
-      cell: ({ cell, row }) => {
-        const raw = cell.getValue();
-        const rendered = col.render?.(raw, row.original);
-        return rendered === undefined || rendered === null
-          ? defaultFormat(raw)
-          : rendered;
-      },
-    }),
+  const columnDefinitions = columnHelper.columns(
+    columns.map((column, index) =>
+      columnHelper.accessor((row) => row[column.key], {
+        /** unique column id, from position in provided column list */
+        id: String(index),
+        /** name */
+        header: () => column.name,
+        /** sortable */
+        enableSorting: column.sortable ?? true,
+        /** individually filterable */
+        enableColumnFilter: column.filter !== false,
+        /** only include in table-wide search if column is visible */
+        enableGlobalFilter: visibleColumns.includes(String(index)),
+        /** allow convenient access to parts of original column definition */
+        meta: {
+          filter: column.filter,
+          tooltip: column.tooltip,
+          style: column.style,
+          attrs: column.attrs,
+        },
+        /** func to use for filtering individual column */
+        filterFn: filterFunc,
+        /** render func for cell */
+        cell: ({ cell, row }) => {
+          const raw = cell.getValue();
+          const rendered = column.render?.(raw as never, row.original);
+          return rendered === undefined || rendered === null
+            ? defaultFormat(raw)
+            : rendered;
+        },
+      }),
+    ),
   );
 
   /** tanstack table api */
-  // eslint-disable-next-line -- https://github.com/facebook/react/issues/33057
-  const table = useReactTable({
+  const table = useTable({
+    features,
     data: rows,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    columns: columnDefinitions,
     globalFilterFn: searchFunc,
     getColumnCanGlobalFilter: () => true,
     autoResetPageIndex: true,
-    columnResizeMode: "onChange",
     /** initial sort, page, etc. state */
     initialState: {
-      sorting: sort,
+      sorting: sort ?? [],
       pagination: {
         pageIndex: 0,
         pageSize: Number(perPage),
@@ -284,9 +285,9 @@ export default function Table<Datum extends object>({
       globalFilter: search,
       /** which columns are visible */
       columnVisibility: Object.fromEntries(
-        cols.map((col, index) => [
+        columns.map((column, index) => [
           String(index),
-          !!visibleCols.includes(String(index)),
+          !!visibleColumns.includes(String(index)),
         ]),
       ),
     },
@@ -308,8 +309,8 @@ export default function Table<Datum extends object>({
         {/* table */}
         <table
           className={clsx(expanded && "w-full")}
-          aria-rowcount={table.getPrePaginationRowModel().rows.length}
-          aria-colcount={cols.length}
+          aria-rowcount={table.getPrePaginatedRowModel().rows.length}
+          aria-colcount={columns.length}
         >
           {/* head */}
           <thead>
@@ -319,9 +320,9 @@ export default function Table<Datum extends object>({
                   <th
                     key={header.id}
                     aria-colindex={Number(header.id) + 1}
-                    style={getCol(header.column.id)?.style}
+                    style={header.column.columnDef.meta?.style}
                     align="left"
-                    {...getCol(header.column.id)?.attrs}
+                    {...header.column.columnDef.meta?.attrs}
                   >
                     {header.isPlaceholder ? null : (
                       <div className="flex items-center justify-start">
@@ -334,8 +335,10 @@ export default function Table<Datum extends object>({
                         </span>
 
                         {/* header tooltip */}
-                        {getCol(header.column.id)?.tooltip && (
-                          <Help tooltip={getCol(header.column.id)?.tooltip} />
+                        {header.column.columnDef.meta?.tooltip && (
+                          <Help
+                            tooltip={header.column.columnDef.meta.tooltip}
+                          />
                         )}
 
                         {/* header sort */}
@@ -365,14 +368,7 @@ export default function Table<Datum extends object>({
 
                         {/* header filter */}
                         {header.column.getCanFilter() ? (
-                          <Popover
-                            content={
-                              <Filter
-                                column={header.column}
-                                def={getCol(header.column.id)}
-                              />
-                            }
-                          >
+                          <Popover content={<Filter column={header.column} />}>
                             <Tooltip content="Filter this column">
                               <Button
                                 className={clsx(
@@ -406,8 +402,8 @@ export default function Table<Datum extends object>({
                 <tr
                   key={row.id}
                   aria-rowindex={
-                    table.getState().pagination.pageIndex *
-                      table.getState().pagination.pageSize +
+                    table.state.pagination.pageIndex *
+                      table.state.pagination.pageSize +
                     index +
                     1
                   }
@@ -415,9 +411,9 @@ export default function Table<Datum extends object>({
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={cell.id}
-                      style={getCol(cell.column.id)?.style}
+                      style={cell.column.columnDef.meta?.style}
                       align="left"
-                      {...getCol(cell.column.id)?.attrs}
+                      {...cell.column.columnDef.meta?.attrs}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -431,7 +427,7 @@ export default function Table<Datum extends object>({
               <tr>
                 <td
                   className="p-8 text-center text-light-gray"
-                  colSpan={cols.length}
+                  colSpan={columns.length}
                 >
                   No Rows
                 </td>
@@ -476,8 +472,8 @@ export default function Table<Datum extends object>({
                 }}
               >
                 {(() => {
-                  const rows = table.getPrePaginationRowModel().rows.length;
-                  const { pageIndex, pageSize } = table.getState().pagination;
+                  const rows = table.getPrePaginatedRowModel().rows.length;
+                  const { pageIndex, pageSize } = table.state.pagination;
                   return [
                     formatNumber(rows ? pageIndex * pageSize + 1 : 0),
                     "–",
@@ -531,8 +527,8 @@ export default function Table<Datum extends object>({
             <SelectMulti
               label="Cols"
               options={visibleOptions}
-              value={visibleCols}
-              onChange={setVisibleCols}
+              value={visibleColumns}
+              onChange={setVisibleColumns}
             />
             {/* table-wide search */}
             <TextBox
@@ -562,16 +558,16 @@ export default function Table<Datum extends object>({
               design="hollow"
               tooltip="Download table data as .csv"
               onClick={() => {
-                /** get col defs that are visible */
-                const defs = visibleCols.map(
-                  (visible) => cols[Number(visible)]!,
+                /** get column definitions that are visible */
+                const definitions = visibleColumns.map(
+                  (visible) => columns[Number(visible)]!,
                 );
 
                 /** visible keys */
-                const keys = defs.map((def) => def.key);
+                const keys = definitions.map((definition) => definition.key);
 
                 /** visible names */
-                const names = defs.map((def) => def.name);
+                const names = definitions.map((definition) => definition.name);
 
                 /** filtered row data */
                 const data = table
@@ -599,15 +595,17 @@ export default function Table<Datum extends object>({
   );
 }
 
-type FilterProps<Datum extends object> = {
-  column: Column<Datum>;
-  def?: Col<Datum>;
+type FilterProps<Datum extends RowData> = {
+  column: TableColumn<Features, Datum>;
 };
 
 /** content of filter popup for column */
-function Filter<Datum extends object>({ column, def }: FilterProps<Datum>) {
+function Filter<Datum extends RowData>({ column }: FilterProps<Datum>) {
+  /** original column definition (from props) */
+  const definition = column.columnDef.meta;
+
   /** type of filter */
-  const type = def?.filterType ?? "string";
+  const type = definition?.filter || "string";
 
   /** filter as number range */
   if (type === "number") {
@@ -714,7 +712,7 @@ function Filter<Datum extends object>({ column, def }: FilterProps<Datum>) {
       placeholder="Search"
       icon={<Search />}
       value={(column.getFilterValue() as string | undefined) ?? ""}
-      onChange={column.setFilterValue}
+      onChange={(value) => column.setFilterValue(value)}
     />
   );
 }

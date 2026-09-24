@@ -208,7 +208,7 @@ export default function IPR({ title, filename = [], sequence, tracks }: Props) {
 
         return (
           <>
-            {/* labels col */}
+            {/* labels column */}
             <g textAnchor="end" transform={`translate(${-rowHeight}, 0)`}>
               <g fill={theme["--color-gray"]}>
                 <text x={0} y={-1.5 * (rowHeight + rowGap)}>

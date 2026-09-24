@@ -23,7 +23,7 @@ export const formatNumber = (value: number | undefined, compact = false) => {
   if (Math.abs(value) < 0.01 && value) return value.toExponential(1);
   const options: Intl.NumberFormatOptions = {};
   if (compact) options.notation = "compact";
-  options.maximumSignificantDigits = compact ? 2 : 4;
+  options.maximumFractionDigits = compact ? 2 : 4;
   return value.toLocaleString(undefined, options).toLowerCase();
 };
 

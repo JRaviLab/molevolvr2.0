@@ -63,29 +63,29 @@ export default function Legend({
   /** max entry width */
   const widestEntry = widestLabel + labelX;
 
-  /** col width limit */
-  const maxColWidth = Math.min(widestEntry, maxEntryWidth);
+  /** column width limit */
+  const maxColumnWidth = Math.min(widestEntry, maxEntryWidth);
 
   /** fit as many columns in available width as possible */
-  let cols = Math.floor((rootW + gapSize) / (gapSize + maxColWidth));
-  if (cols < 1) cols = 1;
+  let columns = Math.floor((rootW + gapSize) / (gapSize + maxColumnWidth));
+  if (columns < 1) columns = 1;
   /** number of rows */
-  const rows = Math.ceil(Object.keys(entries).length / cols);
+  const rows = Math.ceil(Object.keys(entries).length / columns);
 
   /** actual column width */
-  const colWidth = Math.min(
-    (gapSize - cols * gapSize + rootW) / cols,
-    maxColWidth,
+  const columnWidth = Math.min(
+    (gapSize - columns * gapSize + rootW) / columns,
+    maxColumnWidth,
   );
 
   /** resulting root width */
-  rootW = cols * colWidth + (cols - 1) * gapSize;
+  rootW = columns * columnWidth + (columns - 1) * gapSize;
 
   /** resulting root height */
   const rootH = rows * rowHeight + (rows - 1) * gapSize;
 
   /** if resulting width less than available, shift appropriately to fill space */
-  // if (colWidth < rootW) rootX += anchor[0] * (rootW - colWidth);
+  // if (columnWidth < rootW) rootX += anchor[0] * (rootW - columnWidth);
 
   /** shift by anchor point */
   rootX -= anchor[0] * rootW;
@@ -109,8 +109,8 @@ export default function Legend({
             index={index}
             label={label}
             labelX={labelX}
-            cols={cols}
-            colWidth={colWidth}
+            columns={columns}
+            columnWidth={columnWidth}
             color={color}
             shape={shape}
             stroke={stroke}
@@ -127,8 +127,8 @@ type CellProps = {
   index: number;
   label: string;
   labelX: number;
-  cols: number;
-  colWidth: number;
+  columns: number;
+  columnWidth: number;
   theme: ReturnType<typeof useTheme>;
   truncateWidth: ReturnType<typeof useTextSize>["truncateWidth"];
 } & Entry;
@@ -139,18 +139,18 @@ function Cell({
   index,
   label,
   labelX,
-  cols,
-  colWidth,
+  columns,
+  columnWidth,
   color,
   shape,
   stroke,
   theme,
   truncateWidth,
 }: CellProps) {
-  /** wrap to grid of rows/cols */
-  const row = Math.floor(index / cols);
-  const col = index % cols;
-  const x = col * (colWidth + gapSize);
+  /** wrap to grid of rows/columns */
+  const row = Math.floor(index / columns);
+  const column = index % columns;
+  const x = column * (columnWidth + gapSize);
   const y = row * (rowHeight + gapSize);
 
   /** scale shape points */
@@ -197,7 +197,7 @@ function Cell({
           fill={theme["--color-black"]}
           tabIndex={0}
         >
-          {truncateWidth(label, colWidth - labelX)}
+          {truncateWidth(label, columnWidth - labelX)}
         </text>
       </Tooltip>
     </g>

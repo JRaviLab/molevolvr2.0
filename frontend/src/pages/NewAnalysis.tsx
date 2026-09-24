@@ -109,8 +109,8 @@ const analysisTypes = [
   },
 ] as const;
 
-/** csv cols */
-const tableCols = [
+/** csv columns */
+const tableColumns = [
   "Query",
   "AccNum",
   "PcIdentity",
@@ -141,7 +141,7 @@ const parseTable = (
 ): Record<string, unknown>[] =>
   parse(input, {
     delimiter,
-    columns: tableCols,
+    columns: tableColumns,
     skip_records_with_error: true,
   });
 
@@ -188,7 +188,7 @@ export default function NewAnalysis() {
   const stats: Record<string, string> = {};
   if (tableInput?.length) {
     stats.rows = formatNumber(tableInput.length);
-    stats.cols = formatNumber(Object.keys(tableInput[0] || {})?.length);
+    stats.columns = formatNumber(Object.keys(tableInput[0] || {})?.length);
   } else if (listInput)
     stats.proteins = formatNumber(
       listInput
@@ -300,7 +300,10 @@ export default function NewAnalysis() {
           {inputType === "external" && tableInput && (
             <>
               <Table
-                cols={tableCols.map((col) => ({ key: col, name: col }))}
+                columns={tableColumns.map((column) => ({
+                  key: column,
+                  name: column,
+                }))}
                 rows={tableInput}
               />
             </>

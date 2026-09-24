@@ -317,6 +317,7 @@ export default function Network({
             maxNodeSize,
           ),
           color: nodeColors[node.type ?? ""] ?? "",
+          /** can't exceed -1 to 1 or will throw error */
           shape: shapeToList(nodeShapes[node.type ?? ""]),
         })),
     [

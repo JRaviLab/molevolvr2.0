@@ -374,7 +374,7 @@ export default function About() {
         <H2 icon={<Users />}>Team</H2>
 
         <Table
-          cols={[
+          columns={[
             { key: "name", name: "Name" },
             {
               key: "email",

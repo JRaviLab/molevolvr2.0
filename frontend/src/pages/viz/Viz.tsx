@@ -7,7 +7,7 @@ import { useTheme } from "@/util/hooks";
 import { dist } from "@/util/math";
 import Shape from "./shape.svg?raw";
 
-/** number of rows/cols of points */
+/** number of rows/columns of points */
 const rows = 30;
 /** spacing of points */
 const spacing = 20;
@@ -130,8 +130,8 @@ const generate = (svgs: string[], onComplete: () => void) => {
 
     /** generate grid of points that cover svg view box */
     const points = range(x, x + w + gap, gap)
-      .map((x, col) =>
-        range(y, y + h + gap, gap).map((y, row) => ({ col, row, x, y })),
+      .map((x, column) =>
+        range(y, y + h + gap, gap).map((y, row) => ({ column, row, x, y })),
       )
       .flat()
       .filter(({ x, y }) =>
@@ -148,12 +148,12 @@ const generate = (svgs: string[], onComplete: () => void) => {
           );
         }),
       )
-      .map(({ col, row }) => {
+      .map(({ column, row }) => {
         /** shift to center */
-        col -= Math.round(w / gap / 2);
+        column -= Math.round(w / gap / 2);
         row -= Math.round(h / gap / 2);
         /** current state */
-        const point = { col, row, alpha: 0 };
+        const point = { column, row, alpha: 0 };
         /** animation */
         const steps = [{ ...point }];
         return { ...point, steps };
@@ -162,7 +162,7 @@ const generate = (svgs: string[], onComplete: () => void) => {
     /** remove from doc */
     svg.remove();
 
-    /* alternate shuffling by row/col */
+    /* alternate shuffling by row/column */
     let flip = true;
 
     /** animate in steps */
@@ -170,9 +170,9 @@ const generate = (svgs: string[], onComplete: () => void) => {
       /* keep track of offsets for this step so all points offset by same amount */
       const offsets: Record<number, number> = {};
       /* direction to alternate direction by */
-      const axisA = flip ? "col" : "row";
+      const axisA = flip ? "column" : "row";
       /* direction to offset in */
-      const axisB = flip ? "row" : "col";
+      const axisB = flip ? "row" : "column";
 
       for (const { steps } of points) {
         /** clone latest step */
@@ -208,7 +208,7 @@ const generate = (svgs: string[], onComplete: () => void) => {
         .filter(({ a, b }) => {
           const aStep = a.steps[step]!;
           const bStep = b.steps[step]!;
-          const d = dist(aStep.col, aStep.row, bStep.col, bStep.row);
+          const d = dist(aStep.column, aStep.row, bStep.column, bStep.row);
           /** link two points if certain distance */
           return d < 1.5 && d > 0.5;
         })
@@ -230,9 +230,9 @@ const generate = (svgs: string[], onComplete: () => void) => {
       /** sub timeline for point */
       const timeline = gsap.timeline();
       /** keyframes */
-      point.steps.forEach(({ col, row }, stepIndex) =>
+      point.steps.forEach(({ column, row }, stepIndex) =>
         timeline.to(point, {
-          col,
+          column,
           row,
           alpha: stepIndex === steps - 1 ? 0 : 1,
           duration,
@@ -305,19 +305,19 @@ const draw = (
       if (alpha === 0) continue;
       ctx.globalAlpha = alpha;
       ctx.beginPath();
-      ctx.moveTo(a.col * spacing, a.row * spacing);
-      ctx.lineTo(b.col * spacing, b.row * spacing);
+      ctx.moveTo(a.column * spacing, a.row * spacing);
+      ctx.lineTo(b.column * spacing, b.row * spacing);
       ctx.stroke();
     }
   }
 
   /** draw points */
   for (const { points } of objects) {
-    for (const { col, row, alpha } of points) {
+    for (const { column, row, alpha } of points) {
       if (alpha === 0) continue;
       ctx.globalAlpha = alpha;
       ctx.beginPath();
-      ctx.arc(col * spacing, row * spacing, size, 0, Math.PI * 2);
+      ctx.arc(column * spacing, row * spacing, size, 0, Math.PI * 2);
       ctx.fill();
     }
   }
