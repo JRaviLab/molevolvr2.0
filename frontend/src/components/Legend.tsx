@@ -173,13 +173,13 @@ function Cell({
             <>
               <polygon
                 fill="none"
-                strokeWidth={5 * strokeWidth}
+                strokeWidth={4 * strokeWidth}
                 points={shapeToString(shape)}
               />
               <polygon
                 fill="none"
                 stroke={color}
-                strokeWidth={3 * strokeWidth}
+                strokeWidth={2 * strokeWidth}
                 points={shapeToString(shape)}
               />
             </>

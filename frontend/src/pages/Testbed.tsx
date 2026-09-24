@@ -1058,9 +1058,6 @@ function SectionForm() {
 function SectionIcons() {
   return (
     <section>
-      <div className="flex size-100 items-center justify-center bg-deep text-white">
-        <Logo className="size-90" />
-      </div>
       <div className="flex h-100 w-200 items-center justify-center gap-8 bg-deep text-5xl tracking-wide text-white uppercase">
         <Logo className="size-32" />
         {import.meta.env.VITE_TITLE}

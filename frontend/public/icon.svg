@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-55 -50 110 110">
+  <!-- background -->
+  <rect fill="oklch(45% 0.08 315)" x="-55" y="-50" width="110" height="110" />
+
+  <!-- bonds -->
+  <g
+    fill="none"
+    stroke="white"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="4"
+    mask="url(#logo-mask)"
+  >
+    <path
+      d="
+        M 0 0
+        L -40 -25
+        L -40 25
+      "
+    />
+    <path
+      d="
+        M 0 0
+        L 40 -25
+        L 40 25
+      "
+    />
+    <path
+      d="
+        M 0 0
+        L 0 45
+      "
+    />
+  </g>
+
+  <!-- electrons -->
+  <g fill="white">
+    <g transform="translate(-40, -25)">
+      <circle r="8" />
+    </g>
+    <g transform="translate(40, -25)">
+      <circle r="8" />
+    </g>
+    <g transform="translate(0, 45)">
+      <circle r="8" />
+    </g>
+  </g>
+
+  <!-- nucleus -->
+  <circle fill="none" stroke="white" stroke-width="6" cx="0" cy="0" r="9" />
+
+  <defs>
+    <!-- nucleus cutout -->
+    <mask id="logo-mask">
+      <rect fill="white" x="-50" y="-50" width="100" height="100" />
+      <g fill="black">
+        <g transform="translate(-40, -25)">
+          <circle r="12" />
+        </g>
+        <g transform="translate(40, -25)">
+          <circle r="12" />
+        </g>
+        <g transform="translate(0, 45)">
+          <circle r="12" />
+        </g>
+        <circle cx="0" cy="0" r="16" />
+      </g>
+    </mask>
+  </defs>
+  F
+</svg>

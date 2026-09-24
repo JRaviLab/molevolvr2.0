@@ -520,6 +520,7 @@ function Feature({
           width={drawWidth}
           height={rowHeight}
           fill={colorMap[type ?? ""]}
+          stroke={theme["--color-black"]}
         />
         {inRange(drawMidX, fontSize, width - fontSize) && (
           <text

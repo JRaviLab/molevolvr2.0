@@ -4,6 +4,7 @@ import { getDefaultStore, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { Moon, Sun } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
+import { useEventListener } from "@reactuses/core";
 
 /** dark mode state */
 export const darkModeAtom = atomWithStorage("darkMode", false);
@@ -25,6 +26,12 @@ type Props = ComponentProps<"button">;
 /** dark mode toggle */
 export function DarkMode({ className }: Props) {
   const [darkMode, setDarkMode] = useAtom(darkModeAtom);
+
+  /** keyboard shortcut */
+  useEventListener("keydown", ({ key }) => {
+    if (key.toLowerCase() === "d" && document.activeElement === document.body)
+      setDarkMode(!darkMode);
+  });
 
   return (
     <Tooltip content={`Switch to ${darkMode ? "light" : "dark"} mode`}>
