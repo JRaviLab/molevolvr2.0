@@ -1,12 +1,14 @@
 import type { HierarchyNode } from "d3";
 import type { Filename } from "@/util/download";
 import { Fragment, useState } from "react";
+import { useDeepCompareEffect } from "@reactuses/core";
 import { hierarchy } from "d3";
-import { map, mapValues, max, min, orderBy, sum } from "lodash";
+import { map, mapValues, max, min, orderBy, pick, sum, uniq } from "lodash";
 import Chart from "@/components/Chart";
 import CheckBox from "@/components/CheckBox";
 import Legend from "@/components/Legend";
 import NumberBox from "@/components/NumberBox";
+import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
@@ -93,6 +95,39 @@ export default function Tree({ title, filename = [], data }: Props) {
   /** hierarchical data structure with convenient access methods */
   const tree = hierarchy<Node>({ children: data } as Node);
 
+  /** list of node types */
+  const types = uniq([
+    "",
+    ...map(tree.descendants(), (node) => node.data.type ?? ""),
+  ]);
+
+  /** map of node types to colors */
+  const colors = useColorMap(types, "mode");
+
+  /** map of node types to shapes */
+  const shapes = getShapeMap(types);
+
+  /** selected node types */
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+
+  /** update selected types */
+  useDeepCompareEffect(() => {
+    setSelectedTypes(types);
+  }, [types]);
+
+  /** selected types options */
+  const typeOptions = types.map((type) => ({
+    id: type,
+    primary: type || "-",
+  }));
+
+  /** only keep nodes with selected types */
+  tree.eachBefore((node) => {
+    node.children = node.children?.filter(
+      (child) => child.data.type && selectedTypes.includes(child.data.type),
+    );
+  });
+
   /** horizontal = depth */
   /** vertical = breadth */
 
@@ -120,9 +155,6 @@ export default function Tree({ title, filename = [], data }: Props) {
       node.ancestors().map((node) => node.data.collapsedDist),
     );
   });
-
-  /** list of node types */
-  const nodeTypes = map(tree.descendants(), (node) => node.data.type ?? "");
 
   /** sort breadth by dist */
   /** https://github.com/d3/d3-hierarchy/blob/main/src/hierarchy/sort.js */
@@ -180,12 +212,6 @@ export default function Tree({ title, filename = [], data }: Props) {
     (selectedA?.data.rootDist ?? 0) - (selectedB?.data.rootDist ?? 0),
   );
 
-  /** map of node types to colors */
-  const colorMap = useColorMap(nodeTypes, "mode");
-
-  /** map of node types to shapes */
-  const shapeMap = getShapeMap(nodeTypes);
-
   /** clear selection */
   const deselect = () => setSelected([]);
 
@@ -205,6 +231,13 @@ export default function Tree({ title, filename = [], data }: Props) {
       onClick={deselect}
       controls={[
         [
+          <SelectMulti
+            key="types"
+            label="Types"
+            options={typeOptions}
+            value={selectedTypes}
+            onChange={setSelectedTypes}
+          />,
           <SelectSingle
             key="sort"
             label="Sort"
@@ -238,10 +271,13 @@ export default function Tree({ title, filename = [], data }: Props) {
               y={0}
               w={labelWidth}
               anchor={[1, 0]}
-              entries={mapValues(colorMap, (color, type) => ({
-                color,
-                shape: shapeMap[type],
-              }))}
+              entries={mapValues(
+                pick(colors, selectedTypes),
+                (color, type) => ({
+                  color,
+                  shape: shapes[type],
+                }),
+              )}
             />
 
             <g>
@@ -327,7 +363,7 @@ export default function Tree({ title, filename = [], data }: Props) {
                           y={(node.y ?? 0) * rowHeight}
                           fill={theme["--color-black"]}
                         >
-                          {truncateWidth(node.data.label ?? "-", labelWidth)}
+                          {truncateWidth(node.data.label || "-", labelWidth)}
                         </text>
                       </>
                     )}
@@ -358,7 +394,7 @@ export default function Tree({ title, filename = [], data }: Props) {
                       <polygon
                         className="cursor-help"
                         points={shapeToString(
-                          shapeMap[node.data.type ?? ""],
+                          shapes[node.data.type ?? ""],
                           (node.x ?? 0) * width,
                           (node.y ?? 0) * rowHeight,
                           nodeSize / 2,
@@ -366,7 +402,7 @@ export default function Tree({ title, filename = [], data }: Props) {
                         fill={
                           isSelected === false
                             ? theme["--color-off-white"]
-                            : colorMap[node.data.type ?? ""]
+                            : colors[node.data.type ?? ""]
                         }
                         stroke={theme["--color-black"]}
                         strokeWidth={lineWidth}
@@ -408,13 +444,13 @@ export default function Tree({ title, filename = [], data }: Props) {
                 <g fill={theme["--color-black"]}>
                   <text x={labelWidth / 2} y={0 * rowHeight}>
                     {truncateWidth(
-                      selectedA?.data.label ?? "-",
+                      selectedA?.data.label || "-",
                       width - labelWidth / 2,
                     )}
                   </text>
                   <text x={labelWidth / 2} y={1 * rowHeight}>
                     {truncateWidth(
-                      selectedB?.data.label ?? "-",
+                      selectedB?.data.label || "-",
                       width - labelWidth / 2,
                     )}
                   </text>

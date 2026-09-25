@@ -1,9 +1,9 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import type {
-  Column as TableColumn,
   NoInfer,
   RowData,
   SortingState,
+  Column as TableColumn,
 } from "@tanstack/react-table";
 import type { Option as OptionMulti } from "@/components/SelectMulti";
 import type { Option as OptionSingle } from "@/components/SelectSingle";

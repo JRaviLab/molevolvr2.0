@@ -21,6 +21,7 @@ import type { Filename } from "@/util/download";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   useDebounceFn,
+  useDeepCompareEffect,
   useFullscreen,
   useResizeObserver,
 } from "@reactuses/core";
@@ -32,12 +33,21 @@ import fcose from "cytoscape-fcose";
 import klay from "cytoscape-klay";
 import spread from "cytoscape-spread";
 import { extent } from "d3";
-import { mapValues, omit, orderBy, startCase, truncate } from "lodash";
+import {
+  mapValues,
+  omit,
+  orderBy,
+  pick,
+  startCase,
+  truncate,
+  uniq,
+} from "lodash";
 import { Crop, Maximize } from "lucide-react";
 import Button from "@/components/Button";
 import Download from "@/components/Download";
 import Frame from "@/components/Frame";
 import Legend from "@/components/Legend";
+import SelectMulti from "@/components/SelectMulti";
 import SelectSingle from "@/components/SelectSingle";
 import Slider from "@/components/Slider";
 import { useColorMap } from "@/util/color";
@@ -285,7 +295,7 @@ export default function Network({
 
   /** list of node types */
   const nodeTypes = useMemo(
-    () => _nodes.map((node) => node.type ?? ""),
+    () => uniq(["", ..._nodes.map((node) => node.type ?? "")]),
     [_nodes],
   );
   /** map of node types to colors */
@@ -297,10 +307,22 @@ export default function Network({
     () => extent(_nodes.flatMap((node) => node.strength ?? [])),
     [_nodes],
   );
+  /** selected node types */
+  const [selectedNodeTypes, setSelectedNodeTypes] = useState<string[]>([]);
+  /** update selected types */
+  useDeepCompareEffect(() => {
+    setSelectedNodeTypes(nodeTypes);
+  }, [nodeTypes]);
+  /** selected node type options */
+  const nodeTypeOptions = nodeTypes.map((type) => ({
+    id: type,
+    primary: type || "-",
+  }));
   /** derive and map properties for each node */
   const nodes = useMemo(
     () =>
       orderBy(_nodes, "strength")
+        .filter((node) => node.type && selectedNodeTypes.includes(node.type))
         .slice(0, maxNodes)
         .map((node) => ({
           ...node,
@@ -327,6 +349,7 @@ export default function Network({
       maxNodes,
       minNodeStrength,
       maxNodeStrength,
+      selectedNodeTypes,
     ],
   );
 
@@ -335,7 +358,7 @@ export default function Network({
 
   /** list of edge types */
   const edgeTypes = useMemo(
-    () => _edges.map((edge) => edge.type ?? ""),
+    () => uniq(["", ..._edges.map((edge) => edge.type ?? "")]),
     [_edges],
   );
   /** map of edge types to colors */
@@ -650,10 +673,13 @@ export default function Network({
                   </div>
 
                   <Legend
-                    entries={mapValues(nodeColors, (color, type) => ({
-                      color,
-                      shape: nodeShapes[type],
-                    }))}
+                    entries={mapValues(
+                      pick(nodeColors, selectedNodeTypes),
+                      (color, type) => ({
+                        color,
+                        shape: nodeShapes[type],
+                      }),
+                    )}
                   />
                 </div>
 
@@ -688,6 +714,12 @@ export default function Network({
       {/* controls */}
       <div className="controls">
         <div>
+          <SelectMulti
+            label="Node Types"
+            options={nodeTypeOptions}
+            value={selectedNodeTypes}
+            onChange={setSelectedNodeTypes}
+          />
           <Slider
             label="Max Nodes"
             min={1}

@@ -2,10 +2,12 @@ import type { ReactElement } from "react";
 import type { HierarchyNode } from "d3";
 import type { Filename } from "@/util/download";
 import { Fragment, useId, useState } from "react";
+import { useDeepCompareEffect } from "@reactuses/core";
 import { arc, hierarchy } from "d3";
-import { inRange, map, mapValues, sumBy } from "lodash";
+import { inRange, map, mapValues, pick, sumBy, uniq } from "lodash";
 import Chart from "@/components/Chart";
 import Legend from "@/components/Legend";
+import SelectMulti from "@/components/SelectMulti";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import { useTextSize, useTheme } from "@/util/hooks";
@@ -80,6 +82,36 @@ export default function Sunburst({ title, filename = [], data }: Props) {
   /** hierarchical data structure with convenient access methods */
   const tree = hierarchy<Node>({ children: data } as Node);
 
+  /** list of node types */
+  const types = uniq([
+    "",
+    ...map(tree.descendants(), (node) => node.data.type ?? ""),
+  ]);
+
+  /** map of node type to color */
+  const colors = useColorMap(types, "mode");
+
+  /** selected node types */
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+
+  /** update selected types */
+  useDeepCompareEffect(() => {
+    setSelectedTypes(types);
+  }, [types]);
+
+  /** selected types options */
+  const typeOptions = types.map((type) => ({
+    id: type,
+    primary: type || "-",
+  }));
+
+  /** only keep nodes with selected types */
+  tree.eachBefore((node) => {
+    node.children = node.children?.filter(
+      (child) => child.data.type && selectedTypes.includes(child.data.type),
+    );
+  });
+
   /** set fallbacks */
   for (const { data } of tree) {
     data.color ??= "";
@@ -114,16 +146,10 @@ export default function Sunburst({ title, filename = [], data }: Props) {
     parent.data.childAngle += data.percent;
   });
 
-  /** list of node types */
-  const nodeTypes = map(tree.descendants(), (node) => node.data.type ?? "");
-
-  /** map of node type to color */
-  const colorMap = useColorMap(nodeTypes, "mode");
-
   /** convert node tree to list and derive some more props */
   const nodes = [...tree].map((node) => {
     /** assign color from type */
-    node.data.color = colorMap[node.data.type ?? ""] ?? "";
+    node.data.color = colors[node.data.type ?? ""] ?? "";
 
     /** selected state */
     node.data.selected = anySelected ? selected.includes(node.data.id) : null;
@@ -143,11 +169,22 @@ export default function Sunburst({ title, filename = [], data }: Props) {
   return (
     <Chart
       title={title}
+      controls={[
+        <SelectMulti
+          key="types"
+          label="Types"
+          options={typeOptions}
+          value={selectedTypes}
+          onChange={setSelectedTypes}
+        />,
+      ]}
       filename={[...filename, "sunburst"]}
       onClick={deselect}
     >
       <Legend
-        entries={mapValues(colorMap, (color) => ({ color }))}
+        entries={mapValues(pick(colors, selectedTypes), (color) => ({
+          color,
+        }))}
         x={-maxR - ringSize}
         y={0}
         w={panelWidth}
@@ -198,7 +235,7 @@ export default function Sunburst({ title, filename = [], data }: Props) {
                 />
                 <text x={x + gapSize} y={y} tabIndex={0}>
                   {truncateWidth(
-                    node.data.label ?? "-",
+                    node.data.label || "-",
                     panelWidth - 2 * gapSize,
                   )}
                 </text>
@@ -303,7 +340,7 @@ function Segment({ node, select, deselect }: SegmentProps) {
         fill={theme["--color-black"]}
       >
         <textPath href={`#${id}`} startOffset="50%">
-          {truncateWidth(label ?? "-", arcLength)}
+          {truncateWidth(label || "-", arcLength)}
         </textPath>
       </text>
     </g>

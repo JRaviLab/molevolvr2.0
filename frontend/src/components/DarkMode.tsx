@@ -1,10 +1,10 @@
 import type { ComponentProps } from "react";
+import { useEventListener } from "@reactuses/core";
 import { clsx } from "clsx";
 import { getDefaultStore, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { Moon, Sun } from "lucide-react";
 import Tooltip from "@/components/Tooltip";
-import { useEventListener } from "@reactuses/core";
 
 /** dark mode state */
 export const darkModeAtom = atomWithStorage("darkMode", false);

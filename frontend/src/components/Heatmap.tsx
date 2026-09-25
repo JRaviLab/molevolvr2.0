@@ -196,7 +196,7 @@ export default function Heatmap({
               ].join("")}
               tabIndex={0}
             >
-              {truncateWidth(label ?? "-", 4 * cellSize)}
+              {truncateWidth(label || "-", 4 * cellSize)}
             </text>
           </Tooltip>
         ))}
@@ -214,7 +214,7 @@ export default function Heatmap({
               ].join(" ")}
               tabIndex={0}
             >
-              {truncateWidth(label ?? "-", 4 * cellSize)}
+              {truncateWidth(label || "-", 4 * cellSize)}
             </text>
           </Tooltip>
         ))}
@@ -232,7 +232,7 @@ export default function Heatmap({
             `translate(0, ${0.75 * cellSize})`,
           ].join(" ")}
         >
-          {x.label ?? "-"}
+          {x.label || "-"}
         </text>
 
         <text
@@ -242,7 +242,7 @@ export default function Heatmap({
             `rotate(-90)`,
           ].join(" ")}
         >
-          {y.label ?? "-"}
+          {y.label || "-"}
         </text>
       </g>
 
@@ -258,7 +258,7 @@ export default function Heatmap({
           textAnchor="middle"
           style={{ fontWeight: theme["--color-medium"] }}
         >
-          {legend ?? "-"}
+          {legend || "-"}
         </text>
 
         {/* gradient rect */}

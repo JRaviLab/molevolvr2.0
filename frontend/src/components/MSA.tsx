@@ -6,6 +6,7 @@ import { countBy, mapKeys, mapValues, max, orderBy, range } from "lodash";
 import Chart from "@/components/Chart";
 import CheckBox from "@/components/CheckBox";
 import Legend from "@/components/Legend";
+import TextBox from "@/components/TextBox";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import { useTextSize, useTheme } from "@/util/hooks";
@@ -29,7 +30,7 @@ export type Props = {
   /** func to map character to arbitrary type/category */
   getType?: (char: string, combined: Combined) => string;
   /** map of arbitrary type to color */
-  colorMap?: Record<string, Hue>;
+  colors?: Record<string, Hue>;
 };
 
 /** track of single sequence */
@@ -48,9 +49,20 @@ export default function MSA({
   filename = [],
   tracks,
   getType = (char) => char,
-  colorMap: manualColors = {},
+  colors: manualColors = {},
 }: Props) {
   console.debug("msa render");
+
+  /** characters to highlight */
+  const [highlight, setHighlight] = useState("");
+
+  /** highlight props */
+  const getHighlight = (char: string) => ({
+    opacity:
+      highlight.trim() && !highlight.toLowerCase().includes(char.toLowerCase())
+        ? 0.1
+        : 1,
+  });
 
   /** whether to wrap sequence to separate "panels" */
   const [wrap, setWrap] = useState(true);
@@ -70,7 +82,7 @@ export default function MSA({
   );
 
   /** map of type to color */
-  const colorMap = useColorMap(types, "mode", manualColors);
+  const colors = useColorMap(types, "mode", manualColors);
 
   return (
     <Chart
@@ -78,7 +90,14 @@ export default function MSA({
       filename={[...filename, "msa"]}
       className="w-full"
       controls={[
+        <TextBox
+          key="highlight"
+          placeholder="Highlight characters"
+          value={highlight}
+          onChange={setHighlight}
+        />,
         <CheckBox
+          key="wrap"
           label="Wrap"
           tooltip="Wrap sequence to stacked panels"
           value={wrap}
@@ -135,7 +154,7 @@ export default function MSA({
                             y={(trackIndex + 0.5) * rowHeight}
                             tabIndex={0}
                           >
-                            {truncateWidth(track.label ?? "-", labelWidth)}
+                            {truncateWidth(track.label || "-", labelWidth)}
                           </text>
                         </Tooltip>
                       ))}
@@ -159,14 +178,14 @@ export default function MSA({
                           const height = percent * rowHeight;
 
                           const element = (
-                            <Fragment key={charIndex}>
+                            <g key={charIndex} {...getHighlight(char)}>
                               {/* cell */}
                               <rect
                                 x={x}
                                 y={y}
                                 width={width}
                                 height={height}
-                                fill={colorMap[type] ?? colorMap[""]}
+                                fill={colors[type] ?? colors[""]}
                               />
                               {/* char */}
                               <text
@@ -177,7 +196,7 @@ export default function MSA({
                               >
                                 {char && char.trim() ? char : "-"}
                               </text>
-                            </Fragment>
+                            </g>
                           );
                           accumulatedPercent += percent;
                           return element;
@@ -219,14 +238,15 @@ export default function MSA({
                       return (
                         <g key={trackIndex}>
                           {/* cells */}
-                          {sequence.map(({ type }, charIndex) => (
+                          {sequence.map(({ char, type }, charIndex) => (
                             <rect
                               key={trackIndex + "-" + charIndex}
                               x={charIndex * charWidth}
                               y={trackIndex * rowHeight}
                               width={charWidth}
                               height={rowHeight}
-                              fill={colorMap[type] ?? colorMap[""]}
+                              fill={colors[type] ?? colors[""]}
+                              {...getHighlight(char)}
                             />
                           ))}
                           {/* characters */}
@@ -236,6 +256,7 @@ export default function MSA({
                                 key={charIndex}
                                 x={(charIndex + 0.5) * charWidth}
                                 y={(trackIndex + 0.5) * rowHeight}
+                                {...getHighlight(char)}
                               >
                                 {char.trim() ? char : "-"}
                               </tspan>
@@ -255,7 +276,7 @@ export default function MSA({
                 panels.length * (4 + tracks.length) * rowHeight - 2 * rowHeight
               }
               w={wrap ? width : Infinity}
-              entries={mapValues(colorMap, (color) => ({ color }))}
+              entries={mapValues(colors, (color) => ({ color }))}
             />
           </>
         );

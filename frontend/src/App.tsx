@@ -2,6 +2,7 @@ import "@/styles.css";
 import "@fontsource-variable/outfit/wght.css";
 import "@fontsource-variable/jetbrains-mono";
 import type { Location } from "react-router";
+import { useEffect, useRef } from "react";
 import {
   createBrowserRouter,
   Outlet,
@@ -23,9 +24,8 @@ import NewAnalysis from "@/pages/NewAnalysis";
 import NotFound from "@/pages/NotFound";
 import Testbed from "@/pages/Testbed";
 import { scrollTo } from "@/util/dom";
-import { getRedirect } from "@/util/url";
-import { useEffect, useRef } from "react";
 import { waitFor } from "@/util/misc";
+import { getRedirect } from "@/util/url";
 
 /** app entrypoint */
 export default function App() {

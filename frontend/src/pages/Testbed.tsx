@@ -35,6 +35,7 @@ import {
   Waypoints,
   Wine,
 } from "lucide-react";
+import seedrandom from "seedrandom";
 import CustomIcon from "@/assets/custom-icon.svg?react";
 import Logo from "@/assets/logo.svg?react";
 import Ago from "@/components/Ago";
@@ -80,17 +81,16 @@ import {
   msaTracks,
   nodes,
   sunburst,
+  table,
   tree,
   upset,
   words,
-  table,
 } from "@/pages/testbed-data";
 import { useColorMap } from "@/util/color";
 import { useTheme } from "@/util/hooks";
 import { seed } from "@/util/seed";
 import { getShapeMap } from "@/util/shape";
 import { formatDate, formatNumber } from "@/util/string";
-import seedrandom from "seedrandom";
 
 /** test and example usage of formatting, elements, components, etc. */
 export default function TestbedPage() {
@@ -301,15 +301,15 @@ function SectionLegend() {
   const [width] = useElementSize(ref);
 
   const { data, control } = useData(legend);
-  const shapesMap = getShapeMap(data);
-  const colorMap = useColorMap(data, "mode");
+  const shapes = getShapeMap(data);
+  const colors = useColorMap(data, "mode");
 
   const entries = Object.fromEntries(
     data.map((key) => [
       key,
       {
-        shape: shapesMap[key],
-        color: colorMap[key],
+        shape: shapes[key],
+        color: colors[key],
         stroke: seedrandom(key)() > 0.5,
       },
     ]),
@@ -413,7 +413,7 @@ function SectionMSA() {
         filename={[analysis]}
         tracks={data}
         getType={clustalType}
-        colorMap={clustalColors}
+        colors={clustalColors}
       />
 
       {control}

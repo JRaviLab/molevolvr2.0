@@ -1,11 +1,13 @@
 import type { D3DragEvent, D3ZoomEvent } from "d3";
 import type { Filename } from "@/util/download";
 import { useId, useRef, useState } from "react";
+import { useDeepCompareEffect } from "@reactuses/core";
 import { drag, scaleLinear, select, zoom, zoomIdentity } from "d3";
-import { clamp, inRange, mapValues, range } from "lodash";
+import { clamp, inRange, mapValues, pick, range, uniq } from "lodash";
 import Chart from "@/components/Chart";
 import Help from "@/components/Help";
 import Legend from "@/components/Legend";
+import SelectMulti from "@/components/SelectMulti";
 import Tooltip from "@/components/Tooltip";
 import { useColorMap } from "@/util/color";
 import { useTextSize, useTheme } from "@/util/hooks";
@@ -56,13 +58,35 @@ export default function IPR({ title, filename = [], sequence, tracks }: Props) {
   const zoomRef = useRef<SVGGElement>(null);
   const dragRef = useRef<SVGGElement>(null);
 
+  /** track types */
+  const types = uniq([
+    "",
+    ...tracks
+      .map((track) => track.features.map((feature) => feature.type ?? ""))
+      .flat(),
+  ]);
+
   /** map of feature types to colors */
-  const colorMap = useColorMap(
+  const colors = useColorMap(
     tracks
       .map((track) => track.features.map((feature) => feature.type ?? ""))
       .flat(),
     "mode",
   );
+
+  /** selected node types */
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+
+  /** update selected types */
+  useDeepCompareEffect(() => {
+    setSelectedTypes(types);
+  }, [types]);
+
+  /** selected types options */
+  const typeOptions = types.map((type) => ({
+    id: type,
+    primary: type || "-",
+  }));
 
   const theme = useTheme();
   const { fontSize, getWidth, truncateWidth } = useTextSize();
@@ -115,7 +139,15 @@ export default function IPR({ title, filename = [], sequence, tracks }: Props) {
       filename={[...filename, "ipr"]}
       className="w-full"
       controls={[
+        <SelectMulti
+          key="types"
+          label="Types"
+          options={typeOptions}
+          value={selectedTypes}
+          onChange={setSelectedTypes}
+        />,
         <Help
+          key="help"
           tooltip={
             <>
               On main chart area:
@@ -324,6 +356,10 @@ export default function IPR({ title, filename = [], sequence, tracks }: Props) {
                     >
                       {track.features.map(
                         ({ id, label, type, start, end }, featureIndex) => {
+                          /** don't draw features not of selected type */
+                          if (type && !selectedTypes.includes(type))
+                            return null;
+
                           /** don't draw features outside view */
                           if (end < startPosition + 1 || start > endPosition)
                             return null;
@@ -339,7 +375,7 @@ export default function IPR({ title, filename = [], sequence, tracks }: Props) {
                               scaleX={scaleX}
                               width={width}
                               rowHeight={rowHeight}
-                              colorMap={colorMap}
+                              colors={colors}
                               theme={theme}
                               fontSize={fontSize}
                               truncateWidth={truncateWidth}
@@ -389,7 +425,9 @@ export default function IPR({ title, filename = [], sequence, tracks }: Props) {
               x={-labelWidth - 2 * rowHeight}
               y={(1 + tracks.length) * (rowHeight + rowGap)}
               w={width + labelWidth}
-              entries={mapValues(colorMap, (color) => ({ color }))}
+              entries={mapValues(pick(colors, selectedTypes), (color) => ({
+                color,
+              }))}
             />
           </>
         );
@@ -411,7 +449,7 @@ function Label({ index, label, truncateWidth }: LabelProps) {
   return (
     <Tooltip content={label}>
       <text x={0} y={(index + 0.5) * (rowHeight + rowGap)} tabIndex={0}>
-        {truncateWidth(label ?? "-", labelWidth)}
+        {truncateWidth(label || "-", labelWidth)}
       </text>
     </Tooltip>
   );
@@ -472,7 +510,7 @@ type FeatureProps = {
   theme: ReturnType<typeof useTheme>;
   fontSize: ReturnType<typeof useTextSize>["fontSize"];
   truncateWidth: ReturnType<typeof useTextSize>["truncateWidth"];
-  colorMap: ReturnType<typeof useColorMap>;
+  colors: ReturnType<typeof useColorMap>;
 };
 
 /** feature track */
@@ -485,7 +523,7 @@ function Feature({
   scaleX,
   width,
   rowHeight,
-  colorMap,
+  colors,
   theme,
   fontSize,
   truncateWidth,
@@ -519,7 +557,7 @@ function Feature({
           y={0}
           width={drawWidth}
           height={rowHeight}
-          fill={colorMap[type ?? ""]}
+          fill={colors[type ?? ""]}
           stroke={theme["--color-black"]}
         />
         {inRange(drawMidX, fontSize, width - fontSize) && (

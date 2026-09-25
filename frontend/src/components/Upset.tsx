@@ -259,7 +259,7 @@ export default function Upset({
                 y={(yScale(rowIndex) ?? 0) + yScale.bandwidth() / 2}
                 tabIndex={0}
               >
-                {truncateWidth(row.label ?? "-", labelWidthLimited)}
+                {truncateWidth(row.label || "-", labelWidthLimited)}
               </text>
             </Tooltip>
           ))}
